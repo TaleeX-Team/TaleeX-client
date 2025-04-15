@@ -10,7 +10,7 @@ const ForgetPassword = lazy(() => import("./features/auth/password/ForgetPasswor
 const SetPassword = lazy(() => import("./features/auth/password/SetPassword.jsx"));
 
 const AuthLayout = () => (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+    <div className="min-h-screen">
       <Outlet />
     </div>
 );
