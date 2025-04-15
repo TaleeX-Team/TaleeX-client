@@ -49,10 +49,10 @@ const Login = () => {
   const [showPassword, setIsShowPassword] = useState(false);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white p-6 md:p-10">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 p-6 md:p-10">
       <div className="flex flex-col md:flex-row items-center justify-center w-full max-w-6xl space-y-10 md:space-y-0 md:space-x-10">
         {/* Left Section: Card */}
-        <Card className="w-full max-w-md border-none shadow-none bg-white">
+        <Card className="w-full max-w-md border-none shadow-none bg-slate-50">
           <CardHeader>
             <CardTitle className="text-3xl font-bold">
               Welcome back 👋
