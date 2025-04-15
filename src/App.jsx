@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Login from "./features/auth/login/Login";
+import SignUp from "./features/auth/sign-up/SignUp";
 
 function App() {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-svh">
-      <Button>Click me</Button>
-    </div>
-  );
+  const router = createBrowserRouter([
+    { path: "/login", element: <Login /> },
+    { path: "/sign-up", element: <SignUp /> },
+  ]);
+  return <RouterProvider router={router}></RouterProvider>;
 }
-
 export default App;
