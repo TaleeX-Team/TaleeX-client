@@ -45,7 +45,7 @@ const Login = () => {
       </div>
 
       {/* Right Section: Image */}
-      <div className="flex-1/2  justify-center items-center hidden sm:flex">
+      <div className="flex-1/2  justify-center items-center hidden md:flex">
         <img
           className="  md:w-9/12 h-9/12 object-cover border-2 rounded-lg shadow-lg"
           src="/sign-in.jpg"
