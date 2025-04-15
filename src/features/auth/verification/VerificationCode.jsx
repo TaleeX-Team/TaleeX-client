@@ -3,7 +3,7 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {ChevronLeft, Eye, EyeOff, Shield, Lock} from 'lucide-react';
 
-export default function VerificationCodePage() {
+export default function VerificationCode() {
     const [code, setCode] = useState('7789BMEX');
     const [showCode, setShowCode] = useState(true);
 
@@ -73,7 +73,7 @@ export default function VerificationCodePage() {
                 </div>
 
                 {/* Right side - Illustration (hidden on mobile) */}
-                <div className="hidden md:flex bg-gray-100 w-1/2 items-center justify-center p-8">
+                <div className="hidden md:flex  w-1/2 items-center justify-center p-8">
                     <div className="relative w-full">
                         <div className="relative">
 
