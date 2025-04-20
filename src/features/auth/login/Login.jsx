@@ -25,6 +25,9 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../../hooks/useAuth";
+import { toast } from "sonner";
+
 const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address.",
@@ -35,6 +38,8 @@ const formSchema = z.object({
 });
 
 const Login = () => {
+  const { login } = useAuth();
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -44,7 +49,18 @@ const Login = () => {
   });
 
   function onSubmit(values) {
-    console.log(values);
+    login.mutate(values, {
+      onSuccess: () => {
+        toast.success("Login successful!");
+      },
+      onError: (error) => {
+        // Handle errors locally
+
+        toast.error(
+          error.response?.data?.message || "Login failed. Please try again."
+        );
+      },
+    });
   }
   const [showPassword, setIsShowPassword] = useState(false);
 
@@ -171,6 +187,18 @@ const Login = () => {
               Sign in with Facebook
             </Button>
           </div>
+
+          <CardFooter className="flex justify-center items-center space-x-2 mb-4">
+            <span className="text-sm text-gray-500">
+              Don't have an account?
+            </span>
+            <Link
+              to="/sign-up"
+              className="text-sm text-blue-500 hover:underline"
+            >
+              Sign Up
+            </Link>
+          </CardFooter>
         </Card>
 
         {/* Right Section: Image */}

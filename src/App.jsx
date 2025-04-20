@@ -10,7 +10,7 @@ import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ProtectedLayout from "./layouts/ProtectedLayout";
-
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 const Login = lazy(() => import("./features/auth/login/Login"));
 const SignUp = lazy(() => import("./features/auth/sign-up/SignUp"));
 const Home = lazy(() => import("./features/home/Home.jsx"));
@@ -160,6 +160,7 @@ function App() {
   return (
     <>
       <QueryClientProvider client={queryClient}>
+        <ReactQueryDevtools initialIsOpen={false} />
         <RouterProvider router={router} />;
         <Toaster />
       </QueryClientProvider>
