@@ -13,6 +13,7 @@ import ProtectedLayout from "./layouts/ProtectedLayout";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import SettingsLayout from "./layouts/SettingsLayout";
 import ProfilePage from "./features/settings/profile/Profile";
+import BillingPage from "./features/settings/billing/Billing";
 const Login = lazy(() => import("./features/auth/login/Login"));
 const SignUp = lazy(() => import("./features/auth/sign-up/SignUp"));
 const Home = lazy(() => import("./features/home/Home.jsx"));
@@ -101,6 +102,20 @@ function App() {
               }
             >
               <ProfilePage />
+            </Suspense>
+          ),
+        },
+        {
+          path: "billing",
+          element: (
+            <Suspense
+              fallback={
+                <div className="min-h-screen flex items-center justify-center">
+                  Loading...
+                </div>
+              }
+            >
+              <BillingPage />
             </Suspense>
           ),
         },
