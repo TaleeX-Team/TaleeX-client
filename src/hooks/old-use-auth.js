@@ -11,7 +11,7 @@ export const useAuth = () => {
     isError,
   } = useQuery("currentUser", fetchCurrentUser, {
     enabled: !!localStorage.getItem("token"), // Only fetch if token exists
-  });
+  })
 
   // Login mutation
   const login = useMutation(loginUser, {
@@ -22,7 +22,7 @@ export const useAuth = () => {
       // Refetch the current user
       queryClient.invalidateQueries("currentUser");
     },
-  });
+  })
 
   // Logout mutation
   const logout = useMutation(logoutUser, {
@@ -33,7 +33,7 @@ export const useAuth = () => {
       // Clear the current user cache
       queryClient.removeQueries("currentUser");
     },
-  });
+  })
 
   return {
     user,

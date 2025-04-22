@@ -112,9 +112,141 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased overflow-x-hidden;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    transition: background 0.25s, color 0.25s;
+  }
+  .glass-card {
+    @apply rounded-xl border shadow-2xl transition-all duration-300;
+    background: linear-gradient(120deg, rgba(255,255,255,0.56) 30%, rgba(250,240,255,0.48) 100%);
+    border-color: rgba(160,140,255,0.20);
+    box-shadow: 0 8px 64px 0 rgba(160,140,255,0.16), 0 1.5px 18px 0 rgba(100,80,210,0.08);
+  }
+  .dark .glass-card {
+    background: linear-gradient(120deg, rgba(26,31,44,0.88) 10%, rgba(60,34,75,0.62) 100%);
+    border-color: rgba(120,80,240,0.12);
+    box-shadow: 0 8px 64px 0 rgba(80,80,100,0.22), 0 1.5px 18px 0 rgba(160,140,255,0.10);
+  }
+
+  .gradient-border {
+    @apply relative rounded-lg p-[1px] bg-gradient-to-r from-purple-500/60 via-pink-500/60 to-purple-500/50 backdrop-blur-xl shadow-lg;
+  }
+  .dark .gradient-border {
+    @apply from-purple-500 via-indigo-500 to-pink-400;
+    opacity: 0.80;
+  }
+
+  .gradient-border-content {
+    @apply relative rounded-[calc(0.75rem-1px)] bg-[#1A1F2C]/90 dark:bg-[#24123c]/80 p-4;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400;
+  }
+  .bg-gradient-dark {
+    @apply bg-gradient-to-br from-[#1A1F2C] via-[#2A2F3C] to-[#1A1F2C];
+  }
+
+  /* New: Auth panel */
+  .auth-bg-gradient {
+    @apply absolute inset-0 z-0;
+    background: radial-gradient(circle at 70% 90%, #9b87f566 0, #1a1f2c00 65%), linear-gradient(124deg, #e2d1c338 0 60%, transparent 100%);
+  }
+  .dark .auth-bg-gradient {
+    background: radial-gradient(circle at 60% 90%, #24244caa 0, #1a1f2c00 60%), linear-gradient(127deg, #1a1f2c 60%, #2a2f3c 100%);
+  }
+
+  /* Modern input focus and consistent border for all auth forms */
+  input,
+  .glass-card input,
+  .glass-card .shadcn-input,
+  .glass-card .shadcn-button {
+    @apply outline-none transition-[box-shadow,border] duration-150;
+    border-radius: var(--radius);
+    border: 1.2px solid var(--tw-prose-invert,rgba(115,80,245,0.08));
+    box-shadow: 0 1px 12px 0 rgba(160,140,255,0.14);
+  }
+  input:focus,
+  .glass-card input:focus {
+    border-color: #7E69AB;
+    box-shadow: 0 0 0 2px #9b87f5aa;
+  }
+  .dark input,
+  .dark .glass-card input {
+    background: rgba(44,39,68,0.88);
+    color: #f6f6f7;
+    border-color: #4E4170;
+  }
+  .dark input:focus {
+    border-color: #9b87f5;
+    box-shadow: 0 0 0 2px #7E69AB77;
+  }
+
+  /* Button glass effect and soft shadow, especially in auth pages */
+  .glass-card .shadcn-button,
+  .glass-card .shadcn-btn,
+  .glass-card .btn {
+    background: linear-gradient(90deg, #9b87f5 40%, #FFDEE2 140%);
+    color: #222;
+    border-radius: var(--radius);
+    box-shadow: 0 2px 18px 0 #cfbef822;
+  }
+  .glass-card .shadcn-button:hover,
+  .glass-card .btn:hover {
+    background: linear-gradient(90deg, #7E69AB 10%, #D3E4FD 110%);
+    color: #2d0d4a;
+  }
+  .dark .glass-card .shadcn-button,
+  .dark .glass-card .btn {
+    background: linear-gradient(90deg, #9b87f5cc 20%, #28204e 100%);
+    color: #f6f6f7;
+    border: none;
+    box-shadow: 0 2px 12px 0 #24123c77;
+  }
+  .dark .glass-card .btn:hover {
+    background: linear-gradient(105deg, #5f4978cc, #9b87f5cc 100%);
+    color: #fff;
+  }
+
+  /* Subtle 3D shadow for auth logo and panels */
+  .auth-3d {
+    box-shadow: 0 8px 40px 0 rgba(108,86,240,0.15), 0 1.5px 18px 0 rgba(144,130,246,0.09);
+  }
+
+  /* Error messages & toasts styling for consistency */
+  .form-error, .shadcn-form-error, .glass-card .form-error {
+    color: #ea384c;
+    font-weight: 500;
+    background: rgba(255,209,209,0.08);
+    border-radius: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    margin-top: 0.25rem;
+    font-size: 0.96rem;
+  }
+  .dark .form-error, .dark .shadcn-form-error {
+    color: #FFDEE2;
+    background: rgba(220,41,71,0.15);
+  }
+
+  /* Theme toggle icon improvements */
+  .theme-toggle-glass {
+    @apply rounded-full border border-white/30 bg-white/60 dark:bg-[#221f33]/60 shadow-md;
+    transition: background 0.2s;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl;
+  }
+  .glass-dark {
+    @apply bg-[#1A1F2C]/80 backdrop-blur-xl border border-white/10;
+  }
+  .hover-shadow {
+    @apply transition-shadow hover:shadow-2xl duration-200;
   }
 }

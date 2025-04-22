@@ -35,7 +35,7 @@ const formSchema = z.object({
   password: z.string().min(6, {
     message: "Password must be at least 6 characters long.",
   }),
-});
+})
 
 const Login = () => {
   const { login } = useAuth();
@@ -46,7 +46,7 @@ const Login = () => {
       email: "",
       password: "",
     },
-  });
+  })
 
   function onSubmit(values) {
     login.mutate(values, {
