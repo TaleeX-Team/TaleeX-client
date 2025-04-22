@@ -11,6 +11,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ProtectedLayout from "./layouts/ProtectedLayout";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import SettingsLayout from "./layouts/SettingsLayout";
+import ProfilePage from "./features/settings/profile/Profile";
 const Login = lazy(() => import("./features/auth/login/Login"));
 const SignUp = lazy(() => import("./features/auth/sign-up/SignUp"));
 const Home = lazy(() => import("./features/home/Home.jsx"));
@@ -79,6 +81,32 @@ function App() {
         },
       ],
     },
+    {
+      element: (
+        <ProtectedRoute>
+          <SettingsLayout />
+        </ProtectedRoute>
+      ),
+      path: "/settings",
+      errorElement: <ErrorPage />,
+      children: [
+        {
+          path: "profile",
+          element: (
+            <Suspense
+              fallback={
+                <div className="min-h-screen flex items-center justify-center">
+                  Loading...
+                </div>
+              }
+            >
+              <ProfilePage />
+            </Suspense>
+          ),
+        },
+      ],
+    },
+
     {
       element: <AuthLayout />,
       errorElement: <ErrorPage />,
