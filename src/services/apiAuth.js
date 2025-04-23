@@ -107,8 +107,7 @@ apiClient.interceptors.response.use(
           processQueue(refreshError, null);
           isRefreshing = false;
 
-          // You might want to redirect to login
-          // window.location.href = '/login';
+           window.location.href = 'auth';
 
           return Promise.reject(refreshError);
         }
