@@ -13,7 +13,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       "/api": {
-        target: "https://careerhelper-development.up.railway.app",
+        target: "https://hirex-production.up.railway.app",
         changeOrigin: true,
         secure: false,
       },
