@@ -35,7 +35,7 @@ const formSchema = z.object({
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
-});
+})
 
 const registerUser = async (userData) => {
     try {
@@ -43,7 +43,7 @@ const registerUser = async (userData) => {
         const formData = new URLSearchParams();
         Object.entries(userData).forEach(([key, value]) => {
             formData.append(key, value);
-        });
+        })
 
         console.log("Sending form data:", formData.toString());
 
@@ -55,7 +55,7 @@ const registerUser = async (userData) => {
                 "Accept": "application/json",
             },
             body: formData.toString(), // Convert URLSearchParams to string
-        });
+        })
 
         if (!response.ok) {
             let errorMessage = "Registration failed";
@@ -105,7 +105,7 @@ export default function SignUp() {
             confirmPassword: "",
             termsAccepted: false,
         },
-    });
+    })
 
     const mutation = useMutation({
         mutationFn: registerUser,
@@ -117,7 +117,7 @@ export default function SignUp() {
         onError: (error) => {
             toast.error(error.message || "Registration failed. Please try again.");
         },
-    });
+    })
 
     function onSubmit(values) {
         const { confirmPassword, termsAccepted, ...userData } = values;

@@ -11,6 +11,11 @@ import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ProtectedLayout from "./layouts/ProtectedLayout";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import Auth from "@/features/auth/Auth.jsx";
+import { ThemeProvider } from "@/layouts/theme_provider/ThemeProvider.jsx";
+import { useAuth } from "@/hooks/useAuth.js";
+
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import SettingsLayout from "./layouts/SettingsLayout";
 import ProfilePage from "./features/settings/profile/Profile";
 import BillingPage from "./features/settings/billing/Billing";
@@ -34,8 +39,8 @@ const AuthLayout = () => (
 );
 
 const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = true; // Replace with your auth logic (e.g., checking a token)
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="auth" replace />;
 };
 
 const ErrorPage = () => {
@@ -57,6 +62,80 @@ const ErrorPage = () => {
 function App() {
   const queryClient = new QueryClient();
 
+  const router = createBrowserRouter([
+    {
+      element: (
+        <ProtectedRoute>
+          <ProtectedLayout />
+        </ProtectedRoute>
+      ),
+      errorElement: <ErrorPage />,
+      children: [
+        {
+          path: "/",
+          element: (
+            <Suspense
+              fallback={
+                <div className="min-h-screen flex items-center justify-center">
+                  Loading...
+                </div>
+              }
+            >
+              <Home />
+            </Suspense>
+          ),
+        },
+      ],
+    },
+    {
+      element: <AuthLayout />,
+      errorElement: <ErrorPage />,
+      children: [
+        {
+          path: "auth",
+          element: (
+            <Suspense
+              fallback={
+                <div className="min-h-screen flex items-center justify-center">
+                  Loading...
+                </div>
+              }
+            >
+              <Auth />
+            </Suspense>
+          ),
+        },
+        {
+          path: "forget-password",
+          element: (
+            <Suspense
+              fallback={
+                <div className="min-h-screen flex items-center justify-center">
+                  Loading...
+                </div>
+              }
+            >
+              <ForgetPassword />
+            </Suspense>
+          ),
+        },
+        {
+          path: "set-password",
+          element: (
+            <Suspense
+              fallback={
+                <div className="min-h-screen flex items-center justify-center">
+                  Loading...
+                </div>
+              }
+            >
+              <SetPassword />
+            </Suspense>
+          ),
+        },
+      ],
+    },
+  ]);
   const router = createBrowserRouter([
     {
       element: (
@@ -203,9 +282,11 @@ function App() {
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        <ReactQueryDevtools initialIsOpen={false} />
-        <RouterProvider router={router} />;
-        <Toaster />
+        <ThemeProvider storageKey="app-theme">
+          <ReactQueryDevtools initialIsOpen={false} />
+          <RouterProvider router={router} />
+          <Toaster />
+        </ThemeProvider>
       </QueryClientProvider>
     </>
   );

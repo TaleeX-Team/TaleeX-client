@@ -1,17 +1,31 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { loginUser, logoutUser } from "../services/apiAuth";
+import { loginUser, logoutUser, registerUser } from "../services/apiAuth";
+import { useCallback } from "react";
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
 
-  // Login mutation
-  const login = useMutation({
-    mutationFn: loginUser, // Ensure this is a valid function
-    onSuccess: (data) => {
-      // Save token to localStorage
-      localStorage.setItem("token", data.token);
+  // Function to store tokens securely
+  const storeTokens = useCallback((accessToken, refreshToken) => {
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
+  }, []);
 
-      // Save the logged-in user directly into the cache
+  // Function to clear auth data on logout
+  const clearAuthData = useCallback(() => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    queryClient.removeQueries(["currentUser"], { exact: true });
+  }, [queryClient]);
+
+  // Login mutation
+  const loginMutation = useMutation({
+    mutationFn: loginUser,
+    onSuccess: (data) => {
+      // Store tokens
+      storeTokens(data.accessToken, data.refreshToken);
+
+      // Update user data in React Query cache
       queryClient.setQueryData(["currentUser"], data.user);
     },
     onError: (error) => {
@@ -20,26 +34,58 @@ export const useAuth = () => {
   });
 
   // Logout mutation
-  const logout = useMutation({
-    mutationFn: logoutUser,
+  const logoutMutation = useMutation({
+    mutationFn: () => {
+      const refreshToken = localStorage.getItem("refreshToken");
+      return logoutUser(refreshToken);
+    },
     onSuccess: () => {
-      // Remove token from localStorage
-      localStorage.removeItem("token");
-
-      // Clear the current user cache
-      queryClient.removeQueries(["currentUser"], { exact: true });
+      clearAuthData();
     },
     onError: (error) => {
       console.error("Logout failed:", error.message);
+      // Still clear local data even if server logout fails
+      clearAuthData();
     },
   });
 
-  // Get the current user from the cache
-  const user = queryClient.getQueryData("currentUser");
+  // Register mutation
+  const registerMutation = useMutation({
+    mutationFn: registerUser,
+    onSuccess: (data) => {
+      console.log("Registration successful:", data.message);
+    },
+    onError: (error) => {
+      console.error("Registration failed:", error.message);
+    },
+  });
+
+  // Get current user
+  const user = queryClient.getQueryData(["currentUser"]);
+
+  // Check if user is authenticated
+  const isAuthenticated = !!localStorage.getItem("accessToken");
 
   return {
     user,
-    login,
-    logout,
+    isAuthenticated,
+    login: {
+      mutate: loginMutation.mutate,
+      isLoading: loginMutation.isPending,
+      isError: loginMutation.isError,
+      error: loginMutation.error
+    },
+    logout: {
+      mutate: logoutMutation.mutate,
+      isLoading: logoutMutation.isPending,
+      isError: logoutMutation.isError,
+      error: logoutMutation.error
+    },
+    register: {
+      mutate: registerMutation.mutate,
+      isLoading: registerMutation.isPending,
+      isError: registerMutation.isError,
+      error: registerMutation.error
+    }
   };
 };
