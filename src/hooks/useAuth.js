@@ -1,30 +1,14 @@
+// useAuth.js - Updated version
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { loginUser, logoutUser, registerUser } from "../services/apiAuth";
-import { useCallback } from "react";
+import { loginUser, logoutUser, registerUser, TokenService } from "../services/apiAuth.js";
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
-
-  // Function to store tokens securely
-  const storeTokens = useCallback((accessToken, refreshToken) => {
-    localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("refreshToken", refreshToken);
-  }, []);
-
-  // Function to clear auth data on logout
-  const clearAuthData = useCallback(() => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    queryClient.removeQueries(["currentUser"], { exact: true });
-  }, [queryClient]);
 
   // Login mutation
   const loginMutation = useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
-      // Store tokens
-      storeTokens(data.accessToken, data.refreshToken);
-
       // Update user data in React Query cache
       queryClient.setQueryData(["currentUser"], data.user);
     },
@@ -36,16 +20,16 @@ export const useAuth = () => {
   // Logout mutation
   const logoutMutation = useMutation({
     mutationFn: () => {
-      const refreshToken = localStorage.getItem("refreshToken");
+      const refreshToken = TokenService.getRefreshToken();
       return logoutUser(refreshToken);
     },
     onSuccess: () => {
-      clearAuthData();
+      queryClient.removeQueries(["currentUser"], { exact: true });
     },
     onError: (error) => {
       console.error("Logout failed:", error.message);
-      // Still clear local data even if server logout fails
-      clearAuthData();
+      // Still clear React Query cache even if server logout fails
+      queryClient.removeQueries(["currentUser"], { exact: true });
     },
   });
 
@@ -54,6 +38,10 @@ export const useAuth = () => {
     mutationFn: registerUser,
     onSuccess: (data) => {
       console.log("Registration successful:", data.message);
+      // If registration returns user data, set it
+      if (data.user) {
+        queryClient.setQueryData(["currentUser"], data.user);
+      }
     },
     onError: (error) => {
       console.error("Registration failed:", error.message);
@@ -64,7 +52,7 @@ export const useAuth = () => {
   const user = queryClient.getQueryData(["currentUser"]);
 
   // Check if user is authenticated
-  const isAuthenticated = !!localStorage.getItem("accessToken");
+  const isAuthenticated = !!TokenService.getAccessToken();
 
   return {
     user,

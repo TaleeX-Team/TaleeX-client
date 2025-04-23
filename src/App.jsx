@@ -14,6 +14,7 @@ import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
 import Auth from "@/features/auth/Auth.jsx";
 import {ThemeProvider} from "@/layouts/theme_provider/ThemeProvider.jsx";
 import {useAuth} from "@/hooks/useAuth.js";
+import OAuthCallback from "@/components/OAuthCallback.jsx";
 
 const Login = lazy(() => import("./features/auth/login/Login"));
 const SignUp = lazy(() => import("./features/auth/sign-up/SignUp"));
@@ -101,6 +102,10 @@ function App() {
                             <Auth/>
                         </Suspense>
                     ),
+                },
+                {
+                    path: "/auth/callback",
+                    element: <OAuthCallback />
                 },
                 {
                     path: "forget-password",
