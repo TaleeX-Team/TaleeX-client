@@ -112,7 +112,6 @@ export default function SignUp() {
         onSuccess: (data) => {
             toast.success(data.message || "Account created successfully!");
             form.reset();
-            navigate("/login");
         },
         onError: (error) => {
             toast.error(error.message || "Registration failed. Please try again.");
