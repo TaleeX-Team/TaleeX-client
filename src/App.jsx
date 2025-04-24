@@ -15,7 +15,6 @@ import Auth from "@/features/auth/Auth.jsx";
 import { ThemeProvider } from "@/layouts/theme_provider/ThemeProvider.jsx";
 import { useAuth } from "@/hooks/useAuth.js";
 
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import SettingsLayout from "./layouts/SettingsLayout";
 import ProfilePage from "./features/settings/profile/Profile";
 import BillingPage from "./features/settings/billing/Billing";
@@ -88,80 +87,6 @@ function App() {
       ],
     },
     {
-      element: <AuthLayout />,
-      errorElement: <ErrorPage />,
-      children: [
-        {
-          path: "auth",
-          element: (
-            <Suspense
-              fallback={
-                <div className="min-h-screen flex items-center justify-center">
-                  Loading...
-                </div>
-              }
-            >
-              <Auth />
-            </Suspense>
-          ),
-        },
-        {
-          path: "forget-password",
-          element: (
-            <Suspense
-              fallback={
-                <div className="min-h-screen flex items-center justify-center">
-                  Loading...
-                </div>
-              }
-            >
-              <ForgetPassword />
-            </Suspense>
-          ),
-        },
-        {
-          path: "set-password",
-          element: (
-            <Suspense
-              fallback={
-                <div className="min-h-screen flex items-center justify-center">
-                  Loading...
-                </div>
-              }
-            >
-              <SetPassword />
-            </Suspense>
-          ),
-        },
-      ],
-    },
-  ]);
-  const router = createBrowserRouter([
-    {
-      element: (
-        <ProtectedRoute>
-          <ProtectedLayout />
-        </ProtectedRoute>
-      ),
-      errorElement: <ErrorPage />,
-      children: [
-        {
-          path: "/",
-          element: (
-            <Suspense
-              fallback={
-                <div className="min-h-screen flex items-center justify-center">
-                  Loading...
-                </div>
-              }
-            >
-              <Home />
-            </Suspense>
-          ),
-        },
-      ],
-    },
-    {
       element: (
         <ProtectedRoute>
           <SettingsLayout />
@@ -206,7 +131,7 @@ function App() {
       errorElement: <ErrorPage />,
       children: [
         {
-          path: "login",
+          path: "auth",
           element: (
             <Suspense
               fallback={
@@ -215,35 +140,7 @@ function App() {
                 </div>
               }
             >
-              <Login />
-            </Suspense>
-          ),
-        },
-        {
-          path: "sign-up",
-          element: (
-            <Suspense
-              fallback={
-                <div className="min-h-screen flex items-center justify-center">
-                  Loading...
-                </div>
-              }
-            >
-              <SignUp />
-            </Suspense>
-          ),
-        },
-        {
-          path: "verify",
-          element: (
-            <Suspense
-              fallback={
-                <div className="min-h-screen flex items-center justify-center">
-                  Loading...
-                </div>
-              }
-            >
-              <VerificationCode />
+              <Auth />
             </Suspense>
           ),
         },
