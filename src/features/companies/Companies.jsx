@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/select";
 import CompanyCard from "./company-card/CompanyCard";
 import AddCompany from "./add-company/AddCompany";
+import { useQuery } from "@tanstack/react-query";
+import { getCompanies } from "@/services/apiCompanies";
 
 export default function Companies() {
   const companies = [

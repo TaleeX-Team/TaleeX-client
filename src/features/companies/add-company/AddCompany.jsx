@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,30 +26,34 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from "sonner";
+import { useCompanies } from "../features";
 
 const formSchema = z.object({
-  logo: z.any().refine((file) => file instanceof File || file === null, {
-    message: "Please upload a valid logo file.",
+  image: z.any().refine((file) => file instanceof File || file === null, {
+    message: "Please upload a valid image file.",
   }),
-  name: z
-    .string()
-    .min(2, { message: "Company name must be at least 2 characters long." }),
+  name: z.string().min(2, {
+    message: "Name must contain only letters and is no less than 3 letters.",
+  }),
   description: z
     .string()
     .min(10, { message: "Description must be at least 10 characters long." }),
-  location: z.string().min(2, { message: "Location is required." }),
-  website: z.string().url({ message: "Please enter a valid website URL." }),
+  address: z.string().min(5, { message: "Address is required." }),
+  website: z
+    .string()
+    .url({ message: "Please enter a valid website URL." })
+    .optional(),
 });
 export default function AddCompany() {
   const [logoPreview, setLogoPreview] = useState(null);
-
+  const { createCompanyMutation } = useCompanies();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      logo: null,
+      image: null,
       name: "",
       description: "",
-      location: "",
+      address: "",
       website: "",
     },
   });
@@ -58,13 +62,25 @@ export default function AddCompany() {
     const file = e.target.files[0];
     if (file) {
       setLogoPreview(URL.createObjectURL(file));
-      form.setValue("logo", file);
+      form.setValue("image", file);
     }
   };
 
   const onSubmit = (values) => {
     console.log("Form submitted:", values);
-    toast.success("Company added successfully!");
+    createCompanyMutation.mutate(values, {
+      onSuccess: () => {
+        toast.success("Company created successfully!");
+      },
+      onError: (error) => {
+        console.error("Error creating company:", error);
+        toast.error(
+          error.response?.data?.message ||
+            "Failed to create company. Please try again."
+        );
+      },
+    });
+
     form.reset();
     setLogoPreview(null);
   };
@@ -121,9 +137,9 @@ export default function AddCompany() {
                 <p className="text-xs text-muted-foreground mt-1">
                   Recommended: 400x400px, PNG or JPG
                 </p>
-                {form.formState.errors.logo && (
+                {form.formState.errors.image && (
                   <p className="text-sm text-destructive">
-                    {form.formState.errors.logo.message}
+                    {form.formState.errors.image.message}
                   </p>
                 )}
               </div>
@@ -144,13 +160,34 @@ export default function AddCompany() {
               )}
             />
 
+            {/* Website */}
+            <FormField
+              control={form.control}
+              name="website"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Website *</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Globe className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        placeholder="e.g. https://www.example.com"
+                        className="pl-10"
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             {/* Description */}
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description *</FormLabel>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Brief description of the company"
@@ -166,10 +203,10 @@ export default function AddCompany() {
             {/* Location */}
             <FormField
               control={form.control}
-              name="location"
+              name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Location *</FormLabel>
+                  <FormLabel>Address</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -185,27 +222,6 @@ export default function AddCompany() {
               )}
             />
 
-            {/* Website */}
-            <FormField
-              control={form.control}
-              name="website"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Website *</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Globe className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        placeholder="e.g. www.example.com"
-                        className="pl-10"
-                        {...field}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <DialogFooter className="sm:justify-end">
               <DialogClose asChild>
                 <Button type="button" variant="outline">
