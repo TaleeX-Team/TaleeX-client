@@ -36,8 +36,19 @@ const AuthLayout = () => (
 );
 
 const ProtectedRoute = ({children}) => {
-    const {isAuthenticated} = useAuth();
-    return isAuthenticated ? children : <Navigate to="auth" replace/>;
+    const {isAuthenticated, isLoading} = useAuth();
+    const location = useLocation();
+
+    if (isLoading) {
+        return <div className="min-h-screen flex items-center justify-center">Loading…</div>;
+    }
+
+    if (!isAuthenticated) {
+        // Store the attempted location for redirect after login
+        return <Navigate to="/auth" state={{from: location}} replace/>;
+    }
+
+    return children;
 };
 
 const ErrorPage = () => {
@@ -56,9 +67,16 @@ const ErrorPage = () => {
     );
 };
 
-function App() {
-    const queryClient = new QueryClient();
 
+function App() {
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: {
+                staleTime: 1000 * 60 * 5, // 5 minutes
+                retry: 1,
+            },
+        },
+    });
     const router = createBrowserRouter([
         {
             element: (
@@ -85,54 +103,34 @@ function App() {
             ],
         },
         {
+            path: "auth",
             element: <AuthLayout/>,
             errorElement: <ErrorPage/>,
             children: [
                 {
-                    path: "auth",
-                    element: (
-                        <Suspense
-                            fallback={
-                                <div className="min-h-screen flex items-center justify-center">
-                                    Loading...
-                                </div>
-                            }
-                        >
-
-                            <Auth/>
-                        </Suspense>
-                    ),
+                    index: true,
+                    element: <Auth/>
                 },
                 {
-                    path: "/auth/callback",
-                    element: <OAuthCallback />
+                    path: "callback",
+                    element: <OAuthCallback/>
                 },
                 {
                     path: "forget-password",
                     element: (
-                        <Suspense
-                            fallback={
-                                <div className="min-h-screen flex items-center justify-center">
-                                    Loading...
-                                </div>
-                            }
-                        >
+                        <Suspense fallback={<div>Loading...</div>}>
                             <ForgetPassword/>
                         </Suspense>
-                    ),
+                    )
                 },
                 {
                     path: "set-password",
+                    element: <SetPassword/>
+                },
+                {
+                    path: "*",
                     element: (
-                        <Suspense
-                            fallback={
-                                <div className="min-h-screen flex items-center justify-center">
-                                    Loading...
-                                </div>
-                            }
-                        >
-                            <SetPassword/>
-                        </Suspense>
+                        <ErrorPage error="The page you're looking for doesn't exist." />
                     ),
                 },
             ],
