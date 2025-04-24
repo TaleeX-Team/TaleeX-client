@@ -96,7 +96,7 @@ export const SignupForm = ({isLoading, handleAuthSubmit, handleOAuthSuccess}) =>
                                             size={14}/>
                                         <Input
                                             placeholder="John"
-                                            className="glass-card pl-10 h-8 text-sm"
+                                            className=" pl-10 h-8 text-sm"
                                             {...field}
                                         />
                                     </div>
@@ -119,7 +119,7 @@ export const SignupForm = ({isLoading, handleAuthSubmit, handleOAuthSuccess}) =>
                                             size={14}/>
                                         <Input
                                             placeholder="Doe"
-                                            className="glass-card pl-10 h-8 text-sm"
+                                            className=" pl-10 h-8 text-sm"
                                             {...field}
                                         />
                                     </div>
@@ -143,7 +143,7 @@ export const SignupForm = ({isLoading, handleAuthSubmit, handleOAuthSuccess}) =>
                                         size={14}/>
                                     <Input
                                         placeholder="name@company.com"
-                                        className="glass-card pl-10 h-8 text-sm"
+                                        className=" pl-10 h-8 text-sm"
                                         {...field}
                                     />
                                 </div>
@@ -166,7 +166,7 @@ export const SignupForm = ({isLoading, handleAuthSubmit, handleOAuthSuccess}) =>
                                         size={14}/>
                                     <Input
                                         placeholder="+1234567890"
-                                        className="glass-card pl-10 h-8 text-sm"
+                                        className=" pl-10 h-8 text-sm"
                                         {...field}
                                     />
                                 </div>
@@ -189,7 +189,7 @@ export const SignupForm = ({isLoading, handleAuthSubmit, handleOAuthSuccess}) =>
                                         size={14}/>
                                     <Input
                                         type={showPassword ? "text" : "password"}
-                                        className="glass-card pl-10 pr-10 h-8 text-sm"
+                                        className=" pl-10 pr-10 h-8 text-sm"
                                         {...field}
                                     />
                                     <button
@@ -219,7 +219,7 @@ export const SignupForm = ({isLoading, handleAuthSubmit, handleOAuthSuccess}) =>
                                         size={14}/>
                                     <Input
                                         type={showConfirmPassword ? "text" : "password"}
-                                        className="glass-card pl-10 pr-10 h-8 text-sm"
+                                        className=" pl-10 pr-10 h-8 text-sm"
                                         {...field}
                                     />
                                     <button

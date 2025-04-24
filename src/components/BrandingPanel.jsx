@@ -12,7 +12,7 @@ const BrandingPanel = ({ headingRef }) => {
                     ref={headingRef}
                     className="text-5xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-purple-400 tracking-tight"
                 >
-                    TalentSync
+                    hireX
                 </h1>
                 <p className="text-xl text-muted-foreground leading-relaxed">
                     Smarter hiring starts here.

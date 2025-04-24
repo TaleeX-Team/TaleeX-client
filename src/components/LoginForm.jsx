@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {Link, useNavigate} from "react-router-dom";
+import {Link} from "react-router-dom";
 import { SocialButtons } from "./SocialButtons";
 
 import gsap from "gsap";
@@ -72,7 +72,7 @@ export const LoginForm = ({ isLoading, handleAuthSubmit ,handleOAuthSuccess}) =>
                                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
                                     <Input
                                         placeholder="name@company.com"
-                                        className="glass-card pl-10"
+                                        className=" pl-10"
                                         {...field}
                                     />
                                 </div>
@@ -93,7 +93,7 @@ export const LoginForm = ({ isLoading, handleAuthSubmit ,handleOAuthSuccess}) =>
                                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
                                     <Input
                                         type={showPassword ? "text" : "password"}
-                                        className="glass-card pl-10 pr-10"
+                                        className=" pl-10 pr-10"
                                         {...field}
                                     />
                                     <button
@@ -130,7 +130,7 @@ export const LoginForm = ({ isLoading, handleAuthSubmit ,handleOAuthSuccess}) =>
                         )}
                     />
                     <Link
-                        to="/forgot-password"
+                        to="forget-password"
                         className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
                     >
                         Forgot password?

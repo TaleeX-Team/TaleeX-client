@@ -1,93 +1,78 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate, useLocation } from "react-router-dom";
+import TokenService from "@/lib/TokenService.js";
 
 export const useOAuth = () => {
+    const queryClient = useQueryClient();
     const navigate = useNavigate();
     const location = useLocation();
-    const queryClient = useQueryClient();
-    const hasProcessedRef = useRef(false);
     const [isProcessingOAuth, setIsProcessingOAuth] = useState(false);
 
-    useEffect(() => {
-        if (hasProcessedRef.current || location.pathname !== "/auth/callback") return;
-
-        const handleOAuthCallback = async () => {
-            hasProcessedRef.current = true;
-            setIsProcessingOAuth(true);
-
-            try {
-                console.log("Processing OAuth callback");
-                const params = new URLSearchParams(location.search);
-                const error = params.get("error");
-                const state = params.get("state");
-                const success = params.get("success");
-
-                if (error) {
-                    console.error("OAuth error:", error);
-                    navigate("/auth?error=oauth_rejected");
-                    return;
-                }
-
-                const expectedState = localStorage.getItem("oauthState");
-                const provider = localStorage.getItem("oauthProvider");
-
-                if (state !== expectedState || !provider) {
-                    console.error("Invalid state or missing provider");
-                    navigate("/auth?error=oauth_state_invalid");
-                    return;
-                }
-
-                // Clean up OAuth state data
-                localStorage.removeItem("oauthState");
-                localStorage.removeItem("oauthProvider");
-
-                if (success === "true") {
-                    // OAuth was successful, and HTTP-only cookie should be set by the server
-                    console.log("OAuth authentication successful");
-
-
-                    // Redirect to home or dashboard
-                    navigate("/", { replace: true });
-                } else {
-                    console.error("OAuth process did not return success status");
-                    navigate("/auth?error=oauth_failed");
-                }
-
-            } catch (error) {
-                console.error("OAuth processing error:", error);
-                navigate("/auth/login?error=oauth_processing_error");
-            } finally {
-                setIsProcessingOAuth(false);
-            }
-        };
-
-        handleOAuthCallback();
-    }, [location, navigate, queryClient]);
-
-    // Function to initiate OAuth login
+    /**
+     * Kick off the OAuth flow by redirecting to your provider’s endpoint
+     */
     const initiateOAuthLogin = useCallback((provider) => {
-        // Generate a secure state parameter using crypto API when available
-        let state;
-        if (window.crypto && window.crypto.randomUUID) {
-            state = window.crypto.randomUUID();
-        } else {
-            // Fallback for older browsers
-            state = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        }
-
-        localStorage.setItem("oauthState", state);
-        localStorage.setItem("oauthProvider", provider);
+        setIsProcessingOAuth(true);
+        sessionStorage.setItem("oauth_provider", provider);
 
         const baseUrl = "https://hirex-production.up.railway.app/api/v1/auth";
-        const redirectUri = encodeURIComponent(`${window.location.origin}/auth/callback`);
+        const redirectUri = encodeURIComponent(
+            `${window.location.origin}/auth/callback`
+        );
 
-        // Start the OAuth flow
-        window.location.href = `${baseUrl}/${provider}?state=${state}&redirect_uri=${redirectUri}`;
+        window.location.href = `${baseUrl}/${provider}?redirect_uri=${redirectUri}`;
     }, []);
+
+    /**
+     * After redirect back to /auth/callback, read tokens from cookies,
+     * stash them via TokenService, mark OAuth flag, and refresh queries.
+     */
+    const processOAuthCallback = useCallback(async () => {
+        setIsProcessingOAuth(true);
+
+        // TokenService.processOAuthTokens reads cookies and writes to localStorage as needed
+        const success = TokenService.processOAuthTokens();
+
+        if (success) {
+            // refresh React Query auth/user data
+            await Promise.all([
+                queryClient.invalidateQueries(["auth"]),
+                queryClient.invalidateQueries(["user"]),
+            ]);
+
+            // clear the saved provider (optional)
+            sessionStorage.removeItem("oauth_provider");
+            // send user home (or wherever)
+            navigate("/", { replace: true });
+        } else {
+            console.error("OAuth callback processing failed: no tokens found");
+            // you might want to navigate to an error page
+            navigate("/login?error=oauth_failed", { replace: true });
+        }
+
+        setIsProcessingOAuth(false);
+    }, [queryClient, navigate]);
+
+    const refreshUserData = useCallback(async () => {
+        await Promise.all([
+            queryClient.invalidateQueries(["auth"]),
+            queryClient.invalidateQueries(["user"]),
+        ]);
+    }, [queryClient]);
+
+    /**
+     * On mount, if we’re on the callback route, kick off processing
+     */
+    useEffect(() => {
+        if (location.pathname === "/auth/callback") {
+            processOAuthCallback();
+        }
+    }, [location.pathname, processOAuthCallback]);
 
     return {
         initiateOAuthLogin,
-        isProcessingOAuth
+        isProcessingOAuth,
+        refreshUserData,
     };
 };

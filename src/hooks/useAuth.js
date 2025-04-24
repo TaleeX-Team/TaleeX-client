@@ -1,62 +1,116 @@
-// useAuth.js - Updated version
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { loginUser, logoutUser, registerUser, TokenService } from "../services/apiAuth.js";
+// useAuth.js
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { loginUser, logoutUser, registerUser } from "../services/apiAuth.js";
+import {useEffect} from "react";
+import TokenService from "@/lib/TokenService";
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
 
-  // Login mutation
+  // 1) Keep track of isAuthenticated by reading TokenService
+  const authQuery = useQuery({
+    queryKey: ["auth"],
+    queryFn: () => ({
+      isAuthenticated: TokenService.isAuthenticated(),
+    }),
+    // we’ll manually invalidate whenever tokens change:
+    staleTime: Infinity,
+    cacheTime: Infinity,
+  });
+
+
+  useEffect(() => {
+    const onChange = () => {
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
+    };
+
+    // patch TokenService to call onChange after set/clear
+    const origSetAccess = TokenService.setAccessToken.bind(TokenService);
+    TokenService.setAccessToken = (token) => {
+      origSetAccess(token);
+      onChange();
+    };
+    const origSetRefresh = TokenService.setRefreshToken.bind(TokenService);
+    TokenService.setRefreshToken = (token) => {
+      origSetRefresh(token);
+      onChange();
+    };
+    const origClear = TokenService.clearTokens.bind(TokenService);
+    TokenService.clearTokens = () => {
+      origClear();
+      onChange();
+    };
+
+    return () => {
+      // restore if you want; skip for brevity
+    };
+  }, [queryClient]);
+
+  // 2) Login
   const loginMutation = useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
-      // Update user data in React Query cache
-      queryClient.setQueryData(["currentUser"], data.user);
-    },
-    onError: (error) => {
-      console.error("Login failed:", error.message);
+      if (data.accessToken) {
+        TokenService.setAccessToken(data.accessToken);
+      }
+      if (data.refreshToken) {
+        TokenService.setRefreshToken(data.refreshToken);
+      }
+      if (data.user) {
+        queryClient.setQueryData(["user"], data.user);
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+      }
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
     },
   });
 
-  // Logout mutation
+  // 3) Logout
   const logoutMutation = useMutation({
-    mutationFn: () => {
-      const refreshToken = TokenService.getRefreshToken();
-      return logoutUser(refreshToken);
-    },
+    mutationFn: () => logoutUser(TokenService.getRefreshToken()),
     onSuccess: () => {
-      queryClient.removeQueries(["currentUser"], { exact: true });
+      TokenService.clearTokens();
+      TokenService.setOAuthAuthenticated(false);
+      queryClient.removeQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
     },
-    onError: (error) => {
-      console.error("Logout failed:", error.message);
-      // Still clear React Query cache even if server logout fails
-      queryClient.removeQueries(["currentUser"], { exact: true });
+    onError: () => {
+      // even on error, clear local
+      TokenService.clearTokens();
+      TokenService.setOAuthAuthenticated(false);
+      queryClient.removeQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
     },
   });
 
-  // Register mutation
+  // 4) Register
   const registerMutation = useMutation({
     mutationFn: registerUser,
     onSuccess: (data) => {
-      console.log("Registration successful:", data.message);
-      // If registration returns user data, set it
       if (data.user) {
-        queryClient.setQueryData(["currentUser"], data.user);
+        queryClient.setQueryData(["user"], data.user);
       }
-    },
-    onError: (error) => {
-      console.error("Registration failed:", error.message);
+      if (data.accessToken) {
+        TokenService.setAccessToken(data.accessToken);
+        queryClient.invalidateQueries({ queryKey: ["auth"] });
+      }
     },
   });
 
-  // Get current user
-  const user = queryClient.getQueryData(["currentUser"]);
-
-  // Check if user is authenticated
-  const isAuthenticated = !!TokenService.getAccessToken();
+  // 5) OAuth callback helper
+  const processOAuthCallback = async () => {
+    const ok = TokenService.processOAuthTokens();
+    if (ok) {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["auth"] }),
+        queryClient.invalidateQueries({ queryKey: ["user"] }),
+      ]);
+    }
+    return ok;
+  };
 
   return {
-    user,
-    isAuthenticated,
+    isAuthenticated: authQuery.data?.isAuthenticated ?? false,
     login: {
       mutate: loginMutation.mutate,
       isLoading: loginMutation.isPending,
@@ -74,6 +128,7 @@ export const useAuth = () => {
       isLoading: registerMutation.isPending,
       isError: registerMutation.isError,
       error: registerMutation.error
-    }
+    },
+    processOAuthCallback
   };
 };
