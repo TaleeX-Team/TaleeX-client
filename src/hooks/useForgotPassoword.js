@@ -11,7 +11,7 @@ export const useForgotPassword = () => {
 
     return {
         sendReset: mutation.mutate,
-        isLoading: mutation.isLoading,
+        isLoading: mutation.isPending,
         isError: mutation.isError,
         error: mutation.error,
     };

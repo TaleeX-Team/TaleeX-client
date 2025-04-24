@@ -135,7 +135,7 @@ const ForgotPassword = () => {
                                                     required
                                                     value={email}
                                                     onChange={(e) => setEmail(e.target.value)}
-                                                    className="glass-card pl-10"
+                                                    className=" pl-10"
                                                 />
                                             </div>
                                         </div>

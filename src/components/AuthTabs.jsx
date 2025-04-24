@@ -15,7 +15,6 @@ export const AuthTabs = ({
     const navigate = useNavigate();
     const {login, register} = useAuth();
 
-
     useEffect(() => {
         gsap.fromTo(
             contentRef.current,
@@ -23,8 +22,6 @@ export const AuthTabs = ({
             {opacity: 1, y: 0, duration: 0.5, ease: "power2.out"}
         );
     }, [activeTab]);
-
-
 
     const handleError = (error, fallbackMessage) => {
         console.error("Auth failed:", error?.message);
@@ -40,28 +37,39 @@ export const AuthTabs = ({
         }
     };
 
+    // Compatible method that works with the existing LoginForm/SignupForm
     const handleAuthSubmit = (data, type) => {
-        const mutation = type === "login" ? login.mutate : register.mutate;
-        const successMessage = type === "login" ? "Logged in successfully!" : "Account created successfully!";
-        const errorMessage = type === "login"
-            ? "Something went wrong during login."
-            : "Something went wrong during registration.";
-
         console.log(`Starting ${type} submission...`);
 
-        mutation(data, {
-            onSuccess: (data) => {
-                console.log(`${type} mutation successful`);
-                toast.success(data.message || successMessage);
-                if (type === "login") navigate("/");
-                if(type === "signup") setActiveTab("login");
-            },
-            onError: (error) => {
-                console.log(`${type} mutation failed`);
-                handleError(error, errorMessage);
-            },
-        });
+        if (type === "login") {
+            console.log("Login loading state:", login.isLoading);
+            login.mutate(data, {
+                onSuccess: (data) => {
+                    console.log("Login mutation successful");
+                    toast.success(data.message || "Logged in successfully!");
+                    navigate("/");
+                },
+                onError: (error) => {
+                    console.log("Login mutation failed");
+                    handleError(error, "Something went wrong during login.");
+                }
+            });
+        } else if (type === "signup") {
+            console.log("Register loading state:", register.isLoading);
+            register.mutate(data, {
+                onSuccess: (data) => {
+                    console.log("Signup mutation successful");
+                    toast.success(data.message || "Account created successfully!");
+                    setActiveTab("login");
+                },
+                onError: (error) => {
+                    console.log("Signup mutation failed");
+                    handleError(error, "Something went wrong during registration.");
+                }
+            });
+        }
     };
+
     const handleOAuthSuccess = () => {
         navigate("/");
     };
@@ -86,14 +94,14 @@ export const AuthTabs = ({
             <div ref={contentRef} className="mt-4">
                 <TabsContent value="login">
                     <LoginForm
-                        handleAuthSubmit={(data) => handleAuthSubmit(data, "login")}
+                        handleAuthSubmit={handleAuthSubmit}
                         isLoading={login.isLoading}
                         handleOAuthSuccess={handleOAuthSuccess}
                     />
                 </TabsContent>
                 <TabsContent value="signup">
                     <SignupForm
-                        handleAuthSubmit={(data) => handleAuthSubmit(data, "signup")}
+                        handleAuthSubmit={handleAuthSubmit}
                         isLoading={register.isLoading}
                         handleOAuthSuccess={handleOAuthSuccess}
                     />

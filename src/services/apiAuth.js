@@ -96,7 +96,7 @@ apiClient.interceptors.response.use(
                 console.log("Calling refresh token endpoint");
                 const response = await axios.post(
                     "https://hirex-production.up.railway.app/api/v1/auth/refresh-token",
-                    isOAuth ? {} : { refreshToken }, // Only send refresh token for non-OAuth flow
+                    isOAuth ? {} : {refreshToken}, // Only send refresh token for non-OAuth flow
                     {
                         withCredentials: true // Always include cookies
                     }
@@ -221,7 +221,7 @@ export const logoutUser = async (refreshToken) => {
     try {
         console.log("Logging out");
         // Include refresh token in the request if your API requires it
-        const response = await apiClient.post("/auth/logout", { refreshToken });
+        const response = await apiClient.post("/auth/logout", {refreshToken});
 
         // Clear the tokens
         TokenService.clearTokens();
@@ -265,7 +265,7 @@ export const forgotPassword = async (payload) => {
         console.error("Forgot‑password request failed:", error.response?.data || error.message);
 
         if (error.response) {
-            const { status, data } = error.response;
+            const {status, data} = error.response;
             if (status === 400 && data.errors) {
                 throw new Error(Object.values(data.errors).join(", "));
             }
@@ -282,20 +282,24 @@ export const forgotPassword = async (payload) => {
     }
 };
 
-export async function resetPassword({ token, password }) {
+export async function resetPassword({token, password, confirmPassword}) {
     try {
-        const response = await apiClient.post("/auth/reset-password", {
-            token,
-            password
-        });
-
+        const response = await apiClient.post(
+            `/auth/reset-password/${token}`,
+            {
+                password,
+                confirmPassword,
+            }
+        );
         return response.data;
     } catch (error) {
         console.error("API Error:", error);
-        const errorMessage = error.response?.data?.message || "Failed to reset password";
-        throw new Error(errorMessage);
+        const msg = error.response?.data?.message || "Failed to reset password";
+        throw new Error(msg);
     }
 }
+
+
 export const getCompanies = async () => {
     try {
         console.log("Fetching companies");

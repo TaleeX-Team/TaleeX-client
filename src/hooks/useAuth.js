@@ -110,32 +110,25 @@ export const useAuth = () => {
   };
 
   return {
-    // state
     isAuthenticated: authQuery.data?.isAuthenticated ?? false,
-    isLoading:
-        authQuery.isLoading ||
-        loginMutation.isLoading ||
-        logoutMutation.isLoading ||
-        registerMutation.isLoading,
-    // operations
     login: {
       mutate: loginMutation.mutate,
-      isLoading: loginMutation.isLoading,
+      isLoading: loginMutation.isPending,
       isError: loginMutation.isError,
-      error: loginMutation.error,
+      error: loginMutation.error
     },
     logout: {
       mutate: logoutMutation.mutate,
-      isLoading: logoutMutation.isLoading,
+      isLoading: logoutMutation.isPending,
       isError: logoutMutation.isError,
-      error: logoutMutation.error,
+      error: logoutMutation.error
     },
     register: {
       mutate: registerMutation.mutate,
-      isLoading: registerMutation.isLoading,
+      isLoading: registerMutation.isPending,
       isError: registerMutation.isError,
-      error: registerMutation.error,
+      error: registerMutation.error
     },
-    processOAuthCallback,
+    processOAuthCallback
   };
 };
