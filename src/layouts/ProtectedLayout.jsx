@@ -1,31 +1,27 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
-import { AppSidebar } from "@/components/app-sidebar";
+import { Outlet, Link } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import UserAvatar from "@/features/header/user-avatar/UserAvatar";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
-import UserAvatar from "@/features/header/UserAvatar";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Menu } from "lucide-react";
+import Header from "@/features/header/Header";
 
 const ProtectedLayout = () => {
   return (
     <SidebarProvider>
-      <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 border-b">
-          <div className="flex items-center gap-2 px-4 w-full">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <div className="ml-auto">
-              <UserAvatar />
-            </div>
-          </div>
-        </header>
+        <Header />
         <Outlet />
       </SidebarInset>
     </SidebarProvider>
   );
 };
+
 export default ProtectedLayout;
