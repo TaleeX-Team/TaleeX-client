@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
 
 const UserAvatar = () => {
   return (
@@ -21,11 +22,17 @@ const UserAvatar = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
+
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Profile</DropdownMenuItem>
-        <DropdownMenuItem>Billing</DropdownMenuItem>
-        <DropdownMenuItem>Team</DropdownMenuItem>
-        <DropdownMenuItem>Subscription</DropdownMenuItem>
+        <Link to="/settings/profile">
+          <DropdownMenuItem>Settings</DropdownMenuItem>
+        </Link>
+        <Link to="/settings/billing">
+          <DropdownMenuItem>Billing</DropdownMenuItem>
+        </Link>
+        <Link to="/settings/billing">
+          <DropdownMenuItem>Logout</DropdownMenuItem>
+        </Link>
       </DropdownMenuContent>
     </DropdownMenu>
   );

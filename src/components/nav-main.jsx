@@ -18,19 +18,29 @@ import {
   SidebarMenuSubItem,
   SidebarGroupContent,
 } from "@/components/ui/sidebar";
+import { Link } from "react-router-dom";
 
 export function NavMain() {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Getting Started</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild isActive={true}>
-              <a href="#">Introduction</a>
+              <Link
+                to="/companies"
+                className="text-sm font-medium text-gray-700 hover:text-primary"
+              >
+                Companies
+              </Link>
             </SidebarMenuButton>
             <SidebarMenuButton asChild>
-              <a href="#">TBD</a>
+              <Link
+                to="/jobs"
+                className="text-sm font-medium text-gray-700 hover:text-primary"
+              >
+                Jobs
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
