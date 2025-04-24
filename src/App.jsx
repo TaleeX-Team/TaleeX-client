@@ -14,6 +14,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import Auth from "@/features/auth/Auth.jsx";
 import { ThemeProvider } from "@/layouts/theme_provider/ThemeProvider.jsx";
 import { useAuth } from "@/hooks/useAuth.js";
+import OAuthCallback from "@/components/OAuthCallback.jsx";
 
 import SettingsLayout from "./layouts/SettingsLayout";
 import ProfilePage from "./features/settings/profile/Profile";
@@ -143,6 +144,10 @@ function App() {
               <Auth />
             </Suspense>
           ),
+        },
+        {
+          path: "/auth/callback",
+          element: <OAuthCallback />,
         },
         {
           path: "forget-password",

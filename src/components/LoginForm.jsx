@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {Link, useNavigate} from "react-router-dom";
 import { SocialButtons } from "./SocialButtons";
+
 import gsap from "gsap";
 
 import {
@@ -26,7 +27,7 @@ const formSchema = z.object({
     rememberMe: z.boolean().optional(),
 })
 
-export const LoginForm = ({ isLoading, handleAuthSubmit }) => {
+export const LoginForm = ({ isLoading, handleAuthSubmit ,handleOAuthSuccess}) => {
     const [showPassword, setShowPassword] = useState(false);
     const formRef = useRef();
 
@@ -144,7 +145,7 @@ export const LoginForm = ({ isLoading, handleAuthSubmit }) => {
                     {isLoading ? "Signing in..." : "Sign In"} <ArrowRight className="ml-2" />
                 </Button>
 
-                <SocialButtons disabled={isLoading} />
+                <SocialButtons disabled={isLoading} handleOAuthSuccess={handleOAuthSuccess} />
             </form>
         </Form>
     );

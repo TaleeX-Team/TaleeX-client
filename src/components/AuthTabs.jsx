@@ -24,6 +24,8 @@ export const AuthTabs = ({
         );
     }, [activeTab]);
 
+
+
     const handleError = (error, fallbackMessage) => {
         console.error("Auth failed:", error?.message);
         const details = error?.response?.data?.details;
@@ -60,6 +62,9 @@ export const AuthTabs = ({
             },
         });
     };
+    const handleOAuthSuccess = () => {
+        navigate("/");
+    };
 
     return (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -73,12 +78,15 @@ export const AuthTabs = ({
                     <LoginForm
                         handleAuthSubmit={(data) => handleAuthSubmit(data, "login")}
                         isLoading={login.isLoading}
+                     handleOAuthSuccess={handleOAuthSuccess}
                     />
                 </TabsContent>
                 <TabsContent value="signup">
                     <SignupForm
                         handleAuthSubmit={(data) => handleAuthSubmit(data, "signup")}
                         isLoading={register.isLoading}
+                        handleOAuthSuccess={handleOAuthSuccess}
+
                     />
                 </TabsContent>
             </div>
