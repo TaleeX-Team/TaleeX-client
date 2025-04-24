@@ -68,17 +68,27 @@ export const AuthTabs = ({
 
     return (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">Sign In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 bg-purple-100 dark:bg-gray-900 border border-purple-200 dark:border-purple-900">
+                <TabsTrigger
+                    value="login"
+                    className="data-[state=active]:bg-white data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-900 dark:data-[state=active]:text-white dark:text-purple-200 dark:data-[state=inactive]:text-purple-400"
+                >
+                    Sign In
+                </TabsTrigger>
+                <TabsTrigger
+                    value="signup"
+                    className="data-[state=active]:bg-white data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-900 dark:data-[state=active]:text-white dark:text-purple-200 dark:data-[state=inactive]:text-purple-400"
+                >
+                    Sign Up
+                </TabsTrigger>
             </TabsList>
 
-            <div ref={contentRef}>
+            <div ref={contentRef} className="mt-4">
                 <TabsContent value="login">
                     <LoginForm
                         handleAuthSubmit={(data) => handleAuthSubmit(data, "login")}
                         isLoading={login.isLoading}
-                     handleOAuthSuccess={handleOAuthSuccess}
+                        handleOAuthSuccess={handleOAuthSuccess}
                     />
                 </TabsContent>
                 <TabsContent value="signup">
@@ -86,7 +96,6 @@ export const AuthTabs = ({
                         handleAuthSubmit={(data) => handleAuthSubmit(data, "signup")}
                         isLoading={register.isLoading}
                         handleOAuthSuccess={handleOAuthSuccess}
-
                     />
                 </TabsContent>
             </div>

@@ -19,18 +19,26 @@ const ThreeDLogo = ({ className }) => {
         renderer.setSize(200, 200);
         containerRef.current.appendChild(renderer.domElement);
 
+        // Create color that matches our theme
+        const getThemeColor = () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            // Light theme: vibrant purple | Dark theme: brighter purple
+            return isDark ? 0x9D5CFF : 0x8A51FF;
+        };
+
         // Add a floating cube as a logo placeholder
         const geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
         const edges = new THREE.EdgesGeometry(geometry);
+        const lineColor = getThemeColor();
         const line = new THREE.LineSegments(
             edges,
-            new THREE.LineBasicMaterial({ color: 0x8B5CF6 })
+            new THREE.LineBasicMaterial({ color: lineColor })
         );
 
         // Add inner cube for effect
         const innerGeometry = new THREE.BoxGeometry(1, 1, 1);
         const innerMaterial = new THREE.MeshBasicMaterial({
-            color: 0x8B5CF6,
+            color: lineColor,
             transparent: true,
             opacity: 0.2
         });
@@ -49,7 +57,7 @@ const ThreeDLogo = ({ className }) => {
             duration: 8,
             repeat: -1,
             ease: "none"
-        })
+        });
 
         gsap.to(cube.rotation, {
             x: Math.PI * 2,
@@ -57,7 +65,7 @@ const ThreeDLogo = ({ className }) => {
             duration: 10,
             repeat: -1,
             ease: "none"
-        })
+        });
 
         gsap.to(cube.position, {
             y: 0.2,
@@ -65,7 +73,34 @@ const ThreeDLogo = ({ className }) => {
             repeat: -1,
             yoyo: true,
             ease: "power1.inOut"
-        })
+        });
+
+        // Add subtle pulsing effect to the inner cube
+        gsap.to(innerMaterial, {
+            opacity: 0.4,
+            duration: 2,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+        });
+
+        // Theme change detection
+        const handleThemeChange = () => {
+            const newColor = getThemeColor();
+            line.material.color.set(newColor);
+            innerMaterial.color.set(newColor);
+        };
+
+        // Listen for theme changes
+        const themeObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'class') {
+                    handleThemeChange();
+                }
+            });
+        });
+
+        themeObserver.observe(document.documentElement, { attributes: true });
 
         // Animation loop
         const animate = () => {
@@ -77,6 +112,7 @@ const ThreeDLogo = ({ className }) => {
 
         // Cleanup
         return () => {
+            themeObserver.disconnect();
             if (containerRef.current && renderer.domElement) {
                 containerRef.current.removeChild(renderer.domElement);
             }
@@ -89,7 +125,7 @@ const ThreeDLogo = ({ className }) => {
         };
     }, []);
 
-    return <div ref={containerRef} className={className} />;
+    return <div ref={containerRef} className={`${className} purple-glow`} />;
 };
 
 export default ThreeDLogo;

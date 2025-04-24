@@ -1,3 +1,4 @@
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import {
     createBrowserRouter,
     RouterProvider,
@@ -5,150 +6,163 @@ import {
     Navigate,
     useLocation,
 } from "react-router-dom";
-import {Button} from "@/components/ui/button";
-import {lazy, Suspense} from "react";
-import {Toaster} from "@/components/ui/sonner";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Toaster } from "@/components/ui/sonner";
+import { Button } from "@/components/ui/button";
 import ProtectedLayout from "./layouts/ProtectedLayout";
-import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
-import Auth from "@/features/auth/Auth.jsx";
-import {ThemeProvider} from "@/layouts/theme_provider/ThemeProvider.jsx";
-import {useAuth} from "@/hooks/useAuth.js";
+import { ThemeProvider } from "@/layouts/theme_provider/ThemeProvider.jsx";
+import { useAuth } from "@/hooks/useAuth.js";
 import OAuthCallback from "@/components/OAuthCallback.jsx";
+import FullPageSpinner from "@/components/FullPageSpinner";
+import ResetPassword from "@/features/auth/password/ResetPassword.jsx";
 
-const Login = lazy(() => import("./features/auth/login/Login"));
-const SignUp = lazy(() => import("./features/auth/sign-up/SignUp"));
+// Lazy pages
 const Home = lazy(() => import("./features/home/Home.jsx"));
-const VerificationCode = lazy(() =>
-    import("./features/auth/verification/VerificationCode.jsx")
-);
-const ForgetPassword = lazy(() =>
-    import("./features/auth/password/ForgetPassword.jsx")
-);
-const SetPassword = lazy(() =>
-    import("./features/auth/password/SetPassword.jsx")
+const Auth = lazy(() => import("./features/auth/Auth.jsx"));
+const ForgetPassword = lazy(
+    () => import("./features/auth/password/ForgetPassword.jsx")
 );
 
-const AuthLayout = () => (
+
+
+const AuthLayout= () => (
     <div className="min-h-screen">
-        <Outlet/>
+        <Outlet />
     </div>
 );
 
-const ProtectedRoute = ({children}) => {
-    const {isAuthenticated, isLoading} = useAuth();
+const ProtectedRoute = ({ children, redirectPath = "/auth" }) => {
+    const { isAuthenticated, isLoading } = useAuth();
     const location = useLocation();
 
     if (isLoading) {
-        return <div className="min-h-screen flex items-center justify-center">Loading…</div>;
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+                <div className="text-center">
+                    <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-gray-700">Verifying authentication...</p>
+                </div>
+            </div>
+        );
     }
 
     if (!isAuthenticated) {
-        // Store the attempted location for redirect after login
-        return <Navigate to="/auth" state={{from: location}} replace/>;
+        return (
+            <Navigate
+                to={redirectPath}
+                state={{ from: location.pathname }}
+                replace
+            />
+        );
     }
 
-    return children;
+    return <>{children}</>;
 };
 
-const ErrorPage = () => {
+
+const ErrorPage = ({ error }) => {
     const location = useLocation();
-    const errorMessage =
-        location.state?.error || "We couldn't find the page you're looking for.";
+    const message =
+        error ?? location.state?.error ?? "We couldn't find that page.";
 
     return (
         <div className="min-h-screen flex items-center justify-center flex-col gap-4">
-            <h1 className="text-2xl font-bold text-red-600">Something went wrong!</h1>
-            <p className="text-gray-600 max-w-md text-center">{errorMessage}</p>
+            <h1 className="text-2xl font-bold text-red-600">Oops!</h1>
+            <p className="text-gray-600 max-w-md text-center">{message}</p>
             <Button asChild>
-                <a href="/">Go to Home</a>
+                <a href="/">Go Home</a>
             </Button>
         </div>
     );
 };
 
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 5 * 60 * 1000, // 5m
+            retry: 1,
+        },
+    },
+});
 
 function App() {
-    const queryClient = new QueryClient({
-        defaultOptions: {
-            queries: {
-                staleTime: 1000 * 60 * 5, // 5 minutes
-                retry: 1,
+    const [router] = useState(() =>
+        createBrowserRouter([
+            {
+                element: (
+                    <ProtectedRoute>
+                        <ProtectedLayout />
+                    </ProtectedRoute>
+                ),
+                errorElement: <ErrorPage />,
+                children: [
+                    {
+                        path: "/",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner />}>
+                                <Home />
+                            </Suspense>
+                        ),
+                    },
+                ],
             },
-        },
-    });
-    const router = createBrowserRouter([
-        {
-            element: (
-                <ProtectedRoute>
-                    <ProtectedLayout/>
-                </ProtectedRoute>
-            ),
-            errorElement: <ErrorPage/>,
-            children: [
-                {
-                    path: "/",
-                    element: (
-                        <Suspense
-                            fallback={
-                                <div className="min-h-screen flex items-center justify-center">
-                                    Loading...
-                                </div>
-                            }
-                        >
-                            <Home/>
-                        </Suspense>
-                    ),
-                },
-            ],
-        },
-        {
-            path: "auth",
-            element: <AuthLayout/>,
-            errorElement: <ErrorPage/>,
-            children: [
-                {
-                    index: true,
-                    element: <Auth/>
-                },
-                {
-                    path: "callback",
-                    element: <OAuthCallback/>
-                },
-                {
-                    path: "forget-password",
-                    element: (
-                        <Suspense fallback={<div>Loading...</div>}>
-                            <ForgetPassword/>
-                        </Suspense>
-                    )
-                },
-                {
-                    path: "set-password",
-                    element: <SetPassword/>
-                },
-                {
-                    path: "*",
-                    element: (
-                        <ErrorPage error="The page you're looking for doesn't exist." />
-                    ),
-                },
-            ],
-        },
-    ]);
+            {
+                path: "/auth",
+                element: (
+                    <Suspense fallback={<FullPageSpinner />}>
+                        <AuthLayout />
+                    </Suspense>
+                ),
+                errorElement: <ErrorPage />,
+                children: [
+                    {
+                        index: true,
+                        element: (
+                            <Suspense fallback={<FullPageSpinner />}>
+                                <Auth />
+                            </Suspense>
+                        ),
+                    },
+                    {
+                        path: "forget-password",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner />}>
+                                <ForgetPassword />
+                            </Suspense>
+                        ),
+                    },
+                    {
+                        path: "reset-password/:accessToken",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner />}>
+                                <ResetPassword />
+                            </Suspense>
+                        ),
+                    },
+                    {
+                        path: "callback",
+                        element: <OAuthCallback />,
+                    },
+                    {
+                        path: "*",
+                        element: <ErrorPage error="That auth page doesn’t exist." />,
+                    },
+                ],
+            },
+        ])
+    );
 
     return (
-        <>
-            <QueryClientProvider client={queryClient}>
-                <ThemeProvider storageKey="app-theme">
-
-                    <ReactQueryDevtools initialIsOpen={false}/>
-                    <RouterProvider router={router}/>
-                    <Toaster/>
-                </ThemeProvider>
-            </QueryClientProvider>
-
-        </>
+        <QueryClientProvider client={queryClient}>
+            <ThemeProvider storageKey="app-theme">
+                <ReactQueryDevtools initialIsOpen={false} />
+                <Suspense fallback={<FullPageSpinner />}>
+                    <RouterProvider router={router} />
+                </Suspense>
+                <Toaster />
+            </ThemeProvider>
+        </QueryClientProvider>
     );
 }
 

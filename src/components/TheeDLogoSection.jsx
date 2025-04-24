@@ -2,9 +2,12 @@ import { useRef, useEffect } from "react";
 import gsap from "gsap";
 import ThreeDLogo from "@/components/ThreeDLogo";
 import { Building2 } from "lucide-react";
+import { useTheme } from "@/layouts/theme_provider/ThemeProvider";
 
 export const ThreeDLogoSection = ({ isMobile = false }) => {
     const headingRef = useRef();
+    const { theme } = useTheme();
+    const isDark = theme === "dark";
 
     useEffect(() => {
         if (!isMobile) {
@@ -29,7 +32,7 @@ export const ThreeDLogoSection = ({ isMobile = false }) => {
     if (isMobile) {
         return (
             <div className="flex items-center">
-                <Building2 className="w-8 h-8 mr-2 text-purple-400" />
+                <Building2 className="w-8 h-8 mr-2 text-purple-500 dark:text-purple-400" />
                 <h2 className="text-2xl font-bold text-gradient">TalentSync</h2>
             </div>
         );
@@ -37,29 +40,30 @@ export const ThreeDLogoSection = ({ isMobile = false }) => {
 
     return (
         <div className="hidden lg:flex flex-col items-center space-y-6 w-1/2 pr-12 mb-8 lg:mb-0 animate-fade-in">
-            <div className="logo-container w-40 h-32 relative">
-                <ThreeDLogo className="absolute inset-y-[-240px] inset-x-[-25px] h-32" />
+            {/* Fixed logo container with proper centering */}
+            <div className="logo-container relative w-40 h-40 flex items-center justify-center">
+                <ThreeDLogo className="w-full h-full" />
             </div>
 
             <div className="text-center space-y-4 max-w-md">
-                <h1 ref={headingRef} className="text-4xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-purple-400">
-                    TalentSync
+                <h1 ref={headingRef} className="text-4xl font-bold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-purple-600 to-purple-400">
+                    hireX
                 </h1>
-                <p className="text-xl text-muted-foreground leading-relaxed">
+                <p className="text-xl text-purple-900 dark:text-purple-200 leading-relaxed transition-colors duration-300">
                     Smarter hiring starts here.
                 </p>
                 <div className="py-6">
-                    <blockquote className="border-l-4 border-purple-500 pl-4 italic text-muted-foreground">
+                    <blockquote className="border-l-4 border-purple-500 pl-4 italic text-purple-800 dark:text-purple-300 transition-colors duration-300">
                         <p>"AI-driven insights that transform how you discover and connect with talent."</p>
                     </blockquote>
                 </div>
                 <div className="pt-8">
                     <div className="glass-card p-4 rounded-xl">
-                        <p className="text-sm font-medium mb-2">Trusted by innovative teams</p>
-                        <div className="flex justify-center space-x-6 opacity-70">
-                            <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md"></div>
-                            <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md"></div>
-                            <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md"></div>
+                        <p className="text-sm font-medium mb-2 text-purple-900 dark:text-purple-200 transition-colors duration-300">Trusted by innovative teams</p>
+                        <div className="flex justify-center space-x-6">
+                            <div className={`w-8 h-8 rounded-full ${isDark ? 'bg-purple-800/30' : 'bg-purple-200/70'} backdrop-blur-md transition-colors duration-300`}></div>
+                            <div className={`w-8 h-8 rounded-full ${isDark ? 'bg-purple-700/30' : 'bg-purple-300/70'} backdrop-blur-md transition-colors duration-300`}></div>
+                            <div className={`w-8 h-8 rounded-full ${isDark ? 'bg-purple-600/30' : 'bg-purple-400/70'} backdrop-blur-md transition-colors duration-300`}></div>
                         </div>
                     </div>
                 </div>

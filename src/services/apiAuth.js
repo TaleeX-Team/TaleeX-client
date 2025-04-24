@@ -255,7 +255,47 @@ export const logoutUser = async (refreshToken) => {
     }
 };
 
+export const forgotPassword = async (payload) => {
+    try {
+        console.log("Requesting password reset for:", payload.email);
+        const response = await apiClient.post("/auth/forgot-password", payload);
+        console.log("Password reset email sent:", response.status);
+        return response.data;
+    } catch (error) {
+        console.error("Forgot‑password request failed:", error.response?.data || error.message);
 
+        if (error.response) {
+            const { status, data } = error.response;
+            if (status === 400 && data.errors) {
+                throw new Error(Object.values(data.errors).join(", "));
+            }
+            if (data.message) {
+                throw new Error(data.message);
+            }
+        }
+
+        if (error.message === "Network Error") {
+            throw new Error("Unable to connect to the server. Check your internet connection.");
+        }
+
+        throw new Error(error.message || "An unexpected error occurred when requesting password reset.");
+    }
+};
+
+export async function resetPassword({ token, password }) {
+    try {
+        const response = await apiClient.post("/auth/reset-password", {
+            token,
+            password
+        });
+
+        return response.data;
+    } catch (error) {
+        console.error("API Error:", error);
+        const errorMessage = error.response?.data?.message || "Failed to reset password";
+        throw new Error(errorMessage);
+    }
+}
 export const getCompanies = async () => {
     try {
         console.log("Fetching companies");

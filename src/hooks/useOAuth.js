@@ -1,69 +1,78 @@
-// hooks/useOAuth.ts
-import { useEffect, useState, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import TokenService from "@/lib/TokenService";
+import { useNavigate, useLocation } from "react-router-dom";
+import TokenService from "@/lib/TokenService.js";
 
 export const useOAuth = () => {
+    const queryClient = useQueryClient();
     const navigate = useNavigate();
     const location = useLocation();
-    const queryClient = useQueryClient();
     const [isProcessingOAuth, setIsProcessingOAuth] = useState(false);
 
-    useEffect(() => {
-        if (location.pathname !== "/auth/callback") return;
-
-        const handleOAuthCallback = async () => {
-            setIsProcessingOAuth(true);
-            try {
-                const params = new URLSearchParams(location.search);
-
-                // 1. Check for explicit errors first
-                if (params.get("error")) {
-                    throw new Error(params.get("error") || "oauth_error");
-                }
-
-                // 2. Verify success flag
-                const success = params.get("success") === "true";
-                if (!success) {
-                    throw new Error("oauth_failed_no_success_flag");
-                }
-
-                // 3. Mark as authenticated
-                TokenService.setOAuthAuthenticated(true);
-                console.log("OAuth authentication confirmed");
-
-                // 4. Refresh application state
-                await Promise.all([
-                    queryClient.invalidateQueries(["auth"]),
-                    queryClient.invalidateQueries(["user"])
-                ]);
-
-                // 5. Redirect to home or original path
-                navigate("/", { replace: true });
-
-            } catch (error) {
-                console.error("OAuth processing error:", error);
-                TokenService.setOAuthAuthenticated(false);
-                navigate(`/auth?error=${error.message}`);
-            } finally {
-                setIsProcessingOAuth(false);
-            }
-        };
-
-        handleOAuthCallback();
-    }, [location, navigate, queryClient]);
-
+    /**
+     * Kick off the OAuth flow by redirecting to your provider’s endpoint
+     */
     const initiateOAuthLogin = useCallback((provider) => {
-        // Store provider in session storage for debugging
+        setIsProcessingOAuth(true);
         sessionStorage.setItem("oauth_provider", provider);
 
         const baseUrl = "https://hirex-production.up.railway.app/api/v1/auth";
         const redirectUri = encodeURIComponent(
             `${window.location.origin}/auth/callback`
         );
+
         window.location.href = `${baseUrl}/${provider}?redirect_uri=${redirectUri}`;
     }, []);
 
-    return { initiateOAuthLogin, isProcessingOAuth };
+    /**
+     * After redirect back to /auth/callback, read tokens from cookies,
+     * stash them via TokenService, mark OAuth flag, and refresh queries.
+     */
+    const processOAuthCallback = useCallback(async () => {
+        setIsProcessingOAuth(true);
+
+        // TokenService.processOAuthTokens reads cookies and writes to localStorage as needed
+        const success = TokenService.processOAuthTokens();
+
+        if (success) {
+            // refresh React Query auth/user data
+            await Promise.all([
+                queryClient.invalidateQueries(["auth"]),
+                queryClient.invalidateQueries(["user"]),
+            ]);
+
+            // clear the saved provider (optional)
+            sessionStorage.removeItem("oauth_provider");
+            // send user home (or wherever)
+            navigate("/", { replace: true });
+        } else {
+            console.error("OAuth callback processing failed: no tokens found");
+            // you might want to navigate to an error page
+            navigate("/login?error=oauth_failed", { replace: true });
+        }
+
+        setIsProcessingOAuth(false);
+    }, [queryClient, navigate]);
+
+    const refreshUserData = useCallback(async () => {
+        await Promise.all([
+            queryClient.invalidateQueries(["auth"]),
+            queryClient.invalidateQueries(["user"]),
+        ]);
+    }, [queryClient]);
+
+    /**
+     * On mount, if we’re on the callback route, kick off processing
+     */
+    useEffect(() => {
+        if (location.pathname === "/auth/callback") {
+            processOAuthCallback();
+        }
+    }, [location.pathname, processOAuthCallback]);
+
+    return {
+        initiateOAuthLogin,
+        isProcessingOAuth,
+        refreshUserData,
+    };
 };

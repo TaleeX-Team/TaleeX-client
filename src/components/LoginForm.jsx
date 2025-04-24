@@ -130,7 +130,7 @@ export const LoginForm = ({ isLoading, handleAuthSubmit ,handleOAuthSuccess}) =>
                         )}
                     />
                     <Link
-                        to="/forgot-password"
+                        to="forget-password"
                         className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
                     >
                         Forgot password?

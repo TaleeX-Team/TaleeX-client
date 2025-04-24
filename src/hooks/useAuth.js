@@ -1,114 +1,141 @@
-// useAuth.js - Updated for hybrid authentication
+// useAuth.js
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { loginUser, logoutUser, registerUser } from "../services/apiAuth.js";
+import {useEffect} from "react";
 import TokenService from "@/lib/TokenService";
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
 
-    const authQuery = useQuery({
+  // 1) Keep track of isAuthenticated by reading TokenService
+  const authQuery = useQuery({
     queryKey: ["auth"],
-    queryFn: () => {
-      return {
-        isAuthenticated: TokenService.isAuthenticated(),
-      };
-    },
-    staleTime: 0,
+    queryFn: () => ({
+      isAuthenticated: TokenService.isAuthenticated(),
+    }),
+    // we’ll manually invalidate whenever tokens change:
+    staleTime: Infinity,
+    cacheTime: Infinity,
   });
 
-  // Login mutation
+
+  useEffect(() => {
+    const onChange = () => {
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
+    };
+
+    // patch TokenService to call onChange after set/clear
+    const origSetAccess = TokenService.setAccessToken.bind(TokenService);
+    TokenService.setAccessToken = (token) => {
+      origSetAccess(token);
+      onChange();
+    };
+    const origSetRefresh = TokenService.setRefreshToken.bind(TokenService);
+    TokenService.setRefreshToken = (token) => {
+      origSetRefresh(token);
+      onChange();
+    };
+    const origClear = TokenService.clearTokens.bind(TokenService);
+    TokenService.clearTokens = () => {
+      origClear();
+      onChange();
+    };
+
+    return () => {
+      // restore if you want; skip for brevity
+    };
+  }, [queryClient]);
+
+  // 2) Login
   const loginMutation = useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
-      // Set tokens if they exist in response
       if (data.accessToken) {
         TokenService.setAccessToken(data.accessToken);
       }
       if (data.refreshToken) {
         TokenService.setRefreshToken(data.refreshToken);
       }
-
-      // Update user data in React Query cache
       if (data.user) {
-        queryClient.setQueryData(["currentUser"], data.user);
+        queryClient.setQueryData(["user"], data.user);
       } else {
-        // If no user data was returned, fetch it
-        queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+        queryClient.invalidateQueries({ queryKey: ["user"] });
       }
-
-      // Invalidate auth status
       queryClient.invalidateQueries({ queryKey: ["auth"] });
-    },
-    onError: (error) => {
-      console.error("Login failed:", error.message);
     },
   });
 
-  // Logout mutation
+  // 3) Logout
   const logoutMutation = useMutation({
-    mutationFn: () => {
-      // For token-based auth, send the refresh token
-      // For OAuth, just call the endpoint with credentials
-      const refreshToken = TokenService.getRefreshToken();
-      return logoutUser(refreshToken);
-    },
+    mutationFn: () => logoutUser(TokenService.getRefreshToken()),
     onSuccess: () => {
-      // Clear all auth state
       TokenService.clearTokens();
       TokenService.setOAuthAuthenticated(false);
-      queryClient.removeQueries({ queryKey: ["currentUser"] });
+      queryClient.removeQueries({ queryKey: ["user"] });
       queryClient.invalidateQueries({ queryKey: ["auth"] });
     },
-    onError: (error) => {
-      console.error("Logout failed:", error.message);
-      // Still clear local state even if server logout fails
+    onError: () => {
+      // even on error, clear local
       TokenService.clearTokens();
       TokenService.setOAuthAuthenticated(false);
-      queryClient.removeQueries({ queryKey: ["currentUser"] });
+      queryClient.removeQueries({ queryKey: ["user"] });
       queryClient.invalidateQueries({ queryKey: ["auth"] });
     },
   });
 
-  // Register mutation
+  // 4) Register
   const registerMutation = useMutation({
     mutationFn: registerUser,
     onSuccess: (data) => {
-      console.log("Registration successful:", data.message);
-      // If registration returns user data, set it
       if (data.user) {
-        queryClient.setQueryData(["currentUser"], data.user);
+        queryClient.setQueryData(["user"], data.user);
       }
-      // If registration includes tokens (some flows do this)
       if (data.accessToken) {
         TokenService.setAccessToken(data.accessToken);
         queryClient.invalidateQueries({ queryKey: ["auth"] });
       }
     },
-    onError: (error) => {
-      console.error("Registration failed:", error.message);
-    },
   });
 
+  // 5) OAuth callback helper
+  const processOAuthCallback = async () => {
+    const ok = TokenService.processOAuthTokens();
+    if (ok) {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["auth"] }),
+        queryClient.invalidateQueries({ queryKey: ["user"] }),
+      ]);
+    }
+    return ok;
+  };
+
   return {
-    isAuthenticated: authQuery.data?.isAuthenticated || false,
-    isLoading: authQuery.isLoading || loginMutation.isPending || logoutMutation.isPending || registerMutation.isPending,
+    // state
+    isAuthenticated: authQuery.data?.isAuthenticated ?? false,
+    isLoading:
+        authQuery.isLoading ||
+        loginMutation.isLoading ||
+        logoutMutation.isLoading ||
+        registerMutation.isLoading,
+    // operations
     login: {
       mutate: loginMutation.mutate,
-      isLoading: loginMutation.isPending,
+      isLoading: loginMutation.isLoading,
       isError: loginMutation.isError,
-      error: loginMutation.error
+      error: loginMutation.error,
     },
     logout: {
       mutate: logoutMutation.mutate,
-      isLoading: logoutMutation.isPending,
+      isLoading: logoutMutation.isLoading,
       isError: logoutMutation.isError,
-      error: logoutMutation.error
+      error: logoutMutation.error,
     },
     register: {
       mutate: registerMutation.mutate,
-      isLoading: registerMutation.isPending,
+      isLoading: registerMutation.isLoading,
       isError: registerMutation.isError,
-      error: registerMutation.error
-    }
+      error: registerMutation.error,
+    },
+    processOAuthCallback,
   };
 };
