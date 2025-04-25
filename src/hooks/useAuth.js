@@ -62,6 +62,9 @@ export const useAuth = () => {
         queryClient.invalidateQueries({ queryKey: ["user"] });
       }
       queryClient.invalidateQueries({ queryKey: ["auth"] });
+
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+
     },
   });
 
@@ -72,6 +75,7 @@ export const useAuth = () => {
       TokenService.clearTokens();
       TokenService.setOAuthAuthenticated(false);
       queryClient.removeQueries({ queryKey: ["user"] });
+      queryClient.removeQueries({ queryKey: ["companies"] });
       queryClient.invalidateQueries({ queryKey: ["auth"] });
     },
     onError: () => {

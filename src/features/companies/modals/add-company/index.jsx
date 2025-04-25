@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,36 +17,50 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { MapPin, Globe, Upload, Plus } from "lucide-react";
+import { MapPin, Globe, Upload, Plus, Building2, Loader2, ImagePlus, Trash } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from "sonner";
 import { useCompanies } from "../../features";
+import { gsap } from "gsap";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const formSchema = z.object({
   image: z.any().refine((file) => file instanceof File || file === null, {
     message: "Please upload a valid image file.",
   }),
   name: z.string().min(2, {
-    message: "Name must contain only letters and is no less than 3 letters.",
+    message: "Name must contain only letters and is no less than 2 letters.",
   }),
   description: z
-    .string()
-    .min(10, { message: "Description must be at least 10 characters long." }),
+      .string()
+      .min(10, { message: "Description must be at least 10 characters long." }),
   address: z.string().min(5, { message: "Address is required." }),
   website: z
-    .string()
-    .url({ message: "Please enter a valid website URL." })
-    .optional(),
+      .string()
+      .url({ message: "Please enter a valid website URL." })
+      .optional()
+      .or(z.literal("")),
+  industry: z.string().optional(),
+  size: z.string().optional(),
 });
+
 export default function AddCompany() {
   const [logoPreview, setLogoPreview] = useState(null);
+  const [open, setOpen] = useState(false);
   const { createCompanyMutation } = useCompanies();
+  const uploadAreaRef = useRef(null);
+  const formContainerRef = useRef(null);
+
+  const isLoading = createCompanyMutation.isLoading;
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,189 +69,377 @@ export default function AddCompany() {
       description: "",
       address: "",
       website: "",
+      industry: "",
+      size: "",
     },
   });
 
+  // Handle dialog open/close with animations
+  const handleOpenChange = (newOpen) => {
+    if (!newOpen) {
+      // Play exit animation
+      gsap.to(formContainerRef.current, {
+        y: 20,
+        opacity: 0,
+        duration: 0.3,
+        onComplete: () => setOpen(false)
+      });
+    } else {
+      setOpen(true);
+    }
+  };
+
+  // Animate form elements when dialog opens
+  useEffect(() => {
+    if (open) {
+      const tl = gsap.timeline();
+
+      // Reset and set initial states
+      tl.set(formContainerRef.current, { y: 20, opacity: 0 });
+      tl.set(".form-field", { y: 15, opacity: 0 });
+
+      // Animate form container
+      tl.to(formContainerRef.current, {
+        y: 0,
+        opacity: 1,
+        duration: 0.4,
+        ease: "power2.out",
+      });
+
+      // Stagger animate form fields
+      tl.to(".form-field", {
+        y: 0,
+        opacity: 1,
+        duration: 0.3,
+        stagger: 0.05,
+        ease: "power2.out",
+      }, "-=0.2");
+    }
+  }, [open]);
+
+  // Handle logo upload
   const handleLogoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setLogoPreview(URL.createObjectURL(file));
       form.setValue("image", file);
+
+      // Animate logo preview
+      gsap.fromTo(
+          ".logo-preview",
+          { scale: 0.8, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(1.7)" }
+      );
     }
   };
 
+  // Handle logo remove
+  const handleRemoveLogo = () => {
+    gsap.to(".logo-preview", {
+      scale: 0.8,
+      opacity: 0,
+      duration: 0.3,
+      onComplete: () => {
+        setLogoPreview(null);
+        form.setValue("image", null);
+      }
+    });
+  };
+
+  // Handle form submit
   const onSubmit = (values) => {
-    console.log("Form submitted:", values);
     createCompanyMutation.mutate(values, {
       onSuccess: () => {
         toast.success("Company created successfully!");
+
+        // Close dialog with animation
+        gsap.to(formContainerRef.current, {
+          y: 20,
+          opacity: 0,
+          duration: 0.3,
+          onComplete: () => {
+            setOpen(false);
+            form.reset();
+            setLogoPreview(null);
+          }
+        });
       },
       onError: (error) => {
         console.error("Error creating company:", error);
         toast.error(
-          error.response?.data?.message ||
+            error.response?.data?.message ||
             "Failed to create company. Please try again."
         );
       },
     });
-
-    form.reset();
-    setLogoPreview(null);
   };
 
+  // Animate upload area on hover
+  useEffect(() => {
+    if (!uploadAreaRef.current) return;
+
+    const enterAnimation = () => {
+      gsap.to(uploadAreaRef.current, {
+        borderColor: "rgba(var(--primary), 0.5)",
+        backgroundColor: "rgba(var(--primary), 0.05)",
+        scale: 1.02,
+        duration: 0.3
+      });
+    };
+
+    const leaveAnimation = () => {
+      gsap.to(uploadAreaRef.current, {
+        borderColor: "",
+        backgroundColor: "",
+        scale: 1,
+        duration: 0.3
+      });
+    };
+
+    uploadAreaRef.current.addEventListener("mouseenter", enterAnimation);
+    uploadAreaRef.current.addEventListener("mouseleave", leaveAnimation);
+
+    return () => {
+      if (uploadAreaRef.current) {
+        uploadAreaRef.current.removeEventListener("mouseenter", enterAnimation);
+        uploadAreaRef.current.removeEventListener("mouseleave", leaveAnimation);
+      }
+    };
+  }, [uploadAreaRef.current]);
+
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button className="mt-4 md:mt-0 bg-primary text-primary-foreground">
-          <Plus className="mr-2 h-4 w-4" /> Add Company
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[525px]">
-        <DialogHeader>
-          <DialogTitle>Add Company</DialogTitle>
-          <DialogDescription>
-            Fill in the details to add a new company to the directory.
-          </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Logo Upload */}
-            <div className="space-y-2">
-              <Label htmlFor="logo-upload">Company Logo</Label>
-              <div className="flex flex-col items-center">
-                <div className="border-2 border-dashed rounded-md p-6 w-40 h-40 flex flex-col items-center justify-center text-center">
-                  {logoPreview ? (
-                    <img
-                      src={logoPreview || "/placeholder.svg"}
-                      alt="Logo preview"
-                      className="max-h-full max-w-full object-contain"
-                    />
-                  ) : (
-                    <>
-                      <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-                      <span className="text-sm text-muted-foreground">
-                        Upload logo
-                      </span>
-                    </>
-                  )}
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogTrigger asChild>
+          <Button className="mt-4 md:mt-0 bg-primary text-primary-foreground">
+            <Plus className="mr-2 h-4 w-4" /> Add Company
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+          <div ref={formContainerRef}>
+            <DialogHeader className="p-6 pb-2">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center">
+                  <Building2 className="h-5 w-5 text-primary" />
                 </div>
-                <input
-                  id="logo-upload"
-                  type="file"
-                  accept="image/png, image/jpeg"
-                  className="hidden"
-                  onChange={handleLogoChange}
-                />
-                <label
-                  htmlFor="logo-upload"
-                  className="mt-2 text-sm text-primary cursor-pointer"
-                >
-                  Upload logo
-                </label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Recommended: 400x400px, PNG or JPG
-                </p>
-                {form.formState.errors.image && (
-                  <p className="text-sm text-destructive">
-                    {form.formState.errors.image.message}
-                  </p>
-                )}
+                <DialogTitle className="text-xl">Add New Company</DialogTitle>
               </div>
-            </div>
+              <DialogDescription>
+                Fill in the details to add a new company to your directory.
+              </DialogDescription>
+            </DialogHeader>
 
-            {/* Company Name */}
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Company Name *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter company name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <Tabs defaultValue="basic" className="w-full">
+              <div className="px-6">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="basic">Basic Info</TabsTrigger>
+                  <TabsTrigger value="additional">Additional Details</TabsTrigger>
+                </TabsList>
+              </div>
 
-            {/* Website */}
-            <FormField
-              control={form.control}
-              name="website"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Website *</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Globe className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        placeholder="e.g. https://www.example.com"
-                        className="pl-10"
-                        {...field}
+              <ScrollArea className="px-6 py-2 max-h-[70vh]">
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <TabsContent value="basic" className="space-y-6 pt-2">
+                      {/* Logo Upload */}
+                      <div className="space-y-2 form-field">
+                        <FormLabel htmlFor="logo-upload">Company Logo</FormLabel>
+                        <div className="flex flex-col items-center">
+                          <div
+                              ref={uploadAreaRef}
+                              className="border-2 border-dashed rounded-lg p-6 w-40 h-40 flex flex-col items-center justify-center text-center relative cursor-pointer transition-all duration-300"
+                          >
+                            {logoPreview ? (
+                                <div className="logo-preview relative w-full h-full">
+                                  <img
+                                      src={logoPreview}
+                                      alt="Logo preview"
+                                      className="max-h-full max-w-full object-contain"
+                                  />
+                                  <button
+                                      type="button"
+                                      onClick={handleRemoveLogo}
+                                      className="absolute -top-3 -right-3 p-1 rounded-full bg-background text-destructive shadow-sm border hover:bg-destructive hover:text-destructive-foreground transition-colors"
+                                  >
+                                    <Trash className="h-4 w-4" />
+                                  </button>
+                                </div>
+                            ) : (
+                                <>
+                                  <ImagePlus className="h-10 w-10 text-muted-foreground mb-2" />
+                                  <span className="text-sm text-muted-foreground">
+                                Upload logo
+                              </span>
+                                </>
+                            )}
+                          </div>
+                          <input
+                              id="logo-upload"
+                              type="file"
+                              accept="image/png, image/jpeg, image/svg+xml"
+                              className="hidden"
+                              onChange={handleLogoChange}
+                          />
+                          <label
+                              htmlFor="logo-upload"
+                              className="mt-2 text-sm text-primary cursor-pointer hover:underline"
+                          >
+                            Browse files
+                          </label>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Recommended: 400×400px, PNG or JPG
+                          </p>
+                          {form.formState.errors.image && (
+                              <p className="text-sm text-destructive">
+                                {form.formState.errors.image.message}
+                              </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Company Name */}
+                      <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                              <FormItem className="form-field">
+                                <FormLabel>Company Name *</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Enter company name" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                          )}
                       />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* Description */}
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Brief description of the company"
-                      className="min-h-[100px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
-            {/* Location */}
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        placeholder="e.g. San Francisco, CA"
-                        className="pl-10"
-                        {...field}
+                      {/* Website */}
+                      <FormField
+                          control={form.control}
+                          name="website"
+                          render={({ field }) => (
+                              <FormItem className="form-field">
+                                <FormLabel>Website</FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <Globe className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                    <Input
+                                        placeholder="e.g. https://www.example.com"
+                                        className="pl-10"
+                                        {...field}
+                                    />
+                                  </div>
+                                </FormControl>
+                                <FormDescription>
+                                  Include the full URL with http:// or https://
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                          )}
                       />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
-            <DialogFooter className="sm:justify-end">
-              <DialogClose asChild>
-                <Button type="button" variant="outline">
-                  Cancel
-                </Button>
-              </DialogClose>
-              <Button
-                type="submit"
-                className="bg-primary text-primary-foreground"
-              >
-                Create Company
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+                      {/* Address */}
+                      <FormField
+                          control={form.control}
+                          name="address"
+                          render={({ field }) => (
+                              <FormItem className="form-field">
+                                <FormLabel>Address *</FormLabel>
+                                <FormControl>
+                                  <div className="relative">
+                                    <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                    <Input
+                                        placeholder="e.g. San Francisco, CA"
+                                        className="pl-10"
+                                        {...field}
+                                    />
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                    </TabsContent>
+
+                    <TabsContent value="additional" className="space-y-6 pt-2">
+                      {/* Description */}
+                      <FormField
+                          control={form.control}
+                          name="description"
+                          render={({ field }) => (
+                              <FormItem className="form-field">
+                                <FormLabel>Description *</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                      placeholder="Brief description of the company"
+                                      className="min-h-[120px] resize-y"
+                                      {...field}
+                                  />
+                                </FormControl>
+                                <FormDescription>
+                                  Provide a short description of the company's mission, products, or services
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+
+                      {/* Industry */}
+                      <FormField
+                          control={form.control}
+                          name="industry"
+                          render={({ field }) => (
+                              <FormItem className="form-field">
+                                <FormLabel>Industry</FormLabel>
+                                <FormControl>
+                                  <Input
+                                      placeholder="e.g. Technology, Healthcare, Education"
+                                      {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+
+                      {/* Company Size */}
+                      <FormField
+                          control={form.control}
+                          name="size"
+                          render={({ field }) => (
+                              <FormItem className="form-field">
+                                <FormLabel>Company Size</FormLabel>
+                                <FormControl>
+                                  <Input
+                                      placeholder="e.g. 1-10 employees, 11-50 employees"
+                                      {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                    </TabsContent>
+
+                    <DialogFooter className="px-6 py-4 bg-muted/30 border-t sticky bottom-0">
+                      <DialogClose asChild>
+                        <Button type="button" variant="outline">
+                          Cancel
+                        </Button>
+                      </DialogClose>
+                      <Button
+                          type="submit"
+                          className="bg-primary text-primary-foreground"
+                          disabled={isLoading}
+                      >
+                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {isLoading ? "Creating..." : "Create Company"}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </ScrollArea>
+            </Tabs>
+          </div>
+        </DialogContent>
+      </Dialog>
   );
 }
