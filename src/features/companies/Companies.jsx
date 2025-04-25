@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {AnimatedBackground} from "@/components/AnimatedBackground.jsx";
 
 // Register GSAP plugins
 if (typeof window !== "undefined") {

@@ -23,6 +23,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import AnimatedBackground from "@/components/AnimatedBackground.jsx";
 
 // This is sample data.
 const data = {

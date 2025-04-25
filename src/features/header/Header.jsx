@@ -13,7 +13,7 @@ import {
 import { Menu } from "lucide-react";
 export default function Header() {
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 border-b">
+    <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 border-b z-20">
       <div className="flex items-center gap-2 px-4 w-full">
         {/* Hamburger Menu for Smaller Screens */}
         <div className="md:hidden flex items-center">

@@ -20,29 +20,52 @@ import ProfilePage from "@/features/settings/profile/Profile.jsx";
 import BillingPage from "@/features/settings/billing/Billing.jsx";
 import OAuthCallback from "@/components/OAuthCallback.jsx";
 import Home from "@/features/home/Home.jsx";
-// Lazy pages
+import { AnimatedBackground } from "./components/AnimatedBackground";
 
+// Lazy pages
 const Auth = lazy(() => import("./features/auth/Auth.jsx"));
 const ForgetPassword = lazy(() =>
-  import("./features/auth/password/ForgetPassword.jsx")
+    import("./features/auth/password/ForgetPassword.jsx")
 );
 
+// Admin pages (lazy loaded)
+const AdminLayout = lazy(() => import("./layouts/AdminLayout.jsx"));
+const AdminDashboard = lazy(() => import("./features/admin/Dashboard.jsx"));
+const UserManagement = lazy(() => import("./features/admin/UserManagement.jsx"));
+const ContentManagement = lazy(() => import("./features/admin/ContentManagement.jsx"));
+const Analytics = lazy(() => import("./features/admin/Analytics.jsx"));
+const Settings = lazy(() => import("./features/admin/Settings.jsx"));
+
+// Create the AnimatedBackground component
+const BackgroundWrapper = ({ children }) => {
+  return (
+      <div className="relative min-h-screen">
+        <AnimatedBackground />
+        <div className="relative z-10">{children}</div>
+      </div>
+  );
+};
+
 const AuthLayout = () => (
-  <div className="min-h-screen">
-    <Outlet />
-  </div>
+    <BackgroundWrapper>
+      <div className="min-h-screen">
+        <Outlet />
+      </div>
+    </BackgroundWrapper>
 );
+
 const PublicRoute = ({ children, redirectPath = "/" }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) return <FullPageSpinner />;
 
   return isAuthenticated ? (
-    <Navigate to={redirectPath} replace />
+      <Navigate to={redirectPath} replace />
   ) : (
-    <>{children}</>
+      <>{children}</>
   );
 };
+
 const ProtectedRoute = ({ children, redirectPath = "/auth" }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
@@ -51,8 +74,28 @@ const ProtectedRoute = ({ children, redirectPath = "/auth" }) => {
 
   if (!isAuthenticated) {
     return (
-      <Navigate to={redirectPath} replace state={{ from: location.pathname }} />
+        <Navigate to={redirectPath} replace state={{ from: location.pathname }} />
     );
+  }
+
+  return <>{children}</>;
+};
+
+const AdminRoute = ({ children, redirectPath = "/" }) => {
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const location = useLocation();
+
+  if (isLoading) return <FullPageSpinner />;
+
+  if (!isAuthenticated) {
+    return (
+        <Navigate to="/auth" replace state={{ from: location.pathname }} />
+    );
+  }
+
+  // Check if user has admin role
+  if (!user?.isAdmin) {
+    return <Navigate to={redirectPath} replace />;
   }
 
   return <>{children}</>;
@@ -61,16 +104,18 @@ const ProtectedRoute = ({ children, redirectPath = "/auth" }) => {
 const ErrorPage = ({ error }) => {
   const location = useLocation();
   const message =
-    error ?? location.state?.error ?? "We couldn't find that page.";
+      error ?? location.state?.error ?? "We couldn't find that page.";
 
   return (
-    <div className="min-h-screen flex items-center justify-center flex-col gap-4">
-      <h1 className="text-2xl font-bold text-red-600">Oops!</h1>
-      <p className="text-gray-600 max-w-md text-center">{message}</p>
-      <Button asChild>
-        <a href="/">Go Home</a>
-      </Button>
-    </div>
+      <BackgroundWrapper>
+        <div className="min-h-screen flex items-center justify-center flex-col gap-4">
+          <h1 className="text-2xl font-bold text-red-600">Oops!</h1>
+          <p className="text-gray-600 max-w-md text-center">{message}</p>
+          <Button asChild>
+            <a href="/">Go Home</a>
+          </Button>
+        </div>
+      </BackgroundWrapper>
   );
 };
 
@@ -82,127 +127,206 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Wrapper for ProtectedLayout with background
+const ProtectedLayoutWithBackground = () => (
+    <BackgroundWrapper>
+      <ProtectedLayout />
+    </BackgroundWrapper>
+);
+
+// Wrapper for SettingsLayout with background
+const SettingsLayoutWithBackground = () => (
+    <BackgroundWrapper>
+      <SettingsLayout />
+    </BackgroundWrapper>
+);
+
+// Wrapper for AdminLayout with background
+const AdminLayoutWithBackground = () => (
+    <BackgroundWrapper>
+      <Suspense fallback={<FullPageSpinner />}>
+        <AdminLayout />
+      </Suspense>
+    </BackgroundWrapper>
+);
+
 function App() {
   const [router] = useState(() =>
-    createBrowserRouter([
-      {
-        element: (
-          <ProtectedRoute>
-            <ProtectedLayout />
-          </ProtectedRoute>
-        ),
-        errorElement: <ErrorPage />,
-        children: [
-          {
-            path: "/",
-            element: <Home />,
-          },
-        ],
-      },
-      {
-        element: (
-          <ProtectedRoute>
-            <SettingsLayout />
-          </ProtectedRoute>
-        ),
-        path: "/settings",
-        errorElement: <ErrorPage />,
-        children: [
-          {
-            path: "profile",
-            element: (
-              <Suspense
-                fallback={
-                  <div className="min-h-screen flex items-center justify-center">
-                    Loading...
-                  </div>
-                }
-              >
-                <ProfilePage />
-              </Suspense>
-            ),
-          },
-          {
-            path: "billing",
-            element: (
-              <Suspense
-                fallback={
-                  <div className="min-h-screen flex items-center justify-center">
-                    Loading...
-                  </div>
-                }
-              >
-                <BillingPage />
-              </Suspense>
-            ),
-          },
-        ],
-      },
-
-      {
-        element: <AuthLayout />,
-        errorElement: <ErrorPage />,
-        children: [
-          {
-            path: "/auth",
-            element: (
-              <Suspense fallback={<FullPageSpinner />}>
-                <PublicRoute>
-                  <AuthLayout />
-                </PublicRoute>
-              </Suspense>
-            ),
-            errorElement: <ErrorPage />,
-            children: [
-              {
-                index: true,
-                element: (
-                  <Suspense fallback={<FullPageSpinner />}>
-                    <Auth />
+      createBrowserRouter([
+        {
+          element: (
+              <ProtectedRoute>
+                <ProtectedLayoutWithBackground />
+              </ProtectedRoute>
+          ),
+          errorElement: <ErrorPage />,
+          children: [
+            {
+              path: "/",
+              element: <Home />,
+            },
+          ],
+        },
+        {
+          element: (
+              <ProtectedRoute>
+                <SettingsLayoutWithBackground />
+              </ProtectedRoute>
+          ),
+          path: "/settings",
+          errorElement: <ErrorPage />,
+          children: [
+            {
+              path: "profile",
+              element: (
+                  <Suspense
+                      fallback={
+                        <div className="min-h-screen flex items-center justify-center">
+                          Loading...
+                        </div>
+                      }
+                  >
+                    <ProfilePage />
                   </Suspense>
-                ),
-              },
-              {
-                path: "forget-password",
-                element: (
-                  <Suspense fallback={<FullPageSpinner />}>
-                    <ForgetPassword />
+              ),
+            },
+            {
+              path: "billing",
+              element: (
+                  <Suspense
+                      fallback={
+                        <div className="min-h-screen flex items-center justify-center">
+                          Loading...
+                        </div>
+                      }
+                  >
+                    <BillingPage />
                   </Suspense>
-                ),
-              },
-              {
-                path: "reset-password/:verificationToken",
-                element: (
+              ),
+            },
+          ],
+        },
+        // Admin Dashboard Routes
+        {
+          element: (
+              <AdminRoute>
+                <AdminLayoutWithBackground />
+              </AdminRoute>
+          ),
+          path: "/admin",
+          errorElement: <ErrorPage error="Admin access required." />,
+          children: [
+            {
+              index: true,
+              element: (
                   <Suspense fallback={<FullPageSpinner />}>
-                    <ResetPassword />
+                    <AdminDashboard />
                   </Suspense>
-                ),
-              },
-              {
-                path: "callback",
-                element: <OAuthCallback />,
-              },
-              {
-                path: "*",
-                element: <ErrorPage error="That auth page doesn’t exist." />,
-              },
-            ],
-          },
-        ],
-      },
-    ])
+              ),
+            },
+            {
+              path: "users",
+              element: (
+                  <Suspense fallback={<FullPageSpinner />}>
+                    <UserManagement />
+                  </Suspense>
+              ),
+            },
+            {
+              path: "content",
+              element: (
+                  <Suspense fallback={<FullPageSpinner />}>
+                    <ContentManagement />
+                  </Suspense>
+              ),
+            },
+            {
+              path: "analytics",
+              element: (
+                  <Suspense fallback={<FullPageSpinner />}>
+                    <Analytics />
+                  </Suspense>
+              ),
+            },
+            {
+              path: "settings",
+              element: (
+                  <Suspense fallback={<FullPageSpinner />}>
+                    <Settings />
+                  </Suspense>
+              ),
+            },
+            {
+              path: "*",
+              element: <ErrorPage error="That admin page doesn't exist." />,
+            },
+          ],
+        },
+        {
+          element: <AuthLayout />,
+          errorElement: <ErrorPage />,
+          children: [
+            {
+              path: "/auth",
+              element: (
+                  <Suspense fallback={<FullPageSpinner />}>
+                    <PublicRoute>
+                      <AuthLayout />
+                    </PublicRoute>
+                  </Suspense>
+              ),
+              errorElement: <ErrorPage />,
+              children: [
+                {
+                  index: true,
+                  element: (
+                      <Suspense fallback={<FullPageSpinner />}>
+                        <Auth />
+                      </Suspense>
+                  ),
+                },
+                {
+                  path: "forget-password",
+                  element: (
+                      <Suspense fallback={<FullPageSpinner />}>
+                        <ForgetPassword />
+                      </Suspense>
+                  ),
+                },
+                {
+                  path: "reset-password/:verificationToken",
+                  element: (
+                      <Suspense fallback={<FullPageSpinner />}>
+                        <ResetPassword />
+                      </Suspense>
+                  ),
+                },
+                {
+                  path: "callback",
+                  element: <OAuthCallback />,
+                },
+                {
+                  path: "*",
+                  element: <ErrorPage error="That auth page doesn't exist." />,
+                },
+              ],
+            },
+          ],
+        },
+      ])
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider storageKey="app-theme">
-        <ReactQueryDevtools initialIsOpen={false} />
-        <Suspense fallback={<FullPageSpinner />}>
-          <RouterProvider router={router} />
-        </Suspense>
-        <Toaster />
-      </ThemeProvider>
-    </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider storageKey="app-theme">
+          <ReactQueryDevtools initialIsOpen={false} />
+          <Suspense fallback={<FullPageSpinner />}>
+            <RouterProvider router={router} />
+          </Suspense>
+          <Toaster />
+        </ThemeProvider>
+      </QueryClientProvider>
   );
 }
 

@@ -13,9 +13,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarGroupContent,
 } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
