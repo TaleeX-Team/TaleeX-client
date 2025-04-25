@@ -2,6 +2,20 @@ import { createCompany, getCompanies } from "@/services/apiCompanies";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useCompanies = () => {
+  const companyData = useQuery({
+    queryKey: ["companies"],
+    queryFn: getCompanies,
+    staleTime: 5 * 60 * 1000, // Prevent refetching for 5 minutes
+    refetchOnWindowFocus: false, // Disable refetching on window focus
+    onSuccess: (data) => {
+      console.log("Companies fetched successfully:", data);
+    },
+    onError: (error) => {
+      console.error("Fetching companies failed:", error.message);
+    },
+    retry: false, // Retry once on failure
+  });
+
   const createCompanyMutation = useMutation({
     mutationFn: createCompany,
     onSuccess: (data) => {
@@ -15,13 +29,6 @@ export const useCompanies = () => {
       console.error("Creating company failed:", error.message);
     },
   });
-  //   const companies2 = useQuery({
-  //     queryKey: ["companies"],
-  //     queryFn: getCompanies,
-  //     onSuccess: (data) => {
-  //       console.log("Companies fetched successfully:", data);
-  //     },
-  //   });
 
   return {
     createCompanyMutation: {
@@ -30,5 +37,6 @@ export const useCompanies = () => {
       isError: createCompanyMutation.isError,
       error: createCompanyMutation.error,
     },
+    companyData,
   };
 };

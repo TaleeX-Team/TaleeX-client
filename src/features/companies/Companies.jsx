@@ -1,43 +1,17 @@
-import { Search, MapPin, Users, Plus, Filter } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search, FolderPlus } from "lucide-react";
 import { Input } from "@/components/ui/input";
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import CompanyCard from "./company-card/CompanyCard";
-import AddCompany from "./add-company/AddCompany";
-import { useQuery } from "@tanstack/react-query";
-import { getCompanies } from "@/services/apiCompanies";
+import AddCompany from "./modals/add-company";
+import { useCompanies } from "./features";
+import { CompanySkeleton } from "./company-skeleton";
 
 export default function Companies() {
-  const companies = [
-    {
-      name: "TechForward",
-      industry: "Information Technology",
-      location: "San Francisco, CA",
-      size: "50-200 employees",
-    },
-    {
-      name: "InnovateX",
-      industry: "Software Development",
-      location: "Austin, TX",
-      size: "200-500 employees",
-    },
-    {
-      name: "FutureWorks AI",
-      industry: "Artificial Intelligence",
-      location: "Boston, MA",
-      size: "10-50 employees",
-    },
-  ];
+  const {
+    companyData: { data: companies, isLoading, isError },
+  } = useCompanies();
 
   return (
-    <div className=" bg-background p-6 md:p-8">
+    <div className="bg-background p-6 md:p-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
@@ -62,7 +36,7 @@ export default function Companies() {
               </svg>
             </h1>
           </div>
-          <div className=" mt-4 md:mt-0">
+          <div className="mt-4 md:mt-0">
             <AddCompany />
           </div>
         </div>
@@ -73,32 +47,43 @@ export default function Companies() {
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input placeholder="Search companies..." className="pl-10 w-full" />
           </div>
-          <div>
-            <Select defaultValue="all">
-              <SelectTrigger className="w-[180px] bg-background">
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  <SelectValue placeholder="All Industries" />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Industries</SelectItem>
-                <SelectItem value="tech">Information Technology</SelectItem>
-                <SelectItem value="software">Software Development</SelectItem>
-                <SelectItem value="ai">Artificial Intelligence</SelectItem>
-                <SelectItem value="finance">Finance</SelectItem>
-                <SelectItem value="healthcare">Healthcare</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
         </div>
 
         {/* Company Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {companies.map((company, index) => (
-            <CompanyCard key={index} company={company} />
-          ))}
-        </div>
+        {isLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <CompanySkeleton />
+            <CompanySkeleton />
+            <CompanySkeleton />
+          </div>
+        )}
+        {isError && (
+          <div className="text-center text-red-500">
+            <h2>Error loading companies. Please try again later.</h2>
+          </div>
+        )}
+        {!isLoading && !isError && (
+          <>
+            {companies?.companies?.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {companies.companies.map((company) => (
+                  <CompanyCard key={company._id} company={company} />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <FolderPlus className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">No companies yet</h3>
+                <p className="text-muted-foreground max-w-md mb-6">
+                  Your company directory is empty. Add your first company to get
+                  started.
+                </p>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
