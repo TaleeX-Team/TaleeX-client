@@ -1,3 +1,5 @@
+// Enhanced ResetPassword component with improved accessibility, UX, and code structure
+
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
@@ -28,12 +30,9 @@ import { useResetPassword } from "@/hooks/useResetPassowrd.js";
 import { toast } from "sonner";
 import gsap from "gsap";
 
-
-// -- Helper hooks --
-
 function useToggle(initial = false) {
     const [state, setState] = useState(initial);
-    return [state, () => setState(v => !v)];
+    return [state, () => setState((v) => !v)];
 }
 
 function usePasswordStrength(password) {
@@ -50,9 +49,6 @@ function usePasswordStrength(password) {
 
     return strength;
 }
-
-
-// -- Component --
 
 export default function ResetPassword() {
     const { verificationToken } = useParams();
@@ -76,7 +72,6 @@ export default function ResetPassword() {
     const cardRef = useRef(null);
     const contentRef = useRef(null);
 
-    // Intro animations
     useEffect(() => {
         const tl = gsap.timeline();
         tl.fromTo(
@@ -99,7 +94,6 @@ export default function ResetPassword() {
         });
     }, []);
 
-    // Post-submit animation
     useEffect(() => {
         if (isSubmitted) {
             gsap.fromTo(
@@ -126,7 +120,7 @@ export default function ResetPassword() {
                     setIsSubmitted(true);
                     toast.success("Password reset successfully");
                 },
-                onError: err => {
+                onError: (err) => {
                     toast.error(err.message || "Failed to reset password");
                 },
             }
@@ -148,23 +142,21 @@ export default function ResetPassword() {
         "Strong — great password!",
     ];
 
-    function renderStrength() {
-        return (
-            <div className="mt-2">
-                <div className="flex gap-2 mb-1">
-                    {[0,1,2,3].map(i => (
-                        <div
-                            key={i}
-                            className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-                                i < strength ? strengthColors[strength] : strengthColors[0]
-                            }`}
-                        />
-                    ))}
-                </div>
-                <p className="text-xs text-muted-foreground">{strengthText[strength]}</p>
+    const renderStrength = () => (
+        <div className="mt-2" aria-live="polite">
+            <div className="flex gap-2 mb-1">
+                {[0, 1, 2, 3].map((i) => (
+                    <div
+                        key={i}
+                        className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
+                            i < strength ? strengthColors[strength] : strengthColors[0]
+                        }`}
+                    />
+                ))}
             </div>
-        );
-    }
+            <p className="text-xs text-muted-foreground">{strengthText[strength]}</p>
+        </div>
+    );
 
     return (
         <div className="min-h-screen flex items-center justify-center overflow-hidden relative">
@@ -176,8 +168,8 @@ export default function ResetPassword() {
                 <div ref={cardRef} className="w-full max-w-md lg:w-1/2 space-y-6">
                     <div className="flex justify-between items-center mb-2">
                         <div className="lg:hidden flex items-center">
-                            <Building2 className="w-8 h-8 mr-2 text-purple-400" />
-                            <h2 className="text-2xl font-bold text-gradient">TalentSync</h2>
+                            <Building2 className="w-8 h-8 mr-2 text-primary dark:text-primary/70" />
+                            <h2 className="text-2xl font-bold text-gradient dark:text-primary/70">TalentSync</h2>
                         </div>
                         <ThemeToggle />
                     </div>
@@ -196,15 +188,15 @@ export default function ResetPassword() {
                             <div ref={contentRef}>
                                 {!isSubmitted ? (
                                     <form onSubmit={handleSubmit} className="space-y-4">
-                                        {/* New Password */}
                                         <Label htmlFor="password">New Password</Label>
                                         <div className="relative">
-                                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />                                            <Input
+                                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
+                                            <Input
                                                 id="password"
                                                 type={showPassword ? "text" : "password"}
                                                 placeholder="••••••••"
                                                 value={password}
-                                                onChange={e => setPassword(e.target.value)}
+                                                onChange={(e) => setPassword(e.target.value)}
                                                 required
                                                 minLength={8}
                                                 disabled={isLoading}
@@ -214,21 +206,22 @@ export default function ResetPassword() {
                                                 type="button"
                                                 onClick={toggleShowPassword}
                                                 className="absolute right-3 top-1/2 -translate-y-1/2"
+                                                aria-label={showPassword ? "Hide password" : "Show password"}
                                             >
                                                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                             </button>
                                         </div>
                                         {renderStrength()}
 
-                                        {/* Confirm Password */}
                                         <Label htmlFor="confirmPassword">Confirm Password</Label>
                                         <div className="relative">
-                                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />                                            <Input
+                                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
+                                            <Input
                                                 id="confirmPassword"
                                                 type={showConfirm ? "text" : "password"}
                                                 placeholder="••••••••"
                                                 value={confirmPassword}
-                                                onChange={e => setConfirmPassword(e.target.value)}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
                                                 required
                                                 disabled={isLoading}
                                                 className={`pl-10 pr-10 ${
@@ -241,6 +234,7 @@ export default function ResetPassword() {
                                                 type="button"
                                                 onClick={toggleShowConfirm}
                                                 className="absolute right-3 top-1/2 -translate-y-1/2"
+                                                aria-label={showConfirm ? "Hide confirm password" : "Show confirm password"}
                                             >
                                                 {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
                                             </button>
@@ -249,11 +243,10 @@ export default function ResetPassword() {
                                             <p className="text-xs text-red-500">Passwords don’t match</p>
                                         )}
 
-                                        {/* Submit */}
                                         <Button
                                             type="submit"
                                             disabled={isLoading || password !== confirmPassword}
-                                            className="w-full bg-gradient-to-r from-purple-500 to-pink-500"
+                                            className="w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300"
                                         >
                                             {isLoading ? (
                                                 <>
@@ -274,15 +267,15 @@ export default function ResetPassword() {
 
                                         <Link
                                             to="/auth"
-                                            className="flex justify-center items-center gap-2 text-sm text-purple-400"
+                                            className="flex justify-center items-center gap-2 text-sm text-primary"
                                         >
-                                            <ArrowLeft /> Back to login
+                                            <ArrowLeft size={16}/> Back to login
                                         </Link>
                                     </form>
                                 ) : (
                                     <div className="text-center space-y-6 py-4">
-                                        <div className="mx-auto w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center">
-                                            <CheckCircle className="h-8 w-8 text-green-500" />
+                                        <div className="mx-auto w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center animate-in zoom-in-95">
+                                            <CheckCircle className="h-8 w-8 text-green-500 animate-bounce" />
                                         </div>
                                         <h3 className="text-xl font-medium">Password Reset Complete</h3>
                                         <p className="text-muted-foreground">
@@ -292,7 +285,7 @@ export default function ResetPassword() {
                                             className="w-full bg-gradient-to-r from-purple-500 to-pink-500"
                                             onClick={() => navigate("/auth")}
                                         >
-                                            Go to Login <ArrowRight className="ml-2" />
+                                            Go to Login <ArrowRight size={16} className="ml-2 " />
                                         </Button>
                                     </div>
                                 )}

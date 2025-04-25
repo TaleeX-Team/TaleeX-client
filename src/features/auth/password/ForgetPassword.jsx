@@ -98,8 +98,8 @@ const ForgotPassword = () => {
                 <div ref={cardRef} className="w-full max-w-md lg:w-1/2 space-y-6">
                     <div className="flex items-center justify-between mb-2">
                         <div className="lg:hidden flex items-center">
-                            <Building2 className="w-8 h-8 mr-2 text-purple-400" />
-                            <h2 className="text-2xl font-bold text-gradient">TalentSync</h2>
+                            <Building2 className="w-8 h-8 mr-2 text-primary dark:text-primary/70" />
+                            <h2 className="text-2xl font-bold text-gradient dark:text-primary/70">TalentSync</h2>
                         </div>
                         <ThemeToggle />
                     </div>
@@ -141,7 +141,7 @@ const ForgotPassword = () => {
                                         </div>
                                         <Button
                                             type="submit"
-                                            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
+                                            className="w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300"
                                             disabled={isLoading}
                                         >
                                             {isLoading ? "Sending..." : "Send reset instructions"}
@@ -149,7 +149,7 @@ const ForgotPassword = () => {
                                         </Button>
                                         <Link
                                             to="/auth"
-                                            className="flex items-center justify-center gap-2 text-sm text-purple-400 hover:text-purple-300 transition-colors mt-4"
+                                            className="flex items-center justify-center gap-2 text-sm text-primary hover:primary/70 transition-colors mt-4"
                                         >
                                             <ArrowLeft size={16} /> Back to login
                                         </Link>

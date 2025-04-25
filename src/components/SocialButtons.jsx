@@ -15,8 +15,8 @@ export const SocialButtons = ({ disabled }) => {
             <div className="relative flex items-center justify-center">
                 <span className="absolute inset-x-0 border-t border-gray-300 dark:border-gray-700" />
                 <span className="relative px-4 text-sm text-muted-foreground bg-background dark:bg-background">
-                    Or continue with
-                </span>
+          Or continue with
+        </span>
             </div>
 
             <div className="flex gap-3 mt-3">

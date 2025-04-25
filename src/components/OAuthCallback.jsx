@@ -1,43 +1,44 @@
-// OAuthCallback.jsx
 import { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
+import {loginWithOAuthCode} from "@/services/apiAuth.js";
 
 const OAuthCallback = () => {
-    const [error, setError] = useState(null);
     const navigate = useNavigate();
-    const location = useLocation();
-    const { handleOAuthCallback, isProcessingOAuth } = useAuth();
+    const [searchParams] = useSearchParams();
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        const processCallback = async () => {
-            try {
-                // Process the OAuth callback
-                const success = await handleOAuthCallback();
+        const oauthError = searchParams.get("error");
+        const errorDescription = searchParams.get("error_description");
 
-                if (success) {
-                    // Get the redirect target from query params or session storage or default
-                    const params = new URLSearchParams(location.search);
-                    const redirectTo = params.get('redirect') ||
-                        sessionStorage.getItem('auth_redirect') ||
-                        '/dashboard';
+        if (oauthError) {
+            const fullError = `OAuth failed: ${errorDescription || oauthError}`;
+            toast.error(fullError);
+            setError(fullError);
+            return;
+        }
 
-                    // Clean up
-                    sessionStorage.removeItem('auth_redirect');
+        const code = searchParams.get('code');
+        const provider = searchParams.get('provider');
 
-                    // Redirect to the target page
-                    navigate(redirectTo, { replace: true });
-                } else {
-                    setError('Authentication failed. Please try again.');
-                }
-            } catch (err) {
-                console.error('Error processing OAuth callback:', err);
-                setError('An error occurred during authentication.');
-            }
-        };
+        if (!code) {
+            const fallbackError = "No code found in the callback URL.";
+            toast.error(fallbackError);
+            setError(fallbackError);
+            return;
+        }
 
-        processCallback();
-    }, [handleOAuthCallback, navigate, location]);
+        loginWithOAuthCode(code, provider)
+            .then(() => {
+                navigate('/');
+            })
+            .catch((err) => {
+                const loginError = err?.message || "OAuth login failed.";
+                toast.error(loginError);
+                setError(loginError);
+            });
+    }, [searchParams]);
 
     if (error) {
         return (

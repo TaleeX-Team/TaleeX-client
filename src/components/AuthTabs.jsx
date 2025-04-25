@@ -37,7 +37,6 @@ export const AuthTabs = ({
         }
     };
 
-    // Compatible method that works with the existing LoginForm/SignupForm
     const handleAuthSubmit = (data, type) => {
         console.log(`Starting ${type} submission...`);
 
@@ -76,30 +75,30 @@ export const AuthTabs = ({
 
     return (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-purple-100 dark:bg-gray-900 border border-purple-200 dark:border-purple-900">
+            <TabsList className="grid w-full grid-cols-2 bg-secondary/50 backdrop-blur-sm border border-border dark:border-border rounded-lg mb-4">
                 <TabsTrigger
                     value="login"
-                    className="data-[state=active]:bg-white data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-900 dark:data-[state=active]:text-white dark:text-purple-200 dark:data-[state=inactive]:text-purple-400"
+                    className="data-[state=active]:bg-white dark:data-[state=active]:bg-primary/10 data-[state=active]:text-primary dark:data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all duration-200"
                 >
                     Sign In
                 </TabsTrigger>
                 <TabsTrigger
                     value="signup"
-                    className="data-[state=active]:bg-white data-[state=active]:text-purple-700 dark:data-[state=active]:bg-purple-900 dark:data-[state=active]:text-white dark:text-purple-200 dark:data-[state=inactive]:text-purple-400"
+                    className="data-[state=active]:bg-white dark:data-[state=active]:bg-primary/10 data-[state=active]:text-primary dark:data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all duration-200"
                 >
                     Sign Up
                 </TabsTrigger>
             </TabsList>
 
-            <div ref={contentRef} className="mt-4">
-                <TabsContent value="login">
+            <div ref={contentRef} className="mt-4 transition-all duration-300">
+                <TabsContent value="login" className="focus-visible:outline-none focus-visible:ring-0">
                     <LoginForm
                         handleAuthSubmit={handleAuthSubmit}
                         isLoading={login.isLoading}
                         handleOAuthSuccess={handleOAuthSuccess}
                     />
                 </TabsContent>
-                <TabsContent value="signup">
+                <TabsContent value="signup" className="focus-visible:outline-none focus-visible:ring-0">
                     <SignupForm
                         handleAuthSubmit={handleAuthSubmit}
                         isLoading={register.isLoading}

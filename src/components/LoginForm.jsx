@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import { SocialButtons } from "./SocialButtons";
-
+import { useTheme } from "@/layouts/theme_provider/ThemeProvider";
 import gsap from "gsap";
 
 import {
@@ -27,9 +27,11 @@ const formSchema = z.object({
     rememberMe: z.boolean().optional(),
 })
 
-export const LoginForm = ({ isLoading, handleAuthSubmit ,handleOAuthSuccess}) => {
+export const LoginForm = ({ isLoading, handleAuthSubmit, handleOAuthSuccess }) => {
     const [showPassword, setShowPassword] = useState(false);
     const formRef = useRef();
+    const { theme } = useTheme();
+    const isDark = theme === "dark";
 
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -51,8 +53,7 @@ export const LoginForm = ({ isLoading, handleAuthSubmit ,handleOAuthSuccess}) =>
         }
 
         try {
-           await handleAuthSubmit(data, "login");
-
+            await handleAuthSubmit(data, "login");
         } catch (error) {
             console.error("Login error:", error);
         }
@@ -66,18 +67,21 @@ export const LoginForm = ({ isLoading, handleAuthSubmit ,handleOAuthSuccess}) =>
                     name="email"
                     render={({ field }) => (
                         <FormItem className="space-y-2">
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel className={`font-medium ${isDark ? "text-foreground" : "text-foreground"}`}>Email</FormLabel>
                             <FormControl>
                                 <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
+                                    <Mail className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${isDark ? "text-muted-foreground" : "text-muted-foreground"}`} size={16} />
                                     <Input
                                         placeholder="name@company.com"
-                                        className=" pl-10"
+                                        className={`pl-10 ${isDark
+                                            ? "bg-input text-foreground border-border focus:border-primary focus:ring-primary/30"
+                                            : "bg-input text-foreground border-border focus:border-primary focus:ring-primary/20"
+                                        }`}
                                         {...field}
                                     />
                                 </div>
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-destructive text-sm" />
                         </FormItem>
                     )}
                 />
@@ -87,25 +91,28 @@ export const LoginForm = ({ isLoading, handleAuthSubmit ,handleOAuthSuccess}) =>
                     name="password"
                     render={({ field }) => (
                         <FormItem className="space-y-2">
-                            <FormLabel>Password</FormLabel>
+                            <FormLabel className={`font-medium ${isDark ? "text-foreground" : "text-foreground"}`}>Password</FormLabel>
                             <FormControl>
                                 <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
+                                    <Lock className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${isDark ? "text-muted-foreground" : "text-muted-foreground"}`} size={16} />
                                     <Input
                                         type={showPassword ? "text" : "password"}
-                                        className=" pl-10 pr-10"
+                                        className={`pl-10 pr-10 ${isDark
+                                            ? "bg-input text-foreground border-border focus:border-primary focus:ring-primary/30"
+                                            : "bg-input text-foreground border-border focus:border-primary focus:ring-primary/20"
+                                        }`}
                                         {...field}
                                     />
                                     <button
                                         type="button"
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                        className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${isDark ? "text-muted-foreground hover:text-foreground" : "text-muted-foreground hover:text-foreground"}`}
                                         onClick={() => setShowPassword(!showPassword)}
                                     >
                                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                     </button>
                                 </div>
                             </FormControl>
-                            <FormMessage />
+                            <FormMessage className="text-destructive text-sm" />
                         </FormItem>
                     )}
                 />
@@ -121,9 +128,10 @@ export const LoginForm = ({ isLoading, handleAuthSubmit ,handleOAuthSuccess}) =>
                                         checked={field.value}
                                         onCheckedChange={field.onChange}
                                         id="remember"
+                                        className={isDark ? "border-border data-[state=checked]:bg-primary" : "border-border data-[state=checked]:bg-primary"}
                                     />
                                 </FormControl>
-                                <Label htmlFor="remember" className="text-sm">
+                                <Label htmlFor="remember" className={`text-sm ${isDark ? "text-muted-foreground" : "text-muted-foreground"}`}>
                                     Remember me
                                 </Label>
                             </FormItem>
@@ -131,7 +139,7 @@ export const LoginForm = ({ isLoading, handleAuthSubmit ,handleOAuthSuccess}) =>
                     />
                     <Link
                         to="forget-password"
-                        className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
+                        className={`text-sm ${isDark ? "text-primary hover:text-primary/80" : "text-primary hover:text-primary/80"} transition-colors`}
                     >
                         Forgot password?
                     </Link>
@@ -139,10 +147,10 @@ export const LoginForm = ({ isLoading, handleAuthSubmit ,handleOAuthSuccess}) =>
 
                 <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-300"
+                    className={`w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300`}
                     disabled={isLoading}
                 >
-                    {isLoading ? "Signing in..." : "Sign In"} <ArrowRight className="ml-2" />
+                    {isLoading ? "Signing in..." : "Sign In"} <ArrowRight className="ml-2" size={16} />
                 </Button>
 
                 <SocialButtons disabled={isLoading} handleOAuthSuccess={handleOAuthSuccess} />

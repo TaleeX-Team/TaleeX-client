@@ -299,17 +299,8 @@ export async function resetPassword({token, password, confirmPassword}) {
     }
 }
 
-
-export const getCompanies = async () => {
-    try {
-        console.log("Fetching companies");
-        const response = await apiClient.get("/companies");
-        console.log("Companies fetched successfully");
-        return response.data;
-    } catch (error) {
-        console.error("Failed to fetch companies:", error.message);
-        throw error;
-    }
+export const loginWithOAuthCode = async (code) => {
+    const res = await axios.post('/api/v1/auth/oauth-callback', { code }); // adjust endpoint if needed
+    return res.data;
 };
-
 export default apiClient;

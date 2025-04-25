@@ -18,6 +18,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import gsap from "gsap";
+import {useTheme} from "@/layouts/theme_provider/ThemeProvider.jsx";
 
 const formSchema = z.object({
     firstName: z
@@ -47,7 +48,8 @@ export const SignupForm = ({isLoading, handleAuthSubmit, handleOAuthSuccess}) =>
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const formRef = useRef();
-
+    const { theme } = useTheme();
+    const isDark = theme === "dark";
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -252,11 +254,11 @@ export const SignupForm = ({isLoading, handleAuthSubmit, handleOAuthSuccess}) =>
                             <div className="space-y-1 leading-none">
                                 <FormLabel htmlFor="terms" className="text-xs">
                                     I agree to the{" "}
-                                    <Link to="#" className="text-purple-400 hover:text-purple-300">
+                                    <Link to="#" className="text-primary hover:text-primary/70">
                                         Terms of Service
                                     </Link>{" "}
                                     and{" "}
-                                    <Link to="#" className="text-purple-400 hover:text-purple-300">
+                                    <Link to="#" className="text-primary hover:text-primary/70">
                                         Privacy Policy
                                     </Link>
                                 </FormLabel>
@@ -268,7 +270,7 @@ export const SignupForm = ({isLoading, handleAuthSubmit, handleOAuthSuccess}) =>
 
                 <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-300 h-8 text-sm"
+                    className={`w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300"}`}
                     disabled={isLoading}
                 >
                     {isLoading ? "Creating account..." : "Create account"} <ArrowRight className="ml-2" size={14}/>

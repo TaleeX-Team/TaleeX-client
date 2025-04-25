@@ -24,7 +24,8 @@ const Auth = () => {
 
     return (
         <div className="min-h-screen relative w-full flex items-center justify-center overflow-hidden transition-colors duration-300">
-            <AnimatedBackground />
+            {/* Add the auth-bg-gradient from your css */}
+            <div className="auth-bg-gradient"></div>
 
             <div className="container relative z-10 flex flex-col lg:flex-row items-center justify-center px-4 md:px-8">
                 {/* Left Panel - Branding */}
@@ -34,12 +35,12 @@ const Auth = () => {
                 <div ref={cardRef} className="w-full max-w-md lg:w-1/2 space-y-6">
                     <div className="flex items-center justify-between mb-2">
                         <ThreeDLogoSection isMobile={true} />
-                        <ThemeToggle />
+                            <ThemeToggle />
                     </div>
 
-                    <Card className={`glass-card ${isDark ? 'border-purple-800/20' : 'border-purple-300/30'} shadow-xl transition-all duration-300`}>
+                    <Card className="glass-card auth-3d">
                         <CardHeader className="pb-2">
-                            <CardTitle className={`text-2xl font-semibold text-center ${isDark ? 'text-purple-100' : 'text-purple-900'} transition-colors duration-300`}>
+                            <CardTitle className="text-2xl font-semibold text-center text-gradient">
                                 {activeTab === "login" ? "Welcome back" : "Create an account"}
                             </CardTitle>
                         </CardHeader>
@@ -51,8 +52,8 @@ const Auth = () => {
                         </CardContent>
                     </Card>
 
-                    {/* Add a subtle help text */}
-                    <p className={`text-center text-sm ${isDark ? 'text-purple-300/70' : 'text-purple-700/70'} transition-colors duration-300`}>
+                    {/* Add a subtle help text with text gradient */}
+                    <p className="text-center text-sm text-muted-foreground">
                         {activeTab === "login"
                             ? "Enter your credentials to access your account"
                             : "Fill out the form to create your free account"}
