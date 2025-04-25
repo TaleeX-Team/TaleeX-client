@@ -75,7 +75,6 @@ export const useAuth = () => {
       TokenService.clearTokens();
       TokenService.setOAuthAuthenticated(false);
       queryClient.removeQueries({ queryKey: ["user"] });
-      queryClient.removeQueries({ queryKey: ["companies"] });
       queryClient.invalidateQueries({ queryKey: ["auth"] });
     },
     onError: () => {
