@@ -75,7 +75,7 @@ export const SignupForm = ({isLoading, handleAuthSubmit, handleOAuthSuccess}) =>
 
 
         try {
-            await handleAuthSubmit(data, "register");
+            await handleAuthSubmit(data, "signup");
         } catch (error) {
             console.error("Registration error:", error);
         }
