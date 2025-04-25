@@ -5,47 +5,64 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Search, MapPin, Users, Plus, Filter } from "lucide-react";
+import { MapPin, Globe, ExternalLink, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Link } from "react-router-dom";
 
 export default function CompanyCard({ company }) {
-  const { name, location, size, industry, id } = company;
+  const { name, id, description, website, image, address } = company;
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="pb-2">
+    <Card key={company.id} className="overflow-hidden flex flex-col relative">
+      <button
+        onClick={() => console.log("Delete company", id)}
+        className="absolute top-2 right-2 p-1.5 rounded-full bg-background/80 hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+        aria-label={`Delete ${company.name}`}
+      >
+        <X className="h-4 w-4" />
+      </button>
+      <CardHeader className="pb-1">
         <div className="flex items-start gap-4">
-          <div className="h-12 w-12 rounded bg-slate-100 flex items-center justify-center text-slate-400">
-            TF
+          <div className="h-12 w-12 rounded bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
+            {image ? (
+              <img
+                src={image || "/placeholder.svg"}
+                alt={`${name} logo`}
+                className="h-full w-full object-cover rounded"
+              />
+            ) : (
+              name.substring(0, 2)
+            )}
           </div>
           <div>
             <h3 className="font-semibold text-lg">{name}</h3>
-            <p className="text-muted-foreground text-sm">{industry}</p>
+            <a
+              href={website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-primary flex items-center hover:underline"
+            >
+              <Globe className="mr-1 h-3 w-3" />
+              {new URL(website).hostname.replace("www.", "")}
+              <ExternalLink className="ml-1 h-3 w-3" />
+            </a>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pb-2">
-        <div className="space-y-2 text-sm text-muted-foreground">
-          <div className="flex items-center">
+      <CardContent className="pb-2 flex-1">
+        <div className="space-y-2 text-sm">
+          <p className="text-muted-foreground line-clamp-3">{description}</p>
+          <div className="flex items-center text-muted-foreground">
             <MapPin className="mr-2 h-4 w-4" />
-            {location}
-          </div>
-          <div className="flex items-center">
-            <Users className="mr-2 h-4 w-4" />
-            {size}
+            {address}
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between pt-4">
+      <CardFooter className="flex justify-between pt-4 mt-auto">
         <Button variant="outline" size="sm">
           Add Job
         </Button>
-        <Link to={`/companies/${id}`}>
-          <Button variant="default" size="sm">
-            View Details
-          </Button>
-        </Link>
+        <Button variant="default" size="sm">
+          View Details
+        </Button>
       </CardFooter>
     </Card>
   );

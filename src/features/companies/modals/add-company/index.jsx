@@ -26,7 +26,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from "sonner";
-import { useCompanies } from "../features";
+import { useCompanies } from "../../features";
 
 const formSchema = z.object({
   image: z.any().refine((file) => file instanceof File || file === null, {
