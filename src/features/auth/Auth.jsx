@@ -26,6 +26,7 @@ const Auth = () => {
         <div className="min-h-screen relative w-full flex items-center justify-center overflow-hidden transition-colors duration-300">
             {/* Add the auth-bg-gradient from your css */}
             <div className="auth-bg-gradient"></div>
+            <AnimatedBackground />
 
             <div className="container relative z-10 flex flex-col lg:flex-row items-center justify-center px-4 md:px-8">
                 {/* Left Panel - Branding */}
