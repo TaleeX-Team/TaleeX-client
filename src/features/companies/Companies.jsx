@@ -16,6 +16,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import {AnimatedBackground} from "@/components/AnimatedBackground.jsx";
+import Cookies from "js-cookie";
 
 // Register GSAP plugins
 if (typeof window !== "undefined") {
@@ -32,7 +33,8 @@ export default function Companies() {
     const searchRef = useRef(null);
     const cardsContainerRef = useRef(null);
     const emptyStateRef = useRef(null);
-
+    const hasPassword =  Cookies.get('hasPassword');
+    console.log(hasPassword,"hasPassword");
     // Initialize animations
     useEffect(() => {
         // Header animation

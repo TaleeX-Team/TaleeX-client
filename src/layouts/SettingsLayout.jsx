@@ -6,7 +6,8 @@ import {ArrowLeft} from "lucide-react";
 import Cookies from "js-cookie";
 
 export default function SettingsLayout() {
-    const hasPassword = Cookies.get("hasPassword");
+    const hasPassword = Cookies.get('hasPassword') === 'true';
+    console.log(hasPassword,"hasPassword");
 
     const sidebarNavItems = React.useMemo(() => {
         const baseItems = [
@@ -41,9 +42,7 @@ export default function SettingsLayout() {
             </div>
             <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
                 <aside className="lg:w-1/5">
-
                     <SidebarNav items={sidebarNavItems}/>
-
                 </aside>
                 <div className="flex-1">
                     <Outlet/>
