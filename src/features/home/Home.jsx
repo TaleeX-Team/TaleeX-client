@@ -1,6 +1,6 @@
 import React from "react";
 import Companies from "../companies/Companies";
-import AnimatedBackground from "@/components/AnimatedBackground.jsx";
+import {AnimatedBackground} from "@/components/AnimatedBackground.jsx";
 
 const Home = () => {
     return (

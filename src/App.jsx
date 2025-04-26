@@ -21,6 +21,8 @@ import BillingPage from "@/features/settings/billing/Billing.jsx";
 import OAuthCallback from "@/components/OAuthCallback.jsx";
 import Home from "@/features/home/Home.jsx";
 import { AnimatedBackground } from "./components/AnimatedBackground";
+import SetPassword from "@/features/settings/set-password/SetPassword.jsx";
+import ChangePasswordPage from "@/features/settings/change-password/ChangePasswordPage.jsx";
 
 // Lazy pages
 const Auth = lazy(() => import("./features/auth/Auth.jsx"));
@@ -202,6 +204,32 @@ function App() {
                       }
                   >
                     <BillingPage />
+                  </Suspense>
+              ),
+            },{
+              path: "set-password",
+              element: (
+                  <Suspense
+                      fallback={
+                        <div className="min-h-screen flex items-center justify-center">
+                          Loading...
+                        </div>
+                      }
+                  >
+                   <SetPassword/>
+                  </Suspense>
+              ),
+            },{
+              path: "change-password",
+              element: (
+                  <Suspense
+                      fallback={
+                        <div className="min-h-screen flex items-center justify-center">
+                          Loading...
+                        </div>
+                      }
+                  >
+                   <ChangePasswordPage/>
                   </Suspense>
               ),
             },

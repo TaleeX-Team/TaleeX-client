@@ -300,7 +300,125 @@ export async function resetPassword({token, password, confirmPassword}) {
 }
 
 export const loginWithOAuthCode = async (code) => {
-    const res = await axios.post('/api/v1/auth/oauth-callback', { code }); // adjust endpoint if needed
+    const res = await axios.post('/api/v1/auth/oauth-callback', { code });
     return res.data;
 };
+
+
+export const sendVerificationEmail = async (email) => {
+    try {
+        console.log("Requesting email verification for:", email);
+        const formData = new URLSearchParams();
+        formData.append('email', email);
+
+        const response = await apiClient.post(
+            "/auth/send-verification-code",
+            formData.toString(),
+            {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+            }
+        );
+        console.log("Verification email sent:", response.status);
+        return response.data;
+    } catch (error) {
+        console.error("Verification email request failed:", error.response?.data || error.message);
+
+        if (error.response) {
+            const { status, data } = error.response;
+            if (status === 400 && data.errors) {
+                throw new Error(Object.values(data.errors).join(", "));
+            }
+            if (data.message) {
+                throw new Error(data.message);
+            }
+        }
+
+        if (error.message === "Network Error") {
+            throw new Error("Unable to connect to the server. Check your internet connection.");
+        }
+
+        throw new Error(error.message || "An unexpected error occurred when requesting email verification.");
+    }
+};
+
+export const setPassword = async (newPassword) => {
+    try {
+        console.log("Setting new password");
+        const formData = new URLSearchParams();
+        formData.append('newPassword', newPassword);
+
+        const response = await apiClient.post(
+            "/auth/set-password",
+            formData.toString(),
+            {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+            }
+        );
+        console.log("Password set successfully:", response.status);
+        return response.data;
+    } catch (error) {
+        console.error("Set password request failed:", error.response?.data || error.message);
+
+        if (error.response) {
+            const { status, data } = error.response;
+            if (status === 400 && data.errors) {
+                throw new Error(Object.values(data.errors).join(", "));
+            }
+            if (data.message) {
+                throw new Error(data.message);
+            }
+        }
+
+        if (error.message === "Network Error") {
+            throw new Error("Unable to connect to the server. Check your internet connection.");
+        }
+
+        throw new Error(error.message || "An unexpected error occurred when setting your password.");
+    }
+};
+
+
+export const changePassword = async ({ oldPassword, newPassword }) => {
+    try {
+        console.log("Changing password");
+        const formData = new URLSearchParams();
+        formData.append('oldPassword', oldPassword);
+        formData.append('newPassword', newPassword);
+
+        const response = await apiClient.post(
+            "/auth/change-password",
+            formData.toString(),
+            {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+            }
+        );
+        console.log("Password changed successfully:", response.status);
+        return response.data;
+    } catch (error) {
+        console.error("Change password request failed:", error.response?.data || error.message);
+
+        if (error.response) {
+            const { status, data } = error.response;
+            if (status === 400 && data.errors) {
+                throw new Error(Object.values(data.errors).join(", "));
+            }
+            if (data.message) {
+                throw new Error(data.message);
+            }
+        }
+
+        if (error.message === "Network Error") {
+            throw new Error("Unable to connect to the server. Check your internet connection.");
+        }
+
+        throw new Error(error.message || "An unexpected error occurred when changing your password.");
+    }
+};
+
 export default apiClient;

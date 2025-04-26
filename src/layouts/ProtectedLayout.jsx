@@ -1,27 +1,24 @@
 import React from "react";
-import { Outlet, Link } from "react-router-dom";
-import { Separator } from "@/components/ui/separator";
+import { Outlet } from "react-router-dom";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import UserAvatar from "@/features/header/user-avatar/UserAvatar";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Menu } from "lucide-react";
 import Header from "@/features/header/Header";
+import VerificationBanner from "@/components/VerificationBanner";
+import { useUser } from "@/hooks/useUser";
 
 const ProtectedLayout = () => {
-  return (
-    <SidebarProvider>
-      <SidebarInset>
-        <Header />
-        <Outlet />
-      </SidebarInset>
-    </SidebarProvider>
-  );
+    const { data: user } = useUser();
+    console.log(user,"user");
+    return (
+        <SidebarProvider>
+            <SidebarInset>
+                <>
+                    {user && user.isVerified && <VerificationBanner />}
+                    <Header user={user} />
+                    <Outlet context={{ user }} />
+                </>
+            </SidebarInset>
+        </SidebarProvider>
+    );
 };
 
 export default ProtectedLayout;

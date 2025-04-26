@@ -283,14 +283,14 @@ export const SignupForm = ({
                   I agree to the{" "}
                   <Link
                     to="#"
-                    className="text-purple-400 hover:text-purple-300"
+                    className="text-primary hover:text-primary/70"
                   >
                     Terms of Service
                   </Link>{" "}
                   and{" "}
                   <Link
                     to="#"
-                    className="text-purple-400 hover:text-purple-300"
+                    className="text-primary hover:text-primary/70"
                   >
                     Privacy Policy
                   </Link>
@@ -303,7 +303,7 @@ export const SignupForm = ({
 
         <Button
           type="submit"
-          className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-300 h-8 text-sm"
+          className={`w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300`}
           disabled={isLoading}
         >
           {isLoading ? "Creating account..." : "Create account"}{" "}
