@@ -23,7 +23,6 @@ import Home from "@/features/home/Home.jsx";
 import {AnimatedBackground} from "./components/AnimatedBackground";
 import SetPassword from "@/features/settings/set-password/SetPassword.jsx";
 import ChangePasswordPage from "@/features/settings/change-password/ChangePasswordPage.jsx";
-
 // Lazy pages
 const Auth = lazy(() => import("./features/auth/Auth.jsx"));
 const ForgetPassword = lazy(() =>
@@ -35,14 +34,12 @@ const AdminLayout = lazy(() => import("./layouts/AdminLayout.jsx"));
 const AdminDashboard = lazy(() => import("./features/admin/AdminDashboard.jsx"));
 const UsersPage = lazy(() => import("./features/admin/pages/UsersPage.jsx"));
 const ContentManagement = lazy(() => import("./features/admin/ContentManagement.jsx"));
-const Analytics = lazy(() => import("./features/admin/Analytics.jsx"));
-const Settings = lazy(() => import("./features/admin/Settings.jsx"));
+const JobsPage = lazy(() => import("./features/admin/pages/JopPage.jsx"));
+const AnalyticsPage = lazy(() => import("./features/admin/pages/AnalyticsPage.jsx"));
+const SettingsPage = lazy(() => import("./features/admin/pages/SettingsPage.jsx"));
+const PlansPage = lazy(() => import("./features/admin/pages/PlansPage.jsx"));
 
-// New admin pages to match navigation menu
-// const JobsPage = lazy(() => import("./features/admin/pages/JobsPage.jsx"));
-// const PlansPage = lazy(() => import("./features/admin/pages/PlansPage.jsx"));
 
-// Create the AnimatedBackground component
 const BackgroundWrapper = ({children}) => {
     return (
         <div className="relative min-h-screen">
@@ -282,7 +279,7 @@ function App() {
                         path: "jobs",
                         element: (
                             <Suspense fallback={<FullPageSpinner/>}>
-                                <ComingSoonPage/>
+                               <JobsPage/>
                             </Suspense>
                         ),
                     },
@@ -299,7 +296,7 @@ function App() {
                         path: "analytics",
                         element: (
                             <Suspense fallback={<FullPageSpinner/>}>
-                                <Analytics/>
+                                <AnalyticsPage/>
                             </Suspense>
                         ),
                     },
@@ -308,7 +305,7 @@ function App() {
                         path: "plans",
                         element: (
                             <Suspense fallback={<FullPageSpinner/>}>
-                                <ComingSoonPage/>
+                                <PlansPage/>
                             </Suspense>
                         ),
                     },
@@ -316,50 +313,7 @@ function App() {
                         path: "settings",
                         element: (
                             <Suspense fallback={<FullPageSpinner/>}>
-                                <Settings/>
-                            </Suspense>
-                        ),
-                    },
-                    // Support nested routes for all admin sections
-                    {
-                        path: "users/*",
-                        element: (
-                            <Suspense fallback={<FullPageSpinner/>}>
-                                <UsersPage/>
-                            </Suspense>
-                        ),
-                    },
-                    {
-                        path: "jobs/*",
-                        element: (
-                            <Suspense fallback={<FullPageSpinner/>}>
-                                <ComingSoonPage/>
-
-                            </Suspense>
-                        ),
-                    },
-                    {
-                        path: "analytics/*",
-                        element: (
-                            <Suspense fallback={<FullPageSpinner/>}>
-                                <Analytics/>
-                            </Suspense>
-                        ),
-                    },
-                    {
-                        path: "plans/*",
-                        element: (
-                            <Suspense fallback={<FullPageSpinner/>}>
-                                <ComingSoonPage/>
-
-                            </Suspense>
-                        ),
-                    },
-                    {
-                        path: "settings/*",
-                        element: (
-                            <Suspense fallback={<FullPageSpinner/>}>
-                                <Settings/>
+                                <SettingsPage/>
                             </Suspense>
                         ),
                     },
