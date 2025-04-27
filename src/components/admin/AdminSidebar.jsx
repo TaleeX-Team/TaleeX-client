@@ -12,7 +12,7 @@ import {
     ChevronRight,
     Moon,
     Sun,
-    Laptop
+    Laptop, Building2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -109,6 +109,12 @@ const AdminSidebar = () => {
             label: "Users",
             href: "/admin/users",
             active: currentPath.includes("/admin/users")
+        },
+        {
+            icon: <Building2 size={collapsed ? 20 : 18} />,
+            label: "Companies",
+            href: "/admin/companies",
+            active: currentPath.includes("/admin/companies")
         },
         {
             icon: <Briefcase size={collapsed ? 20 : 18} />,

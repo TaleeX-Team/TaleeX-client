@@ -34,7 +34,8 @@ const AdminLayout = lazy(() => import("./layouts/AdminLayout.jsx"));
 const AdminDashboard = lazy(() => import("./features/admin/AdminDashboard.jsx"));
 const UsersPage = lazy(() => import("./features/admin/pages/UsersPage.jsx"));
 const ContentManagement = lazy(() => import("./features/admin/ContentManagement.jsx"));
-const JobsPage = lazy(() => import("./features/admin/pages/JopPage.jsx"));
+const JobsPage = lazy(() => import("./features/admin/pages/JobsPage.jsx"));
+const CompaniesPage = lazy(() => import("./features/admin/pages/CompaniesPage.jsx"));
 const AnalyticsPage = lazy(() => import("./features/admin/pages/AnalyticsPage.jsx"));
 const SettingsPage = lazy(() => import("./features/admin/pages/SettingsPage.jsx"));
 const PlansPage = lazy(() => import("./features/admin/pages/PlansPage.jsx"));
@@ -280,6 +281,14 @@ function App() {
                         element: (
                             <Suspense fallback={<FullPageSpinner/>}>
                                <JobsPage/>
+                            </Suspense>
+                        ),
+                    },
+                    {
+                        path: "companies",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner/>}>
+                                <CompaniesPage/>
                             </Suspense>
                         ),
                     },

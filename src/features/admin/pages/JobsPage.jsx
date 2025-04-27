@@ -1,8 +1,7 @@
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, UserPlus, Clock, Trash2, UserCircle, Edit2, X } from "lucide-react";
+import { Search, Plus, Filter, MoreHorizontal, Briefcase, CalendarDays, MapPin, Users, X } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -14,9 +13,7 @@ import {
 import {
     Select,
     SelectContent,
-    SelectGroup,
     SelectItem,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
@@ -38,77 +35,94 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from 'sonner';
 import gsap from 'gsap';
 
-const users = [
+// Sample job data
+const jobs = [
     {
         id: "1",
-        name: "Alex Johnson",
-        email: "alex@example.com",
-        role: "Admin",
+        title: "Senior Frontend Developer",
+        company: "Tech Solutions Inc.",
+        location: "San Francisco, CA",
+        type: "Full-time",
         status: "active",
-        lastActive: "2 minutes ago"
+        applicants: 24,
+        posted: "5 days ago"
     },
     {
         id: "2",
-        name: "Sarah Chen",
-        email: "sarah@example.com",
-        role: "Recruiter",
+        title: "Product Manager",
+        company: "InnovateCorp",
+        location: "New York, NY",
+        type: "Full-time",
         status: "active",
-        lastActive: "1 hour ago"
+        applicants: 42,
+        posted: "2 days ago"
     },
     {
         id: "3",
-        name: "Michael Smith",
-        email: "michael@example.com",
-        role: "Manager",
-        status: "inactive",
-        lastActive: "2 days ago"
+        title: "DevOps Engineer",
+        company: "Cloud Systems",
+        location: "Remote",
+        type: "Contract",
+        status: "closed",
+        applicants: 16,
+        posted: "2 weeks ago"
     },
     {
         id: "4",
-        name: "Lisa Parker",
-        email: "lisa@example.com",
-        role: "Candidate",
-        status: "pending",
-        lastActive: "Just now"
+        title: "UX/UI Designer",
+        company: "Creative Labs",
+        location: "Los Angeles, CA",
+        type: "Part-time",
+        status: "active",
+        applicants: 31,
+        posted: "3 days ago"
     },
     {
         id: "5",
-        name: "David Wilson",
-        email: "david@example.com",
-        role: "Employer",
-        status: "active",
-        lastActive: "3 hours ago"
+        title: "Backend Developer",
+        company: "Data Dynamics",
+        location: "Austin, TX",
+        type: "Full-time",
+        status: "draft",
+        applicants: 0,
+        posted: "Not published"
     },
     {
         id: "6",
-        name: "Emma Torres",
-        email: "emma@example.com",
-        role: "Candidate",
+        title: "Marketing Specialist",
+        company: "GrowthHub",
+        location: "Chicago, IL",
+        type: "Full-time",
         status: "active",
-        lastActive: "5 hours ago"
+        applicants: 17,
+        posted: "1 week ago"
     },
     {
         id: "7",
-        name: "James Lee",
-        email: "james@example.com",
-        role: "Employer",
-        status: "inactive",
-        lastActive: "1 day ago"
+        title: "Data Scientist",
+        company: "Analytics Pro",
+        location: "Remote",
+        type: "Full-time",
+        status: "active",
+        applicants: 29,
+        posted: "4 days ago"
     },
     {
         id: "8",
-        name: "Olivia Miller",
-        email: "olivia@example.com",
-        role: "Recruiter",
-        status: "active",
-        lastActive: "4 hours ago"
+        title: "Customer Support Specialist",
+        company: "ServiceNow",
+        location: "Boston, MA",
+        type: "Full-time",
+        status: "closed",
+        applicants: 52,
+        posted: "3 weeks ago"
     },
 ];
 
-const UsersPage = () => {
+const JobsPage = () => {
     const [searchQuery, setSearchQuery] = useState("");
-    const [roleFilter, setRoleFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
+    const [typeFilter, setTypeFilter] = useState("all");
     const [isLoading, setIsLoading] = useState(true);
     const [activeFilters, setActiveFilters] = useState([]);
 
@@ -155,8 +169,8 @@ const UsersPage = () => {
     useEffect(() => {
         const newFilters = [];
 
-        if (roleFilter !== "all") {
-            newFilters.push({ type: 'role', value: roleFilter });
+        if (typeFilter !== "all") {
+            newFilters.push({ type: 'type', value: typeFilter });
         }
 
         if (statusFilter !== "all") {
@@ -168,42 +182,42 @@ const UsersPage = () => {
         }
 
         setActiveFilters(newFilters);
-    }, [roleFilter, statusFilter, searchQuery]);
+    }, [typeFilter, statusFilter, searchQuery]);
 
-    const filteredUsers = users.filter(user => {
+    const filteredJobs = jobs.filter(job => {
         // Search filter
-        const matchesSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchQuery.toLowerCase());
-
-        // Role filter
-        const matchesRole = roleFilter === "all" || user.role.toLowerCase() === roleFilter.toLowerCase();
+        const matchesSearch = job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            job.company.toLowerCase().includes(searchQuery.toLowerCase());
 
         // Status filter
-        const matchesStatus = statusFilter === "all" || user.status === statusFilter;
+        const matchesStatus = statusFilter === "all" || job.status === statusFilter;
 
-        return matchesSearch && matchesRole && matchesStatus;
+        // Type filter
+        const matchesType = typeFilter === "all" || job.type === typeFilter;
+
+        return matchesSearch && matchesStatus && matchesType;
     });
 
-    const handleAddUser = () => {
-        gsap.to(".add-user-btn", {
+    const handleCreateJob = () => {
+        gsap.to(".create-job-btn", {
             scale: 0.95,
             duration: 0.1,
             onComplete: () => {
-                gsap.to(".add-user-btn", {
+                gsap.to(".create-job-btn", {
                     scale: 1,
                     duration: 0.2,
                 });
             }
         });
-        toast.success("This feature would open a user creation modal", {
-            description: "You can customize the user creation form here.",
+        toast.success("Create Job", {
+            description: "This would open a job creation form modal.",
             position: "top-center",
         });
     };
 
-    const handleAction = (action, user) => {
-        toast.success(`${action} ${user.name}`, {
-            description: `Action performed on user ID: ${user.id}`,
+    const handleAction = (action, job) => {
+        toast.success(`${action} job: ${job.title}`, {
+            description: `Action performed on job ID: ${job.id}`,
         });
     };
 
@@ -216,8 +230,8 @@ const UsersPage = () => {
             duration: 0.2,
             onComplete: () => {
                 setSearchQuery("");
-                setRoleFilter("all");
                 setStatusFilter("all");
+                setTypeFilter("all");
             }
         });
     };
@@ -230,8 +244,8 @@ const UsersPage = () => {
             duration: 0.2,
             onComplete: () => {
                 if (type === 'search') setSearchQuery("");
-                if (type === 'role') setRoleFilter("all");
                 if (type === 'status') setStatusFilter("all");
+                if (type === 'type') setTypeFilter("all");
             }
         });
     };
@@ -239,36 +253,39 @@ const UsersPage = () => {
     const getStatusStyles = (status) => {
         switch (status) {
             case "active":
-                return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20";
-            case "inactive":
-                return "bg-slate-500/10 text-slate-600 dark:text-slate-400 hover:bg-slate-500/20";
-            case "pending":
-                return "bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20";
+                return "bg-green-500/20 text-green-600 dark:text-green-400 hover:bg-green-500/30";
+            case "closed":
+                return "bg-gray-500/20 text-gray-600 dark:text-gray-400 hover:bg-gray-500/30";
+            case "draft":
+                return "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/30";
             default:
                 return "bg-gray-500/10 text-gray-600 dark:text-gray-400 hover:bg-gray-500/20";
         }
     };
 
     return (
-        <Card className="border border-border shadow-lg transition-all duration-200 hover:shadow-md" ref={cardRef}>
+        <Card className="border border-border shadow-lg" ref={cardRef}>
             <CardHeader className="pb-4" ref={headerRef}>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <CardTitle className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">Users</CardTitle>
+                        <CardTitle className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">Jobs</CardTitle>
                         <CardDescription className="mt-1 text-muted-foreground">
-                            Manage your platform users and their access permissions
+                            View and manage your job listings
                         </CardDescription>
                     </div>
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button onClick={handleAddUser} className="add-user-btn transition-all hover:shadow-md relative overflow-hidden group">
+                                <Button
+                                    onClick={handleCreateJob}
+                                    className="create-job-btn transition-all hover:shadow-md relative overflow-hidden group"
+                                >
                                     <span className="absolute inset-0 bg-primary/10 transform scale-0 group-hover:scale-100 transition-transform duration-300 rounded-md"></span>
-                                    <UserPlus className="mr-2 h-4 w-4" /> Add User
+                                    <Plus className="mr-2 h-4 w-4" /> Create Job
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent className="bg-popover text-popover-foreground">
-                                <p>Add a new user to the platform</p>
+                                <p>Create a new job listing</p>
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
@@ -277,45 +294,38 @@ const UsersPage = () => {
             <CardContent className="space-y-6">
                 {/* Filters */}
                 <div className="bg-muted/50 p-4 rounded-lg border border-border transition-all duration-300 hover:border-border/80">
-                    <div className="flex flex-col md:flex-row gap-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
                         <div className="relative flex-1 group">
                             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-200" />
                             <Input
-                                placeholder="Search by name or email..."
+                                placeholder="Search jobs or companies..."
                                 className="pl-9 bg-background border-border focus-visible:ring-primary transition-all duration-200"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2">
-                            <Select value={roleFilter} onValueChange={setRoleFilter}>
-                                <SelectTrigger className="w-full sm:w-40 bg-background border-border transition-all duration-200">
-                                    <SelectValue placeholder="Role" />
-                                </SelectTrigger>
-                                <SelectContent className="bg-background border-border">
-                                    <SelectGroup>
-                                        <SelectLabel className="text-muted-foreground">Filter by role</SelectLabel>
-                                        <SelectItem value="all">All Roles</SelectItem>
-                                        <SelectItem value="admin">Admin</SelectItem>
-                                        <SelectItem value="recruiter">Recruiter</SelectItem>
-                                        <SelectItem value="manager">Manager</SelectItem>
-                                        <SelectItem value="candidate">Candidate</SelectItem>
-                                        <SelectItem value="employer">Employer</SelectItem>
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
                             <Select value={statusFilter} onValueChange={setStatusFilter}>
                                 <SelectTrigger className="w-full sm:w-40 bg-background border-border transition-all duration-200">
                                     <SelectValue placeholder="Status" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-background border-border">
-                                    <SelectGroup>
-                                        <SelectLabel className="text-muted-foreground">Filter by status</SelectLabel>
-                                        <SelectItem value="all">All Status</SelectItem>
-                                        <SelectItem value="active">Active</SelectItem>
-                                        <SelectItem value="inactive">Inactive</SelectItem>
-                                        <SelectItem value="pending">Pending</SelectItem>
-                                    </SelectGroup>
+                                    <SelectItem value="all">All Status</SelectItem>
+                                    <SelectItem value="active">Active</SelectItem>
+                                    <SelectItem value="closed">Closed</SelectItem>
+                                    <SelectItem value="draft">Draft</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Select value={typeFilter} onValueChange={setTypeFilter}>
+                                <SelectTrigger className="w-full sm:w-40 bg-background border-border transition-all duration-200">
+                                    <SelectValue placeholder="Job Type" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-background border-border">
+                                    <SelectItem value="all">All Types</SelectItem>
+                                    <SelectItem value="Full-time">Full-time</SelectItem>
+                                    <SelectItem value="Part-time">Part-time</SelectItem>
+                                    <SelectItem value="Contract">Contract</SelectItem>
+                                    <SelectItem value="Remote">Remote</SelectItem>
                                 </SelectContent>
                             </Select>
                             <TooltipProvider>
@@ -357,84 +367,89 @@ const UsersPage = () => {
                                     </button>
                                 </Badge>
                             ))}
-                            {filteredUsers.length > 0 && (
+                            {filteredJobs.length > 0 && (
                                 <span className="text-sm text-muted-foreground ml-2">
-                  Showing {filteredUsers.length} of {users.length} users
+                  Showing {filteredJobs.length} of {jobs.length} jobs
                 </span>
                             )}
                         </div>
                     )}
                 </div>
 
-                {/* Users table */}
+                {/* Jobs table */}
                 <div className="border border-border rounded-lg overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm" ref={tableRef}>
                             <thead>
                             <tr className="bg-muted/70 border-b border-border">
-                                <th className="px-6 py-4 text-left font-medium text-muted-foreground">User</th>
-                                <th className="px-6 py-4 text-left font-medium text-muted-foreground">Role</th>
-                                <th className="px-6 py-4 text-left font-medium text-muted-foreground">Status</th>
-                                <th className="px-6 py-4 text-left font-medium text-muted-foreground">Last Active</th>
-                                <th className="px-6 py-4 text-right font-medium text-muted-foreground">Actions</th>
+                                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Job Title</th>
+                                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Company</th>
+                                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Location</th>
+                                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Type</th>
+                                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
+                                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Applicants</th>
+                                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Posted</th>
+                                <th className="px-4 py-3 text-right font-medium text-muted-foreground">Actions</th>
                             </tr>
                             </thead>
                             <tbody>
                             {isLoading ? (
                                 Array(5).fill(0).map((_, index) => (
                                     <tr key={index} className="border-b border-border">
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <Skeleton className="h-10 w-10 rounded-full bg-muted" />
-                                                <div className="space-y-2">
-                                                    <Skeleton className="h-4 w-32 bg-muted" />
-                                                    <Skeleton className="h-3 w-24 bg-muted" />
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4"><Skeleton className="h-4 w-16 bg-muted" /></td>
-                                        <td className="px-6 py-4"><Skeleton className="h-6 w-16 rounded-full bg-muted" /></td>
-                                        <td className="px-6 py-4"><Skeleton className="h-4 w-24 bg-muted" /></td>
-                                        <td className="px-6 py-4 text-right"><Skeleton className="h-8 w-8 rounded-full bg-muted ml-auto" /></td>
+                                        <td className="px-4 py-3"><Skeleton className="h-5 w-40 bg-muted" /></td>
+                                        <td className="px-4 py-3"><Skeleton className="h-5 w-32 bg-muted" /></td>
+                                        <td className="px-4 py-3"><Skeleton className="h-5 w-28 bg-muted" /></td>
+                                        <td className="px-4 py-3"><Skeleton className="h-5 w-20 bg-muted" /></td>
+                                        <td className="px-4 py-3"><Skeleton className="h-6 w-16 rounded-full bg-muted" /></td>
+                                        <td className="px-4 py-3"><Skeleton className="h-5 w-10 bg-muted" /></td>
+                                        <td className="px-4 py-3"><Skeleton className="h-5 w-20 bg-muted" /></td>
+                                        <td className="px-4 py-3 text-right"><Skeleton className="h-8 w-8 rounded-full bg-muted ml-auto" /></td>
                                     </tr>
                                 ))
-                            ) : filteredUsers.length > 0 ? (
-                                filteredUsers.map((user) => (
-                                    <tr key={user.id} className="border-b border-border hover:bg-accent/30 transition-colors duration-200">
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <Avatar className="h-10 w-10 border border-border ring-2 ring-background transition-all duration-300 hover:ring-primary/20">
-                                                    <AvatarImage src={`/placeholder.svg`} alt={user.name} />
-                                                    <AvatarFallback className="bg-muted text-primary font-medium">
-                                                        {user.name.split(' ').map(n => n[0]).join('')}
-                                                    </AvatarFallback>
-                                                </Avatar>
-                                                <div>
-                                                    <div className="font-medium text-foreground hover:text-primary transition-colors duration-200">{user.name}</div>
-                                                    <div className="text-xs text-muted-foreground">{user.email}</div>
-                                                </div>
+                            ) : filteredJobs.length > 0 ? (
+                                filteredJobs.map((job) => (
+                                    <tr key={job.id} className="border-b border-border hover:bg-accent/30 transition-colors duration-200">
+                                        <td className="px-4 py-3">
+                                            <div className="font-medium hover:text-primary transition-colors duration-200">{job.title}</div>
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center text-muted-foreground">
+                                                <Briefcase className="h-3 w-3 mr-2 inline-block" />
+                                                {job.company}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center">
-                                                <span className="font-medium text-foreground">{user.role}</span>
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center text-muted-foreground">
+                                                <MapPin className="h-3 w-3 mr-2 inline-block" />
+                                                {job.location}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <Badge
-                                                variant="outline"
-                                                className={`${getStatusStyles(user.status)} font-medium capitalize border-none transition-all duration-200`}
-                                            >
-                                                {user.status}
+                                        <td className="px-4 py-3">
+                                            <Badge variant="outline" className="font-normal bg-primary/5 hover:bg-primary/10 text-primary border-primary/20 transition-colors duration-200">
+                                                {job.type}
                                             </Badge>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="px-4 py-3">
+                                            <Badge
+                                                variant="outline"
+                                                className={`${getStatusStyles(job.status)} capitalize border-none transition-all duration-200`}
+                                            >
+                                                {job.status}
+                                            </Badge>
+                                        </td>
+                                        <td className="px-4 py-3">
                                             <div className="flex items-center text-muted-foreground">
-                                                <Clock className="h-3 w-3 mr-1 inline-block" />
-                                                {user.lastActive}
+                                                <Users className="h-3 w-3 mr-2 inline-block" />
+                                                {job.applicants}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-right">
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center text-muted-foreground">
+                                                <CalendarDays className="h-3 w-3 mr-2 inline-block" />
+                                                {job.posted}
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-3 text-right">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-accent transition-colors duration-200">
@@ -445,29 +460,32 @@ const UsersPage = () => {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-48 bg-popover border-border shadow-lg animate-in slide-in-from-top-5 fade-in-80">
-                                                    <DropdownMenuLabel className="text-foreground">User Actions</DropdownMenuLabel>
+                                                    <DropdownMenuLabel className="text-foreground">Job Actions</DropdownMenuLabel>
                                                     <DropdownMenuSeparator className="bg-border" />
                                                     <DropdownMenuItem
-                                                        onClick={() => handleAction("View profile", user)}
+                                                        onClick={() => handleAction("View details for", job)}
                                                         className="focus:bg-accent focus:text-accent-foreground transition-colors duration-200 cursor-pointer"
                                                     >
-                                                        <UserCircle className="h-4 w-4 mr-2" />
-                                                        View profile
+                                                        View details
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
-                                                        onClick={() => handleAction("Edit", user)}
+                                                        onClick={() => handleAction("Edit", job)}
                                                         className="focus:bg-accent focus:text-accent-foreground transition-colors duration-200 cursor-pointer"
                                                     >
-                                                        <Edit2 className="h-4 w-4 mr-2" />
-                                                        Edit user
+                                                        Edit job
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() => handleAction("View applicants for", job)}
+                                                        className="focus:bg-accent focus:text-accent-foreground transition-colors duration-200 cursor-pointer"
+                                                    >
+                                                        View applicants
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator className="bg-border" />
                                                     <DropdownMenuItem
-                                                        onClick={() => handleAction("Delete", user)}
+                                                        onClick={() => handleAction("Delete", job)}
                                                         className="text-destructive focus:text-destructive focus:bg-destructive/10 transition-colors duration-200 cursor-pointer"
                                                     >
-                                                        <Trash2 className="h-4 w-4 mr-2" />
-                                                        Delete user
+                                                        Delete job
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -476,14 +494,14 @@ const UsersPage = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-10 text-center text-muted-foreground">
+                                    <td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">
                                         <div className="flex flex-col items-center justify-center space-y-4">
                                             <div className="relative">
                                                 <Search className="h-10 w-10 text-muted" />
                                                 <span className="absolute top-0 right-0 h-3 w-3 rounded-full bg-primary/30 animate-ping"></span>
                                             </div>
                                             <div>
-                                                <p className="text-lg font-medium text-foreground">No users found</p>
+                                                <p className="text-lg font-medium text-foreground">No jobs found</p>
                                                 <p className="text-sm">Try adjusting your search or filter criteria</p>
                                             </div>
                                             <Button
@@ -506,4 +524,4 @@ const UsersPage = () => {
     );
 };
 
-export default UsersPage;
+export default JobsPage;
