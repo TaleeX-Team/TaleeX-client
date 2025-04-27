@@ -29,3 +29,15 @@ export const createCompany = async (companyData) => {
     throw error;
   }
 };
+
+export const deleteCompany = async (companyId) => {
+  try {
+    console.log("Deleting company with ID:", companyId);
+    const response = await apiClient.delete(`/companies/${companyId}`);
+    console.log("Company deleted successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to delete company:", error.message);
+    throw error;
+  }
+};

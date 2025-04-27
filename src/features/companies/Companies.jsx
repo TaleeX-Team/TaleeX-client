@@ -26,6 +26,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+
 // Register GSAP plugins
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -34,16 +36,41 @@ if (typeof window !== "undefined") {
 export default function Companies() {
   const {
     companyData: { data: companies, isLoading, isError },
+    deleteCompanyMutation,
   } = useCompanies();
+
   const [selectedCompany, setSelectedCompany] = useState(null);
 
   const handleDelete = (company) => {
     setSelectedCompany(company);
   };
 
+  // Confirm delete mutation
   const confirmDelete = () => {
-    console.log("Delete company", selectedCompany._id);
-    setSelectedCompany(null);
+    if (selectedCompany) {
+      deleteCompanyMutation.mutate(selectedCompany._id, {
+        onSuccess: () => {
+          toast.success("Company deleted successfully!");
+
+          // Animate dialog close
+          gsap.to(dialogRef.current, {
+            y: -20,
+            opacity: 0,
+            duration: 0.3,
+            onComplete: () => {
+              setSelectedCompany(null);
+            },
+          });
+        },
+        onError: (error) => {
+          console.error("Error deleting company:", error);
+          toast.error(
+            error.response?.data?.message ||
+              "Failed to delete company. Please try again."
+          );
+        },
+      });
+    }
   };
 
   // Refs for animations
@@ -51,6 +78,7 @@ export default function Companies() {
   const searchRef = useRef(null);
   const cardsContainerRef = useRef(null);
   const emptyStateRef = useRef(null);
+  const dialogRef = useRef(null); // Ref for the dialog
 
   // Initialize animations
   useEffect(() => {
@@ -289,7 +317,7 @@ export default function Companies() {
         open={!!selectedCompany}
         onOpenChange={() => setSelectedCompany(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent ref={dialogRef}>
           <AlertDialogHeader>
             <AlertDialogTitle>
               Delete {selectedCompany?.name || "this company"}?
