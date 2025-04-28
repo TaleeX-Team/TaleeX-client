@@ -57,6 +57,7 @@ const TokenService = {
         localStorage.removeItem('refreshToken');
         Cookies.remove('accessToken');
         Cookies.remove('refreshToken');
+        Cookies.remove('hasPassword');
     },
 
     // OAuth specific methods

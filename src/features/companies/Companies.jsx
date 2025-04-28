@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import Cookies from "js-cookie";
 
 // Register GSAP plugins
 if (typeof window !== "undefined") {
@@ -79,7 +80,8 @@ export default function Companies() {
   const cardsContainerRef = useRef(null);
   const emptyStateRef = useRef(null);
   const dialogRef = useRef(null); // Ref for the dialog
-
+  const hasPassword = Cookies.get("hasPassword");
+  console.log(hasPassword, "hasPassword");
   // Initialize animations
   useEffect(() => {
     // Header animation
