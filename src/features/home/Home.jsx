@@ -5,8 +5,9 @@ import {AnimatedBackground} from "@/components/AnimatedBackground.jsx";
 const Home = () => {
     return (
         <div className="min-h-screen">
-            <AnimatedBackground/>
+            {/* <AnimatedBackground/> */}
             <Companies />
+
         </div>
     );
 };

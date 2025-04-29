@@ -229,7 +229,11 @@ export default function Companies() {
                                         clients, partners, and opportunities.
                                     </p>
                                     <AddCompany/>
+                                    <Button variant="outline" className="mt-4">
+                                        <Building2 className="h-4 w-4 mr-2"/> Add Company
+                                    </Button>
                                 </div>
+                                
                             )}
                         </>
                     )}

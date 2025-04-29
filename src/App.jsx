@@ -35,6 +35,7 @@ const AdminDashboard = lazy(() => import("./features/admin/AdminDashboard.jsx"))
 const UsersPage = lazy(() => import("./features/admin/pages/UsersPage.jsx"));
 const ContentManagement = lazy(() => import("./features/admin/ContentManagement.jsx"));
 const JobsPage = lazy(() => import("./features/admin/pages/JobsPage.jsx"));
+const CreateJob = lazy(() => import("./features/jobs/addJob/CreateJob.jsx"));
 const CompaniesPage = lazy(() => import("./features/admin/pages/CompaniesPage.jsx"));
 const AnalyticsPage = lazy(() => import("./features/admin/pages/AnalyticsPage.jsx"));
 const SettingsPage = lazy(() => import("./features/admin/pages/SettingsPage.jsx"));
@@ -172,7 +173,7 @@ function App() {
                 element: (
                     <ProtectedRoute>
                         <ProtectedLayoutWithBackground/>
-                    </ProtectedRoute>
+                      </ProtectedRoute>
                 ),
                 errorElement: <ErrorPage/>,
                 children: [
@@ -180,6 +181,10 @@ function App() {
                         path: "/",
                         element: <Home/>,
                     },
+                  //   {
+                  //     path: "create-job", 
+                  //     element: <CreateJob />
+                  // }
                 ],
             },
             {
