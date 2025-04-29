@@ -1,4 +1,8 @@
-import { createCompany, getCompanies } from "@/services/apiCompanies";
+import {
+  createCompany,
+  deleteCompany,
+  getCompanies,
+} from "@/services/apiCompanies";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCompanies = () => {
@@ -34,7 +38,7 @@ export const useCompanies = () => {
         // Add the new company to the existing companies array
         return {
           ...oldData,
-          companies: [...oldData.companies, newCompany]
+          companies: [...oldData.companies, newCompany],
         };
       });
 
@@ -48,6 +52,34 @@ export const useCompanies = () => {
     },
   });
 
+  ///Function to delete a company
+  const deleteCompanyMutation = useMutation({
+    mutationFn: deleteCompany,
+    onSuccess: (deletedCompany) => {
+      // Update companies data in React Query cache
+      queryClient.setQueryData(["companies"], (oldData) => {
+        if (!oldData || !oldData.companies) {
+          return { companies: [] };
+        }
+
+        // Filter out the deleted company from the existing companies array
+        return {
+          ...oldData,
+          companies: oldData.companies.filter(
+            (company) => company._id !== deletedCompany._id
+          ),
+        };
+      });
+      // Optionally invalidate the query to trigger a refresh in the background
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+
+      console.log("Company deleted successfully:", deletedCompany);
+    },
+    onError: (error) => {
+      console.error("Deleting company failed:", error.message);
+    },
+  });
+
   return {
     createCompanyMutation: {
       mutate: createCompanyMutation.mutate,
@@ -56,5 +88,11 @@ export const useCompanies = () => {
       error: createCompanyMutation.error,
     },
     companyData,
+    deleteCompanyMutation: {
+      mutate: deleteCompanyMutation.mutate,
+      isLoading: deleteCompanyMutation.isPending,
+      isError: deleteCompanyMutation.isError,
+      error: deleteCompanyMutation.error,
+    },
   };
 };
