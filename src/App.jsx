@@ -1,18 +1,18 @@
-import React, {lazy, Suspense, useState} from "react";
+import React, { lazy, Suspense, useState } from "react";
 import {
-    createBrowserRouter,
-    RouterProvider,
-    Outlet,
-    Navigate,
-    useLocation,
+  createBrowserRouter,
+  RouterProvider,
+  Outlet,
+  Navigate,
+  useLocation,
 } from "react-router-dom";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
-import {Toaster} from "@/components/ui/sonner";
-import {Button} from "@/components/ui/button";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Toaster } from "@/components/ui/sonner";
+import { Button } from "@/components/ui/button";
 import ProtectedLayout from "./layouts/ProtectedLayout";
-import {ThemeProvider} from "@/layouts/theme_provider/ThemeProvider.jsx";
-import {useAuth} from "@/hooks/useAuth.js";
+import { ThemeProvider } from "@/layouts/theme_provider/ThemeProvider.jsx";
+import { useAuth } from "@/hooks/useAuth.js";
 import FullPageSpinner from "@/components/FullPageSpinner";
 import ResetPassword from "@/features/auth/password/ResetPassword.jsx";
 import SettingsLayout from "@/layouts/SettingsLayout.jsx";
@@ -20,7 +20,7 @@ import ProfilePage from "@/features/settings/profile/Profile.jsx";
 import BillingPage from "@/features/settings/billing/Billing.jsx";
 import OAuthCallback from "@/components/OAuthCallback.jsx";
 import Home from "@/features/home/Home.jsx";
-import {AnimatedBackground} from "./components/AnimatedBackground";
+import { AnimatedBackground } from "./components/AnimatedBackground";
 import SetPassword from "@/features/settings/set-password/SetPassword.jsx";
 import ChangePasswordPage from "@/features/settings/change-password/ChangePasswordPage.jsx";
 import {useUser} from "@/hooks/useUser.js";
@@ -28,7 +28,7 @@ import {useUser} from "@/hooks/useUser.js";
 // Lazy pages
 const Auth = lazy(() => import("./features/auth/Auth.jsx"));
 const ForgetPassword = lazy(() =>
-    import("./features/auth/password/ForgetPassword.jsx")
+  import("./features/auth/password/ForgetPassword.jsx")
 );
 
 // Admin Auth pages (lazy loaded)
@@ -38,14 +38,25 @@ const AdminSetPassword = lazy(() => import("./features/admin/auth/AdminResetPass
 
 // Admin pages (lazy loaded)
 const AdminLayout = lazy(() => import("./layouts/AdminLayout.jsx"));
-const AdminDashboard = lazy(() => import("./features/admin/AdminDashboard.jsx"));
+const AdminDashboard = lazy(() =>
+  import("./features/admin/AdminDashboard.jsx")
+);
 const UsersPage = lazy(() => import("./features/admin/pages/UsersPage.jsx"));
-const ContentManagement = lazy(() => import("./features/admin/ContentManagement.jsx"));
+const ContentManagement = lazy(() =>
+  import("./features/admin/ContentManagement.jsx")
+);
 const JobsPage = lazy(() => import("./features/admin/pages/JobsPage.jsx"));
-const CompaniesPage = lazy(() => import("./features/admin/pages/CompaniesPage.jsx"));
-const AnalyticsPage = lazy(() => import("./features/admin/pages/AnalyticsPage.jsx"));
-const SettingsPage = lazy(() => import("./features/admin/pages/SettingsPage.jsx"));
+const CompaniesPage = lazy(() =>
+  import("./features/admin/pages/CompaniesPage.jsx")
+);
+const AnalyticsPage = lazy(() =>
+  import("./features/admin/pages/AnalyticsPage.jsx")
+);
+const SettingsPage = lazy(() =>
+  import("./features/admin/pages/SettingsPage.jsx")
+);
 const PlansPage = lazy(() => import("./features/admin/pages/PlansPage.jsx"));
+
 
 const BackgroundWrapper = ({children}) => {
     return (
@@ -57,12 +68,13 @@ const BackgroundWrapper = ({children}) => {
 };
 
 const AuthLayout = () => (
-    <BackgroundWrapper>
-        <div className="min-h-screen">
-            <Outlet/>
-        </div>
-    </BackgroundWrapper>
+  <BackgroundWrapper>
+    <div className="min-h-screen">
+      <Outlet />
+    </div>
+  </BackgroundWrapper>
 );
+
 
 const AdminAuthLayout = () => (
     <BackgroundWrapper>
@@ -150,7 +162,8 @@ const AdminRoute = ({children}) => {
         return <Navigate to="/" replace/>;
     }
 
-    return <>{children}</>;
+
+  return <>{children}</>;
 };
 
 const ErrorPage = ({error}) => {
@@ -172,30 +185,32 @@ const ErrorPage = ({error}) => {
             </div>
         </BackgroundWrapper>
     );
+
 };
 
 const queryClient = new QueryClient({
-    defaultOptions: {
-        queries: {
-            staleTime: 5 * 60 * 1000, // 5m
-            retry: 1,
-        },
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5m
+      retry: 1,
     },
+  },
 });
 
 // Wrapper for ProtectedLayout with background
 const ProtectedLayoutWithBackground = () => (
-    <BackgroundWrapper>
-        <ProtectedLayout/>
-    </BackgroundWrapper>
+  <BackgroundWrapper>
+    <ProtectedLayout />
+  </BackgroundWrapper>
 );
 
 // Wrapper for SettingsLayout with background
 const SettingsLayoutWithBackground = () => (
-    <BackgroundWrapper>
-        <SettingsLayout/>
-    </BackgroundWrapper>
+  <BackgroundWrapper>
+    <SettingsLayout />
+  </BackgroundWrapper>
 );
+
 
 const AdminLayoutWithBackground = () => (
     <Suspense fallback={<FullPageSpinner/>}>
@@ -207,14 +222,7 @@ const AdminLayoutWithBackground = () => (
 
 function App() {
     const [router] = useState(() =>
-        createBrowserRouter([
-            // Root route that redirects based on role
-            {
-                path: "/",
-                element: <RootRedirect />,
-                errorElement: <ErrorPage/>,
-            },
-            // User protected routes
+        createBrowserRouter(
             {
                 element: (
                     <UserRoute>
@@ -449,17 +457,17 @@ function App() {
         ])
     );
 
-    return (
-        <QueryClientProvider client={queryClient}>
-            <ThemeProvider storageKey="app-theme">
-                <ReactQueryDevtools initialIsOpen={false}/>
-                <Suspense fallback={<FullPageSpinner/>}>
-                    <RouterProvider router={router}/>
-                </Suspense>
-                <Toaster/>
-            </ThemeProvider>
-        </QueryClientProvider>
-    );
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider storageKey="app-theme">
+        <ReactQueryDevtools initialIsOpen={false} />
+        <Suspense fallback={<FullPageSpinner />}>
+          <RouterProvider router={router} />
+        </Suspense>
+        <Toaster />
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
 }
 
 export default App;
