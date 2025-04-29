@@ -1,16 +1,42 @@
-// apiClient.js - Updated version with getUser implementation
 import axios from "axios";
 import TokenService from "@/lib/TokenService.js";
 
-// Create an axios instance with base URL
-const apiClient = axios.create({
-    baseURL: "https://hirex-production.up.railway.app/api/v1",
-    headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-    },
-    withCredentials: true, // Critical for sending cookies with cross-origin requests
-});
+// Base URL without the path prefix
+const BASE_URL = "https://hirex-production.up.railway.app";
+
+// Create a function to generate an axios instance with the right configuration
+const createApiClient = (pathPrefix = "/api/v1") => {
+    const instance = axios.create({
+        baseURL: `${BASE_URL}${pathPrefix}`,
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        withCredentials: true, // Critical for sending cookies with cross-origin requests
+    });
+
+    // Setup request interceptor
+    instance.interceptors.request.use(
+        (config) => {
+            console.log(`Making request to: ${config.url}`);
+
+            // Get token from localStorage for token-based auth
+            const token = TokenService.getAccessToken();
+
+            // If we have a token, add it to the headers
+            if (token) {
+                config.headers["Authorization"] = `Bearer ${token}`;
+                console.log("Adding Authorization header");
+            } else {
+                console.log("No token available, request will use cookies if present");
+            }
+            return config;
+        },
+        (error) => Promise.reject(error)
+    );
+
+    return instance;
+};
 
 // Flag to prevent multiple simultaneous refresh requests
 let isRefreshing = false;
@@ -29,131 +55,156 @@ const processQueue = (error, token = null) => {
     failedQueue = [];
 };
 
-// Setup request interceptor
-apiClient.interceptors.request.use(
-    (config) => {
-        console.log(`Making request to: ${config.url}`);
+// Create the main API client instances
+const apiClient = createApiClient("/api/v1");
+const adminApiClient = createApiClient("/admin/v1");
 
-        // Get token from localStorage for token-based auth
-        const token = TokenService.getAccessToken();
+// Setup response interceptor for both clients
+[apiClient, adminApiClient].forEach(client => {
+    client.interceptors.response.use(
+        (response) => {
+            console.log(`Response from ${response.config.url}:`, response.status);
 
-        // If we have a token, add it to the headers
-        if (token) {
-            config.headers["Authorization"] = `Bearer ${token}`;
-            console.log("Adding Authorization header");
-        } else {
-            console.log("No token available, request will use cookies if present");
-        }
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
-
-// Setup response interceptor
-apiClient.interceptors.response.use(
-    (response) => {
-        console.log(`Response from ${response.config.url}:`, response.status);
-
-        // If the response includes a new token, update it in localStorage
-        if (response.data && response.data.accessToken) {
-            console.log("Received new access token in response");
-            TokenService.setAccessToken(response.data.accessToken);
-        }
-        return response;
-    },
-    async (error) => {
-        console.log(`Error response from ${error.config?.url}:`, error.response?.status);
-
-        const originalRequest = error.config;
-
-        // If error is 401 and we haven't tried to refresh the token yet
-        if (error.response?.status === 401 && !originalRequest._retry) {
-            if (isRefreshing) {
-                console.log("Token refresh already in progress, queuing request");
-                return new Promise((resolve, reject) => {
-                    failedQueue.push({resolve, reject});
-                })
-                    .then(token => {
-                        console.log("Retrying request with new token");
-                        if (token) {
-                            originalRequest.headers["Authorization"] = `Bearer ${token}`;
-                        }
-                        return apiClient(originalRequest);
-                    })
-                    .catch(err => Promise.reject(err));
+            // If the response includes a new token, update it in localStorage
+            if (response.data && response.data.accessToken) {
+                console.log("Received new access token in response");
+                TokenService.setAccessToken(response.data.accessToken);
             }
+            return response;
+        },
+        async (error) => {
+            console.log(`Error response from ${error.config?.url}:`, error.response?.status);
 
-            originalRequest._retry = true;
-            isRefreshing = true;
-            console.log("Starting token refresh process");
+            const originalRequest = error.config;
 
-            try {
-                // Use refresh token for manual login or OAuth cookie-based refresh
-                const refreshToken = TokenService.getRefreshToken();
-                const isOAuth = TokenService.isOAuthAuthenticated();
-
-                // Call refresh endpoint
-                console.log("Calling refresh token endpoint");
-                const response = await axios.post(
-                    "https://hirex-production.up.railway.app/api/v1/auth/refresh-token",
-                    isOAuth ? {} : {refreshToken}, // Only send refresh token for non-OAuth flow
-                    {
-                        withCredentials: true // Always include cookies
-                    }
-                );
-
-                console.log("Refresh token response:", response.status);
-
-                // For token-based auth, update the tokens
-                if (response.data && response.data.accessToken) {
-                    console.log("New token received from refresh");
-                    TokenService.setAccessToken(response.data.accessToken);
-
-                    if (response.data.refreshToken) {
-                        TokenService.setRefreshToken(response.data.refreshToken);
-                    }
-
-                    // Add it to the original request
-                    originalRequest.headers["Authorization"] = `Bearer ${response.data.accessToken}`;
-
-                    // Process all queued requests with the new token
-                    processQueue(null, response.data.accessToken);
-                } else if (isOAuth) {
-                    // For OAuth, we just need to ensure the cookies are sent
-                    console.log("OAuth cookie refresh, continuing with request");
-                    processQueue(null);
-                } else {
-                    console.log("No token in refresh response");
-                    processQueue(null);
+            // If error is 401 and we haven't tried to refresh the token yet
+            if (error.response?.status === 401 && !originalRequest._retry) {
+                if (isRefreshing) {
+                    console.log("Token refresh already in progress, queuing request");
+                    return new Promise((resolve, reject) => {
+                        failedQueue.push({ resolve, reject });
+                    })
+                        .then(token => {
+                            console.log("Retrying request with new token");
+                            if (token) {
+                                originalRequest.headers["Authorization"] = `Bearer ${token}`;
+                            }
+                            return axios(originalRequest);
+                        })
+                        .catch(err => Promise.reject(err));
                 }
 
-                isRefreshing = false;
-                return apiClient(originalRequest);
-            } catch (refreshError) {
-                console.error("Token refresh failed:", refreshError.message);
-                processQueue(refreshError);
-                isRefreshing = false;
+                originalRequest._retry = true;
+                isRefreshing = true;
+                console.log("Starting token refresh process");
 
-                // Clear tokens from localStorage
-                TokenService.clearTokens();
-                TokenService.setOAuthAuthenticated(false);
+                try {
+                    // Use refresh token for manual login or OAuth cookie-based refresh
+                    const refreshToken = TokenService.getRefreshToken();
+                    const isOAuth = TokenService.isOAuthAuthenticated();
 
-                // Dispatch an event that auth has failed
-                window.dispatchEvent(new CustomEvent('auth:failed'));
+                    // Call refresh endpoint
+                    console.log("Calling refresh token endpoint");
+                    const response = await axios.post(
+                        `${BASE_URL}/api/v1/auth/refresh-token`,
+                        isOAuth ? {} : { refreshToken }, // Only send refresh token for non-OAuth flow
+                        {
+                            withCredentials: true // Always include cookies
+                        }
+                    );
 
-                return Promise.reject(refreshError);
+                    console.log("Refresh token response:", response.status);
+
+                    // For token-based auth, update the tokens
+                    if (response.data && response.data.accessToken) {
+                        console.log("New token received from refresh");
+                        TokenService.setAccessToken(response.data.accessToken);
+
+                        if (response.data.refreshToken) {
+                            TokenService.setRefreshToken(response.data.refreshToken);
+                        }
+
+                        // Add it to the original request
+                        originalRequest.headers["Authorization"] = `Bearer ${response.data.accessToken}`;
+
+                        // Process all queued requests with the new token
+                        processQueue(null, response.data.accessToken);
+                    } else if (isOAuth) {
+                        // For OAuth, we just need to ensure the cookies are sent
+                        console.log("OAuth cookie refresh, continuing with request");
+                        processQueue(null);
+                    } else {
+                        console.log("No token in refresh response");
+                        processQueue(null);
+                    }
+
+                    isRefreshing = false;
+                    return axios(originalRequest);
+                } catch (refreshError) {
+                    console.error("Token refresh failed:", refreshError.message);
+                    processQueue(refreshError);
+                    isRefreshing = false;
+
+                    // Clear tokens from localStorage
+                    TokenService.clearTokens();
+                    TokenService.setOAuthAuthenticated(false);
+
+                    // Dispatch an event that auth has failed
+                    window.dispatchEvent(new CustomEvent('auth:failed'));
+
+                    return Promise.reject(refreshError);
+                }
             }
+
+            return Promise.reject(error);
         }
+    );
+});
 
-        return Promise.reject(error);
+// Create a unified API object that routes to the correct client
+const api = {
+    get: (url, config) => {
+        if (url.startsWith('/admin/')) {
+            // Remove the /admin/v1 prefix since it's already in the baseURL
+            const adminUrl = url.replace(/^\/admin\/v1/, '');
+            return adminApiClient.get(adminUrl, config);
+        }
+        return apiClient.get(url, config);
+    },
+    post: (url, data, config) => {
+        if (url.startsWith('/admin/')) {
+            const adminUrl = url.replace(/^\/admin\/v1/, '');
+            return adminApiClient.post(adminUrl, data, config);
+        }
+        return apiClient.post(url, data, config);
+    },
+    put: (url, data, config) => {
+        if (url.startsWith('/admin/')) {
+            const adminUrl = url.replace(/^\/admin\/v1/, '');
+            return adminApiClient.put(adminUrl, data, config);
+        }
+        return apiClient.put(url, data, config);
+    },
+    patch: (url, data, config) => {
+        if (url.startsWith('/admin/')) {
+            const adminUrl = url.replace(/^\/admin\/v1/, '');
+            return adminApiClient.patch(adminUrl, data, config);
+        }
+        return apiClient.patch(url, data, config);
+    },
+    delete: (url, config) => {
+        if (url.startsWith('/admin/')) {
+            const adminUrl = url.replace(/^\/admin\/v1/, '');
+            return adminApiClient.delete(adminUrl, config);
+        }
+        return apiClient.delete(url, config);
     }
-);
+};
 
-
-// Login API
+// Login API - keeping the same implementation but using the unified api object
 export const loginUser = async (credentials) => {
     console.log("Attempting login");
-    const response = await apiClient.post("/auth/login", credentials);
+    const response = await api.post("/auth/login", credentials);
 
     // If the response includes tokens, store them in localStorage
     if (response.data) {
@@ -182,7 +233,7 @@ export const registerUser = async (userData) => {
             formData.append(key, value);
         });
 
-        const response = await apiClient.post(
+        const response = await api.post(
             "/auth/register",
             formData.toString(),
             {
@@ -196,7 +247,7 @@ export const registerUser = async (userData) => {
     } catch (error) {
         // Graceful error parsing
         if (error.response) {
-            const {status, data} = error.response;
+            const { status, data } = error.response;
             let message = "Registration failed";
 
             if (status === 400 && data.errors) {
@@ -221,7 +272,7 @@ export const logoutUser = async (refreshToken) => {
     try {
         console.log("Logging out");
         // Include refresh token in the request if your API requires it
-        const response = await apiClient.post("/auth/logout", {refreshToken});
+        const response = await api.post("/auth/logout", { refreshToken });
 
         // Clear the tokens
         TokenService.clearTokens();
@@ -235,7 +286,7 @@ export const logoutUser = async (refreshToken) => {
         TokenService.setOAuthAuthenticated(false);
 
         if (error.response) {
-            const {data} = error.response;
+            const { data } = error.response;
             let message = "Logout failed";
 
             if (data.message) {
@@ -258,14 +309,14 @@ export const logoutUser = async (refreshToken) => {
 export const forgotPassword = async (payload) => {
     try {
         console.log("Requesting password reset for:", payload.email);
-        const response = await apiClient.post("/auth/forgot-password", payload);
+        const response = await api.post("/auth/forgot-password", payload);
         console.log("Password reset email sent:", response.status);
         return response.data;
     } catch (error) {
         console.error("Forgot‑password request failed:", error.response?.data || error.message);
 
         if (error.response) {
-            const {status, data} = error.response;
+            const { status, data } = error.response;
             if (status === 400 && data.errors) {
                 throw new Error(Object.values(data.errors).join(", "));
             }
@@ -282,9 +333,9 @@ export const forgotPassword = async (payload) => {
     }
 };
 
-export async function resetPassword({token, password, confirmPassword}) {
+export async function resetPassword({ token, password, confirmPassword }) {
     try {
-        const response = await apiClient.post(
+        const response = await api.post(
             `/auth/reset-password/${token}`,
             {
                 password,
@@ -304,14 +355,13 @@ export const loginWithOAuthCode = async (code) => {
     return res.data;
 };
 
-
 export const sendVerificationEmail = async (email) => {
     try {
         console.log("Requesting email verification for:", email);
         const formData = new URLSearchParams();
         formData.append('email', email);
 
-        const response = await apiClient.post(
+        const response = await api.post(
             "/auth/send-verification-code",
             formData.toString(),
             {
@@ -349,7 +399,7 @@ export const setPassword = async (newPassword) => {
         const formData = new URLSearchParams();
         formData.append('newPassword', newPassword);
 
-        const response = await apiClient.post(
+        const response = await api.post(
             "/auth/set-password",
             formData.toString(),
             {
@@ -381,7 +431,6 @@ export const setPassword = async (newPassword) => {
     }
 };
 
-
 export const changePassword = async ({ oldPassword, newPassword }) => {
     try {
         console.log("Changing password");
@@ -389,7 +438,7 @@ export const changePassword = async ({ oldPassword, newPassword }) => {
         formData.append('oldPassword', oldPassword);
         formData.append('newPassword', newPassword);
 
-        const response = await apiClient.post(
+        const response = await api.post(
             "/auth/change-password",
             formData.toString(),
             {
@@ -418,6 +467,153 @@ export const changePassword = async ({ oldPassword, newPassword }) => {
         }
 
         throw new Error(error.message || "An unexpected error occurred when changing your password.");
+    }
+};
+
+export const getUsers = async () => {
+    const response = await api.get("/users");
+    return response.data;
+};
+
+// Get user by ID
+export const getUserById = async (userId) => {
+    try {
+        const response = await api.get(`/users/${userId}`);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.message || 'Failed to fetch user');
+    }
+};
+
+// Update user
+export const updateUser = async ({ userId, userData }) => {
+    try {
+        const response = await api.patch(`/users/${userId}`, userData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("API Error:", error.response?.data || error.message);
+        throw error;
+    }
+};
+
+// Delete user
+export const deleteUser = async ({ userId, password }) => {
+    const formData = new URLSearchParams();
+    formData.append('password', password);
+
+    const response = await api.delete(`/users/${userId}`, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        data: formData.toString(),
+    });
+
+    return response.data;
+};
+
+// Promote user
+export const promoteUser = async (userId) => {
+    const response = await api.patch(`/users/promote/${userId}`);
+    return response.data;
+};
+
+// Company functions - now using the correct paths
+export const getAllCompanies = async () => {
+    try {
+        // Use the admin path directly
+        const response = await api.get("/admin/v1/companies");
+        return response.data;
+    } catch (error) {
+        console.error("Failed to fetch companies:", error.response?.data || error.message);
+        throw new Error(error.response?.data?.message || "Failed to fetch companies");
+    }
+};
+
+// Verify or reject a company
+export const verifyCompany = async ({ id, status, reason }) => {
+    try {
+        if (!id) {
+            throw new Error("Company ID is required for verification");
+        }
+
+        const formData = new URLSearchParams();
+        formData.append('action', status === 'verified' ? 'approve' : 'reject'); // Convert status to action
+        if (reason) {
+            formData.append('reason', reason);
+        }
+
+        console.log(`Verifying company with ID: ${id}, action: ${status === 'verified' ? 'approve' : 'reject'}`);
+
+        const response = await api.post(
+            `/admin/v1/companies/${id}/verification`,
+            formData.toString(),
+            {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error(`Company verification failed for ID ${id}:`, error.response?.data || error.message);
+        throw new Error(error.response?.data?.message || "Failed to verify company");
+    }
+};
+// Filter companies with various parameters
+export const filterCompanies = async (filters = {}) => {
+    try {
+        // Convert filters object to URL query parameters
+        const params = new URLSearchParams();
+
+        // Map filter keys to API parameter names
+        const parameterMapping = {
+            name: 'name',
+            address: 'address',
+            website: 'website',
+            verificationStatus: 'verificationStatus',
+            verificationMethod: 'verificationMethod',
+            createdBy: 'createdBy',
+            createdAtFrom: 'createdAtFrom',
+            createdAtTo: 'createdAtTo'
+        };
+
+        // Process all filters, skipping null, undefined, and empty strings
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value !== null && value !== undefined && value !== "") {
+                const apiParamName = parameterMapping[key] || key;
+
+                // Handle arrays (like multiple status values)
+                if (Array.isArray(value)) {
+                    value.forEach((item) => params.append(`${apiParamName}`, item));
+                } else {
+                    params.append(apiParamName, value);
+                }
+            }
+        });
+
+        // Log the request for debugging
+        console.log("Filtering companies with params:", Object.fromEntries(params.entries()));
+
+        const response = await api.get(`/admin/v1/companies/filter`, { params });
+        return response.data;
+    } catch (error) {
+        const errorMessage = error.response?.data?.message || "Failed to filter companies";
+        console.error("Failed to filter companies:", errorMessage, error);
+        throw new Error(errorMessage);
+    }
+}
+// Get company statistics
+export const getCompanyStatistics = async () => {
+    try {
+        const response = await api.get("/admin/v1/companies/statistics");
+        return response.data;
+    } catch (error) {
+        console.error("Failed to fetch company statistics:", error.response?.data || error.message);
+        throw new Error(error.response?.data?.message || "Failed to fetch company statistics");
     }
 };
 
