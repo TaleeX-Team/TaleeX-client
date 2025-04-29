@@ -276,13 +276,13 @@ const JobsPage = () => {
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button
-                                    onClick={handleCreateJob}
-                                    className="create-job-btn transition-all hover:shadow-md relative overflow-hidden group"
-                                >
-                                    <span className="absolute inset-0 bg-primary/10 transform scale-0 group-hover:scale-100 transition-transform duration-300 rounded-md"></span>
-                                    <Plus className="mr-2 h-4 w-4" /> Create Job
-                                </Button>
+                                {/*<Button*/}
+                                {/*    onClick={handleCreateJob}*/}
+                                {/*    className="create-job-btn transition-all hover:shadow-md relative overflow-hidden group"*/}
+                                {/*>*/}
+                                {/*    <span className="absolute inset-0 bg-primary/10 transform scale-0 group-hover:scale-100 transition-transform duration-300 rounded-md"></span>*/}
+                                {/*    <Plus className="mr-2 h-4 w-4" /> Create Job*/}
+                                {/*</Button>*/}
                             </TooltipTrigger>
                             <TooltipContent className="bg-popover text-popover-foreground">
                                 <p>Create a new job listing</p>

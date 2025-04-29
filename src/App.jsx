@@ -23,10 +23,21 @@ import Home from "@/features/home/Home.jsx";
 import { AnimatedBackground } from "./components/AnimatedBackground";
 import SetPassword from "@/features/settings/set-password/SetPassword.jsx";
 import ChangePasswordPage from "@/features/settings/change-password/ChangePasswordPage.jsx";
+import { useUser } from "@/hooks/useUser.js";
+
 // Lazy pages
 const Auth = lazy(() => import("./features/auth/Auth.jsx"));
 const ForgetPassword = lazy(() =>
   import("./features/auth/password/ForgetPassword.jsx")
+);
+
+// Admin Auth pages (lazy loaded)
+const AdminSignIn = lazy(() => import("./features/admin/auth/AdminSignIn.jsx"));
+const AdminForgetPassword = lazy(() =>
+  import("./features/admin/auth/AdminForgetPassword.jsx")
+);
+const AdminSetPassword = lazy(() =>
+  import("./features/admin/auth/AdminResetPassword.jsx")
 );
 
 // Admin pages (lazy loaded)
@@ -67,58 +78,107 @@ const AuthLayout = () => (
   </BackgroundWrapper>
 );
 
-const PublicRoute = ({ children, redirectPath = "/" }) => {
+const AdminAuthLayout = () => (
+  <BackgroundWrapper>
+    <div className="min-h-screen">
+      <Outlet />
+    </div>
+  </BackgroundWrapper>
+);
+
+// Root level redirect based on user role
+const RootRedirect = () => {
   const { isAuthenticated, isLoading } = useAuth();
+  const { data: user, isLoading: isUserLoading } = useUser();
 
-  if (isLoading) return <FullPageSpinner />;
-
-  return isAuthenticated ? (
-    <Navigate to={redirectPath} replace />
-  ) : (
-    <>{children}</>
-  );
-};
-
-const ProtectedRoute = ({ children, redirectPath = "/auth" }) => {
-  const { isAuthenticated, isLoading } = useAuth();
-  const location = useLocation();
-
-  if (isLoading) return <FullPageSpinner />;
+  if (isLoading || isUserLoading) return <FullPageSpinner />;
 
   if (!isAuthenticated) {
-    return (
-      <Navigate to={redirectPath} replace state={{ from: location.pathname }} />
-    );
+    return <Navigate to="/auth" replace />;
+  }
+
+  // If admin, redirect to admin dashboard
+  if (user?.role === "admin") {
+    return <Navigate to="/admin" replace />;
+  }
+
+  // Otherwise, go to user home
+  return <Navigate to="/" replace />;
+};
+
+// Public route (login pages)
+const PublicRoute = ({
+  children,
+  adminRedirect = "/admin",
+  userRedirect = "/",
+}) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  const { data: user, isLoading: isUserLoading } = useUser();
+
+  if (isLoading || isUserLoading) return <FullPageSpinner />;
+
+  // If authenticated, redirect based on role
+  if (isAuthenticated) {
+    if (user?.role === "admin") {
+      return <Navigate to={adminRedirect} replace />;
+    }
+    return <Navigate to={userRedirect} replace />;
   }
 
   return <>{children}</>;
 };
 
-const AdminRoute = ({ children, redirectPath = "/" }) => {
-  const { isAuthenticated, isLoading, user } = useAuth();
+// Regular user routes - admins should not access these
+const UserRoute = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  const { data: user, isLoading: isUserLoading } = useUser();
   const location = useLocation();
 
-  if (isLoading) return <FullPageSpinner />;
+  if (isLoading || isUserLoading) return <FullPageSpinner />;
 
-  // Uncomment when ready to enforce admin role check
-  // if (!isAuthenticated) {
-  //     return (
-  //         <Navigate to="/auth" replace state={{from: location.pathname}}/>
-  //     );
-  // }
-  //
-  // // Check if user has admin role
-  // if (user?.role !== "admin") {
-  //     return <Navigate to={redirectPath} replace/>;
-  // }
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" replace state={{ from: location.pathname }} />;
+  }
+
+  // If admin tries to access user routes, redirect to admin dashboard
+  if (user?.role === "admin") {
+    return <Navigate to="/admin" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+// Admin routes - only admins can access
+const AdminRoute = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  const { data: user, isLoading: isUserLoading } = useUser();
+  const location = useLocation();
+
+  if (isLoading || isUserLoading) return <FullPageSpinner />;
+
+  // If not authenticated, go to admin login
+  if (!isAuthenticated) {
+    return (
+      <Navigate to="/admin/auth" replace state={{ from: location.pathname }} />
+    );
+  }
+
+  // If not admin, redirect to appropriate home based on authentication
+  if (user?.role !== "admin") {
+    return <Navigate to="/" replace />;
+  }
 
   return <>{children}</>;
 };
 
 const ErrorPage = ({ error }) => {
   const location = useLocation();
+  const { data: user } = useUser();
   const message =
     error ?? location.state?.error ?? "We couldn't find that page.";
+
+  // Determine where "home" is based on user role
+  const homeLink = user?.role === "admin" ? "/admin" : "/";
 
   return (
     <BackgroundWrapper>
@@ -126,7 +186,7 @@ const ErrorPage = ({ error }) => {
         <h1 className="text-2xl font-bold text-red-600">Oops!</h1>
         <p className="text-gray-600 max-w-md text-center">{message}</p>
         <Button asChild>
-          <a href="/">Go Home</a>
+          <a href={homeLink}>Go Home</a>
         </Button>
       </div>
     </BackgroundWrapper>
@@ -156,30 +216,29 @@ const SettingsLayoutWithBackground = () => (
   </BackgroundWrapper>
 );
 
-const AdminLayoutWithBackground = ({ children }) => (
+const AdminLayoutWithBackground = () => (
   <Suspense fallback={<FullPageSpinner />}>
-    <AdminLayout>{children}</AdminLayout>
+    <AdminLayout>
+      <Outlet />
+    </AdminLayout>
   </Suspense>
-);
-
-// Create a placeholder component for routes that haven't been implemented yet
-const ComingSoonPage = ({ feature }) => (
-  <div className="flex flex-col items-center justify-center min-h-[80vh] text-center p-4">
-    <h1 className="text-3xl font-bold mb-4">{feature} Coming Soon</h1>
-    <p className="text-gray-600 max-w-md">
-      This feature is currently under development and will be available soon.
-    </p>
-  </div>
 );
 
 function App() {
   const [router] = useState(() =>
     createBrowserRouter([
+      // Root route that redirects based on role
+      {
+        path: "/",
+        element: <RootRedirect />,
+        errorElement: <ErrorPage />,
+      },
+      // User protected routes
       {
         element: (
-          <ProtectedRoute>
+          <UserRoute>
             <ProtectedLayoutWithBackground />
-          </ProtectedRoute>
+          </UserRoute>
         ),
         errorElement: <ErrorPage />,
         children: [
@@ -189,11 +248,12 @@ function App() {
           },
         ],
       },
+      // User settings routes
       {
         element: (
-          <ProtectedRoute>
+          <UserRoute>
             <SettingsLayoutWithBackground />
-          </ProtectedRoute>
+          </UserRoute>
         ),
         path: "/settings",
         errorElement: <ErrorPage />,
@@ -201,13 +261,7 @@ function App() {
           {
             path: "profile",
             element: (
-              <Suspense
-                fallback={
-                  <div className="min-h-screen flex items-center justify-center">
-                    Loading...
-                  </div>
-                }
-              >
+              <Suspense fallback={<FullPageSpinner />}>
                 <ProfilePage />
               </Suspense>
             ),
@@ -215,13 +269,7 @@ function App() {
           {
             path: "billing",
             element: (
-              <Suspense
-                fallback={
-                  <div className="min-h-screen flex items-center justify-center">
-                    Loading...
-                  </div>
-                }
-              >
+              <Suspense fallback={<FullPageSpinner />}>
                 <BillingPage />
               </Suspense>
             ),
@@ -229,13 +277,7 @@ function App() {
           {
             path: "set-password",
             element: (
-              <Suspense
-                fallback={
-                  <div className="min-h-screen flex items-center justify-center">
-                    Loading...
-                  </div>
-                }
-              >
+              <Suspense fallback={<FullPageSpinner />}>
                 <SetPassword />
               </Suspense>
             ),
@@ -243,14 +285,46 @@ function App() {
           {
             path: "change-password",
             element: (
-              <Suspense
-                fallback={
-                  <div className="min-h-screen flex items-center justify-center">
-                    Loading...
-                  </div>
-                }
-              >
+              <Suspense fallback={<FullPageSpinner />}>
                 <ChangePasswordPage />
+              </Suspense>
+            ),
+          },
+        ],
+      },
+      // Admin Auth Routes
+      {
+        path: "/admin/auth",
+        element: <AdminAuthLayout />,
+        errorElement: <ErrorPage />,
+        children: [
+          {
+            index: true,
+            element: (
+              <Suspense fallback={<FullPageSpinner />}>
+                <PublicRoute adminRedirect="/admin" userRedirect="/">
+                  <AdminSignIn />
+                </PublicRoute>
+              </Suspense>
+            ),
+          },
+          {
+            path: "forgot-password",
+            element: (
+              <Suspense fallback={<FullPageSpinner />}>
+                <PublicRoute adminRedirect="/admin" userRedirect="/">
+                  <AdminForgetPassword />
+                </PublicRoute>
+              </Suspense>
+            ),
+          },
+          {
+            path: "reset-password/:verificationToken",
+            element: (
+              <Suspense fallback={<FullPageSpinner />}>
+                <PublicRoute adminRedirect="/admin" userRedirect="/">
+                  <AdminSetPassword />
+                </PublicRoute>
               </Suspense>
             ),
           },
@@ -260,9 +334,7 @@ function App() {
       {
         element: (
           <AdminRoute>
-            <AdminLayoutWithBackground>
-              <Outlet />
-            </AdminLayoutWithBackground>
+            <AdminLayoutWithBackground />
           </AdminRoute>
         ),
         path: "/admin",
@@ -284,7 +356,6 @@ function App() {
               </Suspense>
             ),
           },
-          // Add Jobs route to match menu item
           {
             path: "jobs",
             element: (
@@ -301,7 +372,6 @@ function App() {
               </Suspense>
             ),
           },
-          // Content route (kept for backward compatibility)
           {
             path: "content",
             element: (
@@ -318,7 +388,6 @@ function App() {
               </Suspense>
             ),
           },
-          // Add Plans route to match menu item
           {
             path: "plans",
             element: (
@@ -341,6 +410,7 @@ function App() {
           },
         ],
       },
+      // User Auth Routes
       {
         element: <AuthLayout />,
         errorElement: <ErrorPage />,
@@ -349,7 +419,7 @@ function App() {
             path: "/auth",
             element: (
               <Suspense fallback={<FullPageSpinner />}>
-                <PublicRoute>
+                <PublicRoute adminRedirect="/admin" userRedirect="/">
                   <AuthLayout />
                 </PublicRoute>
               </Suspense>
@@ -391,6 +461,11 @@ function App() {
             ],
           },
         ],
+      },
+      // Catch-all route
+      {
+        path: "*",
+        element: <ErrorPage error="Page not found." />,
       },
     ])
   );

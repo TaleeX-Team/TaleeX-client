@@ -29,11 +29,20 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import {useAuth} from "@/hooks/useAuth.js";
+import React, {useState} from "react";
 
 export function NavUser({
   user
 }) {
   const { isMobile } = useSidebar()
+  const { logout } = useAuth();
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const handleLogout = () => {
+    logout.mutate();
+    setOpenDialog(false);
+  };
 
   return (
     <SidebarMenu>
@@ -94,9 +103,15 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut />
-              Log out
+
+            <DropdownMenuItem
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setOpenDialog(true);
+                }}
+                className="text-red-600 focus:bg-red-100 dark:focus:bg-red-900 cursor-pointer"
+            >
+              Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
