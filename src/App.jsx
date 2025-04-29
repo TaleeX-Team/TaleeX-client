@@ -23,7 +23,6 @@ import Home from "@/features/home/Home.jsx";
 import { AnimatedBackground } from "./components/AnimatedBackground";
 import SetPassword from "@/features/settings/set-password/SetPassword.jsx";
 import ChangePasswordPage from "@/features/settings/change-password/ChangePasswordPage.jsx";
-
 // Lazy pages
 const Auth = lazy(() => import("./features/auth/Auth.jsx"));
 const ForgetPassword = lazy(() =>
@@ -32,17 +31,25 @@ const ForgetPassword = lazy(() =>
 
 // Admin pages (lazy loaded)
 const AdminLayout = lazy(() => import("./layouts/AdminLayout.jsx"));
-const AdminDashboard = lazy(() => import("./features/admin/Dashboard.jsx"));
-const UserManagement = lazy(() =>
-  import("./features/admin/UserManagement.jsx")
+const AdminDashboard = lazy(() =>
+  import("./features/admin/AdminDashboard.jsx")
 );
+const UsersPage = lazy(() => import("./features/admin/pages/UsersPage.jsx"));
 const ContentManagement = lazy(() =>
   import("./features/admin/ContentManagement.jsx")
 );
-const Analytics = lazy(() => import("./features/admin/Analytics.jsx"));
-const Settings = lazy(() => import("./features/admin/Settings.jsx"));
+const JobsPage = lazy(() => import("./features/admin/pages/JobsPage.jsx"));
+const CompaniesPage = lazy(() =>
+  import("./features/admin/pages/CompaniesPage.jsx")
+);
+const AnalyticsPage = lazy(() =>
+  import("./features/admin/pages/AnalyticsPage.jsx")
+);
+const SettingsPage = lazy(() =>
+  import("./features/admin/pages/SettingsPage.jsx")
+);
+const PlansPage = lazy(() => import("./features/admin/pages/PlansPage.jsx"));
 
-// Create the AnimatedBackground component
 const BackgroundWrapper = ({ children }) => {
   return (
     <div className="relative min-h-screen">
@@ -93,14 +100,17 @@ const AdminRoute = ({ children, redirectPath = "/" }) => {
 
   if (isLoading) return <FullPageSpinner />;
 
-  if (!isAuthenticated) {
-    return <Navigate to="/auth" replace state={{ from: location.pathname }} />;
-  }
-
-  // Check if user has admin role
-  if (!user?.isAdmin) {
-    return <Navigate to={redirectPath} replace />;
-  }
+  // Uncomment when ready to enforce admin role check
+  // if (!isAuthenticated) {
+  //     return (
+  //         <Navigate to="/auth" replace state={{from: location.pathname}}/>
+  //     );
+  // }
+  //
+  // // Check if user has admin role
+  // if (user?.role !== "admin") {
+  //     return <Navigate to={redirectPath} replace/>;
+  // }
 
   return <>{children}</>;
 };
@@ -146,13 +156,20 @@ const SettingsLayoutWithBackground = () => (
   </BackgroundWrapper>
 );
 
-// Wrapper for AdminLayout with background
-const AdminLayoutWithBackground = () => (
-  <BackgroundWrapper>
-    <Suspense fallback={<FullPageSpinner />}>
-      <AdminLayout />
-    </Suspense>
-  </BackgroundWrapper>
+const AdminLayoutWithBackground = ({ children }) => (
+  <Suspense fallback={<FullPageSpinner />}>
+    <AdminLayout>{children}</AdminLayout>
+  </Suspense>
+);
+
+// Create a placeholder component for routes that haven't been implemented yet
+const ComingSoonPage = ({ feature }) => (
+  <div className="flex flex-col items-center justify-center min-h-[80vh] text-center p-4">
+    <h1 className="text-3xl font-bold mb-4">{feature} Coming Soon</h1>
+    <p className="text-gray-600 max-w-md">
+      This feature is currently under development and will be available soon.
+    </p>
+  </div>
 );
 
 function App() {
@@ -161,7 +178,7 @@ function App() {
       {
         element: (
           <ProtectedRoute>
-            <ProtectedLayout />
+            <ProtectedLayoutWithBackground />
           </ProtectedRoute>
         ),
         errorElement: <ErrorPage />,
@@ -243,7 +260,9 @@ function App() {
       {
         element: (
           <AdminRoute>
-            <AdminLayoutWithBackground />
+            <AdminLayoutWithBackground>
+              <Outlet />
+            </AdminLayoutWithBackground>
           </AdminRoute>
         ),
         path: "/admin",
@@ -261,10 +280,28 @@ function App() {
             path: "users",
             element: (
               <Suspense fallback={<FullPageSpinner />}>
-                <UserManagement />
+                <UsersPage />
               </Suspense>
             ),
           },
+          // Add Jobs route to match menu item
+          {
+            path: "jobs",
+            element: (
+              <Suspense fallback={<FullPageSpinner />}>
+                <JobsPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: "companies",
+            element: (
+              <Suspense fallback={<FullPageSpinner />}>
+                <CompaniesPage />
+              </Suspense>
+            ),
+          },
+          // Content route (kept for backward compatibility)
           {
             path: "content",
             element: (
@@ -277,7 +314,16 @@ function App() {
             path: "analytics",
             element: (
               <Suspense fallback={<FullPageSpinner />}>
-                <Analytics />
+                <AnalyticsPage />
+              </Suspense>
+            ),
+          },
+          // Add Plans route to match menu item
+          {
+            path: "plans",
+            element: (
+              <Suspense fallback={<FullPageSpinner />}>
+                <PlansPage />
               </Suspense>
             ),
           },
@@ -285,7 +331,7 @@ function App() {
             path: "settings",
             element: (
               <Suspense fallback={<FullPageSpinner />}>
-                <Settings />
+                <SettingsPage />
               </Suspense>
             ),
           },

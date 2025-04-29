@@ -16,8 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const SetPassword = () => {
-    const hasPassword =  Cookies.get('hasPassword');
-    console.log(hasPassword,"hasPassword");
+    const hasPassword = Cookies.get('hasPassword') === 'true';
+    console.log(hasPassword, "hasPassword");
     const setPasswordMutation = useSetPassword();
 
     const [newPassword, setNewPassword] = useState("");
@@ -52,74 +52,76 @@ const SetPassword = () => {
             }
         });
     };
+
     return (
-       <div>
-           {hasPassword && (
-               <Card>
-                   <CardHeader>
-                       <CardTitle>Set Password</CardTitle>
-                       <CardDescription>
-                           Enhance your account security by setting a password
-                       </CardDescription>
-                   </CardHeader>
-                   <CardContent>
-                       <form onSubmit={handleSetPassword} className="space-y-4">
-                           <div className="space-y-2">
-                               <Label htmlFor="newPassword">New Password</Label>
-                               <div className="relative">
-                                   <Input
-                                       id="newPassword"
-                                       type={showPassword ? "text" : "password"}
-                                       value={newPassword}
-                                       onChange={(e) => setNewPassword(e.target.value)}
-                                       placeholder="Enter a secure password"
-                                       className="pr-10"
-                                   />
-                                   <button
-                                       type="button"
-                                       className="absolute right-3 top-1/2 -translate-y-1/2"
-                                       onClick={() => setShowPassword(!showPassword)}
-                                   >
-                                       {showPassword ? (
-                                           <EyeOff className="h-4 w-4 text-gray-400" />
-                                       ) : (
-                                           <Eye className="h-4 w-4 text-gray-400" />
-                                       )}
-                                   </button>
-                               </div>
-                           </div>
+        <div>
+            {!hasPassword && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Set Password</CardTitle>
+                        <CardDescription>
+                            Enhance your account security by setting a password
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handleSetPassword} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="newPassword">New Password</Label>
+                                <div className="relative">
+                                    <Input
+                                        id="newPassword"
+                                        type={showPassword ? "text" : "password"}
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        placeholder="Enter a secure password"
+                                        className="pr-10"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                    >
+                                        {showPassword ? (
+                                            <EyeOff className="h-4 w-4 text-gray-400" />
+                                        ) : (
+                                            <Eye className="h-4 w-4 text-gray-400" />
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
 
-                           <div className="space-y-2">
-                               <Label htmlFor="confirmPassword">Confirm Password</Label>
-                               <Input
-                                   id="confirmPassword"
-                                   type={showPassword ? "text" : "password"}
-                                   value={confirmPassword}
-                                   onChange={(e) => setConfirmPassword(e.target.value)}
-                                   placeholder="Confirm your password"
-                               />
-                           </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                                <Input
+                                    id="confirmPassword"
+                                    type={showPassword ? "text" : "password"}
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    placeholder="Confirm your password"
+                                />
+                            </div>
 
-                           {passwordError && (
-                               <Alert variant="destructive">
-                                   <AlertCircle className="h-4 w-4" />
-                                   <AlertDescription>{passwordError}</AlertDescription>
-                               </Alert>
-                           )}
-                       </form>
-                   </CardContent>
-                   <CardFooter>
-                       <Button
-                           type="submit"
-                           onClick={handleSetPassword}
-                           disabled={setPasswordMutation.isPending || !newPassword || !confirmPassword}
-                       >
-                           {setPasswordMutation.isPending ? "Setting Password..." : "Set Password"}
-                       </Button>
-                   </CardFooter>
-               </Card>
-           )}
-       </div>
+                            {passwordError && (
+                                <Alert variant="destructive">
+                                    <AlertCircle className="h-4 w-4" />
+                                    <AlertDescription>{passwordError}</AlertDescription>
+                                </Alert>
+                            )}
+                        </form>
+                    </CardContent>
+                    <CardFooter>
+                        <Button
+                            type="submit"
+                            onClick={handleSetPassword}
+                            disabled={setPasswordMutation.isPending || !newPassword || !confirmPassword}
+                        >
+                            {setPasswordMutation.isPending ? "Setting Password..." : "Set Password"}
+                        </Button>
+                    </CardFooter>
+                </Card>
+            )}
+        </div>
     )
 }
+
 export default SetPassword
