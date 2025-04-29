@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { useCompanies, useVerifyCompany, useFilterCompanies } from "@/hooks/userQueries.js"
 import { useQueryClient } from "@tanstack/react-query"
@@ -7,8 +5,15 @@ import { ErrorBanner } from "@/components/admin/ErrorBanner.jsx"
 import { SuccessBanner } from "@/components/admin/SuccessBanner.jsx"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+    DropdownMenuCheckboxItem,
+    DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
     Dialog,
@@ -33,7 +38,11 @@ import {
     List,
     Filter,
     ChevronDown,
+    FileText,
+    User,
+    Globe,
 } from "lucide-react"
+import { format } from "date-fns"
 
 const StatusBadge = ({ status }) => {
     const getStatusConfig = () => {
@@ -83,16 +92,44 @@ const StatusBadge = ({ status }) => {
     )
 }
 
+const MethodBadge = ({ method }) => {
+    if (!method) return null
+
+    const methodConfig = {
+        admin: {
+            icon: <User className="h-3 w-3 mr-1" />,
+            className: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+        },
+        domain: {
+            icon: <Globe className="h-3 w-3 mr-1" />,
+            className: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+        },
+    }
+
+    const config = methodConfig[method] || methodConfig.admin
+
+    return (
+        <Badge variant="outline" className={`flex items-center gap-1 px-2 py-1 font-medium ${config.className}`}>
+            {config.icon}
+            <span className="capitalize">{method}</span>
+        </Badge>
+    )
+}
+
 export default function CompaniesManagement() {
     // State for UI
     const [searchTerm, setSearchTerm] = useState("")
     const [statusFilter, setStatusFilter] = useState("all")
+    const [methodFilters, setMethodFilters] = useState([])
     const [selectedCompany, setSelectedCompany] = useState(null)
     const [viewMode, setViewMode] = useState("grid") // 'grid' or 'table'
     const [showSuccessAlert, setShowSuccessAlert] = useState(false)
     const [successMessage, setSuccessMessage] = useState("")
     const [isFilterOpen, setIsFilterOpen] = useState(false)
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm)
+    const [rejectionReason, setRejectionReason] = useState("")
+    const [showRejectionDialog, setShowRejectionDialog] = useState(false)
+    const [companyToReject, setCompanyToReject] = useState(null)
 
     // Add this debounce effect
     useEffect(() => {
@@ -110,15 +147,23 @@ export default function CompaniesManagement() {
     const [filters, setFilters] = useState({
         name: searchTerm,
         verificationStatus: statusFilter !== "all" ? statusFilter : undefined,
+        verificationMethod: methodFilters.length > 0 ? methodFilters : undefined,
     })
 
-    // Update filters when search or status filter changes
+    // Update filters when search, status filter, or method filters change
     useEffect(() => {
+        // Domain has priority over admin if both are selected
+        let methodFilter = methodFilters
+        if (methodFilters.includes("domain") && methodFilters.includes("admin")) {
+            methodFilter = ["domain"]
+        }
+
         setFilters({
             name: debouncedSearchTerm,
             verificationStatus: statusFilter !== "all" ? statusFilter : undefined,
+            verificationMethod: methodFilter.length > 0 ? methodFilter : undefined,
         })
-    }, [debouncedSearchTerm, statusFilter])
+    }, [debouncedSearchTerm, statusFilter, methodFilters])
 
     // Use the filtered companies data
     const {
@@ -136,12 +181,16 @@ export default function CompaniesManagement() {
 
     // Get all companies (used as fallback)
     const { data: allCompaniesData, isLoading: allCompaniesLoading } = useCompanies({
-        enabled: !filters.name && !filters.verificationStatus,
+        enabled: !filters.name && !filters.verificationStatus && !filters.verificationMethod,
     })
 
     // Determine which data to use
-    const companiesData = filters.name || filters.verificationStatus ? filteredCompaniesData : allCompaniesData
-    const isLoading = filters.name || filters.verificationStatus ? filteredCompaniesLoading : allCompaniesLoading
+    const companiesData =
+        filters.name || filters.verificationStatus || filters.verificationMethod ? filteredCompaniesData : allCompaniesData
+    const isLoading =
+        filters.name || filters.verificationStatus || filters.verificationMethod
+            ? filteredCompaniesLoading
+            : allCompaniesLoading
     const isError = isFilterError
 
     // Company verification mutation
@@ -168,6 +217,42 @@ export default function CompaniesManagement() {
                 },
             },
         )
+    }
+
+    // Handle rejecting a company with reason
+    const handleRejectCompany = (companyId, reason) => {
+        verifyCompanyMutation(
+            { id: companyId, status: "rejected", reason },
+            {
+                onSuccess: () => {
+                    setSuccessMessage("Company rejection processed")
+                    setShowSuccessAlert(true)
+                    setTimeout(() => setShowSuccessAlert(false), 3000)
+
+                    // Close modals
+                    setShowRejectionDialog(false)
+                    setRejectionReason("")
+                    setCompanyToReject(null)
+
+                    if (selectedCompany && selectedCompany._id === companyId) {
+                        setSelectedCompany(null)
+                    }
+                },
+                onError: (error) => {
+                    console.error("Rejection error:", error)
+                    setSuccessMessage(`Error: ${error.message || "Failed to reject company"}`)
+                    setShowSuccessAlert(true)
+                    setTimeout(() => setShowSuccessAlert(false), 5000)
+                },
+            },
+        )
+    }
+
+    // Open rejection dialog
+    const openRejectionDialog = (company) => {
+        setCompanyToReject(company)
+        setRejectionReason("")
+        setShowRejectionDialog(true)
     }
 
     // Handle deleting a company
@@ -197,15 +282,32 @@ export default function CompaniesManagement() {
         }
     }
 
-    // Handle rejecting a company (wrapper for handleVerifyCompany with isApproved=false)
-    const handleRejectCompany = (companyId) => {
-        handleVerifyCompany(companyId, false)
+    // Format date helper
+    const formatDate = (dateString) => {
+        if (!dateString) return "-"
+        try {
+            return format(new Date(dateString), "MMM d, yyyy")
+        } catch (error) {
+            return dateString
+        }
+    }
+
+    // Toggle method filter
+    const toggleMethodFilter = (method) => {
+        setMethodFilters((current) => {
+            if (current.includes(method)) {
+                return current.filter((m) => m !== method)
+            } else {
+                return [...current, method]
+            }
+        })
     }
 
     // Clear all filters
     const clearAllFilters = () => {
         setSearchTerm("")
         setStatusFilter("all")
+        setMethodFilters([])
     }
 
     // Render the grid view of companies
@@ -255,6 +357,18 @@ export default function CompaniesManagement() {
                             <div className="absolute top-2 right-2">
                                 <StatusBadge status={company.verification.status} />
                             </div>
+                            {company.verification.document && (
+                                <div className="absolute bottom-2 right-2">
+                                    <a
+                                        href={company.verification.document}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="bg-white/90 dark:bg-black/70 p-2 rounded-full shadow-sm hover:bg-white dark:hover:bg-black"
+                                    >
+                                        <FileText className="h-4 w-4 text-primary" />
+                                    </a>
+                                </div>
+                            )}
                         </div>
 
                         <CardContent className="p-4">
@@ -272,7 +386,7 @@ export default function CompaniesManagement() {
 
                             <p className="text-muted-foreground text-sm mt-2 line-clamp-2">{company.description}</p>
 
-                            <div className="mt-4 flex items-center text-sm text-muted-foreground">
+                            <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
                                 <a
                                     href={company.website}
                                     target="_blank"
@@ -282,15 +396,25 @@ export default function CompaniesManagement() {
                                     <ExternalLink size={14} className="mr-1" />
                                     Website
                                 </a>
+
+                                {company.verification.method && <MethodBadge method={company.verification.method} />}
                             </div>
 
                             <div className="mt-3 flex flex-wrap gap-1">
-                                {company.values.slice(0, 3).map((value, idx) => (
+                                {company.values?.slice(0, 3).map((value, idx) => (
                                     <Badge key={idx} variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20">
                                         {value}
                                     </Badge>
                                 ))}
                             </div>
+
+                            {company.verification.status === "rejected" && company.verification.reason && (
+                                <div className="mt-3 p-2 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-md">
+                                    <p className="text-xs text-red-700 dark:text-red-400">
+                                        <span className="font-medium">Rejection reason:</span> {company.verification.reason}
+                                    </p>
+                                </div>
+                            )}
 
                             <div className="mt-4 flex justify-between items-center border-t pt-3">
                                 <Button variant="link" onClick={() => setSelectedCompany(company)} className="p-0 h-auto text-primary">
@@ -301,7 +425,7 @@ export default function CompaniesManagement() {
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            onClick={() => handleVerifyCompany(company._id, false)}
+                                            onClick={() => openRejectionDialog(company)}
                                             className="h-8 border-destructive text-destructive hover:bg-destructive/10"
                                         >
                                             Reject
@@ -347,8 +471,9 @@ export default function CompaniesManagement() {
                             </div>
                         </TableHead>
                         <TableHead>Method</TableHead>
+                        <TableHead>Created</TableHead>
                         <TableHead>Website</TableHead>
-                        <TableHead>Reviewed</TableHead>
+                        <TableHead>Document</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -364,6 +489,11 @@ export default function CompaniesManagement() {
                                         <div>
                                             <div className="font-medium">{company.name}</div>
                                             <div className="text-sm text-muted-foreground truncate max-w-xs">{company.description}</div>
+                                            {company.verification.status === "rejected" && company.verification.reason && (
+                                                <div className="mt-1 text-xs text-red-600 dark:text-red-400">
+                                                    <span className="font-medium">Rejected:</span> {company.verification.reason}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </TableCell>
@@ -371,8 +501,13 @@ export default function CompaniesManagement() {
                                     <StatusBadge status={company.verification.status} />
                                 </TableCell>
                                 <TableCell>
-                                    <span className="capitalize">{company.verification.method}</span>
+                                    {company.verification.method ? (
+                                        <MethodBadge method={company.verification.method} />
+                                    ) : (
+                                        <span className="text-muted-foreground">-</span>
+                                    )}
                                 </TableCell>
+                                <TableCell className="text-muted-foreground">{formatDate(company.createdAt)}</TableCell>
                                 <TableCell>
                                     <a
                                         href={company.website}
@@ -384,10 +519,20 @@ export default function CompaniesManagement() {
                                         <ExternalLink size={14} className="ml-1" />
                                     </a>
                                 </TableCell>
-                                <TableCell className="text-muted-foreground">
-                                    {company.verification.reviewedDate
-                                        ? new Date(company.verification.reviewedDate).toLocaleDateString()
-                                        : "-"}
+                                <TableCell>
+                                    {company.verification.document ? (
+                                        <a
+                                            href={company.verification.document}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-primary hover:underline flex items-center"
+                                        >
+                                            <FileText size={14} className="mr-1" />
+                                            <span>View</span>
+                                        </a>
+                                    ) : (
+                                        <span className="text-muted-foreground">-</span>
+                                    )}
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex justify-end gap-2">
@@ -404,7 +549,7 @@ export default function CompaniesManagement() {
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
-                                                    onClick={() => handleRejectCompany(company._id)}
+                                                    onClick={() => openRejectionDialog(company)}
                                                     className="h-8 border-destructive text-destructive hover:bg-destructive/10"
                                                 >
                                                     Reject
@@ -433,7 +578,7 @@ export default function CompaniesManagement() {
                         ))
                     ) : isError ? (
                         <TableRow>
-                            <TableCell colSpan={6} className="p-6">
+                            <TableCell colSpan={7} className="p-6">
                                 <ErrorBanner
                                     title="Failed to load companies"
                                     message={filterError?.message || "There was an error loading the companies data"}
@@ -443,7 +588,7 @@ export default function CompaniesManagement() {
                         </TableRow>
                     ) : (
                         <TableRow>
-                            <TableCell colSpan={6} className="px-6 py-12 text-center">
+                            <TableCell colSpan={7} className="px-6 py-12 text-center">
                                 <div className="inline-flex flex-col items-center justify-center">
                                     <Search className="h-8 w-8 text-muted-foreground mb-4" />
                                     <h3 className="text-lg font-medium">No companies found</h3>
@@ -472,6 +617,45 @@ export default function CompaniesManagement() {
                     )}
                 </div>
             )}
+
+            {/* Rejection Dialog */}
+            <Dialog open={showRejectionDialog} onOpenChange={(open) => !open && setShowRejectionDialog(false)}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Reject Company</DialogTitle>
+                        <DialogDescription>
+                            Please provide a reason for rejecting {companyToReject?.name}. This will be sent to the company.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                        <Textarea
+                            placeholder="Reason for rejection"
+                            value={rejectionReason}
+                            onChange={(e) => setRejectionReason(e.target.value)}
+                            className="min-h-[100px]"
+                        />
+                    </div>
+                    <DialogFooter className="sm:justify-between">
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={() => setShowRejectionDialog(false)}
+                            disabled={verificationLoading}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={() => handleRejectCompany(companyToReject?._id, rejectionReason)}
+                            disabled={verificationLoading || !rejectionReason.trim()}
+                        >
+                            {verificationLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                            Reject Company
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {/* Company Detail Dialog */}
             <Dialog open={!!selectedCompany} onOpenChange={(open) => !open && setSelectedCompany(null)}>
@@ -531,11 +715,22 @@ export default function CompaniesManagement() {
                                         <div>
                                             <h3 className="text-sm font-medium text-muted-foreground">Company Values</h3>
                                             <div className="mt-1 flex flex-wrap gap-2">
-                                                {selectedCompany.values.map((value, idx) => (
+                                                {selectedCompany.values?.map((value, idx) => (
                                                     <Badge key={idx} variant="secondary" className="bg-primary/10 text-primary">
                                                         {value}
                                                     </Badge>
                                                 ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <h3 className="text-sm font-medium text-muted-foreground">Created At</h3>
+                                                <p className="mt-1">{formatDate(selectedCompany.createdAt)}</p>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-sm font-medium text-muted-foreground">Updated At</h3>
+                                                <p className="mt-1">{formatDate(selectedCompany.updatedAt)}</p>
                                             </div>
                                         </div>
 
@@ -548,38 +743,53 @@ export default function CompaniesManagement() {
                                                     <StatusBadge status={selectedCompany.verification.status} />
                                                 </div>
 
+                                                {selectedCompany.verification.method && (
+                                                    <div className="flex justify-between">
+                                                        <span className="text-sm font-medium text-muted-foreground">Method</span>
+                                                        <MethodBadge method={selectedCompany.verification.method} />
+                                                    </div>
+                                                )}
+
                                                 <div className="flex justify-between">
-                                                    <span className="text-sm font-medium text-muted-foreground">Method</span>
-                                                    <span className="text-sm capitalize">{selectedCompany.verification.method}</span>
+                                                    <span className="text-sm font-medium text-muted-foreground">Requested Date</span>
+                                                    <span className="text-sm">{formatDate(selectedCompany.verification.requestedDate)}</span>
                                                 </div>
-
-                                                {selectedCompany.verification.domain && (
-                                                    <div className="flex justify-between">
-                                                        <span className="text-sm font-medium text-muted-foreground">Domain</span>
-                                                        <span className="text-sm">{selectedCompany.verification.domain}</span>
-                                                    </div>
-                                                )}
-
-                                                {selectedCompany.verification.email && (
-                                                    <div className="flex justify-between">
-                                                        <span className="text-sm font-medium text-muted-foreground">Email</span>
-                                                        <span className="text-sm">{selectedCompany.verification.email}</span>
-                                                    </div>
-                                                )}
 
                                                 {selectedCompany.verification.reviewedDate && (
                                                     <div className="flex justify-between">
                                                         <span className="text-sm font-medium text-muted-foreground">Reviewed Date</span>
-                                                        <span className="text-sm">
-                              {new Date(selectedCompany.verification.reviewedDate).toLocaleDateString()}
-                            </span>
+                                                        <span className="text-sm">{formatDate(selectedCompany.verification.reviewedDate)}</span>
+                                                    </div>
+                                                )}
+
+                                                {selectedCompany.verification.reviewedBy && (
+                                                    <div className="flex justify-between">
+                                                        <span className="text-sm font-medium text-muted-foreground">Reviewed By</span>
+                                                        <span className="text-sm">{selectedCompany.verification.reviewedBy}</span>
+                                                    </div>
+                                                )}
+
+                                                {selectedCompany.verification.document && (
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="text-sm font-medium text-muted-foreground">Verification Document</span>
+                                                        <a
+                                                            href={selectedCompany.verification.document}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-primary hover:underline flex items-center"
+                                                        >
+                                                            <FileText size={14} className="mr-1" />
+                                                            View Document
+                                                        </a>
                                                     </div>
                                                 )}
 
                                                 {selectedCompany.verification.reason && (
-                                                    <div className="flex justify-between">
-                                                        <span className="text-sm font-medium text-muted-foreground">Reason</span>
-                                                        <span className="text-sm">{selectedCompany.verification.reason}</span>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-medium text-muted-foreground">Rejection Reason</span>
+                                                        <span className="text-sm mt-1 p-2 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-md text-red-700 dark:text-red-400">
+                              {selectedCompany.verification.reason}
+                            </span>
                                                     </div>
                                                 )}
                                             </div>
@@ -593,11 +803,13 @@ export default function CompaniesManagement() {
                                     <>
                                         <Button
                                             variant="outline"
-                                            onClick={() => handleVerifyCompany(selectedCompany._id, false)}
+                                            onClick={() => {
+                                                setSelectedCompany(null)
+                                                openRejectionDialog(selectedCompany)
+                                            }}
                                             disabled={verificationLoading}
                                             className="border-destructive text-destructive hover:bg-destructive/10"
                                         >
-                                            {verificationLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                                             Reject
                                         </Button>
                                         <Button
@@ -691,6 +903,26 @@ export default function CompaniesManagement() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
+
+                                        <DropdownMenuSeparator />
+
+                                        <div className="p-2">
+                                            <p className="text-sm font-medium mb-2">Verification Method</p>
+                                            <div className="space-y-2">
+                                                <DropdownMenuCheckboxItem
+                                                    checked={methodFilters.includes("domain")}
+                                                    onCheckedChange={() => toggleMethodFilter("domain")}
+                                                >
+                                                    Domain
+                                                </DropdownMenuCheckboxItem>
+                                                <DropdownMenuCheckboxItem
+                                                    checked={methodFilters.includes("admin")}
+                                                    onCheckedChange={() => toggleMethodFilter("admin")}
+                                                >
+                                                    Admin
+                                                </DropdownMenuCheckboxItem>
+                                            </div>
+                                        </div>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
 
@@ -715,7 +947,7 @@ export default function CompaniesManagement() {
                             </div>
                         </div>
 
-                        {(searchTerm || statusFilter !== "all") && (
+                        {(searchTerm || statusFilter !== "all" || methodFilters.length > 0) && (
                             <div className="flex flex-wrap items-center gap-2">
                                 <span className="text-sm text-muted-foreground">Active filters:</span>
                                 <div className="flex flex-wrap gap-2">
@@ -745,8 +977,25 @@ export default function CompaniesManagement() {
                                             </Button>
                                         </Badge>
                                     )}
+                                    {methodFilters.map((method) => (
+                                        <Badge
+                                            key={method}
+                                            variant="outline"
+                                            className="bg-primary/10 text-primary flex items-center gap-1"
+                                        >
+                                            Method: {method}
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => toggleMethodFilter(method)}
+                                                className="h-4 w-4 p-0 ml-1 hover:bg-transparent"
+                                            >
+                                                <X className="h-3 w-3" />
+                                            </Button>
+                                        </Badge>
+                                    ))}
                                 </div>
-                                {(searchTerm || statusFilter !== "all") && (
+                                {(searchTerm || statusFilter !== "all" || methodFilters.length > 0) && (
                                     <Button variant="link" onClick={clearAllFilters} className="text-sm h-auto p-0">
                                         Clear all filters
                                     </Button>
