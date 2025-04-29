@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect } from 'react';
+import React, { ReactNode, useState, useEffect } from 'react';
 
 import { Bell, ChevronDown, Search, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -20,12 +20,27 @@ import {
 } from '@/components/ui/sheet';
 import AdminSidebar from "@/components/admin/AdminSidebar.jsx";
 import {ThemeToggle} from "@/components/ThemeToggle.jsx";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from "@/components/ui/dialog.jsx";
+import {useAuth} from "@/hooks/useAuth.js";
 
 
 const AdminLayout = ({ children, title = "Admin Dashboard" }) => {
     const [scrolled, setScrolled] = useState(false);
     const [notifications, setNotifications] = useState(3);
+    const { logout } = useAuth();
+    const [openDialog, setOpenDialog] = useState(false);
 
+    const handleLogout = () => {
+        logout.mutate();
+        setOpenDialog(false);
+    };
     // Listen for scroll events to add shadow to header when scrolled
     useEffect(() => {
         const handleScroll = () => {
@@ -149,14 +164,37 @@ const AdminLayout = ({ children, title = "Admin Dashboard" }) => {
                                     <span>Profile</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-red-500 focus:text-red-500">
-                                    Log out
+                                <DropdownMenuItem
+                                    onSelect={(e) => {
+                                        e.preventDefault();
+                                        setOpenDialog(true);
+                                    }}
+                                    className="text-red-600 focus:bg-red-100 dark:focus:bg-red-900 cursor-pointer"
+                                >
+                                    Logout
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
                 </header>
-
+                <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Are you sure you want to logout?</DialogTitle>
+                            <DialogDescription>
+                                You will be logged out of your account. This action cannot be undone.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <Button variant="ghost" onClick={() => setOpenDialog(false)}>
+                                Cancel
+                            </Button>
+                            <Button variant="destructive" onClick={handleLogout}>
+                                Logout
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
                 {/* Main content */}
                 <main className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
                     <div className="animate-in fade-in duration-500">
