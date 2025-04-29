@@ -41,3 +41,4 @@ export const deleteCompany = async (companyId) => {
     throw error;
   }
 };
+

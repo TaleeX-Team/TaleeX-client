@@ -72,56 +72,56 @@ const PlansPage = () => {
     };
 
     return (
-            <div className="space-y-6 p-6">
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <h1 className="text-3xl font-bold tracking-tight">Subscription Plans</h1>
-                        <p className="text-muted-foreground mt-1">
-                            Manage your subscription plans and pricing.
-                        </p>
-                    </div>
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button className="flex items-center gap-2">
-                                <Plus className="h-4 w-4" />
-                                Add Plan
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[600px]">
-                            <DialogHeader>
-                                <DialogTitle>Create New Plan</DialogTitle>
-                                <DialogDescription>
-                                    Add a new subscription plan to your offerings.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <PlanForm onSubmit={(data) => console.log(data)} />
-                        </DialogContent>
-                    </Dialog>
-                </div>
-
+        <div className="space-y-6 p-6">
+            <div className="flex items-center justify-between mb-6">
                 <div>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>All Plans</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Name</TableHead>
-                                        <TableHead>Price</TableHead>
-                                        <TableHead>Billing Cycle</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {plans.map((plan) => (
-                                        <TableRow key={plan.id} className="group">
-                                            <TableCell className="font-medium">{plan.name}</TableCell>
-                                            <TableCell>${plan.price}</TableCell>
-                                            <TableCell className="capitalize">{plan.billingCycle}</TableCell>
-                                            <TableCell>
+                    <h1 className="text-3xl font-bold tracking-tight">Subscription Plans</h1>
+                    <p className="text-muted-foreground mt-1">
+                        Manage your subscription plans and pricing.
+                    </p>
+                </div>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button className="flex items-center gap-2">
+                            <Plus className="h-4 w-4" />
+                            Add Plan
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[600px]">
+                        <DialogHeader>
+                            <DialogTitle>Create New Plan</DialogTitle>
+                            <DialogDescription>
+                                Add a new subscription plan to your offerings.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <PlanForm onSubmit={(data) => console.log(data)} />
+                    </DialogContent>
+                </Dialog>
+            </div>
+
+            <div>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>All Plans</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Price</TableHead>
+                                    <TableHead>Billing Cycle</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {plans.map((plan) => (
+                                    <TableRow key={plan.id} className="group">
+                                        <TableCell className="font-medium">{plan.name}</TableCell>
+                                        <TableCell>${plan.price}</TableCell>
+                                        <TableCell className="capitalize">{plan.billingCycle}</TableCell>
+                                        <TableCell>
                         <span
                             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                 plan.status === "active"
@@ -131,68 +131,68 @@ const PlansPage = () => {
                         >
                           {plan.status}
                         </span>
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <Dialog>
-                                                        <DialogTrigger asChild>
-                                                            <Button
-                                                                variant="outline"
-                                                                size="icon"
-                                                                onClick={() => handleEditPlan(plan)}
-                                                                className="h-8 w-8"
-                                                            >
-                                                                <Edit className="h-4 w-4" />
-                                                            </Button>
-                                                        </DialogTrigger>
-                                                        <DialogContent className="sm:max-w-[600px]">
-                                                            <DialogHeader>
-                                                                <DialogTitle>Edit Plan</DialogTitle>
-                                                                <DialogDescription>
-                                                                    Modify the details of your subscription plan.
-                                                                </DialogDescription>
-                                                            </DialogHeader>
-                                                            <PlanForm plan={plan} onSubmit={(data) => console.log(data)} />
-                                                        </DialogContent>
-                                                    </Dialog>
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Dialog>
+                                                    <DialogTrigger asChild>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="icon"
+                                                            onClick={() => handleEditPlan(plan)}
+                                                            className="h-8 w-8"
+                                                        >
+                                                            <Edit className="h-4 w-4" />
+                                                        </Button>
+                                                    </DialogTrigger>
+                                                    <DialogContent className="sm:max-w-[600px]">
+                                                        <DialogHeader>
+                                                            <DialogTitle>Edit Plan</DialogTitle>
+                                                            <DialogDescription>
+                                                                Modify the details of your subscription plan.
+                                                            </DialogDescription>
+                                                        </DialogHeader>
+                                                        <PlanForm plan={plan} onSubmit={(data) => console.log(data)} />
+                                                    </DialogContent>
+                                                </Dialog>
 
-                                                    <AlertDialog>
-                                                        <AlertDialogTrigger asChild>
-                                                            <Button
-                                                                variant="destructive"
-                                                                size="icon"
-                                                                className="h-8 w-8"
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button
+                                                            variant="destructive"
+                                                            size="icon"
+                                                            className="h-8 w-8"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>Delete Plan</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                Are you sure you want to delete this plan? This action cannot be undone.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                            <AlertDialogAction
+                                                                onClick={() => handleDeletePlan(plan.id)}
                                                             >
-                                                                <Trash2 className="h-4 w-4" />
-                                                            </Button>
-                                                        </AlertDialogTrigger>
-                                                        <AlertDialogContent>
-                                                            <AlertDialogHeader>
-                                                                <AlertDialogTitle>Delete Plan</AlertDialogTitle>
-                                                                <AlertDialogDescription>
-                                                                    Are you sure you want to delete this plan? This action cannot be undone.
-                                                                </AlertDialogDescription>
-                                                            </AlertDialogHeader>
-                                                            <AlertDialogFooter>
-                                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                                <AlertDialogAction
-                                                                    onClick={() => handleDeletePlan(plan.id)}
-                                                                >
-                                                                    Delete
-                                                                </AlertDialogAction>
-                                                            </AlertDialogFooter>
-                                                        </AlertDialogContent>
-                                                    </AlertDialog>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
-                </div>
+                                                                Delete
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
             </div>
+        </div>
     );
 };
 
