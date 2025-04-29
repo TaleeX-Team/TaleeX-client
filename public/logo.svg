@@ -1,4 +1,71 @@
-<svg width="10" height="14" viewBox="0 0 10 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M2.05027 2.05239C3.34084 0.918925 5.26773 0.648483 6.85459 1.26692C9.12749 2.08222 10.4419 4.78067 9.81155 7.08539C9.53514 8.04386 8.99823 8.89496 8.4832 9.74009C8.01391 8.93274 7.35172 8.2626 6.53443 7.80723C7.19662 7.11323 7.64404 6.0772 7.18866 5.15054C6.6438 3.68697 4.49618 3.25745 3.48003 4.47443C2.52553 5.41302 2.80194 6.94818 3.68287 7.83308C2.86756 8.2288 2.24515 8.90291 1.86335 9.7202C0.956577 8.5927 0.23076 7.2047 0.369957 5.71329C0.294393 4.30541 1.01623 2.96911 2.05027 2.05239Z" fill="#3869EB"/>
-<path d="M3.63525 11.9334C3.93155 10.5733 4.12046 9.19324 4.39687 7.8291C4.86616 7.83109 5.33347 7.83109 5.80276 7.83109C6.0911 9.18529 6.29791 10.5554 6.57233 11.9136C6.09508 12.3491 5.71527 13.0053 5.10478 13.226C4.50425 12.9933 4.12046 12.353 3.63525 11.9334Z" fill="#3869EB"/>
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+    <!-- Gradient Background -->
+    <defs>
+        <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#f1f5f9" />
+            <stop offset="100%" stop-color="#e2e8f0" />
+        </linearGradient>
+        <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2563eb" />
+            <stop offset="100%" stop-color="#3b82f6" />
+        </linearGradient>
+    </defs>
+
+    <!-- Base Circle -->
+    <circle cx="200" cy="150" r="120" fill="url(#bgGradient)" />
+
+    <!-- AI Grid Pattern -->
+    <g stroke="#3b82f6" stroke-width="1" opacity="0.2">
+        <line x1="120" y1="90" x2="280" y2="90" />
+        <line x1="120" y1="120" x2="280" y2="120" />
+        <line x1="120" y1="150" x2="280" y2="150" />
+        <line x1="120" y1="180" x2="280" y2="180" />
+        <line x1="120" y1="210" x2="280" y2="210" />
+
+        <line x1="150" y1="60" x2="150" y2="240" />
+        <line x1="180" y1="60" x2="180" y2="240" />
+        <line x1="210" y1="60" x2="210" y2="240" />
+        <line x1="240" y1="60" x2="240" y2="240" />
+    </g>
+
+    <!-- Main Logo Elements -->
+    <g>
+        <!-- Modern Stylized Person -->
+        <circle cx="175" cy="115" r="22" fill="url(#accentGradient)" />
+        <path d="M145,190 C145,160 205,160 205,190" fill="url(#accentGradient)" />
+
+        <!-- AI Circuit Board -->
+        <path d="M225,105 L255,105 L255,135 L225,135 Z" fill="none" stroke="#2563eb" stroke-width="3" />
+        <circle cx="240" cy="120" r="8" fill="#2563eb" />
+
+        <line x1="240" y1="105" x2="240" y2="95" stroke="#2563eb" stroke-width="3" />
+        <line x1="240" y1="135" x2="240" y2="145" stroke="#2563eb" stroke-width="3" />
+        <line x1="225" y1="120" x2="215" y2="120" stroke="#2563eb" stroke-width="3" />
+        <line x1="255" y1="120" x2="265" y2="120" stroke="#2563eb" stroke-width="3" />
+
+        <circle cx="240" cy="95" r="4" fill="#2563eb" />
+        <circle cx="240" cy="145" r="4" fill="#2563eb" />
+        <circle cx="215" cy="120" r="4" fill="#2563eb" />
+        <circle cx="265" cy="120" r="4" fill="#2563eb" />
+
+        <!-- Connection Line -->
+        <path d="M205,140 C220,140 225,120 240,120" stroke="#2563eb" stroke-width="3" fill="none" stroke-linecap="round" />
+
+        <!-- Document Lines -->
+        <rect x="145" y="160" width="60" height="70" rx="5" fill="white" stroke="#2563eb" stroke-width="2" />
+        <line x1="155" y1="175" x2="195" y2="175" stroke="#2563eb" stroke-width="2" />
+        <line x1="155" y1="190" x2="195" y2="190" stroke="#2563eb" stroke-width="2" />
+        <line x1="155" y1="205" x2="180" y2="205" stroke="#2563eb" stroke-width="2" />
+
+        <!-- Checkmark -->
+        <path d="M235,190 L245,200 L265,180" stroke="#2563eb" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+
+    <!-- Accent Ring -->
+    <circle cx="200" cy="150" r="117" stroke="url(#accentGradient)" stroke-width="3" fill="none" />
+
+    <!-- Orbital Accent -->
+    <ellipse cx="200" cy="150" rx="130" ry="65" stroke="#3b82f6" stroke-width="1" stroke-dasharray="5,5" fill="none" transform="rotate(45 200 150)">
+        <animateTransform attributeName="transform" type="rotate" from="45 200 150" to="405 200 150" dur="90s" repeatCount="indefinite" />
+    </ellipse>
 </svg>

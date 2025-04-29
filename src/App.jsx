@@ -23,11 +23,18 @@ import Home from "@/features/home/Home.jsx";
 import { AnimatedBackground } from "./components/AnimatedBackground";
 import SetPassword from "@/features/settings/set-password/SetPassword.jsx";
 import ChangePasswordPage from "@/features/settings/change-password/ChangePasswordPage.jsx";
+import {useUser} from "@/hooks/useUser.js";
+
 // Lazy pages
 const Auth = lazy(() => import("./features/auth/Auth.jsx"));
 const ForgetPassword = lazy(() =>
   import("./features/auth/password/ForgetPassword.jsx")
 );
+
+// Admin Auth pages (lazy loaded)
+const AdminSignIn = lazy(() => import("./features/admin/auth/AdminSignIn.jsx"));
+const AdminForgetPassword = lazy(() => import("./features/admin/auth/AdminForgetPassword.jsx"));
+const AdminSetPassword = lazy(() => import("./features/admin/auth/AdminResetPassword.jsx"));
 
 // Admin pages (lazy loaded)
 const AdminLayout = lazy(() => import("./layouts/AdminLayout.jsx"));
@@ -50,13 +57,14 @@ const SettingsPage = lazy(() =>
 );
 const PlansPage = lazy(() => import("./features/admin/pages/PlansPage.jsx"));
 
-const BackgroundWrapper = ({ children }) => {
-  return (
-    <div className="relative min-h-screen">
-      <AnimatedBackground />
-      <div className="relative z-10">{children}</div>
-    </div>
-  );
+
+const BackgroundWrapper = ({children}) => {
+    return (
+        <div className="relative min-h-screen">
+            <AnimatedBackground/>
+            <div className="relative z-10">{children}</div>
+        </div>
+    );
 };
 
 const AuthLayout = () => (
@@ -67,70 +75,117 @@ const AuthLayout = () => (
   </BackgroundWrapper>
 );
 
-const PublicRoute = ({ children, redirectPath = "/" }) => {
-  const { isAuthenticated, isLoading } = useAuth();
 
-  if (isLoading) return <FullPageSpinner />;
-
-  return isAuthenticated ? (
-    <Navigate to={redirectPath} replace />
-  ) : (
-    <>{children}</>
-  );
-};
-
-const ProtectedRoute = ({ children, redirectPath = "/auth" }) => {
-  const { isAuthenticated, isLoading } = useAuth();
-  const location = useLocation();
-
-  if (isLoading) return <FullPageSpinner />;
-
-  if (!isAuthenticated) {
-    return (
-      <Navigate to={redirectPath} replace state={{ from: location.pathname }} />
-    );
-  }
-
-  return <>{children}</>;
-};
-
-const AdminRoute = ({ children, redirectPath = "/" }) => {
-  const { isAuthenticated, isLoading, user } = useAuth();
-  const location = useLocation();
-
-  if (isLoading) return <FullPageSpinner />;
-
-  // Uncomment when ready to enforce admin role check
-  // if (!isAuthenticated) {
-  //     return (
-  //         <Navigate to="/auth" replace state={{from: location.pathname}}/>
-  //     );
-  // }
-  //
-  // // Check if user has admin role
-  // if (user?.role !== "admin") {
-  //     return <Navigate to={redirectPath} replace/>;
-  // }
-
-  return <>{children}</>;
-};
-
-const ErrorPage = ({ error }) => {
-  const location = useLocation();
-  const message =
-    error ?? location.state?.error ?? "We couldn't find that page.";
-
-  return (
+const AdminAuthLayout = () => (
     <BackgroundWrapper>
-      <div className="min-h-screen flex items-center justify-center flex-col gap-4">
-        <h1 className="text-2xl font-bold text-red-600">Oops!</h1>
-        <p className="text-gray-600 max-w-md text-center">{message}</p>
-        <Button asChild>
-          <a href="/">Go Home</a>
-        </Button>
-      </div>
+        <div className="min-h-screen">
+            <Outlet/>
+        </div>
     </BackgroundWrapper>
-  );
+);
+
+// Root level redirect based on user role
+const RootRedirect = () => {
+    const {isAuthenticated, isLoading} = useAuth();
+    const {data: user, isLoading: isUserLoading} = useUser();
+
+    if (isLoading || isUserLoading) return <FullPageSpinner/>;
+
+    if (!isAuthenticated) {
+        return <Navigate to="/auth" replace/>;
+    }
+
+    // If admin, redirect to admin dashboard
+    if (user?.role === "admin") {
+        return <Navigate to="/admin" replace/>;
+    }
+
+    // Otherwise, go to user home
+    return <Navigate to="/" replace/>;
+};
+
+// Public route (login pages)
+const PublicRoute = ({children, adminRedirect = "/admin", userRedirect = "/"}) => {
+    const {isAuthenticated, isLoading} = useAuth();
+    const {data: user, isLoading: isUserLoading} = useUser();
+
+    if (isLoading || isUserLoading) return <FullPageSpinner/>;
+
+    // If authenticated, redirect based on role
+    if (isAuthenticated) {
+        if (user?.role === "admin") {
+            return <Navigate to={adminRedirect} replace/>;
+        }
+        return <Navigate to={userRedirect} replace/>;
+    }
+
+    return <>{children}</>;
+};
+
+// Regular user routes - admins should not access these
+const UserRoute = ({children}) => {
+    const {isAuthenticated, isLoading} = useAuth();
+    const {data: user, isLoading: isUserLoading} = useUser();
+    const location = useLocation();
+
+    if (isLoading || isUserLoading) return <FullPageSpinner/>;
+
+    if (!isAuthenticated) {
+        return (
+            <Navigate to="/auth" replace state={{from: location.pathname}}/>
+        );
+    }
+
+    // If admin tries to access user routes, redirect to admin dashboard
+    if (user?.role === "admin") {
+        return <Navigate to="/admin" replace/>;
+    }
+
+    return <>{children}</>;
+};
+
+// Admin routes - only admins can access
+const AdminRoute = ({children}) => {
+    const {isAuthenticated, isLoading} = useAuth();
+    const {data: user, isLoading: isUserLoading} = useUser();
+    const location = useLocation();
+
+    if (isLoading || isUserLoading) return <FullPageSpinner/>;
+
+    // If not authenticated, go to admin login
+    if (!isAuthenticated) {
+        return <Navigate to="/admin/auth" replace state={{from: location.pathname}}/>;
+    }
+
+    // If not admin, redirect to appropriate home based on authentication
+    if (user?.role !== "admin") {
+        return <Navigate to="/" replace/>;
+    }
+
+
+  return <>{children}</>;
+};
+
+const ErrorPage = ({error}) => {
+    const location = useLocation();
+    const {data: user} = useUser();
+    const message = error ?? location.state?.error ?? "We couldn't find that page.";
+
+    // Determine where "home" is based on user role
+    const homeLink = user?.role === "admin" ? "/admin" : "/";
+
+    return (
+        <BackgroundWrapper>
+            <div className="min-h-screen flex items-center justify-center flex-col gap-4">
+                <h1 className="text-2xl font-bold text-red-600">Oops!</h1>
+                <p className="text-gray-600 max-w-md text-center">{message}</p>
+                <Button asChild>
+                    <a href={homeLink}>Go Home</a>
+                </Button>
+            </div>
+        </BackgroundWrapper>
+    );
+
 };
 
 const queryClient = new QueryClient({
@@ -156,244 +211,251 @@ const SettingsLayoutWithBackground = () => (
   </BackgroundWrapper>
 );
 
-const AdminLayoutWithBackground = ({ children }) => (
-  <Suspense fallback={<FullPageSpinner />}>
-    <AdminLayout>{children}</AdminLayout>
-  </Suspense>
-);
 
-// Create a placeholder component for routes that haven't been implemented yet
-const ComingSoonPage = ({ feature }) => (
-  <div className="flex flex-col items-center justify-center min-h-[80vh] text-center p-4">
-    <h1 className="text-3xl font-bold mb-4">{feature} Coming Soon</h1>
-    <p className="text-gray-600 max-w-md">
-      This feature is currently under development and will be available soon.
-    </p>
-  </div>
+const AdminLayoutWithBackground = () => (
+    <Suspense fallback={<FullPageSpinner/>}>
+        <AdminLayout>
+            <Outlet />
+        </AdminLayout>
+    </Suspense>
 );
 
 function App() {
-  const [router] = useState(() =>
-    createBrowserRouter([
-      {
-        element: (
-          <ProtectedRoute>
-            <ProtectedLayoutWithBackground />
-          </ProtectedRoute>
-        ),
-        errorElement: <ErrorPage />,
-        children: [
-          {
-            path: "/",
-            element: <Home />,
-          },
-        ],
-      },
-      {
-        element: (
-          <ProtectedRoute>
-            <SettingsLayoutWithBackground />
-          </ProtectedRoute>
-        ),
-        path: "/settings",
-        errorElement: <ErrorPage />,
-        children: [
-          {
-            path: "profile",
-            element: (
-              <Suspense
-                fallback={
-                  <div className="min-h-screen flex items-center justify-center">
-                    Loading...
-                  </div>
-                }
-              >
-                <ProfilePage />
-              </Suspense>
-            ),
-          },
-          {
-            path: "billing",
-            element: (
-              <Suspense
-                fallback={
-                  <div className="min-h-screen flex items-center justify-center">
-                    Loading...
-                  </div>
-                }
-              >
-                <BillingPage />
-              </Suspense>
-            ),
-          },
-          {
-            path: "set-password",
-            element: (
-              <Suspense
-                fallback={
-                  <div className="min-h-screen flex items-center justify-center">
-                    Loading...
-                  </div>
-                }
-              >
-                <SetPassword />
-              </Suspense>
-            ),
-          },
-          {
-            path: "change-password",
-            element: (
-              <Suspense
-                fallback={
-                  <div className="min-h-screen flex items-center justify-center">
-                    Loading...
-                  </div>
-                }
-              >
-                <ChangePasswordPage />
-              </Suspense>
-            ),
-          },
-        ],
-      },
-      // Admin Dashboard Routes
-      {
-        element: (
-          <AdminRoute>
-            <AdminLayoutWithBackground>
-              <Outlet />
-            </AdminLayoutWithBackground>
-          </AdminRoute>
-        ),
-        path: "/admin",
-        errorElement: <ErrorPage error="Admin access required." />,
-        children: [
-          {
-            index: true,
-            element: (
-              <Suspense fallback={<FullPageSpinner />}>
-                <AdminDashboard />
-              </Suspense>
-            ),
-          },
-          {
-            path: "users",
-            element: (
-              <Suspense fallback={<FullPageSpinner />}>
-                <UsersPage />
-              </Suspense>
-            ),
-          },
-          // Add Jobs route to match menu item
-          {
-            path: "jobs",
-            element: (
-              <Suspense fallback={<FullPageSpinner />}>
-                <JobsPage />
-              </Suspense>
-            ),
-          },
-          {
-            path: "companies",
-            element: (
-              <Suspense fallback={<FullPageSpinner />}>
-                <CompaniesPage />
-              </Suspense>
-            ),
-          },
-          // Content route (kept for backward compatibility)
-          {
-            path: "content",
-            element: (
-              <Suspense fallback={<FullPageSpinner />}>
-                <ContentManagement />
-              </Suspense>
-            ),
-          },
-          {
-            path: "analytics",
-            element: (
-              <Suspense fallback={<FullPageSpinner />}>
-                <AnalyticsPage />
-              </Suspense>
-            ),
-          },
-          // Add Plans route to match menu item
-          {
-            path: "plans",
-            element: (
-              <Suspense fallback={<FullPageSpinner />}>
-                <PlansPage />
-              </Suspense>
-            ),
-          },
-          {
-            path: "settings",
-            element: (
-              <Suspense fallback={<FullPageSpinner />}>
-                <SettingsPage />
-              </Suspense>
-            ),
-          },
-          {
-            path: "*",
-            element: <ErrorPage error="That admin page doesn't exist." />,
-          },
-        ],
-      },
-      {
-        element: <AuthLayout />,
-        errorElement: <ErrorPage />,
-        children: [
-          {
-            path: "/auth",
-            element: (
-              <Suspense fallback={<FullPageSpinner />}>
-                <PublicRoute>
-                  <AuthLayout />
-                </PublicRoute>
-              </Suspense>
-            ),
-            errorElement: <ErrorPage />,
-            children: [
-              {
-                index: true,
+    const [router] = useState(() =>
+        createBrowserRouter(
+            {
                 element: (
-                  <Suspense fallback={<FullPageSpinner />}>
-                    <Auth />
-                  </Suspense>
+                    <UserRoute>
+                        <ProtectedLayoutWithBackground/>
+                    </UserRoute>
                 ),
-              },
-              {
-                path: "forget-password",
+                errorElement: <ErrorPage/>,
+                children: [
+                    {
+                        path: "/",
+                        element: <Home/>,
+                    },
+                ],
+            },
+            // User settings routes
+            {
                 element: (
-                  <Suspense fallback={<FullPageSpinner />}>
-                    <ForgetPassword />
-                  </Suspense>
+                    <UserRoute>
+                        <SettingsLayoutWithBackground/>
+                    </UserRoute>
                 ),
-              },
-              {
-                path: "reset-password/:verificationToken",
+                path: "/settings",
+                errorElement: <ErrorPage/>,
+                children: [
+                    {
+                        path: "profile",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner/>}>
+                                <ProfilePage/>
+                            </Suspense>
+                        ),
+                    },
+                    {
+                        path: "billing",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner/>}>
+                                <BillingPage/>
+                            </Suspense>
+                        ),
+                    }, {
+                        path: "set-password",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner/>}>
+                                <SetPassword/>
+                            </Suspense>
+                        ),
+                    }, {
+                        path: "change-password",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner/>}>
+                                <ChangePasswordPage/>
+                            </Suspense>
+                        ),
+                    },
+                ],
+            },
+            // Admin Auth Routes
+            {
+                path: "/admin/auth",
+                element: <AdminAuthLayout />,
+                errorElement: <ErrorPage/>,
+                children: [
+                    {
+                        index: true,
+                        element: (
+                            <Suspense fallback={<FullPageSpinner/>}>
+                                <PublicRoute adminRedirect="/admin" userRedirect="/">
+                                    <AdminSignIn/>
+                                </PublicRoute>
+                            </Suspense>
+                        ),
+                    },
+                    {
+                        path: "forgot-password",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner/>}>
+                                <PublicRoute adminRedirect="/admin" userRedirect="/">
+                                    <AdminForgetPassword/>
+                                </PublicRoute>
+                            </Suspense>
+                        ),
+                    },
+                    {
+                        path: "reset-password/:verificationToken",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner/>}>
+                                <PublicRoute adminRedirect="/admin" userRedirect="/">
+                                    <AdminSetPassword/>
+                                </PublicRoute>
+                            </Suspense>
+                        ),
+                    },
+                ],
+            },
+            // Admin Dashboard Routes
+            {
                 element: (
-                  <Suspense fallback={<FullPageSpinner />}>
-                    <ResetPassword />
-                  </Suspense>
+                    <AdminRoute>
+                        <AdminLayoutWithBackground />
+                    </AdminRoute>
                 ),
-              },
-              {
-                path: "callback",
-                element: <OAuthCallback />,
-              },
-              {
+                path: "/admin",
+                errorElement: <ErrorPage error="Admin access required."/>,
+                children: [
+                    {
+                        index: true,
+                        element: (
+                            <Suspense fallback={<FullPageSpinner/>}>
+                                <AdminDashboard/>
+                            </Suspense>
+                        ),
+                    },
+                    {
+                        path: "users",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner/>}>
+                                <UsersPage/>
+                            </Suspense>
+                        ),
+                    },
+                    {
+                        path: "jobs",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner/>}>
+                                <JobsPage/>
+                            </Suspense>
+                        ),
+                    },
+                    {
+                        path: "companies",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner/>}>
+                                <CompaniesPage/>
+                            </Suspense>
+                        ),
+                    },
+                    {
+                        path: "content",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner/>}>
+                                <ContentManagement/>
+                            </Suspense>
+                        ),
+                    },
+                    {
+                        path: "analytics",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner/>}>
+                                <AnalyticsPage/>
+                            </Suspense>
+                        ),
+                    },
+                    {
+                        path: "plans",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner/>}>
+                                <PlansPage/>
+                            </Suspense>
+                        ),
+                    },
+                    {
+                        path: "settings",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner/>}>
+                                <SettingsPage/>
+                            </Suspense>
+                        ),
+                    },
+                    {
+                        path: "*",
+                        element: <ErrorPage error="That admin page doesn't exist."/>,
+                    },
+                ],
+            },
+            // User Auth Routes
+            {
+                element: <AuthLayout/>,
+                errorElement: <ErrorPage/>,
+                children: [
+                    {
+                        path: "/auth",
+                        element: (
+                            <Suspense fallback={<FullPageSpinner/>}>
+                                <PublicRoute adminRedirect="/admin" userRedirect="/">
+                                    <AuthLayout/>
+                                </PublicRoute>
+                            </Suspense>
+                        ),
+                        errorElement: <ErrorPage/>,
+                        children: [
+                            {
+                                index: true,
+                                element: (
+                                    <Suspense fallback={<FullPageSpinner/>}>
+                                        <Auth/>
+                                    </Suspense>
+                                ),
+                            },
+                            {
+                                path: "forget-password",
+                                element: (
+                                    <Suspense fallback={<FullPageSpinner/>}>
+                                        <ForgetPassword/>
+                                    </Suspense>
+                                ),
+                            },
+                            {
+                                path: "reset-password/:verificationToken",
+                                element: (
+                                    <Suspense fallback={<FullPageSpinner/>}>
+                                        <ResetPassword/>
+                                    </Suspense>
+                                ),
+                            },
+                            {
+                                path: "callback",
+                                element: <OAuthCallback/>,
+                            },
+                            {
+                                path: "*",
+                                element: <ErrorPage error="That auth page doesn't exist."/>,
+                            },
+                        ],
+                    },
+                ],
+            },
+            // Catch-all route
+            {
                 path: "*",
-                element: <ErrorPage error="That auth page doesn't exist." />,
-              },
-            ],
-          },
-        ],
-      },
-    ])
-  );
+                element: <ErrorPage error="Page not found."/>,
+            },
+        ])
+    );
 
   return (
     <QueryClientProvider client={queryClient}>
