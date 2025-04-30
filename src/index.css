@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -88,12 +87,12 @@
   --popover-foreground: #f8fafc;
   --primary: #3b82f6;
   --primary-foreground: #ffffff;
-  --secondary: #334155;
-  --secondary-foreground: #f1f5f9;
-  --muted: #334155;
+  --secondary: #1e293b; /* Darkened for better contrast with active elements */
+  --secondary-foreground: #94a3b8; /* Lightened for better visibility */
+  --muted: #1e293b; /* Adjusted to match secondary */
   --muted-foreground: #94a3b8;
-  --accent: #475569;
-  --accent-foreground: #f8fafc;
+  --accent: #2d3748; /* Darkened for better distinction */
+  --accent-foreground: #e2e8f0;
   --destructive: #f87171;
   --border: #334155;
   --input: #334155;
@@ -103,12 +102,12 @@
   --chart-3: #93c5fd;
   --chart-4: #bfdbfe;
   --chart-5: #dbeafe;
-  --sidebar: #1e293b;
+  --sidebar: #1a1a1a; /* Darkened for better contrast */
   --sidebar-foreground: #f8fafc;
   --sidebar-primary: #3b82f6;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #475569;
-  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-accent: #2d3748; /* Matched with main accent */
+  --sidebar-accent-foreground: #e2e8f0;
   --sidebar-border: #334155;
   --sidebar-ring: #60a5fa;
 }
