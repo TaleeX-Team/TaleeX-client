@@ -767,3 +767,5 @@ const AnalyticsPage = () => {
 }
 
 export default AnalyticsPage
+
+export default AnalyticsPage
