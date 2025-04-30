@@ -2,6 +2,8 @@ import {
   createCompany,
   deleteCompany,
   getCompanies,
+  requestDomainVerification,
+  confirmDomainVerification,
 } from "@/services/apiCompanies";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -52,7 +54,7 @@ export const useCompanies = () => {
     },
   });
 
-  ///Function to delete a company
+  // Function to delete a company
   const deleteCompanyMutation = useMutation({
     mutationFn: deleteCompany,
     onSuccess: (deletedCompany) => {
@@ -80,6 +82,86 @@ export const useCompanies = () => {
     },
   });
 
+  // Mutation to request domain verification
+  const requestDomainVerificationMutation = useMutation({
+    mutationFn: ({ companyId, data }) =>
+      requestDomainVerification(companyId, data),
+    onSuccess: (response, variables) => {
+      console.log(
+        `Verification code requested successfully for company ID: ${variables.companyId}`,
+        response
+      );
+
+      // Update the company's verification status in the cache if needed
+      queryClient.setQueryData(["companies"], (oldData) => {
+        if (!oldData || !oldData.companies) return oldData;
+
+        return {
+          ...oldData,
+          companies: oldData.companies.map((company) => {
+            if (company._id === variables.companyId) {
+              return {
+                ...company,
+                domainVerificationRequested: true,
+                // Add any other fields that might be updated in the response
+              };
+            }
+            return company;
+          }),
+        };
+      });
+
+      // Optionally invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+    },
+    onError: (error, variables) => {
+      console.error(
+        `Failed to request verification code for company ID: ${variables.companyId}`,
+        error.message
+      );
+    },
+  });
+
+  // Mutation to confirm domain verification
+  const confirmDomainVerificationMutation = useMutation({
+    mutationFn: ({ companyId, data }) =>
+      confirmDomainVerification(companyId, data),
+    onSuccess: (response, variables) => {
+      console.log(
+        `Domain verification confirmed successfully for company ID: ${variables.companyId}`,
+        response
+      );
+
+      // Update the company's verification status in the cache
+      queryClient.setQueryData(["companies"], (oldData) => {
+        if (!oldData || !oldData.companies) return oldData;
+
+        return {
+          ...oldData,
+          companies: oldData.companies.map((company) => {
+            if (company._id === variables.companyId) {
+              return {
+                ...company,
+                domainVerified: true,
+                // Add any other fields that might be updated in the response
+              };
+            }
+            return company;
+          }),
+        };
+      });
+
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+    },
+    onError: (error, variables) => {
+      console.error(
+        `Failed to confirm domain verification for company ID: ${variables.companyId}`,
+        error.message
+      );
+    },
+  });
+
   return {
     createCompanyMutation: {
       mutate: createCompanyMutation.mutate,
@@ -93,6 +175,20 @@ export const useCompanies = () => {
       isLoading: deleteCompanyMutation.isPending,
       isError: deleteCompanyMutation.isError,
       error: deleteCompanyMutation.error,
+    },
+    requestDomainVerificationMutation: {
+      mutate: requestDomainVerificationMutation.mutate,
+      isLoading: requestDomainVerificationMutation.isPending,
+      isError: requestDomainVerificationMutation.isError,
+      error: requestDomainVerificationMutation.error,
+      isSuccess: requestDomainVerificationMutation.isSuccess,
+    },
+    confirmDomainVerificationMutation: {
+      mutate: confirmDomainVerificationMutation.mutate,
+      isLoading: confirmDomainVerificationMutation.isPending,
+      isError: confirmDomainVerificationMutation.isError,
+      error: confirmDomainVerificationMutation.error,
+      isSuccess: confirmDomainVerificationMutation.isSuccess,
     },
   };
 };

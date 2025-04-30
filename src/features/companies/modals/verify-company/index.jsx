@@ -27,10 +27,12 @@ export default function VerifyCompany({ companyId }) {
 
   // State for email verification
   const [email, setEmail] = useState("");
+  const [domain, setDomain] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [emailVerified, setEmailVerified] = useState(false);
   const [emailError, setEmailError] = useState(null);
+  const [domainError, setDomainError] = useState(null);
 
   // State for document verification
   const [file, setFile] = useState(null);
@@ -48,16 +50,34 @@ export default function VerifyCompany({ companyId }) {
 
   // Handle email submission
   const handleSendOtp = () => {
+    // Validate email
     if (!email || !email.includes("@")) {
       setEmailError("Please enter a valid email address");
+      return;
+    }
+
+    // Validate domain
+    if (!domain || domain.trim() === "") {
+      setDomainError("Please enter a company domain");
+      return;
+    }
+
+    // Check if domain format is valid (simple validation)
+    const domainRegex =
+      /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/;
+    if (!domainRegex.test(domain)) {
+      setDomainError("Please enter a valid domain (e.g., company.com)");
       return;
     }
 
     setIsLoading(true);
 
     // Simulate API call
+    // In a real app, you would send both email and domain to the backend
+    // /companies/{companyId}/verification/domain/request
     setTimeout(() => {
       setEmailError(null);
+      setDomainError(null);
       setOtpSent(true);
       setIsLoading(false);
       toast.success(`Verification code sent to ${email}`);
@@ -144,10 +164,12 @@ export default function VerifyCompany({ companyId }) {
   // Reset form state
   const resetForm = () => {
     setEmail("");
+    setDomain("");
     setOtp("");
     setOtpSent(false);
     setEmailVerified(false);
     setEmailError(null);
+    setDomainError(null);
     setFile(null);
     setFileUploaded(false);
     setFileError(null);
@@ -251,9 +273,28 @@ export default function VerifyCompany({ companyId }) {
                       <p className="text-sm text-destructive">{emailError}</p>
                     )}
                   </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="domain">Company Domain</Label>
+                    <div className="relative">
+                      <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="domain"
+                        placeholder="company.com"
+                        className="pl-10"
+                        value={domain}
+                        onChange={(e) => setDomain(e.target.value)}
+                      />
+                    </div>
+                    {domainError && (
+                      <p className="text-sm text-destructive">{domainError}</p>
+                    )}
+                  </div>
+
                   <div className="text-sm text-muted-foreground">
                     We'll send a verification code to your company email
-                    address.
+                    address. The domain will be used to verify your company
+                    ownership.
                   </div>
                   <Button
                     onClick={handleSendOtp}

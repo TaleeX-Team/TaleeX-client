@@ -42,3 +42,44 @@ export const deleteCompany = async (companyId) => {
   }
 };
 
+export const requestDomainVerification = async (companyId, data) => {
+  try {
+    console.log(
+      `Requesting domain verification for company ID: ${companyId}`,
+      data
+    );
+    const response = await apiClient.post(
+      `/companies/${companyId}/verification/domain/request`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    console.log("Domain verification code requested successfully");
+    return response.data;
+  } catch (error) {
+    console.error("Failed to request domain verification code:", error.message);
+    throw error;
+  }
+};
+export const confirmDomainVerification = async (companyId, data) => {
+  try {
+    console.log(`Confirming domain verification for company ID: ${companyId}`);
+    const response = await apiClient.post(
+      `/companies/${companyId}/verification/domain/confirm`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    console.log("Domain verification confirmed successfully");
+    return response.data;
+  } catch (error) {
+    console.error("Failed to confirm domain verification:", error.message);
+    throw error;
+  }
+};
