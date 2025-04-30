@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Check, Mail, Upload, Loader2, Building2 } from "lucide-react";
+import { Check, Mail, Upload, Loader2, Building2, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -36,7 +36,8 @@ export default function VerifyCompany({}) {
   const companies = queryClient.getQueryData(["companies"])?.companies || [];
   const company = companies.find((company) => company._id === companyId);
   const companyName = company.name || "Your Company";
-  const isAwaitingDomainVerification = company.verification?.domain || false;
+  const isAwaitingDomainVerification = company?.verification?.method || false;
+
   // State for email verification
   const [email, setEmail] = useState("");
   const [domain, setDomain] = useState("");
@@ -118,7 +119,7 @@ export default function VerifyCompany({}) {
     // Reset any previous errors
     setEmailError(null);
 
-    if (!otp || otp.length < 4) {
+    if (!otp || otp.length < 6) {
       setEmailError("Please enter a valid verification code");
       return;
     }
@@ -225,8 +226,8 @@ export default function VerifyCompany({}) {
       }}
     >
       <DialogTrigger asChild>
-        <Button className="mt-4 md:mt-0 bg-primary text-primary-foreground">
-          <Building2 className="mr-2 h-4 w-4" /> Verify Company
+        <Button variant="default" className="flex items-center gap-2">
+          <Shield className="h-4 w-4" /> Verify Company
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
@@ -256,7 +257,15 @@ export default function VerifyCompany({}) {
           <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">
             {/* Email Verification Tab */}
             <TabsContent value="email" className="space-y-4">
-              {emailVerified ? (
+              {company?.verification?.method === "domain" ? (
+                <Alert className="bg-yellow-50 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-900">
+                  <Check className="h-4 w-4 mr-2" />
+                  <AlertDescription>
+                    Email verified successfully! Your account is awaiting admin
+                    approval to manage {companyName}.
+                  </AlertDescription>
+                </Alert>
+              ) : emailVerified ? (
                 <Alert className="bg-green-50 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-900">
                   <Check className="h-4 w-4 mr-2" />
                   <AlertDescription>

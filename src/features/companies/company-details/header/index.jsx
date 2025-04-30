@@ -35,7 +35,7 @@ export default function Header({
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          {verification.status !== "verified" && <VerifyCompany />}
+          {verification.status === "pending" && <VerifyCompany />}
           <Button
             variant="outline"
             className="flex items-center gap-2"
