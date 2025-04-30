@@ -16,15 +16,27 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
+import { useCompanies } from "../../features";
+import { useParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
-export default function VerifyCompany({ companyId }) {
+export default function VerifyCompany({}) {
+  const queryClient = useQueryClient();
+
   // Dialog state
   const [open, setOpen] = useState(false);
 
-  // Company information (would be fetched in a real app)
-  const [companyName, setCompanyName] = useState("Acme Inc.");
-  const [isLoading, setIsLoading] = useState(false);
-
+  // Get the company data and domain verification mutations from our hook
+  const {
+    requestDomainVerificationMutation,
+    confirmDomainVerificationMutation,
+  } = useCompanies();
+  const { companyId } = useParams();
+  // Find the company with the matching ID
+  const companies = queryClient.getQueryData(["companies"])?.companies || [];
+  const company = companies.find((company) => company._id === companyId);
+  const companyName = company.name || "Your Company";
+  const isAwaitingDomainVerification = company.verification?.domain || false;
   // State for email verification
   const [email, setEmail] = useState("");
   const [domain, setDomain] = useState("");
@@ -39,17 +51,41 @@ export default function VerifyCompany({ companyId }) {
   const [fileUploaded, setFileUploaded] = useState(false);
   const [fileError, setFileError] = useState(null);
 
-  // Simulate fetching company data
+  // Set domain from company data if available
   useEffect(() => {
-    // In a real app, you would fetch company information based on companyId
-    // For demo purposes, we're using a static value
-    if (companyId) {
-      setCompanyName(`Acme Corp #${companyId}`);
+    if (company.domain) {
+      setDomain(company.domain);
     }
-  }, [companyId]);
+  }, [company]);
+
+  // Update state when request verification is successful
+  useEffect(() => {
+    if (requestDomainVerificationMutation.isSuccess) {
+      setOtpSent(true);
+      toast.success(`Verification code sent to ${email}`);
+    }
+  }, [requestDomainVerificationMutation.isSuccess, email]);
+
+  // Update state when confirmation is successful
+  useEffect(() => {
+    if (confirmDomainVerificationMutation.isSuccess) {
+      setEmailVerified(true);
+      toast.success("Email verified successfully!");
+
+      // Close dialog after a delay
+      setTimeout(() => {
+        setOpen(false);
+        resetForm();
+      }, 2000);
+    }
+  }, [confirmDomainVerificationMutation.isSuccess]);
 
   // Handle email submission
   const handleSendOtp = () => {
+    // Reset any previous errors
+    setEmailError(null);
+    setDomainError(null);
+
     // Validate email
     if (!email || !email.includes("@")) {
       setEmailError("Please enter a valid email address");
@@ -70,48 +106,28 @@ export default function VerifyCompany({ companyId }) {
       return;
     }
 
-    setIsLoading(true);
-
-    // Simulate API call
-    // In a real app, you would send both email and domain to the backend
-    // /companies/{companyId}/verification/domain/request
-    setTimeout(() => {
-      setEmailError(null);
-      setDomainError(null);
-      setOtpSent(true);
-      setIsLoading(false);
-      toast.success(`Verification code sent to ${email}`);
-    }, 1500);
+    // Call the mutation to request domain verification
+    requestDomainVerificationMutation.mutate({
+      companyId,
+      data: { domain, email },
+    });
   };
 
   // Handle OTP verification
   const handleVerifyOtp = () => {
+    // Reset any previous errors
+    setEmailError(null);
+
     if (!otp || otp.length < 4) {
       setEmailError("Please enter a valid verification code");
       return;
     }
 
-    setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      // In a real app, you would verify the OTP with your backend
-      if (otp.length === 6 && /^\d+$/.test(otp)) {
-        setEmailError(null);
-        setEmailVerified(true);
-        setIsLoading(false);
-        toast.success("Email verified successfully!");
-
-        // Close dialog after a delay
-        setTimeout(() => {
-          setOpen(false);
-          resetForm();
-        }, 2000);
-      } else {
-        setEmailError("Invalid verification code. Please try again.");
-        setIsLoading(false);
-      }
-    }, 1500);
+    // Call the mutation to confirm domain verification
+    confirmDomainVerificationMutation.mutate({
+      companyId,
+      data: { code: otp },
+    });
   };
 
   // Handle file change
@@ -144,13 +160,11 @@ export default function VerifyCompany({ companyId }) {
       return;
     }
 
-    setIsLoading(true);
-
-    // Simulate API call
+    // This would be connected to a document verification API
+    // For now, we'll just simulate it like before
     setTimeout(() => {
       setFileError(null);
       setFileUploaded(true);
-      setIsLoading(false);
       toast.success("Document uploaded successfully!");
 
       // Close dialog after a delay
@@ -164,7 +178,7 @@ export default function VerifyCompany({ companyId }) {
   // Reset form state
   const resetForm = () => {
     setEmail("");
-    setDomain("");
+    setDomain(company.domain || "");
     setOtp("");
     setOtpSent(false);
     setEmailVerified(false);
@@ -175,8 +189,41 @@ export default function VerifyCompany({ companyId }) {
     setFileError(null);
   };
 
+  // Handle errors from mutations
+  useEffect(() => {
+    if (requestDomainVerificationMutation.isError) {
+      toast.error("Failed to send verification code");
+      setEmailError(
+        requestDomainVerificationMutation.error?.message || "An error occurred"
+      );
+    }
+
+    if (confirmDomainVerificationMutation.isError) {
+      toast.error("Failed to verify code");
+      setEmailError(
+        confirmDomainVerificationMutation.error?.message ||
+          "Invalid verification code"
+      );
+    }
+  }, [
+    requestDomainVerificationMutation.isError,
+    requestDomainVerificationMutation.error,
+    confirmDomainVerificationMutation.isError,
+    confirmDomainVerificationMutation.error,
+  ]);
+
+  const isLoadingRequest = requestDomainVerificationMutation.isLoading;
+  const isLoadingConfirm = confirmDomainVerificationMutation.isLoading;
+  const isLoading = isLoadingRequest || isLoadingConfirm;
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(newOpen) => {
+        setOpen(newOpen);
+        if (!newOpen) resetForm();
+      }}
+    >
       <DialogTrigger asChild>
         <Button className="mt-4 md:mt-0 bg-primary text-primary-foreground">
           <Building2 className="mr-2 h-4 w-4" /> Verify Company
@@ -240,6 +287,7 @@ export default function VerifyCompany({ companyId }) {
                       type="button"
                       className="text-primary hover:underline"
                       onClick={handleSendOtp}
+                      disabled={isLoadingRequest}
                     >
                       Resend
                     </button>
@@ -249,10 +297,10 @@ export default function VerifyCompany({ companyId }) {
                     className="w-full bg-primary text-primary-foreground"
                     disabled={isLoading}
                   >
-                    {isLoading && (
+                    {isLoadingConfirm && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    {isLoading ? "Verifying..." : "Verify Code"}
+                    {isLoadingConfirm ? "Verifying..." : "Verify Code"}
                   </Button>
                 </div>
               ) : (
@@ -301,10 +349,10 @@ export default function VerifyCompany({ companyId }) {
                     className="w-full bg-primary text-primary-foreground"
                     disabled={isLoading}
                   >
-                    {isLoading && (
+                    {isLoadingRequest && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    {isLoading ? "Sending..." : "Send Verification Code"}
+                    {isLoadingRequest ? "Sending..." : "Send Verification Code"}
                   </Button>
                 </div>
               )}
