@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   MapPin,
   Globe,
@@ -31,6 +32,7 @@ import {
   Loader2,
   ImagePlus,
   Trash,
+  X,
 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -50,20 +52,23 @@ const formSchema = z.object({
   }),
   description: z
     .string()
-    .min(10, { message: "Description must be at least 10 characters long." }),
+    .min(10, { message: "Description must be at least 10 characters long." })
+    .optional()
+    .or(z.literal("")),
   address: z.string().min(5, { message: "Address is required." }),
   website: z
     .string()
     .url({ message: "Please enter a valid website URL." })
     .optional()
     .or(z.literal("")),
-  industry: z.string().optional(),
-  size: z.string().optional(),
+  values: z.array(z.string()).optional(),
 });
 
 export default function AddCompany() {
   const [logoPreview, setLogoPreview] = useState(null);
   const [open, setOpen] = useState(false);
+  const [values, setValues] = useState([]);
+  const [currentValue, setCurrentValue] = useState("");
   const { createCompanyMutation } = useCompanies();
   const uploadAreaRef = useRef(null);
   const formContainerRef = useRef(null);
@@ -78,10 +83,42 @@ export default function AddCompany() {
       description: "",
       address: "",
       website: "",
-      industry: "",
-      size: "",
+      values: [],
     },
   });
+
+  // Handle company values
+  const handleAddValue = () => {
+    if (currentValue.trim()) {
+      const newValue = currentValue.trim();
+      if (!values.includes(newValue)) {
+        const newValues = [...values, newValue];
+        setValues(newValues);
+        form.setValue("values", newValues);
+        setCurrentValue("");
+
+        // Animate new badge
+        gsap.fromTo(
+          ".company-value-badge:last-child",
+          { scale: 0.8, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(1.7)" }
+        );
+      }
+    }
+  };
+
+  const handleRemoveValue = (valueToRemove) => {
+    const newValues = values.filter((value) => value !== valueToRemove);
+    setValues(newValues);
+    form.setValue("values", newValues);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddValue();
+    }
+  };
 
   // Handle dialog open/close with animations
   const handleOpenChange = (newOpen) => {
@@ -174,6 +211,7 @@ export default function AddCompany() {
             setOpen(false);
             form.reset();
             setLogoPreview(null);
+            setValues([]);
           },
         });
       },
@@ -385,7 +423,7 @@ export default function AddCompany() {
                       name="description"
                       render={({ field }) => (
                         <FormItem className="form-field">
-                          <FormLabel>Description *</FormLabel>
+                          <FormLabel>Description</FormLabel>
                           <FormControl>
                             <Textarea
                               placeholder="Brief description of the company"
@@ -394,52 +432,61 @@ export default function AddCompany() {
                             />
                           </FormControl>
                           <FormDescription>
-                            Provide a short description of the company's
-                            mission, products, or services
+                            If provided, description must be at least 10
+                            characters
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
 
-                    {/* Industry */}
-                    <FormField
-                      control={form.control}
-                      name="industry"
-                      render={({ field }) => (
-                        <FormItem className="form-field">
-                          <FormLabel>Industry</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="e.g. Technology, Healthcare, Education"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    {/* Company Size */}
-                    <FormField
-                      control={form.control}
-                      name="size"
-                      render={({ field }) => (
-                        <FormItem className="form-field">
-                          <FormLabel>Company Size</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="e.g. 1-10 employees, 11-50 employees"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    {/* Company Values */}
+                    <div className="space-y-2 form-field">
+                      <Label htmlFor="values">Company Values</Label>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {values.map((value, index) => (
+                          <Badge
+                            key={index}
+                            className="company-value-badge bg-primary/10 text-primary border-primary/20 flex items-center gap-1"
+                          >
+                            {value}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveValue(value)}
+                              className="ml-1 rounded-full hover:bg-primary/20 p-0.5"
+                            >
+                              <X className="h-3 w-3" />
+                              <span className="sr-only">Remove {value}</span>
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                      <div className="flex gap-2">
+                        <Input
+                          id="values"
+                          value={currentValue}
+                          onChange={(e) => setCurrentValue(e.target.value)}
+                          onKeyDown={handleKeyDown}
+                          placeholder="Add a company value (e.g. Innovation, Integrity)"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={handleAddValue}
+                          disabled={!currentValue.trim()}
+                        >
+                          <Plus className="h-4 w-4" />
+                          <span className="sr-only">Add value</span>
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Press Enter to add a value or click the plus button
+                      </p>
+                    </div>
                   </TabsContent>
 
-                  <DialogFooter className="py-4  sticky bottom-0">
+                  <DialogFooter className="py-4 sticky bottom-0">
                     <DialogClose asChild>
                       <Button type="button" variant="outline">
                         Cancel

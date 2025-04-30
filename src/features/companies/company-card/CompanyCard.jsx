@@ -32,6 +32,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
+import { statusBadgeStyles } from "@/utils/statusBadgeStyles";
+import { StatusIcon } from "@/components/StatusIcon";
 
 export default function CompanyCard({ company, handleDelete }) {
   // Add fallback for company to prevent errors if it's undefined
@@ -39,7 +42,16 @@ export default function CompanyCard({ company, handleDelete }) {
     return null; // Or render a placeholder/skeleton
   }
 
-  const { name = "", id, description = "", website, image, address } = company;
+  const {
+    name = "",
+    _id,
+    description = "",
+    website,
+    image,
+    address,
+    verification,
+    values,
+  } = company;
   const [isFavorite, setIsFavorite] = useState(false);
 
   // Refs for animations
@@ -142,7 +154,7 @@ export default function CompanyCard({ company, handleDelete }) {
       >
         {/* Actions Menu */}
         <div className="absolute top-2 right-2 flex gap-2">
-          <TooltipProvider>
+          {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
@@ -162,7 +174,7 @@ export default function CompanyCard({ company, handleDelete }) {
                 </p>
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          </TooltipProvider> */}
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -209,15 +221,12 @@ export default function CompanyCard({ company, handleDelete }) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-lg">
-                  {name || "Unnamed Company"}
-                </h3>
-                {isFavorite && (
-                  <Badge
-                    variant="outline"
-                    className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800"
-                  >
-                    Favorite
+                <h3 className="font-semibold text-lg">{name}</h3>
+                {verification?.status && (
+                  <Badge className={statusBadgeStyles[verification?.status]}>
+                    <StatusIcon status={verification?.status} />
+                    {verification?.status.charAt(0).toUpperCase() +
+                      verification?.status.slice(1)}
                   </Badge>
                 )}
               </div>
@@ -249,6 +258,27 @@ export default function CompanyCard({ company, handleDelete }) {
               </div>
             )}
           </div>
+          {values && values.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-3">
+              {values.slice(0, 3).map((value, index) => (
+                <Badge
+                  key={index}
+                  variant="outline"
+                  className="bg-primary/10 text-primary border-primary/20"
+                >
+                  {value}
+                </Badge>
+              ))}
+              {values.length > 3 && (
+                <Badge
+                  variant="outline"
+                  className="bg-primary/5 text-primary/70 border-primary/10"
+                >
+                  +{values.length - 3}
+                </Badge>
+              )}
+            </div>
+          )}
         </CardContent>
 
         <CardFooter className="flex justify-between pt-4 mt-auto">
@@ -256,10 +286,12 @@ export default function CompanyCard({ company, handleDelete }) {
             <Briefcase className="h-4 w-4" />
             <span>Add Job</span>
           </Button>
-          <Button variant="default" size="sm" className="gap-1">
-            <Info className="h-4 w-4" />
-            <span>Details</span>
-          </Button>
+          <Link to={`/companies/${_id}`}>
+            <Button variant="default" size="sm" className="gap-1">
+              <Info className="h-4 w-4" />
+              <span>Details</span>
+            </Button>
+          </Link>
         </CardFooter>
       </Card>
     </>
