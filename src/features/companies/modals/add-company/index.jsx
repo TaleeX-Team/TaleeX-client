@@ -40,6 +40,7 @@ import { useCompanies } from "../../features";
 import { gsap } from "gsap";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {Link} from "react-router-dom";
 
 const formSchema = z.object({
   image: z.any().refine((file) => file instanceof File || file === null, {
@@ -227,6 +228,11 @@ export default function AddCompany() {
           <Plus className="mr-2 h-4 w-4" /> Add Company
         </Button>
       </DialogTrigger>
+    <Link to="/questions-page">
+      <Button className="mt-4 md:mt-0 bg-primary text-primary-foreground">
+        <Plus className="mr-2 h-4 w-4" /> Interview
+      </Button>
+    </Link>
       <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
         <div ref={formContainerRef}>
           <DialogHeader className="p-6 pb-2">
