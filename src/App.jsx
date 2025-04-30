@@ -51,7 +51,7 @@ const PlansPage = lazy(() => import("./features/admin/pages/PlansPage.jsx"));
 const BackgroundWrapper = ({children}) => {
     return (
         <div className="relative min-h-screen">
-            <AnimatedBackground/>
+            {/* <AnimatedBackground/> */}
             <div className="relative z-10">{children}</div>
         </div>
     );
@@ -77,7 +77,7 @@ const AdminAuthLayout = () => (
 const RootRedirect = () => {
     const {isAuthenticated, isLoading} = useAuth();
     const {data: user, isLoading: isUserLoading} = useUser();
-
+    
     if (isLoading || isUserLoading) return <FullPageSpinner/>;
 
     if (!isAuthenticated) {
@@ -207,6 +207,8 @@ const AdminLayoutWithBackground = () => (
 );
 
 function App() {
+  
+  console.log("App component rendered");
     const [router] = useState(() =>
         createBrowserRouter([
             // Root route that redirects based on role
@@ -287,6 +289,7 @@ function App() {
                         element: (
                             <Suspense fallback={<FullPageSpinner/>}>
                                 <PublicRoute adminRedirect="/admin" userRedirect="/">
+                                
                                     <AdminSignIn/>
                                 </PublicRoute>
                             </Suspense>
@@ -384,6 +387,7 @@ function App() {
                         path: "settings",
                         element: (
                             <Suspense fallback={<FullPageSpinner/>}>
+                              
                                 <SettingsPage/>
                             </Suspense>
                         ),
@@ -453,8 +457,10 @@ function App() {
             },
         ])
     );
+    
 
     return (
+      
         <QueryClientProvider client={queryClient}>
             <ThemeProvider storageKey="app-theme">
                 <ReactQueryDevtools initialIsOpen={false}/>
