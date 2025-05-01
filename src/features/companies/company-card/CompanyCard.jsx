@@ -286,7 +286,7 @@ export default function CompanyCard({ company, handleDelete }) {
             <Briefcase className="h-4 w-4" />
             <span>Add Job</span>
           </Button>
-          <Link to={`/companies/${_id}`}>
+          <Link to={`${_id}`}>
             <Button variant="default" size="sm" className="gap-1">
               <Info className="h-4 w-4" />
               <span>Details</span>

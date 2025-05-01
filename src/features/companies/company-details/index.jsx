@@ -9,13 +9,14 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AboutTab from "./about-tab";
 import JobsTab from "./jobs-tab";
 import Header from "./header";
+import { useCompanies } from "../features";
 
 export default function CompanyDetails() {
   const queryClient = useQueryClient();
   const { companyId } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("about");
-
+  const { companyData } = useCompanies();
   // Get current company by finding it using the companyId
   const companies = queryClient.getQueryData(["companies"])?.companies || [];
   const company = companies.find((company) => company._id === companyId);
