@@ -1,237 +1,357 @@
-import { useState } from "react";
-import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
-// import { useToast } from "@/components/ui/use-toast";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Plus, X } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import * as z from "zod";
+import { toast } from "sonner";
+import { gsap } from "gsap";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
+import { useCompanies } from "@/hooks/userQueries";
 
-// Schema
 const formSchema = z.object({
-  jobTitle: z.string().min(2, { message: "Job title must be at least 2 characters." }),
-  companyId: z.string().min(1, { message: "Company is required." }),
-  location: z.string().min(2, { message: "Location is required." }),
-  jobType: z.string().min(2, { message: "Job type is required." }),
-  salaryMin: z.string(),
-  salaryMax: z.string(),
-  currency: z.string().min(1, { message: "Currency is required." }),
-  description: z.string().min(10, { message: "Description must be at least 10 characters." }),
-  requirements: z.string().min(10, { message: "Requirements must be at least 10 characters." }),
+  title: z.string().min(3, { message: "Title is required" }),
+  description: z.string().min(10, { message: "Description is required" }),
+  requirement: z.string().min(10, { message: "Requirement is required" }),
+  // company: z.string().min(3, { message: "Company is required" }),
+  company: z.string().optional(),
+  workplaceType: z.enum(["Remote", "Hybrid", "Onsite"]),
+  jobType: z.enum(["Full-time", "Part-time"]),
+  tags: z.array(z.string()).optional(),
+  salaryMin: z.string().optional(),
+  salaryMax: z.string().optional(),
+  currency: z.enum(["USD", "EUR", "GBP", "EGP", "AED"]).optional(),
 });
 
-export default function CreateJob() {
-//   const { toast } = useToast();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const preselectedCompanyId = searchParams.get("companyId") || "";
+export default function AddJob() {
+  const [open, setOpen] = useState(false);
+  const [tags, setTags] = useState([]);
+  const [currentTag, setCurrentTag] = useState("");
+  const formContainerRef = useRef(null);
+
+  const { companies } = useCompanies();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      jobTitle: "",
-      companyId: preselectedCompanyId,
-      location: "",
-      jobType: "",
+      title: "",
+      description: "",
+      requirement: "",
+      company: "",
+      workplaceType: "Remote",
+      jobType: "Full-time",
+      tags: [],
       salaryMin: "",
       salaryMax: "",
       currency: "USD",
-      description: "",
-      requirements: "",
     },
   });
 
   const onSubmit = (values) => {
-    console.log("Job Submitted:", values);
+    const result = formSchema.safeParse(values);
+    if (!result.success) {
+      console.error("Invalid form data");
+      return;
+    }
 
-    // toast({
-    //   title: "Job Created",
-    //   description: `${values.jobTitle} has been created successfully.`,
-    // });
-
-    setTimeout(() => {
-      navigate("/jobs");
-    }, 1000);
-
+    toast.success("Job added successfully!");
+    console.log(values);
     form.reset();
+    setTags([]);
+    setOpen(false);
+  };
+
+  const handleAddTag = () => {
+    if (currentTag.trim() && !tags.includes(currentTag.trim())) {
+      const newTags = [...tags, currentTag.trim()];
+      setTags(newTags);
+      form.setValue("tags", newTags);
+      setCurrentTag("");
+      gsap.fromTo(
+        ".job-tag-badge:last-child",
+        { scale: 0.8, opacity: 0 },
+        { scale: 1, opacity: 1, duration: 0.3 }
+      );
+    }
+  };
+
+  const handleRemoveTag = (tag) => {
+    const newTags = tags.filter((t) => t !== tag);
+    setTags(newTags);
+    form.setValue("tags", newTags);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background/80 p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center mb-6">
-          <Link to="/jobs" className="mr-4">
-            <Button variant="ghost" size="icon" className="hover:bg-white/5">
-              <ArrowLeft size={20} />
-            </Button>
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-              Create Job
-            </h1>
-            <p className="text-muted-foreground">Post a new job opening</p>
-          </div>
-        </div>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="mt-4 md:mt-0 ml-2 bg-primary text-primary-foreground">
+          <Plus className="mr-2 h-4 w-4" /> Post a Job
+        </Button>
+      </DialogTrigger>
 
-        <Card className="w-full">
-          <CardContent className="p-6">
+      <DialogContent className="sm:max-w-[600px] p-0 overflow-y-auto scrollbar-none" 
+        style={{
+          overscrollBehavior: "contain",
+          maxHeight: "90vh",
+          scrollbarWidth: "none",      
+          msOverflowStyle: "none",     
+        }}>
+        <div ref={formContainerRef}>
+          <DialogHeader className="p-6 pb-2">
+            <DialogTitle className="text-xl">Add New Job</DialogTitle>
+            <DialogDescription>
+              Fill in the job details to add a new position.
+            </DialogDescription>
+          </DialogHeader>
+
+          <ScrollArea className="px-6 py-4 max-h-[70vh]">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-
-                {/* Job Title */}
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="jobTitle"
+                  name="title"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Job Title *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter job title" {...field} />
+                        <Input placeholder="e.g. Frontend Developer" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* Company ID */}
                 <FormField
                   control={form.control}
-                  name="companyId"
+                  name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Company ID *</FormLabel>
+                      <FormLabel>Description *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter company ID" {...field} />
+                        <Textarea placeholder="Job description" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* Location */}
                 <FormField
                   control={form.control}
-                  name="location"
+                  name="requirement"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Location *</FormLabel>
+                      <FormLabel>Requirement *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter location" {...field} />
+                        <Textarea placeholder="Job requirements" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* Job Type */}
+                <FormField
+                  control={form.control}
+                  name="company"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Company *</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a company" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {companies?.map((comp) => (
+                            <SelectItem key={comp.id} value={comp.name}>
+                              {comp.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="workplaceType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Workplace Type *</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Remote">Remote</SelectItem>
+                          <SelectItem value="Hybrid">Hybrid</SelectItem>
+                          <SelectItem value="Onsite">Onsite</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="jobType"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Job Type *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g. Full-time, Part-time, Remote" {...field} />
-                      </FormControl>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Full-time">Full-time</SelectItem>
+                          <SelectItem value="Part-time">Part-time</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* Salary Min */}
-                <FormField
-                  control={form.control}
-                  name="salaryMin"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Minimum Salary</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g. 50000" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Salary Max */}
-                <FormField
-                  control={form.control}
-                  name="salaryMax"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Maximum Salary</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g. 90000" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Currency */}
-                <FormField
-                  control={form.control}
-                  name="currency"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Currency *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g. USD, EUR" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Description */}
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Job Description *</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Enter job description..." className="min-h-[100px]" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Requirements */}
-                <FormField
-                  control={form.control}
-                  name="requirements"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Requirements *</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Enter job requirements..." className="min-h-[100px]" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Buttons */}
-                <div className="flex justify-end gap-4 pt-4">
-                  <Button variant="outline" type="button" onClick={() => navigate("/jobs")}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" className="bg-primary text-primary-foreground">
-                    Create Job
-                  </Button>
+                <div className="space-y-2">
+                  <FormLabel>Tags</FormLabel>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {tags.map((tag, i) => (
+                      <Badge key={i} className="job-tag-badge flex items-center gap-1">
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTag(tag)}
+                          className="ml-1 rounded-full hover:bg-primary/20 p-0.5"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      value={currentTag}
+                      onChange={(e) => setCurrentTag(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddTag();
+                        }
+                      }}
+                      placeholder="e.g. React, Node"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={handleAddTag}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
 
+                <div className="grid grid-cols-3 gap-2">
+                  <FormField
+                    control={form.control}
+                    name="salaryMin"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Min Salary</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g. 1000" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="salaryMax"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Max Salary</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g. 5000" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="currency"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Currency</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="USD">USD</SelectItem>
+                            <SelectItem value="EUR">EUR</SelectItem>
+                            <SelectItem value="GBP">GBP</SelectItem>
+                            <SelectItem value="EGP">EGP</SelectItem>
+                            <SelectItem value="AED">AED</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <DialogFooter className="py-4">
+                  <DialogClose asChild>
+                    <Button type="button" variant="outline">
+                      Cancel
+                    </Button>
+                  </DialogClose>
+                  <Button type="submit" className="bg-primary text-primary-foreground">
+                    Submit Job
+                  </Button>
+                </DialogFooter>
               </form>
             </Form>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+          </ScrollArea>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
+
