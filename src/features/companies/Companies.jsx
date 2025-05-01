@@ -27,6 +27,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import AddJob from "../jobs/addJob/createJob";
 
 // Register GSAP plugins
 if (typeof window !== "undefined") {
@@ -186,6 +187,7 @@ export default function Companies() {
           <div className="mt-4 md:mt-0 animate-pulse">
             <AddCompany />
           </div>
+          
         </div>
 
         {/* Search and Filter */}
@@ -199,6 +201,8 @@ export default function Companies() {
               placeholder="Search companies..."
               className="pl-10 w-full transition-all duration-300 focus:border-primary focus:ring focus:ring-primary/20"
             />
+          </div>
+          <div>
           </div>
           <div className="flex gap-3">
             <Select>
@@ -232,6 +236,9 @@ export default function Companies() {
             </Button>
           </div>
         </div>
+        <div className="flex gap-2 m-4 md:mt-0 animate-pulse">
+            <AddJob />
+          </div>
 
         {/* Company Cards */}
         <div className="relative min-h-[300px]">
