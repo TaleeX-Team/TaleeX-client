@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import Vapi from "@vapi-ai/web"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
-import { X } from "lucide-react"
+import { X, Camera } from 'lucide-react'
 import { InterviewHeader } from "@/components/interview/InterviewHeader"
 import { VideoContainer } from "@/components/interview/VideoContainer"
 import { TranscriptPanel } from "@/components/interview/TranscriptPanel"
@@ -11,6 +11,7 @@ import { StartScreen } from "@/components/interview/StartScreen"
 import { InterviewCompletedDialog } from "@/components/interview/InterviewCompletedDialog"
 import { useInterviewState } from "@/hooks/useInterviewState"
 import { globalStyles } from "@/lib/globalStyles"
+import { toast } from "sonner"
 
 // VAPI API configuration
 const VAPI_API_KEY = "d4ecde21-8c7d-4f5c-9996-5c2b306d9ccf"
@@ -52,6 +53,8 @@ export default function Interview() {
         lastUserResponseTime,
         messageHistory,
         lastSpeakingRole,
+        screenshots,
+        lastCapturedScreenshot,
     } = state
 
     const {
@@ -68,6 +71,7 @@ export default function Interview() {
         stopVAPICall,
         setIsInterviewComplete,
         setConclusionDetected,
+        captureScreenshot,
     } = actions
 
     const {
@@ -102,6 +106,13 @@ export default function Interview() {
             setError("Failed to initialize the interview system. Please try again.")
         }
     }, [])
+
+    // Show toast notification when a screenshot is captured
+    useEffect(() => {
+        if (lastCapturedScreenshot) {
+            toast.success(`${screenshots.length} of 3 screenshots taken`)
+        }
+    }, [lastCapturedScreenshot, screenshots.length, toast])
 
     // Setup VAPI event listeners
     const setupVapiEventListeners = () => {
@@ -225,11 +236,17 @@ export default function Interview() {
                     )
 
                     // Force end the call after a short delay if it doesn't end naturally
-                    setTimeout(() => {
-                        stopVAPICall()
-                    }, 5000)
+
+                        stopVAPICall().then(r => {
+                            console.log(r,"TESTST")
+                            setIsInterviewComplete(true)
+                        })
+
                 } else {
-                    stopVAPICall()
+                    stopVAPICall().then(r => {
+                        console.log(r,"TEST")
+                        setIsInterviewComplete(true)
+                    })
                 }
             }, 2000)
         }
@@ -314,9 +331,12 @@ export default function Interview() {
         if (conclusionDetected && !isInterviewComplete) {
             console.log("Conclusion detected, interview ending soon")
             // Small delay to ensure the AI finishes speaking
-            setTimeout(() => {
-                stopVAPICall()
-            }, 3000)
+
+                stopVAPICall().then(r => {
+                    console.log(r,"TESTS@")
+                    setIsInterviewComplete(true)
+                })
+
         }
     }, [conclusionDetected, isInterviewComplete])
 
@@ -375,6 +395,8 @@ export default function Interview() {
                             transcript={transcript}
                             callStatus={callStatus}
                             lastSpeakingRole={lastSpeakingRole}
+                            lastCapturedScreenshot={lastCapturedScreenshot}
+                            screenshotCount={screenshots.length}
                         />
 
                         <VideoContainer
@@ -412,6 +434,7 @@ export default function Interview() {
                 interviewDuration={interviewDuration}
                 questionsAsked={totalQuestionsAsked}
                 totalQuestions={questions.length}
+                screenshots={screenshots}
             />
         </div>
     )

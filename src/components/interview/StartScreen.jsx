@@ -28,19 +28,19 @@ export function StartScreen({
                         {totalQuestions} questions.
                     </p>
                     <div className="w-full space-y-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                        <div className="flex items-center justify-between">
-              <span className="text-sm flex items-center gap-2">
-                <Video className="h-4 w-4" /> Camera:
-              </span>
-                            <Button
-                                variant={isVideoOn ? "default" : "outline"}
-                                size="sm"
-                                onClick={() => setIsVideoOn(!isVideoOn)}
-                                className="transition-all duration-200"
-                            >
-                                {isVideoOn ? "Enabled" : "Disabled"}
-                            </Button>
-                        </div>
+              {/*          <div className="flex items-center justify-between">*/}
+              {/*<span className="text-sm flex items-center gap-2">*/}
+              {/*  <Video className="h-4 w-4" /> Camera:*/}
+              {/*</span>*/}
+              {/*              <Button*/}
+              {/*                  variant={isVideoOn ? "default" : "outline"}*/}
+              {/*                  size="sm"*/}
+              {/*                  onClick={() => setIsVideoOn(!isVideoOn)}*/}
+              {/*                  className="transition-all duration-200"*/}
+              {/*              >*/}
+              {/*                  {isVideoOn ? "Enabled" : "Disabled"}*/}
+              {/*              </Button>*/}
+              {/*          </div>*/}
                         <div className="flex items-center justify-between">
               <span className="text-sm flex items-center gap-2">
                 <Mic className="h-4 w-4" /> Microphone:

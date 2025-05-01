@@ -83,19 +83,19 @@ export function InterviewHeader({
                             <TooltipContent>{isAudioOn ? "Mute microphone" : "Unmute microphone"}</TooltipContent>
                         </Tooltip>
 
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant={isVideoOn ? "outline" : "secondary"}
-                                    size="icon"
-                                    onClick={toggleVideo}
-                                    className="transition-all duration-200"
-                                >
-                                    {isVideoOn ? <Video className="h-4 w-4" /> : <VideoOff className="h-4 w-4" />}
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>{isVideoOn ? "Turn off camera" : "Turn on camera"}</TooltipContent>
-                        </Tooltip>
+                        {/*<Tooltip>*/}
+                        {/*    <TooltipTrigger asChild>*/}
+                        {/*        <Button*/}
+                        {/*            variant={isVideoOn ? "outline" : "secondary"}*/}
+                        {/*            size="icon"*/}
+                        {/*            onClick={toggleVideo}*/}
+                        {/*            className="transition-all duration-200"*/}
+                        {/*        >*/}
+                        {/*            {isVideoOn ? <Video className="h-4 w-4" /> : <VideoOff className="h-4 w-4" />}*/}
+                        {/*        </Button>*/}
+                        {/*    </TooltipTrigger>*/}
+                        {/*    <TooltipContent>{isVideoOn ? "Turn off camera" : "Turn on camera"}</TooltipContent>*/}
+                        {/*</Tooltip>*/}
 
                         <Tooltip>
                             <TooltipTrigger asChild>
