@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,7 +26,6 @@ import { Badge } from "@/components/ui/badge";
 import {
   MapPin,
   Globe,
-  Upload,
   Plus,
   Building2,
   Loader2,
@@ -39,7 +38,6 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { toast } from "sonner";
 import { useCompanies } from "../../features";
-import { gsap } from "gsap";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -71,7 +69,6 @@ export default function AddCompany() {
   const [currentValue, setCurrentValue] = useState("");
   const { createCompanyMutation } = useCompanies();
   const uploadAreaRef = useRef(null);
-  const formContainerRef = useRef(null);
 
   const isLoading = createCompanyMutation.isLoading;
 
@@ -96,13 +93,6 @@ export default function AddCompany() {
         setValues(newValues);
         form.setValue("values", newValues);
         setCurrentValue("");
-
-        // Animate new badge
-        gsap.fromTo(
-          ".company-value-badge:last-child",
-          { scale: 0.8, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(1.7)" }
-        );
       }
     }
   };
@@ -120,80 +110,19 @@ export default function AddCompany() {
     }
   };
 
-  // Handle dialog open/close with animations
-  const handleOpenChange = (newOpen) => {
-    if (!newOpen) {
-      // Play exit animation
-      gsap.to(formContainerRef.current, {
-        y: 20,
-        opacity: 0,
-        duration: 0.3,
-        onComplete: () => setOpen(false),
-      });
-    } else {
-      setOpen(true);
-    }
-  };
-
-  // Animate form elements when dialog opens
-  useEffect(() => {
-    if (open) {
-      const tl = gsap.timeline();
-
-      // Reset and set initial states
-      tl.set(formContainerRef.current, { y: 20, opacity: 0 });
-      tl.set(".form-field", { y: 15, opacity: 0 });
-
-      // Animate form container
-      tl.to(formContainerRef.current, {
-        y: 0,
-        opacity: 1,
-        duration: 0.4,
-        ease: "power2.out",
-      });
-
-      // Stagger animate form fields
-      tl.to(
-        ".form-field",
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.3,
-          stagger: 0.05,
-          ease: "power2.out",
-        },
-        "-=0.2"
-      );
-    }
-  }, [open]);
-
   // Handle logo upload
   const handleLogoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setLogoPreview(URL.createObjectURL(file));
       form.setValue("image", file);
-
-      // Animate logo preview
-      gsap.fromTo(
-        ".logo-preview",
-        { scale: 0.8, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(1.7)" }
-      );
     }
   };
 
   // Handle logo remove
   const handleRemoveLogo = () => {
-    gsap.to(".logo-preview", {
-      scale: 0.8,
-      opacity: 0,
-      duration: 0.3,
-      onComplete: () => {
-        setLogoPreview(null);
-        form.setValue("image", null);
-      },
-    });
+    setLogoPreview(null);
+    form.setValue("image", null);
   };
 
   // Handle form submit
@@ -201,19 +130,10 @@ export default function AddCompany() {
     createCompanyMutation.mutate(values, {
       onSuccess: () => {
         toast.success("Company created successfully!");
-
-        // Close dialog with animation
-        gsap.to(formContainerRef.current, {
-          y: 20,
-          opacity: 0,
-          duration: 0.3,
-          onComplete: () => {
-            setOpen(false);
-            form.reset();
-            setLogoPreview(null);
-            setValues([]);
-          },
-        });
+        setOpen(false);
+        form.reset();
+        setLogoPreview(null);
+        setValues([]);
       },
       onError: (error) => {
         console.error("Error creating company:", error);
@@ -225,48 +145,23 @@ export default function AddCompany() {
     });
   };
 
-  // Animate upload area on hover
-  useEffect(() => {
-    if (!uploadAreaRef.current) return;
-
-    const enterAnimation = () => {
-      gsap.to(uploadAreaRef.current, {
-        borderColor: "rgba(var(--primary), 0.5)",
-        backgroundColor: "rgba(var(--primary), 0.05)",
-        scale: 1.02,
-        duration: 0.3,
-      });
-    };
-
-    const leaveAnimation = () => {
-      gsap.to(uploadAreaRef.current, {
-        borderColor: "",
-        backgroundColor: "",
-        scale: 1,
-        duration: 0.3,
-      });
-    };
-
-    uploadAreaRef.current.addEventListener("mouseenter", enterAnimation);
-    uploadAreaRef.current.addEventListener("mouseleave", leaveAnimation);
-
-    return () => {
-      if (uploadAreaRef.current) {
-        uploadAreaRef.current.removeEventListener("mouseenter", enterAnimation);
-        uploadAreaRef.current.removeEventListener("mouseleave", leaveAnimation);
-      }
-    };
-  }, [uploadAreaRef.current]);
-
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="mt-4 md:mt-0 bg-primary text-primary-foreground">
           <Plus className="mr-2 h-4 w-4" /> Add Company
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
-        <div ref={formContainerRef}>
+      <DialogContent
+        className="sm:max-w-[600px] p-0 h-auto overflow-y-auto scrollbar-none"
+        style={{
+          overscrollBehavior: "contain",
+          maxHeight: "90vh",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
+        <div>
           <DialogHeader className="p-6 pb-2">
             <div className="flex items-center gap-2 mb-2">
               <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center">
@@ -287,7 +182,10 @@ export default function AddCompany() {
               </TabsList>
             </div>
 
-            <ScrollArea className="px-6 py-2 max-h-[70vh]">
+            <ScrollArea
+              className="px-6 py-2"
+              style={{ maxHeight: "calc(85vh - 100px)" }}
+            >
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
@@ -295,15 +193,15 @@ export default function AddCompany() {
                 >
                   <TabsContent value="basic" className="space-y-6 pt-2">
                     {/* Logo Upload */}
-                    <div className="space-y-2 form-field">
+                    <div className="space-y-2">
                       <FormLabel htmlFor="logo-upload">Company Logo</FormLabel>
                       <div className="flex flex-col items-center">
                         <div
                           ref={uploadAreaRef}
-                          className="border-2 border-dashed rounded-lg p-6 w-40 h-40 flex flex-col items-center justify-center text-center relative cursor-pointer transition-all duration-300"
+                          className="border-2 border-dashed rounded-lg p-6 w-40 h-40 flex flex-col items-center justify-center text-center relative cursor-pointer"
                         >
                           {logoPreview ? (
-                            <div className="logo-preview relative w-full h-full">
+                            <div className="relative w-full h-full">
                               <img
                                 src={logoPreview}
                                 alt="Logo preview"
@@ -355,7 +253,7 @@ export default function AddCompany() {
                       control={form.control}
                       name="name"
                       render={({ field }) => (
-                        <FormItem className="form-field">
+                        <FormItem>
                           <FormLabel>Company Name *</FormLabel>
                           <FormControl>
                             <Input
@@ -373,7 +271,7 @@ export default function AddCompany() {
                       control={form.control}
                       name="website"
                       render={({ field }) => (
-                        <FormItem className="form-field">
+                        <FormItem>
                           <FormLabel>Website</FormLabel>
                           <FormControl>
                             <div className="relative">
@@ -398,7 +296,7 @@ export default function AddCompany() {
                       control={form.control}
                       name="address"
                       render={({ field }) => (
-                        <FormItem className="form-field">
+                        <FormItem>
                           <FormLabel>Address *</FormLabel>
                           <FormControl>
                             <div className="relative">
@@ -422,7 +320,7 @@ export default function AddCompany() {
                       control={form.control}
                       name="description"
                       render={({ field }) => (
-                        <FormItem className="form-field">
+                        <FormItem>
                           <FormLabel>Description</FormLabel>
                           <FormControl>
                             <Textarea
@@ -441,13 +339,13 @@ export default function AddCompany() {
                     />
 
                     {/* Company Values */}
-                    <div className="space-y-2 form-field">
+                    <div className="space-y-2">
                       <Label htmlFor="values">Company Values</Label>
                       <div className="flex flex-wrap gap-2 mb-2">
                         {values.map((value, index) => (
                           <Badge
                             key={index}
-                            className="company-value-badge bg-primary/10 text-primary border-primary/20 flex items-center gap-1"
+                            className="bg-primary/10 text-primary border-primary/20 flex items-center gap-1"
                           >
                             {value}
                             <button
@@ -486,7 +384,7 @@ export default function AddCompany() {
                     </div>
                   </TabsContent>
 
-                  <DialogFooter className="py-4 sticky bottom-0">
+                  <DialogFooter className="py-4 bg-background  mt-6">
                     <DialogClose asChild>
                       <Button type="button" variant="outline">
                         Cancel
