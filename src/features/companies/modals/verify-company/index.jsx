@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Check, Mail, Upload, Loader2, Building2 } from "lucide-react";
+import { Check, Mail, Upload, Loader2, Building2, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,82 +16,119 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
+import { useCompanies } from "../../features";
+import { useParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
-export default function VerifyCompany({ companyId }) {
+export default function VerifyCompany({}) {
+  const queryClient = useQueryClient();
+
   // Dialog state
   const [open, setOpen] = useState(false);
 
-  // Company information (would be fetched in a real app)
-  const [companyName, setCompanyName] = useState("Acme Inc.");
-  const [isLoading, setIsLoading] = useState(false);
+  // Get the company data and domain verification mutations from our hook
+  const {
+    requestDomainVerificationMutation,
+    confirmDomainVerificationMutation,
+  } = useCompanies();
+  const { companyId } = useParams();
+  // Find the company with the matching ID
+  const companies = queryClient.getQueryData(["companies"])?.companies || [];
+  const company = companies.find((company) => company._id === companyId);
+  const companyName = company.name || "Your Company";
+  const isAwaitingDomainVerification = company?.verification?.method || false;
 
   // State for email verification
   const [email, setEmail] = useState("");
+  const [domain, setDomain] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [emailVerified, setEmailVerified] = useState(false);
   const [emailError, setEmailError] = useState(null);
+  const [domainError, setDomainError] = useState(null);
 
   // State for document verification
   const [file, setFile] = useState(null);
   const [fileUploaded, setFileUploaded] = useState(false);
   const [fileError, setFileError] = useState(null);
 
-  // Simulate fetching company data
+  // Set domain from company data if available
   useEffect(() => {
-    // In a real app, you would fetch company information based on companyId
-    // For demo purposes, we're using a static value
-    if (companyId) {
-      setCompanyName(`Acme Corp #${companyId}`);
+    if (company.domain) {
+      setDomain(company.domain);
     }
-  }, [companyId]);
+  }, [company]);
+
+  // Update state when request verification is successful
+  useEffect(() => {
+    if (requestDomainVerificationMutation.isSuccess) {
+      setOtpSent(true);
+      toast.success(`Verification code sent to ${email}`);
+    }
+  }, [requestDomainVerificationMutation.isSuccess, email]);
+
+  // Update state when confirmation is successful
+  useEffect(() => {
+    if (confirmDomainVerificationMutation.isSuccess) {
+      setEmailVerified(true);
+      toast.success("Email verified successfully!");
+
+      // Close dialog after a delay
+      setTimeout(() => {
+        setOpen(false);
+        resetForm();
+      }, 2000);
+    }
+  }, [confirmDomainVerificationMutation.isSuccess]);
 
   // Handle email submission
   const handleSendOtp = () => {
+    // Reset any previous errors
+    setEmailError(null);
+    setDomainError(null);
+
+    // Validate email
     if (!email || !email.includes("@")) {
       setEmailError("Please enter a valid email address");
       return;
     }
 
-    setIsLoading(true);
+    // Validate domain
+    if (!domain || domain.trim() === "") {
+      setDomainError("Please enter a company domain");
+      return;
+    }
 
-    // Simulate API call
-    setTimeout(() => {
-      setEmailError(null);
-      setOtpSent(true);
-      setIsLoading(false);
-      toast.success(`Verification code sent to ${email}`);
-    }, 1500);
+    // Check if domain format is valid (simple validation)
+    const domainRegex =
+      /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/;
+    if (!domainRegex.test(domain)) {
+      setDomainError("Please enter a valid domain (e.g., company.com)");
+      return;
+    }
+
+    // Call the mutation to request domain verification
+    requestDomainVerificationMutation.mutate({
+      companyId,
+      data: { domain, email },
+    });
   };
 
   // Handle OTP verification
   const handleVerifyOtp = () => {
-    if (!otp || otp.length < 4) {
+    // Reset any previous errors
+    setEmailError(null);
+
+    if (!otp || otp.length < 6) {
       setEmailError("Please enter a valid verification code");
       return;
     }
 
-    setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      // In a real app, you would verify the OTP with your backend
-      if (otp.length === 6 && /^\d+$/.test(otp)) {
-        setEmailError(null);
-        setEmailVerified(true);
-        setIsLoading(false);
-        toast.success("Email verified successfully!");
-
-        // Close dialog after a delay
-        setTimeout(() => {
-          setOpen(false);
-          resetForm();
-        }, 2000);
-      } else {
-        setEmailError("Invalid verification code. Please try again.");
-        setIsLoading(false);
-      }
-    }, 1500);
+    // Call the mutation to confirm domain verification
+    confirmDomainVerificationMutation.mutate({
+      companyId,
+      data: { code: otp },
+    });
   };
 
   // Handle file change
@@ -124,13 +161,11 @@ export default function VerifyCompany({ companyId }) {
       return;
     }
 
-    setIsLoading(true);
-
-    // Simulate API call
+    // This would be connected to a document verification API
+    // For now, we'll just simulate it like before
     setTimeout(() => {
       setFileError(null);
       setFileUploaded(true);
-      setIsLoading(false);
       toast.success("Document uploaded successfully!");
 
       // Close dialog after a delay
@@ -144,20 +179,55 @@ export default function VerifyCompany({ companyId }) {
   // Reset form state
   const resetForm = () => {
     setEmail("");
+    setDomain(company.domain || "");
     setOtp("");
     setOtpSent(false);
     setEmailVerified(false);
     setEmailError(null);
+    setDomainError(null);
     setFile(null);
     setFileUploaded(false);
     setFileError(null);
   };
 
+  // Handle errors from mutations
+  useEffect(() => {
+    if (requestDomainVerificationMutation.isError) {
+      toast.error("Failed to send verification code");
+      setEmailError(
+        requestDomainVerificationMutation.error?.message || "An error occurred"
+      );
+    }
+
+    if (confirmDomainVerificationMutation.isError) {
+      toast.error("Failed to verify code");
+      setEmailError(
+        confirmDomainVerificationMutation.error?.message ||
+          "Invalid verification code"
+      );
+    }
+  }, [
+    requestDomainVerificationMutation.isError,
+    requestDomainVerificationMutation.error,
+    confirmDomainVerificationMutation.isError,
+    confirmDomainVerificationMutation.error,
+  ]);
+
+  const isLoadingRequest = requestDomainVerificationMutation.isLoading;
+  const isLoadingConfirm = confirmDomainVerificationMutation.isLoading;
+  const isLoading = isLoadingRequest || isLoadingConfirm;
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(newOpen) => {
+        setOpen(newOpen);
+        if (!newOpen) resetForm();
+      }}
+    >
       <DialogTrigger asChild>
-        <Button className="mt-4 md:mt-0 bg-primary text-primary-foreground">
-          <Building2 className="mr-2 h-4 w-4" /> Verify Company
+        <Button variant="default" className="flex items-center gap-2">
+          <Shield className="h-4 w-4" /> Verify Company
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
@@ -187,7 +257,15 @@ export default function VerifyCompany({ companyId }) {
           <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">
             {/* Email Verification Tab */}
             <TabsContent value="email" className="space-y-4">
-              {emailVerified ? (
+              {company?.verification?.method === "domain" ? (
+                <Alert className="bg-yellow-50 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-900">
+                  <Check className="h-4 w-4 mr-2" />
+                  <AlertDescription>
+                    Email verified successfully! Your account is awaiting admin
+                    approval to manage {companyName}.
+                  </AlertDescription>
+                </Alert>
+              ) : emailVerified ? (
                 <Alert className="bg-green-50 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-900">
                   <Check className="h-4 w-4 mr-2" />
                   <AlertDescription>
@@ -218,6 +296,7 @@ export default function VerifyCompany({ companyId }) {
                       type="button"
                       className="text-primary hover:underline"
                       onClick={handleSendOtp}
+                      disabled={isLoadingRequest}
                     >
                       Resend
                     </button>
@@ -227,10 +306,10 @@ export default function VerifyCompany({ companyId }) {
                     className="w-full bg-primary text-primary-foreground"
                     disabled={isLoading}
                   >
-                    {isLoading && (
+                    {isLoadingConfirm && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    {isLoading ? "Verifying..." : "Verify Code"}
+                    {isLoadingConfirm ? "Verifying..." : "Verify Code"}
                   </Button>
                 </div>
               ) : (
@@ -251,19 +330,38 @@ export default function VerifyCompany({ companyId }) {
                       <p className="text-sm text-destructive">{emailError}</p>
                     )}
                   </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="domain">Company Domain</Label>
+                    <div className="relative">
+                      <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="domain"
+                        placeholder="company.com"
+                        className="pl-10"
+                        value={domain}
+                        onChange={(e) => setDomain(e.target.value)}
+                      />
+                    </div>
+                    {domainError && (
+                      <p className="text-sm text-destructive">{domainError}</p>
+                    )}
+                  </div>
+
                   <div className="text-sm text-muted-foreground">
                     We'll send a verification code to your company email
-                    address.
+                    address. The domain will be used to verify your company
+                    ownership.
                   </div>
                   <Button
                     onClick={handleSendOtp}
                     className="w-full bg-primary text-primary-foreground"
                     disabled={isLoading}
                   >
-                    {isLoading && (
+                    {isLoadingRequest && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    {isLoading ? "Sending..." : "Send Verification Code"}
+                    {isLoadingRequest ? "Sending..." : "Send Verification Code"}
                   </Button>
                 </div>
               )}
