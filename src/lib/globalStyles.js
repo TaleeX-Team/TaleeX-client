@@ -69,7 +69,6 @@ export const globalStyles = `
     background-color: white;
     box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
-    max-height: ${transcriptExpanded ? "400px" : "250px"};
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: rgba(59, 130, 246, 0.5) transparent;
