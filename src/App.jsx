@@ -9,30 +9,23 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "@/components/ui/sonner";
-import { Button } from "@/components/ui/button";
-import ProtectedLayout from "./layouts/ProtectedLayout";
 import { ThemeProvider } from "@/layouts/theme_provider/ThemeProvider.jsx";
 import { useAuth } from "@/hooks/useAuth.js";
 import FullPageSpinner from "@/components/FullPageSpinner";
-import ResetPassword from "@/features/auth/password/ResetPassword.jsx";
 import SettingsLayout from "@/layouts/SettingsLayout.jsx";
 import ProfilePage from "@/features/settings/profile/Profile.jsx";
 import BillingPage from "@/features/settings/billing/Billing.jsx";
-import OAuthCallback from "@/components/OAuthCallback.jsx";
-import Home from "@/features/home/Home.jsx";
+
 import { AnimatedBackground } from "./components/AnimatedBackground";
 import SetPassword from "@/features/settings/set-password/SetPassword.jsx";
 import ChangePasswordPage from "@/features/settings/change-password/ChangePasswordPage.jsx";
 import { useUser } from "@/hooks/useUser.js";
-import CompanyDetails from "./features/companies/company-details";
-import { useCompanies } from "./features/companies/features";
-import Companies from "./features/companies/Companies";
 
-// Lazy pages
-const Auth = lazy(() => import("./features/auth/Auth.jsx"));
-const ForgetPassword = lazy(() =>
-  import("./features/auth/password/ForgetPassword.jsx")
-);
+import UserRoutes from "./routes/user-routes/UserRoutes";
+import ErrorPage from "./pages/ErrorPage";
+import PublicRoutes from "./routes/public-routes/PublicRoutes";
+import PublicRouteProtector from "./routes/public-routes/PublicRouteProtector";
+import UserRouteProtector from "./routes/user-routes/UserRouteProtector";
 
 // Admin Auth pages (lazy loaded)
 const AdminSignIn = lazy(() => import("./features/admin/auth/AdminSignIn.jsx"));
@@ -73,15 +66,6 @@ const BackgroundWrapper = ({ children }) => {
   );
 };
 
-// Auth layouts
-const AuthLayout = () => (
-  <BackgroundWrapper>
-    <div className="min-h-screen">
-      <Outlet />
-    </div>
-  </BackgroundWrapper>
-);
-
 const AdminAuthLayout = () => (
   <BackgroundWrapper>
     <div className="min-h-screen">
@@ -110,61 +94,6 @@ const RootRedirect = () => {
   return <Navigate to="/app/companies" replace />;
 };
 
-// App redirect to companies
-const AppRedirect = () => {
-  return <Navigate to="/app/companies" replace />;
-};
-
-// Public route (login pages)
-const PublicRoute = ({
-  children,
-  adminRedirect = "/admin",
-  userRedirect = "/app/companies",
-}) => {
-  const { isAuthenticated, isLoading } = useAuth();
-  const { data: user, isLoading: isUserLoading } = useUser();
-  const location = useLocation();
-  const from = location.state?.from || "";
-
-  if (isLoading || isUserLoading) return <FullPageSpinner />;
-
-  // If authenticated, redirect based on role
-  if (isAuthenticated) {
-    // If there's a saved location, redirect there
-    if (from) {
-      return <Navigate to={from} replace />;
-    }
-
-    // Otherwise redirect to default location based on role
-    if (user?.role === "admin") {
-      return <Navigate to={adminRedirect} replace />;
-    }
-    return <Navigate to={userRedirect} replace />;
-  }
-
-  return <>{children}</>;
-};
-
-// Regular user routes - admins should not access these
-const UserRoute = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
-  const { data: user, isLoading: isUserLoading } = useUser();
-  const location = useLocation();
-
-  if (isLoading || isUserLoading) return <FullPageSpinner />;
-
-  if (!isAuthenticated) {
-    return <Navigate to="/auth" replace state={{ from: location.pathname }} />;
-  }
-
-  // If admin tries to access user routes, redirect to admin dashboard
-  if (user?.role === "admin") {
-    return <Navigate to="/admin" replace />;
-  }
-
-  return <>{children}</>;
-};
-
 // Admin routes - only admins can access
 const AdminRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -188,28 +117,6 @@ const AdminRoute = ({ children }) => {
   return <>{children}</>;
 };
 
-const ErrorPage = ({ error }) => {
-  const location = useLocation();
-  const { data: user } = useUser();
-  const message =
-    error ?? location.state?.error ?? "We couldn't find that page.";
-
-  // Determine where "home" is based on user role
-  const homeLink = user?.role === "admin" ? "/admin" : "/app/companies";
-
-  return (
-    <BackgroundWrapper>
-      <div className="min-h-screen flex items-center justify-center flex-col gap-4">
-        <h1 className="text-2xl font-bold text-red-600">Oops!</h1>
-        <p className="text-gray-600 max-w-md text-center">{message}</p>
-        <Button asChild>
-          <a href={homeLink}>Go Home</a>
-        </Button>
-      </div>
-    </BackgroundWrapper>
-  );
-};
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -218,15 +125,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
-// Wrapper components for layouts with background
-const ProtectedLayoutWithBackground = () => (
-  <BackgroundWrapper>
-    <ProtectedLayout>
-      <Outlet />
-    </ProtectedLayout>
-  </BackgroundWrapper>
-);
 
 const SettingsLayoutWithBackground = () => (
   <BackgroundWrapper>
@@ -254,47 +152,14 @@ function App() {
       },
 
       // Protected user routes
-      {
-        path: "/app",
-        element: (
-          <UserRoute>
-            <ProtectedLayoutWithBackground />
-          </UserRoute>
-        ),
-        errorElement: <ErrorPage />,
-        children: [
-          {
-            index: true,
-            element: <AppRedirect />, // Redirect /app to /app/companies
-          },
-          {
-            path: "companies",
-            children: [
-              {
-                index: true,
-                element: <Companies />, // Show companies list at /app/companies
-              },
-              {
-                path: ":companyId", // Company details as child of companies
-                element: <CompanyDetails />,
-              },
-            ],
-          },
-          // Keep home route but make it accessible via explicit path
-          {
-            path: "home",
-            element: <Home />,
-          },
-        ],
-      },
-
+      UserRoutes,
       // User settings routes
       {
         path: "/settings",
         element: (
-          <UserRoute>
+          <UserRouteProtector>
             <SettingsLayoutWithBackground />
-          </UserRoute>
+          </UserRouteProtector>
         ),
         errorElement: <ErrorPage />,
         children: [
@@ -347,12 +212,12 @@ function App() {
             index: true,
             element: (
               <Suspense fallback={<FullPageSpinner />}>
-                <PublicRoute
+                <PublicRouteProtector
                   adminRedirect="/admin"
                   userRedirect="/app/companies"
                 >
                   <AdminSignIn />
-                </PublicRoute>
+                </PublicRouteProtector>
               </Suspense>
             ),
           },
@@ -360,12 +225,12 @@ function App() {
             path: "forgot-password",
             element: (
               <Suspense fallback={<FullPageSpinner />}>
-                <PublicRoute
+                <PublicRouteProtector
                   adminRedirect="/admin"
                   userRedirect="/app/companies"
                 >
                   <AdminForgetPassword />
-                </PublicRoute>
+                </PublicRouteProtector>
               </Suspense>
             ),
           },
@@ -373,12 +238,12 @@ function App() {
             path: "reset-password/:verificationToken",
             element: (
               <Suspense fallback={<FullPageSpinner />}>
-                <PublicRoute
+                <PublicRouteProtector
                   adminRedirect="/admin"
                   userRedirect="/app/companies"
                 >
                   <AdminSetPassword />
-                </PublicRoute>
+                </PublicRouteProtector>
               </Suspense>
             ),
           },
@@ -467,50 +332,7 @@ function App() {
       },
 
       // User Auth Routes
-      {
-        path: "/auth",
-        element: <AuthLayout />,
-        errorElement: <ErrorPage />,
-        children: [
-          {
-            index: true,
-            element: (
-              <Suspense fallback={<FullPageSpinner />}>
-                <PublicRoute
-                  adminRedirect="/admin"
-                  userRedirect="/app/companies"
-                >
-                  <Auth />
-                </PublicRoute>
-              </Suspense>
-            ),
-          },
-          {
-            path: "forget-password",
-            element: (
-              <Suspense fallback={<FullPageSpinner />}>
-                <ForgetPassword />
-              </Suspense>
-            ),
-          },
-          {
-            path: "reset-password/:verificationToken",
-            element: (
-              <Suspense fallback={<FullPageSpinner />}>
-                <ResetPassword />
-              </Suspense>
-            ),
-          },
-          {
-            path: "callback",
-            element: <OAuthCallback />,
-          },
-          {
-            path: "*",
-            element: <ErrorPage error="That auth page doesn't exist." />,
-          },
-        ],
-      },
+      PublicRoutes,
 
       // Catch-all route
       {
