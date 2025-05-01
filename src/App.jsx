@@ -9,17 +9,13 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "@/components/ui/sonner";
-import { Button } from "@/components/ui/button";
-import ProtectedLayout from "./layouts/ProtectedLayout";
 import { ThemeProvider } from "@/layouts/theme_provider/ThemeProvider.jsx";
 import { useAuth } from "@/hooks/useAuth.js";
 import FullPageSpinner from "@/components/FullPageSpinner";
-import ResetPassword from "@/features/auth/password/ResetPassword.jsx";
 import SettingsLayout from "@/layouts/SettingsLayout.jsx";
 import ProfilePage from "@/features/settings/profile/Profile.jsx";
 import BillingPage from "@/features/settings/billing/Billing.jsx";
-import OAuthCallback from "@/components/OAuthCallback.jsx";
-import Home from "@/features/home/Home.jsx";
+
 import { AnimatedBackground } from "./components/AnimatedBackground";
 import SetPassword from "@/features/settings/set-password/SetPassword.jsx";
 import ChangePasswordPage from "@/features/settings/change-password/ChangePasswordPage.jsx";
@@ -31,6 +27,12 @@ const Auth = lazy(() => import("./features/auth/Auth.jsx"));
 const ForgetPassword = lazy(() =>
   import("./features/auth/password/ForgetPassword.jsx")
 );
+
+import UserRoutes from "./routes/user-routes/UserRoutes";
+import ErrorPage from "./pages/ErrorPage";
+import PublicRoutes from "./routes/public-routes/PublicRoutes";
+import PublicRouteProtector from "./routes/public-routes/PublicRouteProtector";
+import UserRouteProtector from "./routes/user-routes/UserRouteProtector";
 
 // Admin Auth pages (lazy loaded)
 const AdminSignIn = lazy(() => import("./features/admin/auth/AdminSignIn.jsx"));
@@ -148,6 +150,9 @@ const UserRoute = ({ children }) => {
 
   return <>{children}</>;
 };
+  // Otherwise, go to user home - now directly to companies
+  return <Navigate to="/app/companies" replace />;
+};
 
 // Admin routes - only admins can access
 const AdminRoute = ({ children }) => {
@@ -246,12 +251,20 @@ function App() {
           },
         ],
       },
+      // Root redirect
+      {
+        path: "/",
+        element: <RootRedirect />,
+      },
+
+      // Protected user routes
+      UserRoutes,
       // User settings routes
       {
         element: (
-          <UserRoute>
+          <UserRouteProtector>
             <SettingsLayoutWithBackground />
-          </UserRoute>
+          </UserRouteProtector>
         ),
         path: "/settings",
         errorElement: <ErrorPage />,
@@ -301,8 +314,12 @@ function App() {
             element: (
               <Suspense fallback={<FullPageSpinner />}>
                 <PublicRoute adminRedirect="/admin" userRedirect="/">
+                <PublicRouteProtector
+                  adminRedirect="/admin"
+                  userRedirect="/app/companies"
+                >
                   <AdminSignIn />
-                </PublicRoute>
+                </PublicRouteProtector>
               </Suspense>
             ),
           },
@@ -311,8 +328,12 @@ function App() {
             element: (
               <Suspense fallback={<FullPageSpinner />}>
                 <PublicRoute adminRedirect="/admin" userRedirect="/">
+                <PublicRouteProtector
+                  adminRedirect="/admin"
+                  userRedirect="/app/companies"
+                >
                   <AdminForgetPassword />
-                </PublicRoute>
+                </PublicRouteProtector>
               </Suspense>
             ),
           },
@@ -321,8 +342,12 @@ function App() {
             element: (
               <Suspense fallback={<FullPageSpinner />}>
                 <PublicRoute adminRedirect="/admin" userRedirect="/">
+                <PublicRouteProtector
+                  adminRedirect="/admin"
+                  userRedirect="/app/companies"
+                >
                   <AdminSetPassword />
-                </PublicRoute>
+                </PublicRouteProtector>
               </Suspense>
             ),
           },
@@ -409,57 +434,8 @@ function App() {
         ],
       },
       // User Auth Routes
-      {
-        element: <AuthLayout />,
-        errorElement: <ErrorPage />,
-        children: [
-          {
-            path: "/auth",
-            element: (
-              <Suspense fallback={<FullPageSpinner />}>
-                <PublicRoute adminRedirect="/admin" userRedirect="/">
-                  <AuthLayout />
-                </PublicRoute>
-              </Suspense>
-            ),
-            errorElement: <ErrorPage />,
-            children: [
-              {
-                index: true,
-                element: (
-                  <Suspense fallback={<FullPageSpinner />}>
-                    <Auth />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "forget-password",
-                element: (
-                  <Suspense fallback={<FullPageSpinner />}>
-                    <ForgetPassword />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "reset-password/:verificationToken",
-                element: (
-                  <Suspense fallback={<FullPageSpinner />}>
-                    <ResetPassword />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "callback",
-                element: <OAuthCallback />,
-              },
-              {
-                path: "*",
-                element: <ErrorPage error="That auth page doesn't exist." />,
-              },
-            ],
-          },
-        ],
-      },
+      PublicRoutes,
+
       // Catch-all route
       {
         path: "*",
