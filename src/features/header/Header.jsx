@@ -47,19 +47,19 @@ export default function Header() {
 
         {/* Project Name */}
         <div className="flex items-center">
-          <h1 className="text-lg font-bold text-primary">Hirex</h1>
+          <h1 className="text-lg font-bold text-primary">TaleeX</h1>
         </div>
 
         {/* Header Links for Larger Screens */}
         <nav className="hidden md:flex ml-8 gap-4">
           <Link
-            to="/companies"
+            to="companies"
             className="text-sm font-medium text-gray-700 hover:text-primary"
           >
             Companies
           </Link>
           <Link
-            to="/jobs"
+            to="jobs"
             className="text-sm font-medium text-gray-700 hover:text-primary"
           >
             Jobs

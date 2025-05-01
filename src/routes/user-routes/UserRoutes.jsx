@@ -4,6 +4,7 @@ import Companies from "@/features/companies/Companies";
 import CompanyDetails from "@/features/companies/company-details";
 import Home from "@/features/home/Home";
 import ErrorPage from "@/pages/ErrorPage";
+import Jobs from "@/features/jobs/jobs";
 
 const AppRedirect = () => {
   return <Navigate to="/app/companies" replace />;
@@ -40,6 +41,7 @@ const UserRoutes = {
       path: "home",
       element: <Home />,
     },
+    { path: "jobs", element: <Jobs /> },
   ],
 };
 
