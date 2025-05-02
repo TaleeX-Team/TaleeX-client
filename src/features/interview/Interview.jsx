@@ -4,7 +4,6 @@ import Vapi from "@vapi-ai/web"
 import {Alert, AlertDescription} from "@/components/ui/alert"
 import {Button} from "@/components/ui/button"
 import {X, Camera} from 'lucide-react'
-import {InterviewHeader} from "@/components/interview/InterviewHeader"
 import {VideoContainer} from "@/components/interview/VideoContainer"
 import {TranscriptPanel} from "@/components/interview/TranscriptPanel"
 import {StartScreen} from "@/components/interview/StartScreen"
@@ -12,6 +11,7 @@ import {InterviewCompletedDialog} from "@/components/interview/InterviewComplete
 import {useInterviewState} from "@/hooks/useInterviewState"
 import {globalStyles} from "@/lib/globalStyles"
 import {toast} from "sonner"
+import InterviewHeader from "@/components/interview/InterviewHeader.jsx";
 
 // VAPI API configuration
 const VAPI_API_KEY = "d4ecde21-8c7d-4f5c-9996-5c2b306d9ccf"
@@ -20,10 +20,7 @@ const VAPI_ASSISTANT_ID = "a7939f6e-e04e-4bce-ac30-c6e7e35655a6"
 // Mock questions data - now more conversational
 const questions = [
     "Could you walk me through your experience with React.js? I'm particularly interested in a challenging project you've worked on.",
-    "What's been your approach when facing challenges with RESTful APIs? Can you share a specific example?",
-    "I'd like to understand your perspective on React's virtual DOM. How have you seen it impact application performance?",
-    "When it comes to optimizing HTML and CSS for performance, what strategies have you found most effective?",
-    "How do you typically manage version control in your projects? I'm curious about your Git workflow.",
+
 ]
 
 export default function Interview() {
@@ -38,6 +35,9 @@ export default function Interview() {
         isInterviewComplete,
         isInterviewStarted,
         isAITalking,
+        isUserTalking,
+        showAIUI,
+        showUserUI,
         transcript,
         messages,
         lastMessage,
@@ -47,13 +47,9 @@ export default function Interview() {
         error,
         interviewDuration,
         transcriptExpanded,
-        totalQuestionsAsked,
         conclusionDetected,
         timeRemaining,
-        nextQuestion,
-        showNextQuestion,
         lastUserResponseTime,
-        messageHistory,
         questionStates,
         currentQuestionSummary,
         lastSpeakingRole,
@@ -92,11 +88,9 @@ export default function Interview() {
     // Initialize VAPI client
     useEffect(() => {
         try {
-            // Initialize VAPI according to documentation
             vapiClientRef.current = new Vapi(VAPI_API_KEY)
             console.log("VAPI client initialized successfully")
 
-            // Set up event listeners for VAPI
             setupVapiEventListeners()
 
             return () => {
@@ -116,7 +110,7 @@ export default function Interview() {
         if (lastCapturedScreenshot) {
             toast.success(`${screenshots.length} of 3 screenshots taken`)
         }
-    }, [lastCapturedScreenshot, screenshots.length, toast])
+    }, [lastCapturedScreenshot, screenshots.length])
 
     // Setup VAPI event listeners
     const setupVapiEventListeners = () => {
@@ -136,18 +130,15 @@ export default function Interview() {
             actions.setIsLoading(false)
             actions.setIsInterviewComplete(true)
 
-            // Stop the duration timer
             if (actions.durationTimerRef?.current) {
                 clearInterval(actions.durationTimerRef.current)
             }
         })
 
-        // Speech events to track when AI is talking
         vapiClientRef.current.on("speech-start", () => {
             console.log("AI started speaking")
             actions.setIsAITalking(true)
             actions.setLastSpeakingRole("assistant")
-            // Reset AI silent time when it starts speaking
             actions.setAiSilentTime(0)
         })
 
@@ -156,31 +147,26 @@ export default function Interview() {
             actions.setIsAITalking(false)
         })
 
-        // Handle messages from VAPI
-        vapiClientRef.current.on("message", handleVapiMessage)
-
-        // Add user speech events
-        vapiClientRef.current.on("userSpeechStart", () => {
+        vapiClientRef.current.on("user-speech-start", () => {
             console.log("User started speaking")
             actions.setLastSpeakingRole("user")
             actions.setTranscript("")
         })
 
-        vapiClientRef.current.on("userSpeechEnd", () => {
+        vapiClientRef.current.on("user-speech-end", () => {
             console.log("User stopped speaking")
         })
+
+        vapiClientRef.current.on("message", handleVapiMessage)
     }
 
     // Handle messages from VAPI
     const handleVapiMessage = (msg) => {
         console.log("Received message:", msg)
 
-        // Handle transcript messages
         if (msg.type === "transcript") {
             handleTranscriptMessage(msg)
-        }
-        // Handle assistant messages
-        else if (msg.role === "assistant" && msg.content) {
+        } else if (msg.role === "assistant" && msg.content) {
             handleAssistantMessage(msg)
         }
     }
@@ -188,12 +174,10 @@ export default function Interview() {
     // Handle transcript messages
     const handleTranscriptMessage = (msg) => {
         if (msg.transcriptType === "partial") {
-            // Update live transcript
             if (msg.transcript) {
                 actions.setTranscript(msg.transcript)
             }
         } else if (msg.transcriptType === "final") {
-            // Add final transcript to messages
             if (msg.transcript && msg.transcript.trim()) {
                 const newMessage = {
                     id: Date.now().toString(),
@@ -211,7 +195,6 @@ export default function Interview() {
 
     // Handle assistant messages
     const handleAssistantMessage = (msg) => {
-        // Add the assistant message to the messages array
         const newMessage = {
             id: Date.now().toString(),
             role: "assistant",
@@ -222,40 +205,29 @@ export default function Interview() {
         actions.setIsAITalking(true)
         actions.setLastSpeakingRole("assistant")
 
-        // Check for conclusion phrases in the message
         const messageContent = msg.content.toLowerCase()
 
-        // Check if this is a conclusion message
         if (isInterviewConclusionMessage(messageContent)) {
             console.log("Detected interview conclusion message")
             actions.setConclusionDetected(true)
 
-            // Stop the call after a short delay to allow the AI to finish speaking
             setTimeout(() => {
                 if (vapiClientRef.current) {
-                    // Use say method to gracefully end the call
                     vapiClientRef.current.say(
                         "Thank you for completing all the interview questions. I'll end our call now.",
                         true,
                     )
-
-                    // Force end the call after a short delay if it doesn't end naturally
-
-                    stopVAPICall().then(r => {
-                        console.log(r, "TESTST")
+                    stopVAPICall().then(() => {
                         setIsInterviewComplete(true)
                     })
-
                 } else {
-                    stopVAPICall().then(r => {
-                        console.log(r, "TEST")
+                    stopVAPICall().then(() => {
                         setIsInterviewComplete(true)
                     })
                 }
             }, 2000)
         }
 
-        // Check if this message contains one of our questions
         detectQuestionInMessage(messageContent)
     }
 
@@ -278,24 +250,19 @@ export default function Interview() {
     const detectQuestionInMessage = (messageContent) => {
         let foundNewQuestion = false
 
-        // Check against our predefined questions
         for (let i = 0; i < questions.length; i++) {
-            // Skip the current question to avoid false positives
             if (i === currentQuestionIndex) continue
 
-            // Get the first few words of the question to use as a signature
             const questionWords = questions[i].toLowerCase().split(" ").slice(0, 6).join(" ")
 
             if (messageContent.includes(questionWords)) {
                 console.log(`Detected question ${i + 1}: ${questions[i].substring(0, 30)}...`)
                 actions.setCurrentQuestionIndex(i)
-                actions.setTotalQuestionsAsked((prev) => Math.max(prev, i + 1))
                 foundNewQuestion = true
                 break
             }
         }
 
-        // If we didn't find a new question but the message seems like it's asking something
         if (
             !foundNewQuestion &&
             !conclusionDetected &&
@@ -304,12 +271,10 @@ export default function Interview() {
                 messageContent.includes("can you") ||
                 messageContent.includes("tell me"))
         ) {
-            // Move to the next question if we haven't reached the end
             if (currentQuestionIndex < questions.length - 1) {
                 const nextIndex = currentQuestionIndex + 1
                 console.log(`Moving to next question ${nextIndex + 1}`)
                 actions.setCurrentQuestionIndex(nextIndex)
-                actions.setTotalQuestionsAsked((prev) => Math.max(prev, nextIndex + 1))
             }
         }
     }
@@ -318,7 +283,6 @@ export default function Interview() {
     useEffect(() => {
         if (currentQuestionIndex === questions.length - 1 && vapiClientRef.current && isInterviewStarted) {
             console.log("Final question detected - sending system message to AI")
-            // Inform the AI this is the final question
             vapiClientRef.current.send({
                 type: "add-message",
                 message: {
@@ -334,13 +298,9 @@ export default function Interview() {
     useEffect(() => {
         if (conclusionDetected && !isInterviewComplete) {
             console.log("Conclusion detected, interview ending soon")
-            // Small delay to ensure the AI finishes speaking
-
-            stopVAPICall().then(r => {
-                console.log(r, "TESTS@")
+            stopVAPICall().then(() => {
                 setIsInterviewComplete(true)
             })
-
         }
     }, [conclusionDetected, isInterviewComplete])
 
@@ -355,7 +315,6 @@ export default function Interview() {
                 interviewDuration={interviewDuration}
                 currentQuestionIndex={currentQuestionIndex}
                 totalQuestions={questions.length}
-                totalQuestionsAsked={totalQuestionsAsked}
                 isAudioOn={isAudioOn}
                 progress={progress}
                 timeRemaining={timeRemaining}
@@ -401,21 +360,23 @@ export default function Interview() {
                             isVideoOn={isVideoOn}
                             isAudioOn={isAudioOn}
                             isAITalking={isAITalking}
+                            isUserTalking={isUserTalking}
                             transcript={transcript}
                             callStatus={callStatus}
-                            lastSpeakingRole={lastSpeakingRole}
                             lastCapturedScreenshot={lastCapturedScreenshot}
                             screenshotCount={screenshots.length}
+                            sessionDuration={interviewDuration}
+                            interviewProgress={progress.current / progress.total}
                         />
 
                         <VideoContainer
                             isUser={false}
                             ref={aiVideoContainerRef}
                             isAITalking={isAITalking}
+                            isUserTalking={isUserTalking}
                             callStatus={callStatus}
-                            lastSpeakingRole={lastSpeakingRole}
-                            currentQuestion={displayedQuestion}
-                            nextQuestion={showNextQuestion ? nextQuestion : null}
+                            sessionDuration={interviewDuration}
+                            interviewProgress={progress.current / progress.total}
                         />
                     </div>
 
@@ -441,7 +402,7 @@ export default function Interview() {
                 onOpenChange={setIsInterviewComplete}
                 onClose={handleEndInterview}
                 interviewDuration={interviewDuration}
-                questionsAsked={totalQuestionsAsked}
+                questionsAsked={progress.current}
                 totalQuestions={questions.length}
                 screenshots={screenshots}
             />

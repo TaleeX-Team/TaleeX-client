@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Vapi from "@vapi-ai/web";
 
@@ -18,6 +18,8 @@ const INTERVIEW_DURATION_MINUTES = 20;
 const WARNING_TIME_MINUTES = 5;
 const FINAL_WARNING_MINUTES = 1;
 const RESPONSE_TIMEOUT = 10000; // 10 seconds for user response
+const SPEAKING_FALLBACK_DURATION = 3000; // 3 seconds for message-based fallback
+const SPEECH_END_TIMEOUT = 500; // 500ms timeout for speech-end
 
 export function useInterviewState(questions) {
     // State variables
@@ -29,6 +31,7 @@ export function useInterviewState(questions) {
     const [isInterviewComplete, setIsInterviewComplete] = useState(false);
     const [isInterviewStarted, setIsInterviewStarted] = useState(false);
     const [isAITalking, setIsAITalking] = useState(false);
+    const [isUserTalking, setIsUserTalking] = useState(false);
     const [transcript, setTranscript] = useState("");
     const [messages, setMessages] = useState([]);
     const [lastMessage, setLastMessage] = useState(null);
@@ -50,14 +53,13 @@ export function useInterviewState(questions) {
     const [timeRemaining, setTimeRemaining] = useState(INTERVIEW_DURATION_MINUTES * 60);
     const [timerWarningGiven, setTimerWarningGiven] = useState(false);
     const [finalWarningGiven, setFinalWarningGiven] = useState(false);
-    const [lastAssistantMessageTime, setLastAssistantMessageTime] = useState(null);
 
     // Question tracking system
     const [questionStates, setQuestionStates] = useState(
         questions.map((question, idx) => ({
             question,
             index: idx,
-            status: idx === 0 ? "current" : "pending", // "current", "pending", "completed"
+            status: idx === 0 ? "current" : "pending",
             startTime: null,
             endTime: null,
             duration: 0,
@@ -80,12 +82,14 @@ export function useInterviewState(questions) {
     const interviewTimerRef = useRef(null);
     const responseTimeoutRef = useRef(null);
     const screenshotIntervalRef = useRef(null);
+    const speechEndTimeoutRef = useRef(null);
+    const userSpeechEndTimeoutRef = useRef(null);
 
     // Initialize VAPI client
     useEffect(() => {
         if (!vapiClientRef.current && typeof Vapi !== "undefined") {
             vapiClientRef.current = new Vapi(VAPI_API_KEY);
-            if (debugMode) console.log("VAPI client initialized with API key");
+            if (debugMode) console.log("VAPI client initialized with API key", { timestamp: new Date().toISOString() });
         } else if (!Vapi) {
             setError("VAPI SDK failed to load");
         }
@@ -122,7 +126,8 @@ export function useInterviewState(questions) {
                 console.log("Question state updated:", {
                     currentQuestionIndex,
                     displayedQuestion: questions[currentQuestionIndex],
-                    progress: { current: currentQuestionIndex + 1, total: questions.length }
+                    progress: { current: currentQuestionIndex + 1, total: questions.length },
+                    timestamp: new Date().toISOString()
                 });
             }
         }
@@ -146,10 +151,21 @@ export function useInterviewState(questions) {
                         }];
                         setLastUserResponseTime(new Date());
                         setLastSpeakingRole("user");
+                        if (!isUserTalking) {
+                            setIsUserTalking(true);
+                            setIsAITalking(false);
+                            if (debugMode) console.log("User message received, isUserTalking: true, isAITalking: false", { timestamp: new Date().toISOString() });
+                            setTimeout(() => {
+                                if (isUserTalking && !isAITalking) {
+                                    setIsUserTalking(false);
+                                    if (debugMode) console.log("User talking fallback timeout, isUserTalking: false", { timestamp: new Date().toISOString() });
+                                }
+                            }, SPEAKING_FALLBACK_DURATION);
+                        }
                         if (responseTimeoutRef.current) {
                             clearTimeout(responseTimeoutRef.current);
                             responseTimeoutRef.current = null;
-                            if (debugMode) console.log("Response timeout cleared due to user response");
+                            if (debugMode) console.log("Response timeout cleared due to user response", { timestamp: new Date().toISOString() });
                         }
                     }
 
@@ -158,15 +174,25 @@ export function useInterviewState(questions) {
                             content: newLastMessage.content || "",
                             timestamp: new Date()
                         }];
-                        setLastAssistantMessageTime(new Date());
                         setLastSpeakingRole("assistant");
+                        if (!isAITalking) {
+                            setIsAITalking(true);
+                            setIsUserTalking(false);
+                            if (debugMode) console.log("Assistant message received, isAITalking: true, isUserTalking: false", { timestamp: new Date().toISOString() });
+                            setTimeout(() => {
+                                if (isAITalking && !isUserTalking) {
+                                    setIsAITalking(false);
+                                    if (debugMode) console.log("AI talking fallback timeout, isAITalking: false", { timestamp: new Date().toISOString() });
+                                }
+                            }, SPEAKING_FALLBACK_DURATION);
+                        }
                     }
 
                     return newStates;
                 });
             }
         }
-    }, [messages, currentQuestionIndex, debugMode]);
+    }, [messages, currentQuestionIndex, isAITalking, isUserTalking, debugMode]);
 
     // Setup VAPI client listeners
     useEffect(() => {
@@ -177,6 +203,9 @@ export function useInterviewState(questions) {
                     console.log("VAPI message received:", {
                         role: message.role,
                         content: messageContent,
+                        questionIndex: currentQuestionIndex,
+                        isAITalking,
+                        isUserTalking,
                         timestamp: new Date().toISOString()
                     });
                 }
@@ -184,15 +213,14 @@ export function useInterviewState(questions) {
                 setMessages(prev => [...prev, { ...message, content: messageContent }]);
 
                 if (message.role === "assistant" && messageContent.trim() === ENDING_PHRASE) {
-                    if (debugMode) console.log("Conclusion phrase detected, ending interview");
+                    if (debugMode) console.log("Conclusion phrase detected, ending interview", { questionIndex: currentQuestionIndex, timestamp: new Date().toISOString() });
                     setConclusionDetected(true);
                     endCallImmediately();
                     return;
                 }
 
-                // Improved question transition detection
+                // Question transition detection
                 if (message.role === "assistant" && messageContent) {
-                    // Match explicit transition phrases
                     const transitionMatch = messageContent.match(
                         /Moving to question\s*(\d+)|Next question\s*(\d+)|Question\s*(\d+)|Now for question\s*(\d+)/i
                     );
@@ -206,13 +234,16 @@ export function useInterviewState(questions) {
                             questionIndex < questions.length &&
                             questionIndex !== currentQuestionIndex
                         ) {
-                            if (debugMode) console.log(`Detected explicit transition to question ${questionNumber}`);
+                            if (debugMode) console.log(`Detected explicit transition to question ${questionNumber}`, { timestamp: new Date().toISOString() });
                             updateQuestionState(questionIndex);
                             return;
+                        } else if (questionIndex === currentQuestionIndex) {
+                            if (debugMode) console.log("Transition to current question ignored", { questionIndex, timestamp: new Date().toISOString() });
+                        } else {
+                            if (debugMode) console.log("Invalid question transition detected", { questionNumber, timestamp: new Date().toISOString() });
                         }
                     }
 
-                    // Fallback: Check if the message contains the next question's text
                     const nextIndex = currentQuestionIndex + 1;
                     if (nextIndex < questions.length) {
                         const nextQuestion = questions[nextIndex];
@@ -220,7 +251,7 @@ export function useInterviewState(questions) {
                             messageContent.toLowerCase().includes(`question ${nextIndex + 1}`);
 
                         if (isQuestionMatch && nextIndex !== currentQuestionIndex) {
-                            if (debugMode) console.log(`Detected question content match for question ${nextIndex + 1}`);
+                            if (debugMode) console.log(`Detected question content match for question ${nextIndex + 1}`, { timestamp: new Date().toISOString() });
                             updateQuestionState(nextIndex);
                             return;
                         }
@@ -229,7 +260,6 @@ export function useInterviewState(questions) {
             };
 
             const updateQuestionState = (newIndex) => {
-                // Clear all timers to prevent conflicts
                 clearAllTimers();
 
                 setQuestionStates(prevStates => {
@@ -260,64 +290,131 @@ export function useInterviewState(questions) {
                     console.log("Question state updated:", {
                         newQuestionIndex: newIndex,
                         question: questions[newIndex],
-                        progress: { current: newIndex + 1, total: questions.length }
+                        progress: { current: newIndex + 1, total: questions.length },
+                        timestamp: new Date().toISOString()
                     });
                 }
             };
 
             const handleSpeechStart = () => {
-                setIsAITalking(true);
-                if (responseTimeoutRef.current) {
-                    clearTimeout(responseTimeoutRef.current);
-                    responseTimeoutRef.current = null;
-                    if (debugMode) console.log("Response timeout cleared due to AI speech start");
+                if (!isAITalking) {
+                    setIsAITalking(true);
+                    setIsUserTalking(false);
+                    setLastSpeakingRole("assistant");
+                    if (responseTimeoutRef.current) {
+                        clearTimeout(responseTimeoutRef.current);
+                        responseTimeoutRef.current = null;
+                        if (debugMode) console.log("Response timeout cleared due to AI speech start", { timestamp: new Date().toISOString() });
+                    }
+                    if (debugMode) console.log("AI speech started, isAITalking: true, isUserTalking: false", { questionIndex: currentQuestionIndex, timestamp: new Date().toISOString() });
                 }
-                if (debugMode) console.log("AI speech started");
             };
 
             const handleSpeechEnd = () => {
                 setIsAITalking(false);
-                // Start timeout if interview is active
+                setLastSpeakingRole(null);
+                if (debugMode) console.log("AI speech ended, isAITalking: false", { questionIndex: currentQuestionIndex, timestamp: new Date().toISOString() });
+
+                if (speechEndTimeoutRef.current) clearTimeout(speechEndTimeoutRef.current);
+                speechEndTimeoutRef.current = setTimeout(() => {
+                    if (isAITalking) {
+                        setIsAITalking(false);
+                        if (debugMode) console.log("Forced isAITalking to false after speech-end timeout", { timestamp: new Date().toISOString() });
+                    }
+                }, SPEECH_END_TIMEOUT);
+
                 if (callStatus === CallStatus.ACTIVE) {
-                    if (debugMode) console.log(`Setting response timeout for ${RESPONSE_TIMEOUT}ms`);
+                    if (debugMode) console.log(`Setting response timeout for ${RESPONSE_TIMEOUT}ms`, { questionIndex: currentQuestionIndex, timestamp: new Date().toISOString() });
                     responseTimeoutRef.current = setTimeout(() => {
+                        if (callStatus !== CallStatus.ACTIVE) {
+                            if (debugMode) console.log("Timeout aborted due to inactive call status", { questionIndex: currentQuestionIndex, timestamp: new Date().toISOString() });
+                            return;
+                        }
+
                         const nextIndex = currentQuestionIndex + 1;
-                        if (nextIndex < questions.length && callStatus === CallStatus.ACTIVE) {
-                            if (debugMode) console.log(`No user response after ${RESPONSE_TIMEOUT}ms, moving to question ${nextIndex + 1}`);
+                        if (nextIndex < questions.length) {
+                            if (debugMode) console.log(`No user response after ${RESPONSE_TIMEOUT}ms, moving to question ${nextIndex + 1}`, { timestamp: new Date().toISOString() });
                             vapiClientRef.current.send({
                                 type: "add-message",
                                 message: {
                                     role: "system",
-                                    content: `Moving to question ${nextIndex + 1}: "${questions[nextIndex]}"`,
+                                    content: `The candidate has not responded after 10 seconds. Moving to question ${nextIndex + 1}: "${questions[nextIndex]}"`,
                                 },
                             });
                             updateQuestionState(nextIndex);
-                        } else if (callStatus === CallStatus.ACTIVE) {
-                            if (debugMode) console.log("Reached last question, ending interview");
+                        } else {
+                            if (debugMode) console.log("Reached last question, ending interview", { timestamp: new Date().toISOString() });
                             vapiClientRef.current.say(ENDING_PHRASE, true);
                         }
                     }, RESPONSE_TIMEOUT);
                 } else {
-                    if (debugMode) console.log("Response timeout not set:", { callStatus });
+                    if (debugMode) console.log("Response timeout not set due to inactive call status", { callStatus, questionIndex: currentQuestionIndex, timestamp: new Date().toISOString() });
                 }
+            };
+
+            const handleUserSpeechStart = () => {
+                if (!isUserTalking) {
+                    setIsUserTalking(true);
+                    setIsAITalking(false);
+                    setLastSpeakingRole("user");
+                    if (responseTimeoutRef.current) {
+                        clearTimeout(responseTimeoutRef.current);
+                        responseTimeoutRef.current = null;
+                        if (debugMode) console.log("Response timeout cleared due to user speech start", { timestamp: new Date().toISOString() });
+                    }
+                    if (debugMode) console.log("User speech started, isUserTalking: true, isAITalking: false", { timestamp: new Date().toISOString() });
+                }
+            };
+
+            const handleUserSpeechEnd = () => {
+                setIsUserTalking(false);
+                setLastSpeakingRole(null);
+                if (debugMode) console.log("User speech ended, isUserTalking: false", { timestamp: new Date().toISOString() });
+
+                if (userSpeechEndTimeoutRef.current) clearTimeout(userSpeechEndTimeoutRef.current);
+                userSpeechEndTimeoutRef.current = setTimeout(() => {
+                    if (isUserTalking) {
+                        setIsUserTalking(false);
+                        if (debugMode) console.log("Forced isUserTalking to false after user speech-end timeout", { timestamp: new Date().toISOString() });
+                    }
+                }, SPEECH_END_TIMEOUT);
             };
 
             const handleError = (error) => {
                 setError(`VAPI error: ${error.message || "Unknown error"}`);
-                if (debugMode) console.error("VAPI error:", error);
+                setIsAITalking(false);
+                setIsUserTalking(false);
+                if (debugMode) console.error("VAPI error, isAITalking: false, isUserTalking: false", { error, questionIndex: currentQuestionIndex, timestamp: new Date().toISOString() });
             };
 
+            if (debugMode) console.log("Registering VAPI event listeners", { timestamp: new Date().toISOString() });
             vapiClientRef.current.on("message", handleMessage);
             vapiClientRef.current.on("speech-start", handleSpeechStart);
             vapiClientRef.current.on("speech-end", handleSpeechEnd);
+            vapiClientRef.current.on("user-speech-start", handleUserSpeechStart);
+            vapiClientRef.current.on("user-speech-end", handleUserSpeechEnd);
             vapiClientRef.current.on("error", handleError);
 
             return () => {
+                if (debugMode) console.log("Cleaning up VAPI event listeners", { timestamp: new Date().toISOString() });
                 vapiClientRef.current.off("message", handleMessage);
                 vapiClientRef.current.off("speech-start", handleSpeechStart);
                 vapiClientRef.current.off("speech-end", handleSpeechEnd);
+                vapiClientRef.current.off("user-speech-start", handleUserSpeechStart);
+                vapiClientRef.current.off("user-speech-end", handleUserSpeechEnd);
                 vapiClientRef.current.off("error", handleError);
-                if (responseTimeoutRef.current) clearTimeout(responseTimeoutRef.current);
+                if (responseTimeoutRef.current) {
+                    clearTimeout(responseTimeoutRef.current);
+                    if (debugMode) console.log("Response timeout cleared on cleanup", { timestamp: new Date().toISOString() });
+                }
+                if (speechEndTimeoutRef.current) {
+                    clearTimeout(speechEndTimeoutRef.current);
+                    if (debugMode) console.log("AI speech end timeout cleared on cleanup", { timestamp: new Date().toISOString() });
+                }
+                if (userSpeechEndTimeoutRef.current) {
+                    clearTimeout(userSpeechEndTimeoutRef.current);
+                    if (debugMode) console.log("User speech end timeout cleared on cleanup", { timestamp: new Date().toISOString() });
+                }
             };
         }
     }, [vapiClientRef.current, currentQuestionIndex, questions, callStatus, debugMode]);
@@ -328,14 +425,14 @@ export function useInterviewState(questions) {
             interviewTimerRef.current = setInterval(() => {
                 setTimeRemaining(prev => {
                     const newTime = prev - 1;
-                    const canSpeak = !isAITalking && (!lastUserResponseTime || (new Date() - lastUserResponseTime) > 2000);
+                    const canSpeak = !isAITalking && !isUserTalking && (!lastUserResponseTime || (new Date() - lastUserResponseTime) > 2000);
 
                     if (newTime <= WARNING_TIME_MINUTES * 60 && !timerWarningGiven && canSpeak) {
                         vapiClientRef.current.say(
                             `We have five minutes remaining in the interview. Please continue with your response or prepare to wrap up.`
                         );
                         setTimerWarningGiven(true);
-                        if (debugMode) console.log("5-minute warning given");
+                        if (debugMode) console.log("5-minute warning given", { timestamp: new Date().toISOString() });
                     }
 
                     if (newTime <= FINAL_WARNING_MINUTES * 60 && !finalWarningGiven && canSpeak) {
@@ -343,7 +440,7 @@ export function useInterviewState(questions) {
                             `We have one minute remaining. Please conclude your current response.`
                         );
                         setFinalWarningGiven(true);
-                        if (debugMode) console.log("1-minute warning given");
+                        if (debugMode) console.log("1-minute warning given", { timestamp: new Date().toISOString() });
                     }
 
                     return newTime;
@@ -351,9 +448,12 @@ export function useInterviewState(questions) {
             }, 1000);
         }
         return () => {
-            if (interviewTimerRef.current) clearInterval(interviewTimerRef.current);
+            if (interviewTimerRef.current) {
+                clearInterval(interviewTimerRef.current);
+                if (debugMode) console.log("Interview timer cleared", { timestamp: new Date().toISOString() });
+            }
         };
-    }, [isInterviewStarted, callStatus, isAITalking, lastUserResponseTime, timerWarningGiven, finalWarningGiven, debugMode]);
+    }, [isInterviewStarted, callStatus, isAITalking, isUserTalking, lastUserResponseTime, timerWarningGiven, finalWarningGiven, debugMode]);
 
     // Capture screenshot
     const captureScreenshot = () => {
@@ -406,6 +506,7 @@ export function useInterviewState(questions) {
                     if (screenshotCount >= maxScreenshots) {
                         clearInterval(intervalId);
                         setScreenshotInterval(null);
+                        if (debugMode) console.log("Screenshot interval cleared", { timestamp: new Date().toISOString() });
                     }
                 }
             }, intervalTime);
@@ -417,9 +518,10 @@ export function useInterviewState(questions) {
             return () => {
                 clearInterval(intervalId);
                 setScreenshotInterval(null);
+                if (debugMode) console.log("Screenshot interval cleared on cleanup", { timestamp: new Date().toISOString() });
             };
         }
-    }, [isInterviewStarted, callStatus]);
+    }, [isInterviewStarted, callStatus, debugMode]);
 
     // Duration timer
     useEffect(() => {
@@ -429,9 +531,12 @@ export function useInterviewState(questions) {
             }, 1000);
         }
         return () => {
-            if (durationTimerRef.current) clearInterval(durationTimerRef.current);
+            if (durationTimerRef.current) {
+                clearInterval(durationTimerRef.current);
+                if (debugMode) console.log("Duration timer cleared", { timestamp: new Date().toISOString() });
+            }
         };
-    }, [isInterviewStarted]);
+    }, [isInterviewStarted, debugMode]);
 
     // Monitor conclusion
     useEffect(() => {
@@ -441,26 +546,38 @@ export function useInterviewState(questions) {
         }
     }, [conclusionDetected, isInterviewComplete, screenshots.length]);
 
+    // Reset isAITalking and isUserTalking when call is inactive or finished
+    useEffect(() => {
+        if (callStatus === CallStatus.INACTIVE || callStatus === CallStatus.FINISHED) {
+            setIsAITalking(false);
+            setIsUserTalking(false);
+            if (debugMode) console.log(`Call status changed to ${callStatus}, isAITalking: false, isUserTalking: false`, { timestamp: new Date().toISOString() });
+        }
+    }, [callStatus, debugMode]);
+
     // Stop VAPI call
     const stopVAPICall = async () => {
         try {
             if (!vapiClientRef.current) {
-                if (debugMode) console.warn("VAPI client is not available");
+                if (debugMode) console.warn("VAPI client is not available", { timestamp: new Date().toISOString() });
             } else if (callStatus === CallStatus.FINISHED) {
-                if (debugMode) console.log("Call already finished");
+                if (debugMode) console.log("Call already finished", { timestamp: new Date().toISOString() });
             } else {
                 await endCallImmediately();
             }
         } catch (error) {
             setIsInterviewComplete(true);
             setCallStatus(CallStatus.FINISHED);
+            setIsAITalking(false);
+            setIsUserTalking(false);
             clearAllTimers();
-            if (debugMode) console.error("Stop VAPI call error:", error);
+            if (debugMode) console.error("Stop VAPI call error:", { error, timestamp: new Date().toISOString() });
         }
     };
 
     const endCallImmediately = async () => {
         if (callStatus === CallStatus.FINISHED) {
+            if (debugMode) console.log("Call already finished, skipping end call", { timestamp: new Date().toISOString() });
             return;
         }
         try {
@@ -489,34 +606,60 @@ export function useInterviewState(questions) {
             setIsInterviewComplete(true);
             setCallStatus(CallStatus.FINISHED);
             setIsAITalking(false);
+            setIsUserTalking(false);
             setConclusionDetected(true);
             clearAllTimers();
-            if (debugMode) console.log("Interview ended");
+            if (debugMode) console.log("Interview ended, isAITalking: false, isUserTalking: false", { questionIndex: currentQuestionIndex, timestamp: new Date().toISOString() });
         } catch (error) {
             setError(`Call termination error: ${error.message}`);
             setIsInterviewComplete(true);
             setCallStatus(CallStatus.FINISHED);
+            setIsAITalking(false);
+            setIsUserTalking(false);
             clearAllTimers();
-            if (debugMode) console.error("End call error:", error);
+            if (debugMode) console.error("End call error:", { error, timestamp: new Date().toISOString() });
         }
     };
 
     const clearAllTimers = () => {
-        if (durationTimerRef.current) clearInterval(durationTimerRef.current);
-        if (responseTimeoutRef.current) clearTimeout(responseTimeoutRef.current);
-        if (screenshotIntervalRef.current) clearInterval(screenshotIntervalRef.current);
-        if (interviewTimerRef.current) clearInterval(interviewTimerRef.current);
+        if (durationTimerRef.current) {
+            clearInterval(durationTimerRef.current);
+            if (debugMode) console.log("Duration timer cleared", { timestamp: new Date().toISOString() });
+        }
+        if (responseTimeoutRef.current) {
+            clearTimeout(responseTimeoutRef.current);
+            if (debugMode) console.log("Response timeout cleared", { timestamp: new Date().toISOString() });
+        }
+        if (screenshotIntervalRef.current) {
+            clearInterval(screenshotIntervalRef.current);
+            if (debugMode) console.log("Screenshot interval cleared", { timestamp: new Date().toISOString() });
+        }
+        if (interviewTimerRef.current) {
+            clearInterval(interviewTimerRef.current);
+            if (debugMode) console.log("Interview timer cleared", { timestamp: new Date().toISOString() });
+        }
+        if (speechEndTimeoutRef.current) {
+            clearTimeout(speechEndTimeoutRef.current);
+            if (debugMode) console.log("AI speech end timeout cleared", { timestamp: new Date().toISOString() });
+        }
+        if (userSpeechEndTimeoutRef.current) {
+            clearTimeout(userSpeechEndTimeoutRef.current);
+            if (debugMode) console.log("User speech end timeout cleared", { timestamp: new Date().toISOString() });
+        }
         durationTimerRef.current = null;
         responseTimeoutRef.current = null;
         screenshotIntervalRef.current = null;
         interviewTimerRef.current = null;
+        speechEndTimeoutRef.current = null;
+        userSpeechEndTimeoutRef.current = null;
         setScreenshotInterval(null);
-        if (debugMode) console.log("All timers cleared");
+        if (debugMode) console.log("All timers cleared", { timestamp: new Date().toISOString() });
     };
 
     // Start VAPI call
     const startVAPICall = async () => {
         if (!vapiClientRef.current || callStatus === CallStatus.ACTIVE || isLoading) {
+            if (debugMode) console.log("Cannot start VAPI call", { callStatus, isLoading, timestamp: new Date().toISOString() });
             return;
         }
 
@@ -524,6 +667,8 @@ export function useInterviewState(questions) {
             setIsLoading(true);
             setError(null);
             setCallStatus(CallStatus.CONNECTING);
+            setIsAITalking(false);
+            setIsUserTalking(false);
 
             if (currentQuestionIndex === 0 && messages.length === 0) {
                 const introMessage = {
@@ -533,6 +678,8 @@ export function useInterviewState(questions) {
                     timestamp: new Date(),
                 };
                 setMessages([introMessage]);
+                setLastSpeakingRole("assistant");
+                if (debugMode) console.log("Intro message added", { timestamp: new Date().toISOString() });
             }
 
             const formattedQuestions = questions.map((q, i) => `Question ${i + 1}: ${q}`).join("\n\n");
@@ -544,6 +691,8 @@ export function useInterviewState(questions) {
                     provider: "deepgram",
                     model: "nova-2",
                     language: "en-US",
+                    keywords: [],
+                    smartFormat: false, // Disabled to reduce segmentation
                 },
                 voice: {
                     provider: "playht",
@@ -558,33 +707,38 @@ export function useInterviewState(questions) {
                             content: `You are a senior technical interviewer conducting a structured, professional interview to evaluate a candidate's technical expertise, problem-solving ability, and communication skills. Your goal is to create a realistic, engaging, and fair interview experience.
 
 **OBJECTIVES**:
-1. Ask the ${questions.length} predefined technical questions in order, one at a time.
+1. Ask the ${questions.length} predefined technical questions in order, one at a time, starting with question 1.
 2. Maintain a professional, friendly, yet firm tone.
 3. Analyze responses for accuracy, depth, clarity, and relevance.
 4. Detect evasive or off-topic responses and redirect politely with: "Could you focus on the question?"
 5. Ask follow-up questions if the response is incomplete (e.g., "Can you elaborate on X?").
-6. After receiving a satisfactory response, a declined answer, or no response after 10 seconds, explicitly announce the transition to the next question with: "Moving to question X: [question]".
+6. After receiving a response, a declined answer, or exactly 10 seconds of silence, transition to the next question by saying: "Moving to question X: [question]".
 
 **INTERVIEW GUIDELINES**:
-- **Introduction**: Greet the candidate, state the number of questions, and set expectations.
+- **Introduction**: Greet the candidate, state the number of questions, and set expectations for the interview duration.
 - **Question Delivery**:
   - Ask one question at a time, using the exact wording provided.
-  - After a response or 10 seconds of silence, announce: "Moving to question X: [question]".
-  - Wait for the candidate's response or 10 seconds of silence before moving to the next question.
+  - Wait for a response or exactly 10 seconds of silence before moving to the next question.
+  - Announce transitions with: "Moving to question X: [question]" for all questions except the last.
 - **Response Handling**:
-  - If the response is vague, redirect with: "Could you focus on the question?"
-  - If silent for >5 seconds, prompt: "Would you like me to repeat the question?"
+  - If the response is vague or off-topic, redirect with: "Could you focus on the question?"
+  - If silent for 5 seconds, prompt: "Would you like me to repeat the question?"
+  - After a response or 10 seconds of silence, move to the next question.
 - **Conclusion**:
-  - After the final question (question ${questions.length}), regardless of response, end with: "${ENDING_PHRASE}".
-  - Terminate the call immediately after the ending phrase.
+  - After asking the final question (question ${questions.length}) and receiving a response or 10 seconds of silence, say: "${ENDING_PHRASE}".
+  - Terminate the call immediately after saying the ending phrase.
+- **Timing**:
+  - Monitor silence after asking a question or finishing a follow-up.
+  - If 10 seconds of silence occur, immediately announce the next question or ending phrase.
 
 **RESTRICTIONS**:
-- Do NOT move to the next question until the candidate responds, declines to answer, or 10 seconds of silence have passed.
+- Do NOT move to the next question until a response is received, the candidate declines to answer, or exactly 10 seconds of silence have passed.
+- Do NOT end the interview until the final question is asked and the ending phrase is spoken.
 - Do NOT engage in casual conversation or answer unrelated questions.
 - Do NOT provide hints unless clarifying the current question.
 - Do NOT interrupt the candidate's response to announce time warnings.
 - ALWAYS announce question transitions with: "Moving to question X: [question]".
-- Do NOT end the interview until the final question is reached and the ending phrase is spoken.
+- NEVER terminate the call prematurely, even if the interview duration exceeds ${INTERVIEW_DURATION_MINUTES} minutes.
 
 **QUESTIONS**:
 ${formattedQuestions}
@@ -596,9 +750,20 @@ ${formattedQuestions}
                 endCallPhrases: [ENDING_PHRASE],
             };
 
+            if (debugMode) console.log("Starting VAPI call", { timestamp: new Date().toISOString() });
             await vapiClientRef.current.start(VAPI_ASSISTANT_ID, assistantOverrides);
-            setIsAITalking(true);
-            setLastSpeakingRole("assistant");
+            if (debugMode) console.log("VAPI call started successfully", { timestamp: new Date().toISOString() });
+
+            // Ensure microphone is unmuted after call starts
+            try {
+                vapiClientRef.current.setMuted(false);
+                setIsAudioOn(true);
+                if (debugMode) console.log("Microphone unmuted after call start", { timestamp: new Date().toISOString() });
+            } catch (muteError) {
+                if (debugMode) console.warn("Failed to unmute microphone", { error: muteError, timestamp: new Date().toISOString() });
+                setError(`Warning: Could not unmute microphone: ${muteError.message}`);
+            }
+
             setCallStatus(CallStatus.ACTIVE);
             setIsLoading(false);
 
@@ -613,9 +778,10 @@ ${formattedQuestions}
         } catch (error) {
             setError(`Failed to start the interview: ${error.message || "Unknown error"}`);
             setIsAITalking(false);
+            setIsUserTalking(false);
             setCallStatus(CallStatus.INACTIVE);
             setIsLoading(false);
-            if (debugMode) console.error("Start VAPI call error:", error);
+            if (debugMode) console.error("Start VAPI call error, isAITalking: false, isUserTalking: false", { error, timestamp: new Date().toISOString() });
         }
     };
 
@@ -643,6 +809,7 @@ ${formattedQuestions}
         );
 
         await startVAPICall();
+        if (debugMode) console.log("Interview started", { timestamp: new Date().toISOString() });
     };
 
     // Handle end interview
@@ -653,6 +820,7 @@ ${formattedQuestions}
             stream.getTracks().forEach((track) => track.stop());
         }
         navigate("/");
+        if (debugMode) console.log("Interview ended manually", { timestamp: new Date().toISOString() });
     };
 
     // Force next question
@@ -667,10 +835,12 @@ ${formattedQuestions}
                         content: `Moving to question ${nextIndex + 1}: "${questions[nextIndex]}"`,
                     },
                 });
+                if (debugMode) console.log("Forced next question", { nextIndex, timestamp: new Date().toISOString() });
             }
         } else {
             if (vapiClientRef.current) {
                 vapiClientRef.current.say(ENDING_PHRASE, true);
+                if (debugMode) console.log("Forced interview end on last question", { timestamp: new Date().toISOString() });
             }
         }
     };
@@ -700,7 +870,8 @@ ${formattedQuestions}
         if (vapiClientRef.current) {
             const currentMuted = vapiClientRef.current.isMuted();
             vapiClientRef.current.setMuted(!currentMuted);
-            setIsAudioOn(currentMuted);
+            setIsAudioOn(!currentMuted);
+            if (debugMode) console.log("Audio toggled", { isAudioOn: !currentMuted, timestamp: new Date().toISOString() });
         } else {
             setIsAudioOn(!isAudioOn);
         }
@@ -777,6 +948,7 @@ ${formattedQuestions}
         setCurrentQuestionIndex(0);
         setDisplayedQuestion(questions[0] || "");
         setProgress({ current: 1, total: questions.length });
+        if (debugMode) console.log("Question states reset", { timestamp: new Date().toISOString() });
     };
 
     const retryQuestion = (questionIndex) => {
@@ -820,6 +992,7 @@ ${formattedQuestions}
                         content: `Retrying question ${questionIndex + 1}: "${questions[questionIndex]}"`,
                     },
                 });
+                if (debugMode) console.log("Retrying question", { questionIndex, timestamp: new Date().toISOString() });
             }
         }
     };
@@ -874,6 +1047,7 @@ ${formattedQuestions}
             isInterviewComplete,
             isInterviewStarted,
             isAITalking,
+            isUserTalking,
             transcript,
             messages,
             lastMessage,
@@ -891,7 +1065,6 @@ ${formattedQuestions}
             lastCapturedScreenshot,
             debugMode,
             timeRemaining,
-            lastAssistantMessageTime,
             questionStates: formatQuestionStateForUI(),
             currentQuestionSummary: getCurrentQuestionSummary(),
             completedQuestionsSummary: getCompletedQuestionsSummary(),
@@ -906,6 +1079,7 @@ ${formattedQuestions}
             setIsInterviewComplete,
             setIsInterviewStarted,
             setIsAITalking,
+            setIsUserTalking,
             setTranscript,
             setMessages,
             setLastMessage,
