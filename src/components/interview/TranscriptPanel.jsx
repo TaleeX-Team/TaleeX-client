@@ -1,6 +1,6 @@
 "use client"
 
-import { forwardRef } from "react"
+import { forwardRef, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -11,6 +11,7 @@ import {
     Mic,
     Clock
 } from "lucide-react"
+import gsap from "gsap"
 
 export const TranscriptPanel = forwardRef(
     (
@@ -23,6 +24,9 @@ export const TranscriptPanel = forwardRef(
         },
         ref,
     ) => {
+        // Refs for GSAP animations
+        const messageRef = useRef(null);
+
         // Determine who is currently speaking (if anyone)
         const isSpeaking = isAITalking || (transcript && !isAITalking);
         const currentSpeaker = isAITalking ? "assistant" : "user";
@@ -36,40 +40,43 @@ export const TranscriptPanel = forwardRef(
             return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         };
 
+        // Set up GSAP animations when the message changes
+        useEffect(() => {
+            if (messageRef.current) {
+                // Animate the message coming in
+                gsap.fromTo(messageRef.current,
+                    { y: 10, opacity: 0 },
+                    { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" }
+                );
+            }
+        }, [displayMessage, transcript]);
+
+        // Animate the speaking indicator
+        useEffect(() => {
+            if (isSpeaking && messageRef.current) {
+                const speakingDots = messageRef.current.querySelectorAll('.speaking-dot');
+
+                gsap.to(speakingDots, {
+                    y: -4,
+                    stagger: 0.1,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: "sine.inOut",
+                    duration: 0.4
+                });
+            }
+        }, [isSpeaking]);
+
         return (
             <div
                 ref={ref}
-                className="w-full border-t border-border bg-gradient-to-b from-card to-background shadow-lg rounded-b-xl h-auto"
+                className="w-full border-t border-border bg-card/90 backdrop-blur-sm shadow-lg rounded-b-xl h-auto"
             >
-                <div className="flex justify-between items-center p-3 border-b border-border bg-muted/30 backdrop-blur-sm rounded-t-lg">
-                    <div className="flex items-center gap-2 font-medium">
-                        <div className="bg-primary/10 p-1.5 rounded-lg">
-                            <MessageSquare className="h-4 w-4 text-primary" />
-                        </div>
-                        <span className="text-foreground/90 font-semibold">Interview Transcript</span>
-                        {callStatus === "ACTIVE" && (
-                            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 ml-2 animate-pulse flex gap-1 items-center">
-                                <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
-                                Live
-                            </Badge>
-                        )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={toggleTranscript}
-                            className="hover:bg-destructive/10 hover:text-destructive rounded-full transition-all"
-                        >
-                            <X className="h-4 w-4" />
-                        </Button>
-                    </div>
-                </div>
-
-                <div className="transcript-body p-4">
-                    {displayMessage ? (
+                <div className="p-4 flex items-center justify-center">
+                    {displayMessage && displayMessage.content ? (
                         <div
-                            className={`rounded-xl border shadow-md transition-all duration-300 ${
+                            ref={messageRef}
+                            className={`w-full max-w-2xl rounded-xl border shadow-md transition-all duration-300 ${
                                 displayMessage.role === "assistant"
                                     ? "bg-gradient-to-br from-blue-50/80 to-indigo-50/80 dark:from-blue-950/40 dark:to-indigo-950/40 border-blue-200/70 dark:border-blue-800/70"
                                     : "bg-gradient-to-br from-emerald-50/80 to-teal-50/80 dark:from-emerald-950/40 dark:to-teal-950/40 border-emerald-200/70 dark:border-emerald-800/70"
@@ -102,21 +109,27 @@ export const TranscriptPanel = forwardRef(
                                 {/* Speaking indicator */}
                                 {isSpeaking && currentSpeaker === displayMessage.role && (
                                     <div className="speaking-indicator ml-2 flex gap-[3px] items-end h-3">
-                                        <span className={`block w-1 rounded-full animate-soundwave-1 ${
-                                            displayMessage.role === "assistant"
-                                                ? "bg-blue-500 dark:bg-blue-400"
-                                                : "bg-emerald-500 dark:bg-emerald-400"
-                                        }`}></span>
-                                        <span className={`block w-1 rounded-full animate-soundwave-2 ${
-                                            displayMessage.role === "assistant"
-                                                ? "bg-blue-500 dark:bg-blue-400"
-                                                : "bg-emerald-500 dark:bg-emerald-400"
-                                        }`}></span>
-                                        <span className={`block w-1 rounded-full animate-soundwave-3 ${
-                                            displayMessage.role === "assistant"
-                                                ? "bg-blue-500 dark:bg-blue-400"
-                                                : "bg-emerald-500 dark:bg-emerald-400"
-                                        }`}></span>
+                                        <span
+                                            className={`speaking-dot block w-1 h-2 rounded-full ${
+                                                displayMessage.role === "assistant"
+                                                    ? "bg-blue-500 dark:bg-blue-400"
+                                                    : "bg-emerald-500 dark:bg-emerald-400"
+                                            }`}
+                                        ></span>
+                                        <span
+                                            className={`speaking-dot block w-1 h-3 rounded-full ${
+                                                displayMessage.role === "assistant"
+                                                    ? "bg-blue-500 dark:bg-blue-400"
+                                                    : "bg-emerald-500 dark:bg-emerald-400"
+                                            }`}
+                                        ></span>
+                                        <span
+                                            className={`speaking-dot block w-1 h-1 rounded-full ${
+                                                displayMessage.role === "assistant"
+                                                    ? "bg-blue-500 dark:bg-blue-400"
+                                                    : "bg-emerald-500 dark:bg-emerald-400"
+                                            }`}
+                                        ></span>
                                     </div>
                                 )}
 
@@ -157,7 +170,10 @@ export const TranscriptPanel = forwardRef(
                             </div>
                         </div>
                     ) : (
-                        <div className="text-center text-muted-foreground py-8 flex flex-col items-center gap-3">
+                        <div
+                            ref={messageRef}
+                            className="text-center text-muted-foreground py-6 flex flex-col items-center gap-3"
+                        >
                             <div className="bg-muted/50 p-4 rounded-full">
                                 <MessageSquare className="h-8 w-8 opacity-50" />
                             </div>

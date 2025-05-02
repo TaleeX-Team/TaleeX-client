@@ -121,7 +121,7 @@ export default function InterviewHeader({
     };
 
     return (
-        <div className="bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 shadow-lg backdrop-blur-lg sticky top-0 py-4 px-6 z-10">
+        <div className="bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 shadow-lg backdrop-blur-lg sticky top-0 py-4 px-6 z-21">
             {/* Top section with title and controls */}
             <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-3">

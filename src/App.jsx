@@ -24,7 +24,6 @@ import {AnimatedBackground} from "./components/AnimatedBackground";
 import SetPassword from "@/features/settings/set-password/SetPassword.jsx";
 import ChangePasswordPage from "@/features/settings/change-password/ChangePasswordPage.jsx";
 import {useUser} from "@/hooks/useUser.js";
-import QuestionsPage from "@/features/interview/pages/QuestionsPage.jsx";
 import Interview from "@/features/interview/Interview.jsx";
 
 // Lazy pages
@@ -237,23 +236,16 @@ function App() {
                         path: "/",
                         element: <Home/>,
                     },
-                    {
-                        path: "questions-page",
-                        element: (
-                            <Suspense fallback={<FullPageSpinner/>}>
-                                <QuestionsPage/>
-                            </Suspense>
-                        ),
-                    },
-                    {
-                        path: "interview",
-                        element: (
-                            <Suspense fallback={<FullPageSpinner/>}>
-                                <Interview/>
-                            </Suspense>
-                        ),
-                    },
+
                 ],
+            },
+            {
+                path: "interview",
+                element: (
+                    <Suspense fallback={<FullPageSpinner/>}>
+                        <Interview/>
+                    </Suspense>
+                ),
             },
             // User settings routes
             {

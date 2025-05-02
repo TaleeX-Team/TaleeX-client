@@ -4,6 +4,8 @@ import { User, MicOff, Bot, Camera, Volume2, Sun, Moon } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import SplineComponent from "@/components/interview/3dLoading"
 import Webcam from "react-webcam"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Progress } from '@/components/ui/progress';
 
 export const VideoContainer = forwardRef(
     ({
@@ -207,15 +209,47 @@ export const VideoContainer = forwardRef(
                         </div>
 
                         {screenshotCount > 0 && (
-                            <div className={cn(
-                                "absolute top-4 left-4 px-3 py-1.5 rounded-full text-sm flex items-center space-x-2 backdrop-blur-md",
-                                isDarkMode
-                                    ? "bg-gray-800/80 text-white"
-                                    : "bg-white/80 text-gray-800"
-                            )}>
-                                <Camera className={cn("h-4 w-4 mr-1", isDarkMode ? "text-blue-300" : "text-blue-600")} />
-                                <span>{screenshotCount}/3</span>
-                            </div>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <div className={cn(
+                                            "absolute top-4 left-4 px-3 py-2 rounded-lg flex items-center gap-2",
+                                            isDarkMode
+                                                ? "bg-slate-800 text-white border border-slate-700"
+                                                : "bg-white text-slate-800 border border-slate-200 shadow-sm"
+                                        )}>
+                                            <Camera className={cn(
+                                                "h-4 w-4",
+                                                screenshotCount === 3
+                                                    ? "text-amber-500"
+                                                    : "text-blue-500"
+                                            )} />
+                                            <div className="flex flex-col">
+                                                <div className="flex items-center">
+                                                    <span className="font-medium text-sm">{screenshotCount}</span>
+                                                    <span className="text-xs text-slate-500 ml-1">/ {3}</span>
+                                                </div>
+                                                <Progress
+                                                    value={(screenshotCount / 3) * 100}
+                                                    className={cn(
+                                                        "h-1 w-16 mt-1",
+                                                        screenshotCount === 3 ? "bg-amber-100" : "bg-blue-100"
+                                                    )}
+                                                    indicatorClassName={
+                                                        screenshotCount === 3 ? "bg-amber-500" : "bg-blue-500"
+                                                    }
+                                                />
+                                            </div>
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p className="text-xs">{`${screenshotCount} of ${3} screenshots taken`}</p>
+                                        {screenshotCount === 3 && (
+                                            <p className="text-xs text-amber-500">Maximum screenshots reached</p>
+                                        )}
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
                         )}
 
                         {showScreenshotEffect && (
