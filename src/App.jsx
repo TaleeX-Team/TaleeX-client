@@ -27,6 +27,8 @@ import { useUser } from "@/hooks/useUser.js";
 import CompanyDetails from "./features/companies/company-details";
 import { useCompanies } from "./features/companies/features";
 import Companies from "./features/companies/Companies";
+import Jobs from "./features/jobs/jobs";
+import JobDetailsPage from "./features/jobs/jobDetails";
 
 // Lazy pages
 const Auth = lazy(() => import("./features/auth/Auth.jsx"));
@@ -284,6 +286,11 @@ function App() {
           {
             path: "home",
             element: <Home />,
+          },
+          { path: "jobs", element: <Jobs /> },
+          {
+            path: "jobs/:id",
+            element: <JobDetailsPage />,
           },
         ],
       },

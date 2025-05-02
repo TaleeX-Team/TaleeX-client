@@ -53,13 +53,13 @@ export default function Header() {
         {/* Header Links for Larger Screens */}
         <nav className="hidden md:flex ml-8 gap-4">
           <Link
-            to="/companies"
+            to="companies"
             className="text-sm font-medium text-gray-700 hover:text-primary"
           >
             Companies
           </Link>
           <Link
-            to="/jobs"
+            to="jobs"
             className="text-sm font-medium text-gray-700 hover:text-primary"
           >
             Jobs
