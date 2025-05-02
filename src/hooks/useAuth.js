@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { loginUser, logoutUser, registerUser } from "../services/apiAuth.js";
-import {useEffect} from "react";
+import { useEffect } from "react";
 import TokenService from "@/lib/TokenService";
 
 export const useAuth = () => {
@@ -16,7 +16,6 @@ export const useAuth = () => {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
-
 
   useEffect(() => {
     const onChange = () => {
@@ -57,14 +56,13 @@ export const useAuth = () => {
       }
       if (data.user) {
         queryClient.setQueryData(["user"], data.user);
-        localStorage.setItem("react-query-user", JSON.stringify(data.user));
+        localStorage.setItem("userId", JSON.stringify(data.user._id));
       } else {
         queryClient.invalidateQueries({ queryKey: ["user"] });
       }
       queryClient.invalidateQueries({ queryKey: ["auth"] });
 
       queryClient.invalidateQueries({ queryKey: ["companies"] });
-
     },
   });
 
@@ -82,7 +80,7 @@ export const useAuth = () => {
       TokenService.clearTokens();
       TokenService.setOAuthAuthenticated(false);
       queryClient.removeQueries({ queryKey: ["user"] });
-      localStorage.removeItem("react-query-user");
+      localStorage.removeItem("userId");
       queryClient.invalidateQueries({ queryKey: ["auth"] });
     },
   });
@@ -119,20 +117,20 @@ export const useAuth = () => {
       mutate: loginMutation.mutate,
       isLoading: loginMutation.isPending,
       isError: loginMutation.isError,
-      error: loginMutation.error
+      error: loginMutation.error,
     },
     logout: {
       mutate: logoutMutation.mutate,
       isLoading: logoutMutation.isPending,
       isError: logoutMutation.isError,
-      error: logoutMutation.error
+      error: logoutMutation.error,
     },
     register: {
       mutate: registerMutation.mutate,
       isLoading: registerMutation.isPending,
       isError: registerMutation.isError,
-      error: registerMutation.error
+      error: registerMutation.error,
     },
-    processOAuthCallback
+    processOAuthCallback,
   };
 };

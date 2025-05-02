@@ -116,16 +116,6 @@ export default function CompanyCard({ company, handleDelete }) {
   //   };
 
   // Toggle favorite status
-  const toggleFavorite = () => {
-    setIsFavorite(!isFavorite);
-
-    // Animation for favorite button
-    gsap.fromTo(
-      ".favorite-icon",
-      { scale: 0.8, rotation: -10 },
-      { scale: 1.2, rotation: 0, duration: 0.3, yoyo: true, repeat: 1 }
-    );
-  };
 
   // Format website URL for display
   const formatWebsiteUrl = (url) => {
@@ -154,28 +144,6 @@ export default function CompanyCard({ company, handleDelete }) {
       >
         {/* Actions Menu */}
         <div className="absolute top-2 right-2 flex gap-2">
-          {/* <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={toggleFavorite}
-                  className="p-1.5 rounded-full bg-background/80 hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {isFavorite ? (
-                    <Star className="h-4 w-4 text-amber-400 favorite-icon" />
-                  ) : (
-                    <StarOff className="h-4 w-4 favorite-icon" />
-                  )}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>
-                  {isFavorite ? "Remove from favorites" : "Add to favorites"}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider> */}
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button

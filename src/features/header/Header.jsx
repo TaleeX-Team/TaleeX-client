@@ -1,9 +1,4 @@
-import React from "react";
-import { Link } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
-
-import UserAvatar from "@/features/header/user-avatar/UserAvatar";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,64 +6,70 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Menu } from "lucide-react";
+import { Link } from "react-router-dom";
+import UserAvatar from "./user-avatar/UserAvatar";
+import { ThemeToggle } from "@/components/ThemeToggle";
+
 export default function Header() {
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 border-b z-20">
-      <div className="flex items-center gap-2 px-4 w-full">
-        {/* Hamburger Menu for Smaller Screens */}
-        <div className="md:hidden flex items-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="p-2 rounded-md hover:bg-gray-100">
-                <Menu className="h-6 w-6 text-gray-700" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-40">
-              <DropdownMenuItem asChild>
-                <Link
-                  to="/companies"
-                  className="text-sm font-medium text-gray-700 hover:text-primary"
+    <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-200">
+      <div className="flex items-center justify-between w-full px-4 md:px-6">
+        {/* Left Section with Logo and Mobile Menu */}
+        <div className="flex items-center gap-4">
+          {/* Hamburger Menu for Smaller Screens */}
+          <div className="md:hidden">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex h-9 w-9 items-center justify-center rounded-full bg-background hover:bg-muted transition-colors">
+                  <Menu className="h-5 w-5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48 p-2">
+                <DropdownMenuItem
+                  asChild
+                  className="flex h-9 cursor-pointer items-center rounded-md px-3 text-sm font-medium"
                 >
-                  Companies
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link
-                  to="/jobs"
-                  className="text-sm font-medium text-gray-700 hover:text-primary"
+                  <Link to="companies">Companies</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  asChild
+                  className="flex h-9 cursor-pointer items-center rounded-md px-3 text-sm font-medium"
                 >
-                  Jobs
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Separator orientation="vertical" className="ml-2 h-4" />
-        </div>
+                  <Link to="jobs">Jobs</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
-        {/* Project Name */}
-        <div className="flex items-center">
-          <h1 className="text-lg font-bold text-primary">Hirex</h1>
-        </div>
+          {/* Project Name */}
+          <div className="flex items-center">
+            <h1 className="text-xl font-bold tracking-tight">
+              <span className="text-primary">Talee</span>
+              <span className="text-foreground">x</span>
+            </h1>
+          </div>
 
-        {/* Header Links for Larger Screens */}
-        <nav className="hidden md:flex ml-8 gap-4">
-          <Link
-            to="companies"
-            className="text-sm font-medium text-gray-700 hover:text-primary"
-          >
-            Companies
-          </Link>
-          <Link
-            to="jobs"
-            className="text-sm font-medium text-gray-700 hover:text-primary"
-          >
-            Jobs
-          </Link>
-        </nav>
+          {/* Header Links for Larger Screens */}
+          <nav className="hidden md:flex items-center space-x-1">
+            <Link
+              to="companies"
+              className="px-3 py-2 text-sm font-medium rounded-md hover:bg-muted transition-colors"
+            >
+              Companies
+            </Link>
+            <Link
+              to="jobs"
+              className="px-3 py-2 text-sm font-medium rounded-md hover:bg-muted transition-colors"
+            >
+              Jobs
+            </Link>
+          </nav>
+        </div>
 
         {/* Right Section */}
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <ThemeToggle />
+          <Separator orientation="vertical" className="h-6 hidden md:block" />
           <UserAvatar />
         </div>
       </div>

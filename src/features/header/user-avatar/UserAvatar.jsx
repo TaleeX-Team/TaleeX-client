@@ -20,46 +20,46 @@ import {
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth.js";
+import { useUser } from "@/hooks/useUser";
 
 const UserAvatar = () => {
   const { logout } = useAuth();
   const [openDialog, setOpenDialog] = useState(false);
+  const { data: user } = useUser();
 
   const handleLogout = () => {
     logout.mutate();
     setOpenDialog(false);
   };
+  const getInitials = (name) => name?.charAt(0).toUpperCase() || "U"; // Fallback to 'U' if name is empty
 
   return (
-    <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <Link to="settings">
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-          </Link>
-          <Link to="/settings/billing">
-            <DropdownMenuItem>Billing</DropdownMenuItem>
-          </Link>
-          <DropdownMenuItem
-            onSelect={(e) => {
-              e.preventDefault();
-              setOpenDialog(true);
-            }}
-            className="text-red-600 focus:bg-red-100 dark:focus:bg-red-900 cursor-pointer"
-          >
-            Logout
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Avatar className="cursor-pointer ring-offset-background transition-opacity hover:opacity-80">
+          <AvatarImage src={user?.image} alt="@shadcn" />
+          <AvatarFallback>{getInitials(user?.firstName)}</AvatarFallback>
+        </Avatar>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <Link to="settings">
+          <DropdownMenuItem>Settings</DropdownMenuItem>
+        </Link>
+        <Link to="/settings/billing">
+          <DropdownMenuItem>Billing</DropdownMenuItem>
+        </Link>
+        <DropdownMenuItem
+          onSelect={(e) => {
+            e.preventDefault();
+            setOpenDialog(true);
+          }}
+          className="text-red-600 focus:bg-red-100 dark:focus:bg-red-900 cursor-pointer"
+        >
+          Logout
+        </DropdownMenuItem>
+      </DropdownMenuContent>
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogContent>
           <DialogHeader>
@@ -79,7 +79,7 @@ const UserAvatar = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+    </DropdownMenu>
   );
 };
 
