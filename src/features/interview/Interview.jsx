@@ -1,17 +1,17 @@
-import { useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import {useEffect} from "react"
+import {useNavigate} from "react-router-dom"
 import Vapi from "@vapi-ai/web"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { X, Camera } from 'lucide-react'
-import { InterviewHeader } from "@/components/interview/InterviewHeader"
-import { VideoContainer } from "@/components/interview/VideoContainer"
-import { TranscriptPanel } from "@/components/interview/TranscriptPanel"
-import { StartScreen } from "@/components/interview/StartScreen"
-import { InterviewCompletedDialog } from "@/components/interview/InterviewCompletedDialog"
-import { useInterviewState } from "@/hooks/useInterviewState"
-import { globalStyles } from "@/lib/globalStyles"
-import { toast } from "sonner"
+import {Alert, AlertDescription} from "@/components/ui/alert"
+import {Button} from "@/components/ui/button"
+import {X, Camera} from 'lucide-react'
+import {InterviewHeader} from "@/components/interview/InterviewHeader"
+import {VideoContainer} from "@/components/interview/VideoContainer"
+import {TranscriptPanel} from "@/components/interview/TranscriptPanel"
+import {StartScreen} from "@/components/interview/StartScreen"
+import {InterviewCompletedDialog} from "@/components/interview/InterviewCompletedDialog"
+import {useInterviewState} from "@/hooks/useInterviewState"
+import {globalStyles} from "@/lib/globalStyles"
+import {toast} from "sonner"
 
 // VAPI API configuration
 const VAPI_API_KEY = "d4ecde21-8c7d-4f5c-9996-5c2b306d9ccf"
@@ -27,13 +27,14 @@ const questions = [
 ]
 
 export default function Interview() {
-    const { state, actions, refs } = useInterviewState(questions)
+    const {state, actions, refs} = useInterviewState(questions)
 
     const {
         currentQuestionIndex,
         displayedQuestion,
         isVideoOn,
         isAudioOn,
+        progress,
         isInterviewComplete,
         isInterviewStarted,
         isAITalking,
@@ -48,10 +49,13 @@ export default function Interview() {
         transcriptExpanded,
         totalQuestionsAsked,
         conclusionDetected,
+        timeRemaining,
         nextQuestion,
         showNextQuestion,
         lastUserResponseTime,
         messageHistory,
+        questionStates,
+        currentQuestionSummary,
         lastSpeakingRole,
         screenshots,
         lastCapturedScreenshot,
@@ -237,14 +241,14 @@ export default function Interview() {
 
                     // Force end the call after a short delay if it doesn't end naturally
 
-                        stopVAPICall().then(r => {
-                            console.log(r,"TESTST")
-                            setIsInterviewComplete(true)
-                        })
+                    stopVAPICall().then(r => {
+                        console.log(r, "TESTST")
+                        setIsInterviewComplete(true)
+                    })
 
                 } else {
                     stopVAPICall().then(r => {
-                        console.log(r,"TEST")
+                        console.log(r, "TEST")
                         setIsInterviewComplete(true)
                     })
                 }
@@ -332,16 +336,17 @@ export default function Interview() {
             console.log("Conclusion detected, interview ending soon")
             // Small delay to ensure the AI finishes speaking
 
-                stopVAPICall().then(r => {
-                    console.log(r,"TESTS@")
-                    setIsInterviewComplete(true)
-                })
+            stopVAPICall().then(r => {
+                console.log(r, "TESTS@")
+                setIsInterviewComplete(true)
+            })
 
         }
     }, [conclusionDetected, isInterviewComplete])
 
     return (
-        <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <div
+            className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
             <style jsx>{globalStyles}</style>
 
             <InterviewHeader
@@ -352,7 +357,11 @@ export default function Interview() {
                 totalQuestions={questions.length}
                 totalQuestionsAsked={totalQuestionsAsked}
                 isAudioOn={isAudioOn}
+                progress={progress}
+                timeRemaining={timeRemaining}
                 isVideoOn={isVideoOn}
+                questionStates={questionStates}
+                currentQuestionSummary={currentQuestionSummary}
                 showTranscript={showTranscript}
                 isLoading={isLoading}
                 toggleAudio={toggleAudio}
@@ -366,7 +375,7 @@ export default function Interview() {
                     <AlertDescription className="flex justify-between items-center">
                         <span>{error}</span>
                         <Button variant="ghost" size="sm" onClick={() => setError(null)}>
-                            <X className="h-4 w-4" />
+                            <X className="h-4 w-4"/>
                         </Button>
                     </AlertDescription>
                 </Alert>
