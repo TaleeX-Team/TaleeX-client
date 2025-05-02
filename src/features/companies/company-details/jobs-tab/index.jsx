@@ -10,6 +10,7 @@ import { TabsContent } from "@radix-ui/react-tabs";
 import { Briefcase, Clock, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import AddJob from "@/features/jobs/addJob/createJob";
 const jobTypeColors = {
   "Full-time":
     "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
@@ -25,9 +26,9 @@ export default function JobsTab({ jobs }) {
       <div className="bg-card rounded-lg shadow-sm border p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold">Open Positions</h2>
-          <Button variant="outline" size="sm">
-            <Briefcase className="mr-2 h-4 w-4" /> Post a Job
-          </Button>
+          
+            <AddJob></AddJob>
+          
         </div>
 
         {

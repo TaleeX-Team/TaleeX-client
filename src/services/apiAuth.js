@@ -616,5 +616,49 @@ export const getCompanyStatistics = async () => {
         throw new Error(error.response?.data?.message || "Failed to fetch company statistics");
     }
 };
+//Jobs Functions 
+export const getAllJobs = async () => {
+    try {
+        const response = await api.get("/admin/v1/jobs");
+        return response.data;
+    } catch (error) {
+        console.error("Failed to fetch jobs:", error.response?.data || error.message);
+        throw new Error(error.response?.data?.message || "Failed to fetch jobs");
+    }
+};
+// Get job by ID
+export const getJobById = async (jobId) => {
+    try {
+        const response = await api.get(`/admin/v1/jobs/${jobId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Failed to fetch job:", error.response?.data || error.message);
+        throw new Error(error.response?.data?.message || "Failed to fetch job");
+    }
+};
+//Filter jobs with optional query parameters
+export const filterJobs = async (filters = {}) => {
+    try {
+      const params = new URLSearchParams();
+  
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && value !== "") {
+          if (Array.isArray(value)) {
+            value.forEach((val) => params.append(key, val));
+          } else {
+            params.append(key, value);
+          }
+        }
+      });
+  
+      console.log("Filtering jobs with:", Object.fromEntries(params.entries()));
+  
+      const response = await api.get("/admin/v1/jobs/filter", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to filter jobs:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || "Failed to filter jobs");
+    }
+  };
 
 export default apiClient;

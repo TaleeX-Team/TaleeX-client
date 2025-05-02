@@ -26,6 +26,7 @@ import ChangePasswordPage from "@/features/settings/change-password/ChangePasswo
 import { useUser } from "@/hooks/useUser.js";
 import CompanyDetails from "./features/companies/company-details";
 import Jobs from "./features/jobs/jobs";
+import JobDetailsPage from "./features/jobs/jobDetails";
 
 // Lazy pages
 const Auth = lazy(() => import("./features/auth/Auth.jsx"));
@@ -246,7 +247,11 @@ function App() {
             element: <CompanyDetails />,
           },
           {path:"/jobs",
-            element:<Jobs />,}
+            element:<Jobs />},
+          {
+            path: "/jobs/:id",
+            element: <JobDetailsPage />,
+          }  
         ],
       },
       // User settings routes

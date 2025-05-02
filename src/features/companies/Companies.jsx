@@ -236,9 +236,6 @@ export default function Companies() {
             </Button>
           </div>
         </div>
-        <div className="flex gap-2 m-4 md:mt-0 animate-pulse">
-            <AddJob />
-          </div>
 
         {/* Company Cards */}
         <div className="relative min-h-[300px]">
