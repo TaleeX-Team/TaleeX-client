@@ -131,29 +131,6 @@ const PublicRoute = ({
   return <>{children}</>;
 };
 
-// Regular user routes - admins should not access these
-const UserRoute = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth();
-  const { data: user, isLoading: isUserLoading } = useUser();
-  const location = useLocation();
-
-  if (isLoading || isUserLoading) return <FullPageSpinner />;
-
-  if (!isAuthenticated) {
-    return <Navigate to="/auth" replace state={{ from: location.pathname }} />;
-  }
-
-  // If admin tries to access user routes, redirect to admin dashboard
-  if (user?.role === "admin") {
-    return <Navigate to="/admin" replace />;
-  }
-
-  return <>{children}</>;
-};
-  // Otherwise, go to user home - now directly to companies
-  return <Navigate to="/app/companies" replace />;
-};
-
 // Admin routes - only admins can access
 const AdminRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -175,28 +152,6 @@ const AdminRoute = ({ children }) => {
   }
 
   return <>{children}</>;
-};
-
-const ErrorPage = ({ error }) => {
-  const location = useLocation();
-  const { data: user } = useUser();
-  const message =
-    error ?? location.state?.error ?? "We couldn't find that page.";
-
-  // Determine where "home" is based on user role
-  const homeLink = user?.role === "admin" ? "/admin" : "/";
-
-  return (
-    <BackgroundWrapper>
-      <div className="min-h-screen flex items-center justify-center flex-col gap-4">
-        <h1 className="text-2xl font-bold text-red-600">Oops!</h1>
-        <p className="text-gray-600 max-w-md text-center">{message}</p>
-        <Button asChild>
-          <a href={homeLink}>Go Home</a>
-        </Button>
-      </div>
-    </BackgroundWrapper>
-  );
 };
 
 const queryClient = new QueryClient({
@@ -233,24 +188,6 @@ const AdminLayoutWithBackground = () => (
 function App() {
   const [router] = useState(() =>
     createBrowserRouter([
-      {
-        element: (
-          <UserRoute>
-            <ProtectedLayoutWithBackground />
-          </UserRoute>
-        ),
-        errorElement: <ErrorPage />,
-        children: [
-          {
-            path: "/",
-            element: <Home />,
-          },
-          {
-            path: "/companies/:companyId",
-            element: <CompanyDetails />,
-          },
-        ],
-      },
       // Root redirect
       {
         path: "/",
@@ -313,7 +250,6 @@ function App() {
             index: true,
             element: (
               <Suspense fallback={<FullPageSpinner />}>
-                <PublicRoute adminRedirect="/admin" userRedirect="/">
                 <PublicRouteProtector
                   adminRedirect="/admin"
                   userRedirect="/app/companies"
@@ -327,7 +263,6 @@ function App() {
             path: "forgot-password",
             element: (
               <Suspense fallback={<FullPageSpinner />}>
-                <PublicRoute adminRedirect="/admin" userRedirect="/">
                 <PublicRouteProtector
                   adminRedirect="/admin"
                   userRedirect="/app/companies"
@@ -341,7 +276,6 @@ function App() {
             path: "reset-password/:verificationToken",
             element: (
               <Suspense fallback={<FullPageSpinner />}>
-                <PublicRoute adminRedirect="/admin" userRedirect="/">
                 <PublicRouteProtector
                   adminRedirect="/admin"
                   userRedirect="/app/companies"
