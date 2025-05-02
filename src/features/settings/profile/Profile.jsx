@@ -20,26 +20,33 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 // Create a schema for form validation with the new requirements
+// All fields are optional for update, but if provided must follow validation rules
 const profileSchema = z.object({
   firstName: z
     .string()
     .min(2, { message: "First name must be at least 2 characters." })
     .regex(/^[a-zA-Z\s]+$/, {
       message: "First name can only contain letters and spaces.",
-    }),
+    })
+    .optional()
+    .or(z.literal("")),
   lastName: z
     .string()
     .min(2, { message: "Last name must be at least 2 characters." })
     .regex(/^[a-zA-Z\s]+$/, {
       message: "Last name can only contain letters and spaces.",
-    }),
+    })
+    .optional()
+    .or(z.literal("")),
   phone: z
     .string()
-    .min(10, { message: "Phone number must be at least 10 digits." })
+    .min(11, { message: "Phone number must be at least 10 digits." })
     .regex(/^\+?[0-9]+$/, {
       message:
         "Phone number must contain only digits with an optional + prefix.",
-    }),
+    })
+    .optional()
+    .or(z.literal("")),
   image: z.any().optional(),
 });
 
@@ -87,11 +94,24 @@ export default function ProfilePage() {
 
   // Handle form submission
   const onSubmit = (data) => {
-    // Check if phone number is the same as the one from backend
-    if (data.phone === originalPhone) {
+    // Only check if phone number is the same as the original when a value is provided
+    if (data.phone && data.phone === originalPhone) {
       setPhoneError(
         "Please enter a different phone number than your current one."
       );
+      return;
+    }
+
+    // Filter out empty strings to avoid unnecessary updates
+    const cleanedData = Object.fromEntries(
+      Object.entries(data).filter(
+        ([_, value]) => value !== undefined && value !== "" && value !== null
+      )
+    );
+
+    // Don't submit if no changes were made
+    if (Object.keys(cleanedData).length === 0 && !data.image) {
+      toast.info("No changes to save");
       return;
     }
 
@@ -101,17 +121,18 @@ export default function ProfilePage() {
     if (data.image) {
       formData = new FormData();
       formData.append("image", data.image);
-      // Add other fields to the FormData
-      formData.append("firstName", data.firstName);
-      formData.append("lastName", data.lastName);
-      formData.append("phone", data.phone || "");
+
+      // Add other fields to the FormData only if they have values
+      if (data.firstName) formData.append("firstName", data.firstName);
+      if (data.lastName) formData.append("lastName", data.lastName);
+      if (data.phone) formData.append("phone", data.phone);
     }
 
     // Use the mutation to update the user
     updateUserMutation.mutate(
       {
         userId: user?._id,
-        userData: formData || data,
+        userData: formData || cleanedData,
       },
       {
         onSuccess: () => {
@@ -135,7 +156,8 @@ export default function ProfilePage() {
   // Handle phone input changes to clear custom error
   const handlePhoneChange = (e) => {
     form.setValue("phone", e.target.value);
-    if (e.target.value !== originalPhone) {
+    // Only check against original phone if there's a value
+    if (!e.target.value || e.target.value !== originalPhone) {
       setPhoneError("");
     }
   };
@@ -163,7 +185,7 @@ export default function ProfilePage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 pt-10">
-            <div className="flex flex-col md:flex-row gap-6 items-start">
+            <div className="flex flex-col md:flex-row gap-6 ">
               <div className="flex flex-col items-center space-y-2">
                 <div className="relative">
                   <Avatar className="w-24 h-24 border-2 border-muted">
@@ -314,4 +336,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-//
