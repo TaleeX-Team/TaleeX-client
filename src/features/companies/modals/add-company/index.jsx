@@ -265,7 +265,15 @@ export default function AddCompany() {
           <Plus className="mr-2 h-4 w-4" /> Add Company
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+      <DialogContent
+        className="sm:max-w-[600px] p-0 overflow-y-auto scrollbar-none"
+        style={{
+          overscrollBehavior: "contain",
+          maxHeight: "90vh",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
         <div ref={formContainerRef}>
           <DialogHeader className="p-6 pb-2">
             <div className="flex items-center gap-2 mb-2">
