@@ -26,6 +26,7 @@ import UserRoutes from "./routes/user-routes/UserRoutes";
 import PublicRoutes from "./routes/public-routes/PublicRoutes";
 import AdminRoutes from "./routes/admin-routes/AdminRoutes";
 import ErrorPage from "./pages/ErrorPage";
+import Interview from "./features/interview/Interview";
 
 // Lazy pages
 
@@ -180,7 +181,14 @@ function App() {
       AdminRoutes,
       // User Auth Routes
       PublicRoutes,
-
+      {
+        path: "interview",
+        element: (
+          <Suspense fallback={<FullPageSpinner />}>
+            <Interview />
+          </Suspense>
+        ),
+      },
       // Catch-all route
       {
         path: "*",
