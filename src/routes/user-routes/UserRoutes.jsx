@@ -17,6 +17,9 @@ import SetPassword from "@/features/settings/set-password/SetPassword";
 import ChangePasswordPage from "@/features/settings/change-password/ChangePasswordPage";
 import JobApplicationPage from "@/features/jobs/form/JobApplicationPage.jsx";
 import JobApplicationManager from "@/features/jobs/applications/applicants-tab.jsx";
+import CVFeedbackPage from "@/features/feedback/cv-feedback";
+import BehavioralFeedbackPage from "@/features/feedback/behavioral-feedback";
+import TechnicalFeedbackPage from "@/features/feedback/final-feedback";
 
 const AppRedirect = () => {
     return <Navigate to="/app/companies" replace/>;
@@ -57,6 +60,20 @@ const UserRoutes = {
         {
             path: "jobs/:id",
             element: <JobApplicationManager/>,
+        },
+        //feedBack 
+        {
+          path: "cv-feedback",
+          element:<CVFeedbackPage/>,
+        },
+        {
+          path: "behavioral-feedback",
+          element:<BehavioralFeedbackPage/>,
+        },
+        {
+          path: "Final-feedback",
+          element:<TechnicalFeedbackPage/>,
+
         },
 
         {
