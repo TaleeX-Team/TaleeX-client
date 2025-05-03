@@ -59,7 +59,7 @@ export default function Companies() {
     <div className="bg-background p-4 md:p-8 min-h-screen">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 bg-gradient-to-r from-background to-muted/50 p-4 md:p-6 rounded-xl shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mt-6 mb-12  rounded-xl">
           <div className="flex items-center">
             <div className="bg-primary/10 p-3 rounded-lg mr-4 hidden sm:flex">
               <Building2 className="h-8 w-8 text-primary" />

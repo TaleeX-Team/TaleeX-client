@@ -15,14 +15,12 @@ export function ThemeToggle() {
             className="relative theme-toggle-glass transition-colors duration-300 hover:bg-accent dark:hover:bg-accent/30"
         >
             <Sun
-                className={`absolute h-5 w-5 transition-transform duration-300 ease-in-out text-primary ${
-                    isDark ? "rotate-90 scale-0" : "rotate-0 scale-100"
-                }`}
+                className={`absolute h-5 w-5 transition-transform duration-300 ease-in-out text-primary ${isDark ? "rotate-0 scale-100" : "rotate-90 scale-0"
+                    }`}
             />
             <Moon
-                className={`absolute h-5 w-5 transition-transform duration-300 ease-in-out text-primary ${
-                    isDark ? "rotate-0 scale-100" : "-rotate-90 scale-0"
-                }`}
+                className={`absolute h-5 w-5 transition-transform duration-300 ease-in-out text-primary ${isDark ? "-rotate-90 scale-0" : "rotate-0 scale-100"
+                    }`}
             />
             <span className="sr-only">Toggle theme</span>
         </Button>

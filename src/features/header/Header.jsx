@@ -44,8 +44,8 @@ export default function Header() {
           {/* Project Name */}
           <div className="flex items-center">
             <h1 className="text-xl font-bold tracking-tight">
-              <span className="text-primary">Talee</span>
-              <span className="text-foreground">x</span>
+              <span className="text-foreground">Talee</span>
+              <span className="text-primary">x</span>
             </h1>
           </div>
 
