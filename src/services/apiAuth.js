@@ -749,4 +749,19 @@ export const shareJobOnLinkedIn = async (jobId) => {
 }
 
 
+export const getInterviewHeaderInfo = async (interviewId) => {
+  const response = await apiClient.get(
+      `https://hirex-production.up.railway.app/api/v1/interviews/${interviewId}`,
+  );
+  return response.data;
+}
+export const getInterviewQuestions = async (interviewId) => {
+  const response = await apiClient.get(
+      `https://hirex-production.up.railway.app/api/v1/interviews/${interviewId}/start`,
+  );
+  return response.data;
+}
+
+ // Assuming this returns questions or related data
+
 export default apiClient;

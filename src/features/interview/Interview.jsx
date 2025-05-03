@@ -1,5 +1,5 @@
 import {useEffect} from "react"
-import {useNavigate} from "react-router-dom"
+import {useNavigate, useParams} from "react-router-dom"
 import Vapi from "@vapi-ai/web"
 import {Alert, AlertDescription} from "@/components/ui/alert"
 import {Button} from "@/components/ui/button"
@@ -12,6 +12,7 @@ import {useInterviewState} from "@/hooks/useInterviewState"
 import {globalStyles} from "@/lib/globalStyles"
 import {toast} from "sonner"
 import InterviewHeader from "@/components/interview/InterviewHeader.jsx";
+import {useInterviewData, useStartInterview} from "@/hooks/useInterviewData.js";
 
 // VAPI API configuration
 const VAPI_API_KEY = "d4ecde21-8c7d-4f5c-9996-5c2b306d9ccf"
@@ -25,6 +26,12 @@ const questions = [
 
 export default function Interview() {
     const {state, actions, refs} = useInterviewState(questions)
+    const { interviewId } = useParams();
+    const { interviewHeaderData, isLoadingInterview, errorInterview } = useInterviewData(interviewId);
+    const { mutate: startInterview, data: questionsData, isPending: isStarting, error: startError } = useStartInterview(interviewId);
+    const handleStartInterview = () => {
+        startInterview();
+    };
 
     const {
         currentQuestionIndex,
@@ -342,9 +349,11 @@ export default function Interview() {
 
             {!isInterviewStarted ? (
                 <StartScreen
+                    interviewHeaderData={interviewHeaderData}
                     isVideoOn={isVideoOn}
                     isAudioOn={isAudioOn}
-                    isLoading={isLoading}
+                    isLoading={isLoadingInterview}
+                    errorInterview={errorInterview}
                     totalQuestions={questions.length}
                     setIsVideoOn={setIsVideoOn}
                     setIsAudioOn={setIsAudioOn}

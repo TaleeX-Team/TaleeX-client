@@ -24,6 +24,16 @@ export const getNonRejectedCompanies = async () => {
   }
 };
 
+export const acceptJobInvitation = async ({ applicationId, newJobId }) => {
+  const response = await apiClient.get(
+      `/applications/accept`,
+      {
+        params: { applicationId, newJobId },
+      }
+  );
+  return response.data;
+};
+
 // For creating a new company
 export const createCompany = async (companyData) => {
   try {

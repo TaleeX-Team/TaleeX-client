@@ -51,7 +51,7 @@ export default function JobApplicationPage() {
             <JobDetails job={jobData} />
 
             {/* Show warning for pending jobs */}
-            {jobData.status === "pending" && (
+            {jobData.company.verification.status === "pending" && (
                 <Alert className="my-6 bg-amber-50 border-amber-200">
                     <AlertCircle className="h-4 w-4 text-amber-600" />
                     <AlertTitle className="text-amber-800">Job Pending Review</AlertTitle>

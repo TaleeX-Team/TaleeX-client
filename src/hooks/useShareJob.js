@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query"
 import { shareJobOnLinkedIn } from "@/services/apiAuth.js"
 import { toast } from "sonner"
+import {acceptJobInvitation} from "@/services/apiCompanies.js";
 
 export function useShareJob() {
     const { mutateAsync: shareOnLinkedIn, isPending: isSharing } = useMutation({
@@ -22,3 +23,9 @@ export function useShareJob() {
         isSharing,
     }
 }
+
+export const useAcceptJobInvitation = () => {
+    return useMutation({
+        mutationFn: acceptJobInvitation,
+    });
+};
