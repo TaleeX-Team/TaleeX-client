@@ -56,11 +56,13 @@ const formSchema = z.object({
 
   tags: z.array(z.string()).optional(),
 
-  salary: z.object({
-    min: z.string().optional(),
-    max: z.string().optional(),
-    currency: z.enum(["USD", "EUR", "SAR",  "AED","KWD", "EGP"]).optional(),
-  }).optional(),
+  salary: z
+  .object({
+    min: z.coerce.number().min(0, { message: "Minimum salary is required" }),
+    max: z.coerce.number().min(0, { message: "Maximum salary is required" }),
+    currency: z.enum(["USD", "EUR", "SAR", "AED", "KWD", "EGP"]).optional(),
+  })
+  .optional(),
 //optianal
   hiringTarget: z.string().optional(),
 });

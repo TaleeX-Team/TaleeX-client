@@ -62,7 +62,7 @@ export default function CVFeedbackPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-4xl space-y-6 py-8">
+      <div className="w-full max-w-6xl space-y-6 py-8">
         <h1 className="text-3xl font-bold mb-6 text-center">CV Evaluation Results</h1>
 
         <Card>

@@ -12,7 +12,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { X, Search, Filter, Briefcase, Building, Calendar, DollarSign, Tag } from "lucide-react"
 import { format } from "date-fns"
-import { Slider } from "@/components/ui/slider"
+// import { Slider } from "@/components/ui/slider"
 import {
   Popover,
   PopoverContent,

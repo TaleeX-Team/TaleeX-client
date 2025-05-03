@@ -307,14 +307,17 @@ export default function JobDetailsPage() {
                         </div>
                     )}
 
-                    {salary && (
-                        <div className="flex items-start">
-                          <DollarSign className="w-4 h-4 mr-3 text-indigo-400 mt-0.5 flex-shrink-0" />
-                          <span className="text-gray-200">
-                        {salary.currency} {salary.min.toLocaleString()} - {salary.max.toLocaleString()}
-                      </span>
-                        </div>
-                    )}
+{salary?.min != null && salary?.max != null && (
+  <div className="flex items-center gap-2">
+    <div className="p-1.5 rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+      <DollarSign className="h-3.5 w-3.5" />
+    </div>
+    <span className="text-slate-700 dark:text-slate-300 font-medium">
+      {salary.currency || "USD"} {Number(salary.min).toLocaleString()} - {Number(salary.max).toLocaleString()}
+    </span>
+  </div>
+)}
+
                   </div>
 
                   <Separator className="bg-zinc-800" />
