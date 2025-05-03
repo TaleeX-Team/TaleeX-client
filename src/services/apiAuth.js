@@ -374,7 +374,7 @@ export const sendVerificationEmail = async (email) => {
     formData.append("email", email);
 
     const response = await api.post(
-      "/auth/send-verification-code",
+      "/auth/request-email-verification",
       formData.toString(),
       {
         headers: {
@@ -671,5 +671,82 @@ export const getCompanyStatistics = async () => {
     );
   }
 };
+
+export const getJobApplicationForm = async (jobId) => {
+  try {
+    console.log(`Fetching application form for job: ${jobId}`)
+    const response = await api.get(`/jobs/${jobId}/applications/form`)
+    return response.data
+  } catch (error) {
+    console.error("Failed to fetch job application details:", error.response?.data || error.message)
+
+    if (error.response) {
+      const { status, data } = error.response
+      if (data.message) {
+        throw new Error(data.message)
+      }
+    }
+
+    if (error.message === "Network Error") {
+      throw new Error("Unable to connect to the server. Please check your internet connection.")
+    }
+
+    throw new Error(error.message || "Failed to fetch job application details")
+  }
+}
+
+// Submit job application
+export const submitJobApplication = async (jobId, applicationData) => {
+  try {
+    console.log(`Submitting application for job: ${jobId}`)
+
+    // Ensure we're using the correct content type for file uploads
+    const response = await api.post(`/jobs/${jobId}/applications/apply`, applicationData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+
+    console.log("Application submitted successfully:", response.status)
+    return response.data
+  } catch (error) {
+    console.error("Application submission failed:", error.response?.data || error.message)
+
+    if (error.response) {
+      const { status, data } = error.response
+      if (status === 400 && data.errors) {
+        throw new Error(Object.values(data.errors).join(", "))
+      }
+      if (data.message) {
+        throw new Error(data.message)
+      }
+    }
+
+    if (error.message === "Network Error") {
+      throw new Error("Unable to connect to the server. Please check your internet connection.")
+    }
+
+    throw new Error(error.message || "An unexpected error occurred when submitting your application.")
+  }
+}
+export const shareJobOnLinkedIn = async (jobId) => {
+  try {
+    console.log(`Sharing job ${jobId} on LinkedIn`)
+    const response = await api.get(`/jobs/${jobId}/share/linkedin`)
+    return response.data
+  } catch (error) {
+    console.error("Failed to share job on LinkedIn:", error.response?.data || error.message)
+
+    if (error.response) {
+      const { data } = error.response
+      if (data.message) {
+        throw new Error(data.message)
+      }
+    }
+
+    throw new Error("Failed to share job on LinkedIn")
+  }
+}
+
 
 export default apiClient;

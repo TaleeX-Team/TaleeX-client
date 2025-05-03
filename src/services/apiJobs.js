@@ -67,25 +67,30 @@ export const deleteJob = async (id) => {
 };
 
 // 🔹 Filter jobs (for authenticated user)
-export const filterJobs = async (filters = {}) => {
+export async function filterJobs(filters = {}) {
   try {
-    console.log("Filtering jobs with filters:", filters);
     const params = new URLSearchParams();
 
+    // Add each filter to the params
     Object.entries(filters).forEach(([key, value]) => {
-      if (value !== null && value !== undefined && value !== "") {
+      // Handle arrays (like tags)
+      if (Array.isArray(value)) {
+        value.forEach(item => params.append(key, item));
+      } else {
         params.append(key, value);
       }
     });
 
-    const response = await apiClient.get("/jobs/filter", { params });
-    console.log("Jobs filtered successfully:", response.data);
-    return response.data || { jobs: [] };
+    // Log the request for debugging
+    console.log("Filtering jobs with params:", Object.fromEntries(params.entries()));
+
+    const response = await apiClient.get(`/jobs/filter`, { params });
+    return response.data;
   } catch (error) {
-    console.error("Failed to filter jobs:", error.response?.data || error.message);
+    console.error("API Error:", error);
     throw new Error(error.response?.data?.message || "Failed to filter jobs");
   }
-};
+}
 
 //  Share job to LinkedIn
 export const shareJobToLinkedIn = async (id) => {
