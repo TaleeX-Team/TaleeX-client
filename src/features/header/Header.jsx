@@ -45,7 +45,7 @@ export default function Header() {
           <div className="flex items-center">
             <h1 className="text-xl font-bold tracking-tight">
               <span className="text-foreground">Talee</span>
-              <span className="text-primary">x</span>
+              <span className="text-primary">X</span>
             </h1>
           </div>
 
