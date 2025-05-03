@@ -1,17 +1,19 @@
 import { useState } from "react";
-
 import { Button } from "@/components/ui/button";
-
 import { ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import JobOverview from "../jobDetails";
-
-import { RejectedApplicantsTab } from "./rejected-applicants-tab.jsx";
 import { ApplicantsTab } from "./current-applicants-tab.jsx";
-import {JobDetails} from "@/features/jobs/form/components/JobDetails.jsx";
+import { RejectedApplicantsTab } from "./rejected-applicants-tab.jsx";
+import { AllApplicantsTab } from "./all-applicants-tab.jsx";
 import JobDetailsPage from "../jobDetails";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
+import {
+  getJobApplications,
+  advanceToCVReview,
+} from "@/services/apiApplications";
 
-// Define the applicant type
+// Define the application phases
 const PHASES = [
   "Applications",
   "CV Review",
@@ -20,249 +22,88 @@ const PHASES = [
   "Final Feedback",
 ];
 
-// Generate a unique ID
+// Generate a unique ID for client-side operations
 const generateId = () => Math.random().toString(36).substring(2, 9);
-
-// Create dummy applicants data
-const applicantsData = [
-  {
-    id: generateId(),
-    name: "Tommy T.",
-    email: "tommy@example.com",
-    applied: "May 1, 2023",
-    atPhaseSince: "May 1, 2023",
-    assignee: null,
-    score: 3,
-    phase: "Applications",
-    rejected: false,
-  },
-  {
-    id: generateId(),
-    name: "Michael O.",
-    email: "michael@example.com",
-    applied: "Apr 26, 2023",
-    atPhaseSince: "Apr 30, 2023",
-    assignee: "Susan Hayden",
-    score: 5,
-    phase: "Applications",
-    rejected: false,
-  },
-  {
-    id: generateId(),
-    name: "Olivia C.",
-    email: "olivia@example.com",
-    applied: "Apr 20, 2023",
-    atPhaseSince: "Apr 20, 2023",
-    assignee: "Ron Weasley",
-    score: 1,
-    phase: "Applications",
-    rejected: false,
-  },
-  {
-    id: generateId(),
-    name: "Ryan P.",
-    email: "ryan@example.com",
-    applied: "Apr 15, 2023",
-    atPhaseSince: "Apr 16, 2023",
-    assignee: null,
-    score: 4,
-    phase: "Applications",
-    rejected: false,
-  },
-  {
-    id: generateId(),
-    name: "Sophia M.",
-    email: "sophia@example.com",
-    applied: "Apr 10, 2023",
-    atPhaseSince: "Apr 12, 2023",
-    assignee: null,
-    score: 3,
-    phase: "Applications",
-    rejected: false,
-  },
-  {
-    id: generateId(),
-    name: "Grace B.",
-    email: "grace@example.com",
-    applied: "Apr 5, 2023",
-    atPhaseSince: "Apr 7, 2023",
-    assignee: null,
-    score: 2,
-    phase: "CV Review",
-    rejected: false,
-  },
-  {
-    id: generateId(),
-    name: "Arthur M.",
-    email: "arthur@example.com",
-    applied: "Apr 1, 2023",
-    atPhaseSince: "Apr 3, 2023",
-    assignee: null,
-    score: 3,
-    phase: "CV Review",
-    rejected: false,
-  },
-  {
-    id: generateId(),
-    name: "Emma W.",
-    email: "emma@example.com",
-    applied: "Mar 28, 2023",
-    atPhaseSince: "Mar 30, 2023",
-    assignee: "Susan Hayden",
-    score: 4,
-    phase: "CV Review",
-    rejected: false,
-  },
-  {
-    id: generateId(),
-    name: "Daniel K.",
-    email: "daniel@example.com",
-    applied: "Mar 25, 2023",
-    atPhaseSince: "Mar 27, 2023",
-    assignee: "Ron Weasley",
-    score: 5,
-    phase: "Pending Interview",
-    rejected: false,
-  },
-  {
-    id: generateId(),
-    name: "Ava J.",
-    email: "ava@example.com",
-    applied: "Mar 20, 2023",
-    atPhaseSince: "Mar 22, 2023",
-    assignee: null,
-    score: 4,
-    phase: "Pending Interview",
-    rejected: false,
-  },
-  {
-    id: generateId(),
-    name: "Noah S.",
-    email: "noah@example.com",
-    applied: "Mar 15, 2023",
-    atPhaseSince: "Mar 18, 2023",
-    assignee: "Susan Hayden",
-    score: 3,
-    phase: "Pending Interview",
-    rejected: false,
-  },
-  {
-    id: generateId(),
-    name: "Isabella R.",
-    email: "isabella@example.com",
-    applied: "Mar 10, 2023",
-    atPhaseSince: "Mar 12, 2023",
-    assignee: "Ron Weasley",
-    score: 4,
-    phase: "Pending Interview",
-    rejected: false,
-  },
-  {
-    id: generateId(),
-    name: "Liam T.",
-    email: "liam@example.com",
-    applied: "Mar 5, 2023",
-    atPhaseSince: "Mar 8, 2023",
-    assignee: "Susan Hayden",
-    score: 5,
-    phase: "Interview Feedback",
-    rejected: false,
-  },
-  {
-    id: generateId(),
-    name: "Charlotte D.",
-    email: "charlotte@example.com",
-    applied: "Mar 1, 2023",
-    atPhaseSince: "Mar 3, 2023",
-    assignee: null,
-    score: 4,
-    phase: "Interview Feedback",
-    rejected: false,
-  },
-  {
-    id: generateId(),
-    name: "Ethan H.",
-    email: "ethan@example.com",
-    applied: "Feb 25, 2023",
-    atPhaseSince: "Feb 28, 2023",
-    assignee: "Ron Weasley",
-    score: 3,
-    phase: "Final Feedback",
-    rejected: false,
-  },
-  {
-    id: generateId(),
-    name: "Amelia G.",
-    email: "amelia@example.com",
-    applied: "Feb 20, 2023",
-    atPhaseSince: "Feb 22, 2023",
-    assignee: "Susan Hayden",
-    score: 5,
-    phase: "Final Feedback",
-    rejected: false,
-  },
-  {
-    id: generateId(),
-    name: "Benjamin F.",
-    email: "benjamin@example.com",
-    applied: "Feb 15, 2023",
-    atPhaseSince: "Feb 18, 2023",
-    assignee: null,
-    score: 2,
-    phase: "Applications",
-    rejected: true,
-    rejectedOn: "Feb 20, 2023",
-    rejectedBy: "Susan Hayden",
-  },
-  {
-    id: generateId(),
-    name: "Mia E.",
-    email: "mia@example.com",
-    applied: "Feb 10, 2023",
-    atPhaseSince: "Feb 12, 2023",
-    assignee: "Ron Weasley",
-    score: 1,
-    phase: "CV Review",
-    rejected: true,
-    rejectedOn: "Feb 15, 2023",
-    rejectedBy: "Ron Weasley",
-  },
-  {
-    id: generateId(),
-    name: "James D.",
-    email: "james@example.com",
-    applied: "Feb 5, 2023",
-    atPhaseSince: "Feb 8, 2023",
-    assignee: "Susan Hayden",
-    score: 2,
-    phase: "Pending Interview",
-    rejected: true,
-    rejectedOn: "Feb 10, 2023",
-    rejectedBy: "Susan Hayden",
-  },
-  {
-    id: generateId(),
-    name: "Evelyn C.",
-    email: "evelyn@example.com",
-    applied: "Feb 1, 2023",
-    atPhaseSince: "Feb 3, 2023",
-    assignee: null,
-    score: 3,
-    phase: "Interview Feedback",
-    rejected: true,
-    rejectedOn: "Feb 5, 2023",
-    rejectedBy: "Ron Weasley",
-  },
-];
 
 export default function JobApplicationManager() {
   const [activeTab, setActiveTab] = useState("overview");
-  const [applicants, setApplicants] = useState(applicantsData);
   const [selectedApplicants, setSelectedApplicants] = useState([]);
   const [activePhase, setActivePhase] = useState("Applications");
   const [searchQuery, setSearchQuery] = useState("");
+  const { id } = useParams();
+  const queryClient = useQueryClient();
 
-  // Filter applicants based on active phase and rejected status
+  // Fetch job applications using react-query
+  const {
+    data: applicantsData,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["job/applicants", id],
+    queryFn: () => getJobApplications(id),
+    enabled: !!id,
+  });
+
+  // Mutation for advancing applications to CV Review
+  const advanceToCVReviewMutation = useMutation({
+    mutationFn: ({ jobId, applicationIds }) =>
+      advanceToCVReview(jobId, applicationIds),
+    onSuccess: (response, { applicationIds }) => {
+      // Update query data only after successful backend response
+      queryClient.setQueryData(["job/applicants", id], (old) => {
+        if (!old || !old.applications) return old;
+        return {
+          ...old,
+          applications: old.applications.map((app) =>
+            applicationIds.includes(app._id)
+              ? {
+                  ...app,
+                  stage: "cv review",
+                  updatedAt: new Date().toISOString(),
+                }
+              : app
+          ),
+        };
+      });
+      // Clear selected applicants
+      setSelectedApplicants([]);
+      // Invalidate to ensure data consistency
+      queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
+    },
+    onError: (err) => {
+      console.error(
+        "Failed to advance applications to CV review:",
+        err.message
+      );
+    },
+  });
+
+  // Map fetched data to match component's expected structure
+  const applicants =
+    applicantsData?.applications?.map((app) => ({
+      id: app._id || generateId(),
+      name: app.name,
+      email: app.email,
+      applied: app.createdAt,
+      assignee: app.group?.[0] || null,
+      score: null,
+      phase:
+        app.stage === "applied"
+          ? "Applications"
+          : app.stage === "cv review"
+          ? "CV Review"
+          : app.stage,
+      rejected: app.stage === "rejected",
+      rejectedOn: app.stage === "rejected" ? app.createdAt : null,
+      rejectedBy: app.stage === "rejected" ? app.group?.[0] || null : null,
+      notes: app.notes,
+      linkedIn: app.linkedIn,
+      feedback: app.feedback,
+      cvUrl: app.cv.file.url,
+    })) || [];
+
+  // Filter applicants based on active tab, phase, and search query
   const filteredApplicants = applicants.filter((applicant) => {
     const matchesSearch =
       searchQuery === "" ||
@@ -275,6 +116,8 @@ export default function JobApplicationManager() {
       );
     } else if (activeTab === "rejected") {
       return applicant.rejected && matchesSearch;
+    } else if (activeTab === "all") {
+      return matchesSearch; // Show all applicants, regardless of phase or rejection
     }
     return matchesSearch;
   });
@@ -287,56 +130,37 @@ export default function JobApplicationManager() {
     return acc;
   }, {});
 
-  // Handle moving applicants to the next phase
-  const moveToNextPhase = () => {
+  // Handle moving applicants to CV Review
+  const moveToCVReview = () => {
     if (selectedApplicants.length === 0) return;
-
-    const currentPhaseIndex = PHASES.indexOf(activePhase);
-    if (currentPhaseIndex >= PHASES.length - 1) return;
-
-    const nextPhase = PHASES[currentPhaseIndex + 1];
-
-    setApplicants((prev) =>
-      prev.map((applicant) =>
-        selectedApplicants.includes(applicant.id)
-          ? {
-              ...applicant,
-              phase: nextPhase,
-              atPhaseSince: new Date().toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              }),
-            }
-          : applicant
-      )
-    );
-
-    setSelectedApplicants([]);
+    advanceToCVReviewMutation.mutate({
+      jobId: id,
+      applicationIds: selectedApplicants,
+    });
   };
 
-  // Handle rejecting applicants
+  // Handle rejecting applicants (client-side, no backend API assumed)
   const rejectApplicants = () => {
     if (selectedApplicants.length === 0) return;
 
-    setApplicants((prev) =>
-      prev.map((applicant) =>
-        selectedApplicants.includes(applicant.id)
-          ? {
-              ...applicant,
-              rejected: true,
-              rejectedOn: new Date().toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              }),
-              rejectedBy: "Current User",
-            }
-          : applicant
-      )
-    );
+    queryClient.setQueryData(["job/applicants", id], (old) => {
+      if (!old || !old.applications) return old;
+      return {
+        ...old,
+        applications: old.applications.map((app) =>
+          selectedApplicants.includes(app._id)
+            ? {
+                ...app,
+                stage: "rejected",
+                updatedAt: new Date().toISOString(),
+              }
+            : app
+        ),
+      };
+    });
 
     setSelectedApplicants([]);
+    queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
   };
 
   // Handle selecting all applicants
@@ -358,6 +182,45 @@ export default function JobApplicationManager() {
       );
     }
   };
+
+  // Render loading skeleton
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-6 dark:text-gray-200">
+        {/* Header Skeleton */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="h-9 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+          </div>
+        </div>
+
+        {/* Tabs Skeleton */}
+        <div className="w-full">
+          <div className="flex items-center border-b dark:border-gray-700 mb-4">
+            <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mr-4"></div>
+            <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mr-4"></div>
+            <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mr-4"></div>
+            <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+          </div>
+
+          {/* Content Skeleton */}
+          <div className="mt-6 space-y-4">
+            <div className="h-16 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-16 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-16 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render error state
+  if (isError) {
+    return <div>Error: {error.message}</div>;
+  }
+
   return (
     <div className="container mx-auto px-4 py-6 dark:text-gray-200">
       <div className="flex justify-between items-center mb-6">
@@ -424,11 +287,24 @@ export default function JobApplicationManager() {
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black dark:bg-white"></span>
             )}
           </button>
+          <button
+            onClick={() => setActiveTab("all")}
+            className={`relative px-4 py-3 font-medium text-sm transition-colors ${
+              activeTab === "all"
+                ? "text-black dark:text-white"
+                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+            }`}
+          >
+            All Applicants
+            {activeTab === "all" && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black dark:bg-white"></span>
+            )}
+          </button>
         </div>
 
         {activeTab === "overview" && (
           <div className="mt-6">
-            <JobDetailsPage/>
+            <JobDetailsPage />
           </div>
         )}
 
@@ -442,7 +318,7 @@ export default function JobApplicationManager() {
             setSearchQuery={setSearchQuery}
             toggleSelectAll={toggleSelectAll}
             toggleSelectApplicant={toggleSelectApplicant}
-            moveToNextPhase={moveToNextPhase}
+            moveToCVReview={moveToCVReview}
             rejectApplicants={rejectApplicants}
             activePhase={activePhase}
             setActivePhase={setActivePhase}
@@ -451,6 +327,17 @@ export default function JobApplicationManager() {
 
         {activeTab === "rejected" && (
           <RejectedApplicantsTab
+            filteredApplicants={filteredApplicants}
+            selectedApplicants={selectedApplicants}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            toggleSelectAll={toggleSelectAll}
+            toggleSelectApplicant={toggleSelectApplicant}
+          />
+        )}
+
+        {activeTab === "all" && (
+          <AllApplicantsTab
             filteredApplicants={filteredApplicants}
             selectedApplicants={selectedApplicants}
             searchQuery={searchQuery}

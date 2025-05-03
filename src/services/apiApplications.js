@@ -1,0 +1,41 @@
+import apiClient from "./apiAuth";
+
+// Get all applications for a specific job by ID
+export const getJobApplications = async (jobId) => {
+  try {
+    console.log(`Fetching applications for job ID: ${jobId}`);
+    const response = await apiClient.get(`/jobs/${jobId}/applications`);
+    console.log("Job applications fetched successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Failed to fetch applications for job ${jobId}:`,
+      error.response?.data || error.message
+    );
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch job applications"
+    );
+  }
+};
+export const advanceToCVReview = async (jobId, applicationIds) => {
+  try {
+    console.log("Advancing applications to CV review:", {
+      jobId,
+      applicationIds,
+    });
+    const response = await apiClient.post(
+      `/jobs/${jobId}/applications/cv-review`,
+      { applicationIds },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("Applications advanced successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to advance applications:", error.message);
+    throw error;
+  }
+};
