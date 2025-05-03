@@ -40,6 +40,7 @@ import { toast } from "sonner";
 import { useCompanies } from "../../features";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {Link} from "react-router-dom";
 
 const formSchema = z.object({
   image: z.any().refine((file) => file instanceof File || file === null, {
