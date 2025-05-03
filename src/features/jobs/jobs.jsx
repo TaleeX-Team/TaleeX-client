@@ -1,51 +1,45 @@
-"use client"
-import { useState } from "react"
-import { Skeleton } from "@/components/ui/skeleton"
-import { useJobs } from "@/features/jobs/useJobs.js"
-import JobsHeaderWithFilters from "@/features/jobs/jobheaderandfilter.jsx"
-import JobCard from "@/features/jobs/form/components/JobCard.jsx"
+"use client";
+
+import { Skeleton } from "@/components/ui/skeleton";
+import { useJobs } from "@/features/jobs/useJobs.js";
+import JobsHeaderWithFilters from "@/features/jobs/jobheaderandfilter.jsx";
+import JobCard from "@/features/jobs/form/components/JobCard.jsx";
 
 export default function JobsPage() {
-    // Use the useJobs hook with initial empty filters
-    const { jobsQuery, filteredJobsQuery, setFilter } = useJobs()
+    const { jobsQuery, filteredJobsQuery, setFilter, clearFilters, hasFilters } = useJobs();
 
-    // Function to handle filter changes from the JobsHeaderWithFilters component
     const handleFilterChange = (newFilters) => {
-        setFilter(newFilters)
-    }
+        setFilter(newFilters);
+    };
 
-    // Determine which data to use based on which query has data
-    const isFiltering = filteredJobsQuery.data !== undefined
-    const activeQuery = isFiltering ? filteredJobsQuery : jobsQuery
-    const { data: jobData, isLoading, isError } = activeQuery
+    const isLoading = hasFilters ? filteredJobsQuery.isLoading : jobsQuery.isLoading;
+    const isError = hasFilters ? filteredJobsQuery.isError : jobsQuery.isError;
+    const jobData = hasFilters ? filteredJobsQuery.data : jobsQuery.data;
 
     return (
-        <div className="p-6">
-            <JobsHeaderWithFilters onFilterChange={handleFilterChange} />
-
-            {isLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {[...Array(6)].map((_, index) => (
-                        <JobCardSkeleton key={index} />
-                    ))}
-                </div>
-            ) : isError ? (
-                <div className="p-8 text-center">
-                    <p className="text-red-500">Failed to load jobs. Please try again later.</p>
-                </div>
-            ) : jobData?.jobs?.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {jobData.jobs.map((job) => (
-                        <JobCard key={job._id} job={job} />
-                    ))}
-                </div>
-            ) : (
-                <div className="p-8 text-center">
-                    <p className="text-muted-foreground">No jobs found for the selected filters.</p>
-                </div>
-            )}
-        </div>
-    )
+        <>
+            <JobsHeaderWithFilters onFilterChange={handleFilterChange}  clearFilters={clearFilters}/>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 mx-4">
+                {isLoading ? (
+                    <div className="col-span-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {[...Array(6)].map((_, index) => (
+                            <JobCardSkeleton key={index} />
+                        ))}
+                    </div>
+                ) : isError ? (
+                    <div className="col-span-full text-center p-8 bg-red-50 rounded-lg border border-red-200">
+                        Failed to load jobs. Please try again later.
+                    </div>
+                ) : jobData?.jobs?.length > 0 ? (
+                    jobData.jobs.map((job) => <JobCard key={job.id} job={job} />)
+                ) : (
+                    <div className="col-span-full text-center p-8 bg-gray-50 rounded-lg border border-gray-200">
+                        No jobs found for the selected filters.
+                    </div>
+                )}
+            </div>
+        </>
+    );
 }
 
 function JobCardSkeleton() {
@@ -61,7 +55,6 @@ function JobCardSkeleton() {
                     <Skeleton className="h-5 w-16 rounded-full" />
                 </div>
             </div>
-
             <div className="px-4 py-2">
                 <div className="grid grid-cols-2 gap-y-2">
                     {[...Array(4)].map((_, index) => (
@@ -69,11 +62,10 @@ function JobCardSkeleton() {
                     ))}
                 </div>
             </div>
-
             <div className="px-4 py-3 border-t flex justify-between items-center">
                 <Skeleton className="h-4 w-20" />
                 <Skeleton className="h-4 w-24" />
             </div>
         </div>
-    )
+    );
 }

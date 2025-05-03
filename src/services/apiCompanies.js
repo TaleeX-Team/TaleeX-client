@@ -12,6 +12,17 @@ export const getCompanies = async () => {
     throw error;
   }
 };
+export const getNonRejectedCompanies = async () => {
+  try {
+    console.log("Fetching companies");
+    const response = await apiClient.get("/companies/non-rejected");
+    console.log("Companies fetched successfully");
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch companies:", error.message);
+    throw error;
+  }
+};
 
 // For creating a new company
 export const createCompany = async (companyData) => {
