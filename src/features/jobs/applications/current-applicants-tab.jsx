@@ -30,7 +30,6 @@ import {
   ArrowUpDown,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import CVFeedbackPage from "@/features/feedback/cv-feedback";
 import CVFeedbackDialog from "@/features/feedback/cv-feedback";
 import BehavioralFeedbackPage from "@/features/feedback/behavioral-feedback";
