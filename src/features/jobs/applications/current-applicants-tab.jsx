@@ -356,7 +356,7 @@ export function ApplicantsTab({
                         </DialogTrigger>
 
                         <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
-                          <CVFeedbackPage />
+                          <CVFeedbackPage feedback={applicant?.feedback?.cv} />
                         </DialogContent>
                       </Dialog>
                       <Dialog>
