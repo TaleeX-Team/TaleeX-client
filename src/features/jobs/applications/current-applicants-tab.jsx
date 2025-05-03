@@ -1,7 +1,23 @@
+import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import {
   ArrowRight,
@@ -12,6 +28,7 @@ import {
   Video,
   Download,
   Link,
+  ArrowUpDown,
 } from "lucide-react";
 
 export function ApplicantsTab({
@@ -27,7 +44,51 @@ export function ApplicantsTab({
   rejectApplicants,
   activePhase,
   setActivePhase,
+  onSendInterview,
 }) {
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [open, setOpen] = useState(false);
+  const [interviewTypes, setInterviewTypes] = useState([]);
+  const [questionCount, setQuestionCount] = useState(5);
+
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+  };
+
+  const sortedApplicants = [...filteredApplicants].sort((a, b) => {
+    console.log("Sorting applicants:", a.cvScore, b.cvScore);
+    if (activePhase !== "CV Review") return 0;
+    const scoreA = a.cvScore || 0;
+    const scoreB = b.cvScore || 0;
+    return sortOrder === "asc" ? scoreA - scoreB : scoreB - scoreA;
+  });
+
+  // Helper function to determine score text color
+  const getScoreColor = (score) => {
+    if (score >= 80) return "text-green-600 dark:text-green-400";
+    if (score >= 60) return "text-yellow-600 dark:text-yellow-400";
+    return "text-red-600 dark:text-red-400";
+  };
+
+  // Handle interview type toggle
+  const toggleInterviewType = (type) => {
+    setInterviewTypes((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+    );
+  };
+
+  // Handle form submission
+  const handleSubmitInterview = () => {
+    if (interviewTypes.length === 0) {
+      alert("Please select at least one interview type.");
+      return;
+    }
+    onSendInterview({ interviewTypes, questionCount, selectedApplicants });
+    setOpen(false);
+    setInterviewTypes([]);
+    setQuestionCount(5);
+  };
+
   return (
     <div className="mt-6">
       {/* Phase navigation */}
@@ -108,18 +169,21 @@ export function ApplicantsTab({
 
       {/* Action buttons */}
       <div className="flex flex-wrap gap-2 mb-6">
-        {activePhase !== "CV Review" && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-1 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-50 dark:disabled:hover:bg-transparent"
-            onClick={moveToCVReview}
-            disabled={selectedApplicants.length === 0}
-          >
-            <ArrowRight className="h-4 w-4" />
-            Move to CV Review
-          </Button>
-        )}
+        {activePhase !== "CV Review" &&
+          activePhase !== "Sending Interview" &&
+          activePhase !== "Interview Feedback" &&
+          activePhase !== "Final Feedback" && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-50 dark:disabled:hover:bg-transparent"
+              onClick={moveToCVReview}
+              disabled={selectedApplicants.length === 0}
+            >
+              <ArrowRight className="h-4 w-4" />
+              Move to CV Review
+            </Button>
+          )}
         <Button
           variant="outline"
           size="sm"
@@ -129,14 +193,70 @@ export function ApplicantsTab({
         >
           Reject
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-1 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800"
-        >
-          <Video className="h-4 w-4" />
-          Send Video Interview
-        </Button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800"
+              disabled={selectedApplicants.length === 0}
+            >
+              <Video className="h-4 w-4" />
+              Send Video Interview
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px] dark:bg-gray-800 dark:text-gray-200">
+            <DialogHeader>
+              kardeş <DialogTitle>Send Video Interview</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label>Interview Type</Label>
+                <div className="flex gap-4">
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="technical"
+                      checked={interviewTypes.includes("technical")}
+                      onCheckedChange={() => toggleInterviewType("technical")}
+                      className="dark:border-gray-600"
+                    />
+                    <Label htmlFor="technical">Technical</Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="behavioral"
+                      checked={interviewTypes.includes("behavioral")}
+                      onCheckedChange={() => toggleInterviewType("behavioral")}
+                      className="dark:border-gray-600"
+                    />
+                    <Label htmlFor="behavioral">Behavioral</Label>
+                  </div>
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label>Number of Questions: {questionCount}</Label>
+                <Slider
+                  value={[questionCount]}
+                  onValueChange={(value) => setQuestionCount(value[0])}
+                  min={5}
+                  max={15}
+                  step={1}
+                  className="w-full"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setOpen(false)}
+                className="dark:text-gray-300 dark:border-gray-700"
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleSubmitInterview}>Send</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
         <Button
           variant="outline"
           size="sm"
@@ -180,11 +300,18 @@ export function ApplicantsTab({
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
                 Phase
               </th>
+              <th
+                className="py-2 px-4 text-left font-medium dark:text-gray-200 cursor-pointer flex items-center gap-1"
+                onClick={toggleSortOrder}
+              >
+                Score
+                <ArrowUpDown className="h-4 w-4" />
+              </th>
             </tr>
           </thead>
           <tbody>
-            {filteredApplicants.length > 0 ? (
-              filteredApplicants.map((applicant) => (
+            {sortedApplicants.length > 0 ? (
+              sortedApplicants.map((applicant) => (
                 <tr
                   key={applicant.id}
                   className="border-b hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800/50"
@@ -256,12 +383,37 @@ export function ApplicantsTab({
                       {applicant.phase}
                     </Badge>
                   </td>
+                  <td className="py-3 px-4">
+                    {applicant.cvScore !== undefined ? (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <span
+                              className={cn(
+                                "font-medium",
+                                getScoreColor(applicant.cvScore) // Fixed the syntax issue here
+                              )}
+                            >
+                              {Math.round(applicant.cvScore)}%
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            Score: {applicant.cvScore.toFixed(1)}%
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ) : (
+                      <span className="text-gray-400 dark:text-gray-500">
+                        -
+                      </span>
+                    )}
+                  </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={8}
                   className="py-4 text-center text-gray-500 dark:text-gray-400"
                 >
                   No applicants found in this phase.

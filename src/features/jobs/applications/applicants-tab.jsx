@@ -11,13 +11,16 @@ import { useParams } from "react-router-dom";
 import {
   getJobApplications,
   advanceToCVReview,
+  scheduleInterviews,
+  // sendVideoInterview,
 } from "@/services/apiApplications";
+import { getJobById } from "@/services/apiJobs.js";
 
 // Define the application phases
 const PHASES = [
   "Applications",
   "CV Review",
-  "Pending Interview",
+  "Sending Interview",
   "Interview Feedback",
   "Final Feedback",
 ];
@@ -44,13 +47,24 @@ export default function JobApplicationManager() {
     queryFn: () => getJobApplications(id),
     enabled: !!id,
   });
+  const { data: job } = useQuery({
+    queryKey: ["job", id],
+    queryFn: () => getJobById(id),
+    enabled: !!id,
+  });
 
   // Mutation for advancing applications to CV Review
   const advanceToCVReviewMutation = useMutation({
     mutationFn: ({ jobId, applicationIds }) =>
       advanceToCVReview(jobId, applicationIds),
-    onSuccess: (response, { applicationIds }) => {
-      // Update query data only after successful backend response
+    onMutate: async ({ jobId, applicationIds }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["job/applicants", id] });
+
+      // Snapshot the previous value
+      const previousData = queryClient.getQueryData(["job/applicants", id]);
+
+      // Optimistically update the cache
       queryClient.setQueryData(["job/applicants", id], (old) => {
         if (!old || !old.applications) return old;
         return {
@@ -66,16 +80,76 @@ export default function JobApplicationManager() {
           ),
         };
       });
-      // Clear selected applicants
+
+      // Clear selected applicants optimistically
       setSelectedApplicants([]);
-      // Invalidate to ensure data consistency
+
+      // Return context with previous data for rollback
+      return { previousData };
+    },
+    onSuccess: () => {
+      // Invalidate to refetch and sync with server
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
     },
-    onError: (err) => {
+    onError: (err, variables, context) => {
+      // Rollback to previous data on error
+      queryClient.setQueryData(["job/applicants", id], context.previousData);
       console.error(
         "Failed to advance applications to CV review:",
         err.message
       );
+    },
+    onSettled: () => {
+      // Ensure queries are invalidated after success or error
+      queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
+    },
+  });
+
+  const sendVideoInterviewMutation = useMutation({
+    mutationFn: ({ jobId, applicationIds, interviewTypes, questionCount }) =>
+      scheduleInterviews(jobId, applicationIds, interviewTypes, questionCount),
+    onMutate: async ({ jobId, applicationIds }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["job/applicants", id] });
+
+      // Snapshot the previous value
+      const previousData = queryClient.getQueryData(["job/applicants", id]);
+
+      // Optimistically update the cache
+      queryClient.setQueryData(["job/applicants", id], (old) => {
+        if (!old || !old.applications) return old;
+        return {
+          ...old,
+          applications: old.applications.map((app) =>
+            applicationIds.includes(app._id)
+              ? {
+                  ...app,
+                  stage: "Pending Interview",
+                  updatedAt: new Date().toISOString(),
+                }
+              : app
+          ),
+        };
+      });
+
+      // Clear selected applicants optimistically
+      setSelectedApplicants([]);
+
+      // Return context with previous data for rollback
+      return { previousData };
+    },
+    onSuccess: () => {
+      // Invalidate to refetch and sync with server
+      queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
+    },
+    onError: (err, variables, context) => {
+      // Rollback to previous data on error
+      queryClient.setQueryData(["job/applicants", id], context.previousData);
+      console.error("Failed to send video interviews:", err.message);
+    },
+    onSettled: () => {
+      // Ensure queries are invalidated after success or error
+      queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
     },
   });
 
@@ -87,12 +161,14 @@ export default function JobApplicationManager() {
       email: app.email,
       applied: app.createdAt,
       assignee: app.group?.[0] || null,
-      score: null,
+      cvScore: app?.feedback?.cv?.matchScore,
       phase:
         app.stage === "applied"
           ? "Applications"
           : app.stage === "cv review"
           ? "CV Review"
+          : app.stage === "sending interview"
+          ? "Sending Interview"
           : app.stage,
       rejected: app.stage === "rejected",
       rejectedOn: app.stage === "rejected" ? app.createdAt : null,
@@ -117,7 +193,7 @@ export default function JobApplicationManager() {
     } else if (activeTab === "rejected") {
       return applicant.rejected && matchesSearch;
     } else if (activeTab === "all") {
-      return matchesSearch; // Show all applicants, regardless of phase or rejection
+      return matchesSearch;
     }
     return matchesSearch;
   });
@@ -139,7 +215,7 @@ export default function JobApplicationManager() {
     });
   };
 
-  // Handle rejecting applicants (client-side, no backend API assumed)
+  // Handle rejecting applicants
   const rejectApplicants = () => {
     if (selectedApplicants.length === 0) return;
 
@@ -161,6 +237,21 @@ export default function JobApplicationManager() {
 
     setSelectedApplicants([]);
     queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
+  };
+
+  // Handle sending video interviews
+  const handleSendInterview = ({
+    interviewTypes,
+    questionCount,
+    selectedApplicants,
+  }) => {
+    console.log("Selected applicants for interview:", questionCount);
+    sendVideoInterviewMutation.mutate({
+      jobId: id,
+      applicationIds: selectedApplicants,
+      interviewTypes,
+      questionCount,
+    });
   };
 
   // Handle selecting all applicants
@@ -187,7 +278,6 @@ export default function JobApplicationManager() {
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-6 dark:text-gray-200">
-        {/* Header Skeleton */}
         <div className="flex justify-between items-center mb-6">
           <div className="h-9 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
           <div className="flex items-center gap-2">
@@ -195,8 +285,6 @@ export default function JobApplicationManager() {
             <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
           </div>
         </div>
-
-        {/* Tabs Skeleton */}
         <div className="w-full">
           <div className="flex items-center border-b dark:border-gray-700 mb-4">
             <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mr-4"></div>
@@ -204,8 +292,6 @@ export default function JobApplicationManager() {
             <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mr-4"></div>
             <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
           </div>
-
-          {/* Content Skeleton */}
           <div className="mt-6 space-y-4">
             <div className="h-16 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
             <div className="h-16 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
@@ -224,9 +310,7 @@ export default function JobApplicationManager() {
   return (
     <div className="container mx-auto px-4 py-6 dark:text-gray-200">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold dark:text-white">
-          Sales Representative
-        </h1>
+        <h1 className="text-3xl font-bold dark:text-white">{job?.title}</h1>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -322,6 +406,7 @@ export default function JobApplicationManager() {
             rejectApplicants={rejectApplicants}
             activePhase={activePhase}
             setActivePhase={setActivePhase}
+            onSendInterview={handleSendInterview}
           />
         )}
 

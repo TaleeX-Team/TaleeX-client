@@ -39,3 +39,36 @@ export const advanceToCVReview = async (jobId, applicationIds) => {
     throw error;
   }
 };
+export const scheduleInterviews = async (
+  jobId,
+  applicationIds,
+  interviewDetails,
+  questionCount
+) => {
+  try {
+    console.log("Scheduling interviews:", {
+      jobId,
+      applicationIds,
+      interviewDetails,
+      questionCount,
+    });
+    const response = await apiClient.post(
+      `/jobs/${jobId}/applications/sending-interview`,
+      {
+        applicationIds,
+        interviewDetails,
+        questionCount,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("Interviews scheduled successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to schedule interviews:", error.message);
+    throw error;
+  }
+};
