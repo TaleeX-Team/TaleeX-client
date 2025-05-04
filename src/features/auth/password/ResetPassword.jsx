@@ -128,7 +128,7 @@ export default function ResetPassword() {
     }
 
     const strengthColors = [
-        "bg-gray-200 dark:bg-gray-700",
+        "bg-gray-200 dark:bg-sidebar-border",
         "bg-red-500",
         "bg-yellow-500",
         "bg-blue-500",
@@ -148,9 +148,8 @@ export default function ResetPassword() {
                 {[0, 1, 2, 3].map((i) => (
                     <div
                         key={i}
-                        className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-                            i < strength ? strengthColors[strength] : strengthColors[0]
-                        }`}
+                        className={`h-1 flex-1 rounded-full transition-colors duration-300 ${i < strength ? strengthColors[strength] : strengthColors[0]
+                            }`}
                     />
                 ))}
             </div>
@@ -159,141 +158,143 @@ export default function ResetPassword() {
     );
 
     return (
-        <div className="min-h-screen flex items-center justify-center overflow-hidden relative">
-            <AnimatedBackground />
+        <div className="min-h-screen relative w-full flex items-start justify-center pt-20 overflow-hidden">
+            {/* <AnimatedBackground /> */}
 
-            <div className="container z-10 flex flex-col lg:flex-row items-center justify-center px-4 md:px-8">
-                <ThreeDLogoSection />
+            {/* <div className="container z-10 flex flex-col lg:flex-row items-center justify-center px-4 md:px-8">
+                <ThreeDLogoSection /> */}
 
-                <div ref={cardRef} className="w-full max-w-md lg:w-1/2 space-y-6">
-                    <div className="flex justify-between items-center mb-2">
+            <div ref={cardRef} className="w-full max-w-md lg:w-1/2 space-y-6">
+                <div className="flex items-center justify-between mb-3">
+                    <ThreeDLogoSection isMobile={true} />
+                    <ThemeToggle />
+                </div>
+                {/* <div className="flex justify-between items-center mb-2">
                         <div className="lg:hidden flex items-center">
                             <Building2 className="w-8 h-8 mr-2 text-primary dark:text-primary/70" />
                             <h2 className="text-2xl font-bold text-gradient dark:text-primary/70">TalentSync</h2>
                         </div>
                         <ThemeToggle />
-                    </div>
+                    </div> */}
 
-                    <Card className="glass-card border-white/10 shadow-xl">
-                        <CardHeader className="space-y-2">
-                            <CardTitle ref={headingRef} className="text-2xl font-semibold text-center">
-                                Create New Password
-                            </CardTitle>
-                            <CardDescription className="text-center">
-                                Your new password must be different from previous ones.
-                            </CardDescription>
-                        </CardHeader>
+                <Card className="border-white/10 shadow-xl">
+                    <CardHeader className="space-y-2">
+                        <CardTitle ref={headingRef} className="text-2xl font-semibold text-center">
+                            Create New Password
+                        </CardTitle>
+                        <CardDescription className="text-center">
+                            Your new password must be different from previous one.
+                        </CardDescription>
+                    </CardHeader>
 
-                        <CardContent>
-                            <div ref={contentRef}>
-                                {!isSubmitted ? (
-                                    <form onSubmit={handleSubmit} className="space-y-4">
-                                        <Label htmlFor="password">New Password</Label>
-                                        <div className="relative">
-                                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
-                                            <Input
-                                                id="password"
-                                                type={showPassword ? "text" : "password"}
-                                                placeholder="••••••••"
-                                                value={password}
-                                                onChange={(e) => setPassword(e.target.value)}
-                                                required
-                                                minLength={8}
-                                                disabled={isLoading}
-                                                className="pl-10 pr-10"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={toggleShowPassword}
-                                                className="absolute right-3 top-1/2 -translate-y-1/2"
-                                                aria-label={showPassword ? "Hide password" : "Show password"}
-                                            >
-                                                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                                            </button>
-                                        </div>
-                                        {renderStrength()}
-
-                                        <Label htmlFor="confirmPassword">Confirm Password</Label>
-                                        <div className="relative">
-                                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
-                                            <Input
-                                                id="confirmPassword"
-                                                type={showConfirm ? "text" : "password"}
-                                                placeholder="••••••••"
-                                                value={confirmPassword}
-                                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                                required
-                                                disabled={isLoading}
-                                                className={`pl-10 pr-10 ${
-                                                    confirmPassword && password !== confirmPassword
-                                                        ? "border-red-500 focus-visible:ring-red-500"
-                                                        : ""
-                                                }`}
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={toggleShowConfirm}
-                                                className="absolute right-3 top-1/2 -translate-y-1/2"
-                                                aria-label={showConfirm ? "Hide confirm password" : "Show confirm password"}
-                                            >
-                                                {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
-                                            </button>
-                                        </div>
-                                        {confirmPassword && password !== confirmPassword && (
-                                            <p className="text-xs text-red-500">Passwords don’t match</p>
-                                        )}
-
-                                        <Button
-                                            type="submit"
-                                            disabled={isLoading || password !== confirmPassword}
-                                            className="w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300"
+                    <CardContent>
+                        <div ref={contentRef}>
+                            {!isSubmitted ? (
+                                <form onSubmit={handleSubmit} className="space-y-4">
+                                    <Label htmlFor="password">New Password</Label>
+                                    <div className="relative">
+                                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
+                                        <Input
+                                            id="password"
+                                            type={showPassword ? "text" : "password"}
+                                            placeholder="••••••••"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            required
+                                            minLength={8}
+                                            disabled={isLoading}
+                                            className="pl-10 pr-10"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={toggleShowPassword}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2"
+                                            aria-label={showPassword ? "Hide password" : "Show password"}
                                         >
-                                            {isLoading ? (
-                                                <>
-                                                    Resetting… <Loader2 className="animate-spin inline-block ml-2" />
-                                                </>
-                                            ) : (
-                                                <>
-                                                    Reset Password <ArrowRight className="ml-2" />
-                                                </>
-                                            )}
-                                        </Button>
-
-                                        {isError && (
-                                            <p className="text-sm text-red-500">
-                                                {error?.message || "Something went wrong."}
-                                            </p>
-                                        )}
-
-                                        <Link
-                                            to="/auth"
-                                            className="flex justify-center items-center gap-2 text-sm text-primary"
-                                        >
-                                            <ArrowLeft size={16}/> Back to login
-                                        </Link>
-                                    </form>
-                                ) : (
-                                    <div className="text-center space-y-6 py-4">
-                                        <div className="mx-auto w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center animate-in zoom-in-95">
-                                            <CheckCircle className="h-8 w-8 text-green-500 animate-bounce" />
-                                        </div>
-                                        <h3 className="text-xl font-medium">Password Reset Complete</h3>
-                                        <p className="text-muted-foreground">
-                                            Your password has been successfully reset. You can now log in.
-                                        </p>
-                                        <Button
-                                            className="w-full bg-gradient-to-r from-purple-500 to-pink-500"
-                                            onClick={() => navigate("/auth")}
-                                        >
-                                            Go to Login <ArrowRight size={16} className="ml-2 " />
-                                        </Button>
+                                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        </button>
                                     </div>
-                                )}
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
+                                    {renderStrength()}
+
+                                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                                    <div className="relative">
+                                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={16} />
+                                        <Input
+                                            id="confirmPassword"
+                                            type={showConfirm ? "text" : "password"}
+                                            placeholder="••••••••"
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            required
+                                            disabled={isLoading}
+                                            className={`pl-10 pr-10 ${confirmPassword && password !== confirmPassword
+                                                ? "border-red-500 focus-visible:ring-red-500"
+                                                : ""
+                                                }`}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={toggleShowConfirm}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2"
+                                            aria-label={showConfirm ? "Hide confirm password" : "Show confirm password"}
+                                        >
+                                            {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        </button>
+                                    </div>
+                                    {confirmPassword && password !== confirmPassword && (
+                                        <p className="text-xs text-red-500">Passwords don’t match</p>
+                                    )}
+
+                                    <Button
+                                        type="submit"
+                                        disabled={isLoading || password !== confirmPassword}
+                                        className="w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300 mt-6"
+                                    >
+                                        {isLoading ? (
+                                            <>
+                                                Resetting… <Loader2 className="animate-spin inline-block ml-2" />
+                                            </>
+                                        ) : (
+                                            <>
+                                                Reset Password <ArrowRight className="ml-2" />
+                                            </>
+                                        )}
+                                    </Button>
+
+                                    {isError && (
+                                        <p className="text-sm text-red-500">
+                                            {error?.message || "Something went wrong."}
+                                        </p>
+                                    )}
+                                </form>
+                            ) : (
+                                <div className="text-center space-y-6 py-4">
+                                    <div className="mx-auto w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center animate-in zoom-in-95">
+                                        <CheckCircle className="h-8 w-8 text-green-500 animate-bounce" />
+                                    </div>
+                                    <h3 className="text-xl font-medium">Password Reset Complete</h3>
+                                    <p className="text-muted-foreground">
+                                        Your password has been successfully reset. You can now log in.
+                                    </p>
+                                    <Button
+                                        className="w-full bg-gradient-to-r from-purple-500 to-pink-500"
+                                        onClick={() => navigate("/auth")}
+                                    >
+                                        Go to Login <ArrowRight size={16} className="ml-2 " />
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+                <Link
+                    to="/auth"
+                    className="flex justify-start items-center gap-2 text-sm text-primary"
+                >
+                    <ArrowLeft size={16} /> Back to login
+                </Link>
             </div>
+            {/* </div> */}
         </div>
     );
 }

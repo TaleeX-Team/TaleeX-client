@@ -15,9 +15,9 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import gsap from "gsap";
 import ThreeDLogo from "@/components/ThreeDLogo";
 import { toast } from "sonner";
-import {useForgotPassword} from "@/hooks/useForgotPassoword.js";
-import {AnimatedBackground} from "@/components/AnimatedBackground.jsx";
-import {ThreeDLogoSection} from "@/components/TheeDLogoSection.jsx";
+import { useForgotPassword } from "@/hooks/useForgotPassoword.js";
+import { AnimatedBackground } from "@/components/AnimatedBackground.jsx";
+import { ThreeDLogoSection } from "@/components/TheeDLogoSection.jsx";
 
 const ForgotPassword = () => {
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -86,109 +86,106 @@ const ForgotPassword = () => {
     };
 
     return (
-        <div className="min-h-screen relative w-full flex items-center justify-center overflow-hidden">
+        <div className="min-h-screen relative w-full flex items-start justify-center pt-20 overflow-hidden">
             {/* Background */}
-            <AnimatedBackground/>
+            {/* <AnimatedBackground /> */}
 
-            <div className="container relative z-10 flex flex-col lg:flex-row items-center justify-center px-4 md:px-8">
-                {/* Branding */}
-               <ThreeDLogoSection/>
+            {/* <div className="container relative z-10 flex flex-col lg:flex-row items-center justify-center px-4 md:px-8">
+                Branding
+                <ThreeDLogoSection /> */}
 
-                {/* Form */}
-                <div ref={cardRef} className="w-full max-w-md lg:w-1/2 space-y-6">
-                    <div className="flex items-center justify-between mb-2">
-                        <div className="lg:hidden flex items-center">
-                            <Building2 className="w-8 h-8 mr-2 text-primary dark:text-primary/70" />
-                            <h2 className="text-2xl font-bold text-gradient dark:text-primary/70">TalentSync</h2>
-                        </div>
-                        <ThemeToggle />
-                    </div>
-
-                    <Card className="glass-card border-white/10 shadow-xl">
-                        <CardHeader className="space-y-2">
-                            <CardTitle className="text-2xl font-semibold text-center">
-                                Reset Password
-                            </CardTitle>
-                            <CardDescription className="text-center">
-                                Enter your email to receive reset instructions
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div ref={contentRef}>
-                                {!isSubmitted ? (
-                                    <form
-                                        ref={formRef}
-                                        onSubmit={handleSubmit}
-                                        className="space-y-4"
-                                    >
-                                        <div className="space-y-2">
-                                            <Label htmlFor="email">Email address</Label>
-                                            <div className="relative">
-                                                <Mail
-                                                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
-                                                    size={16}
-                                                />
-                                                <Input
-                                                    id="email"
-                                                    type="email"
-                                                    placeholder="name@company.com"
-                                                    required
-                                                    value={email}
-                                                    onChange={(e) => setEmail(e.target.value)}
-                                                    className=" pl-10"
-                                                />
-                                            </div>
-                                        </div>
-                                        <Button
-                                            type="submit"
-                                            className="w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300"
-                                            disabled={isLoading}
-                                        >
-                                            {isLoading ? "Sending..." : "Send reset instructions"}
-                                            <ArrowRight className="ml-2" />
-                                        </Button>
-                                        <Link
-                                            to="/auth"
-                                            className="flex items-center justify-center gap-2 text-sm text-primary hover:primary/70 transition-colors mt-4"
-                                        >
-                                            <ArrowLeft size={16} /> Back to login
-                                        </Link>
-                                    </form>
-                                ) : (
-                                    <div className="text-center space-y-6 py-4">
-                                        <div className="w-16 h-16 mx-auto bg-green-500/10 rounded-full flex items-center justify-center">
-                                            <CheckCircle className="h-8 w-8 text-green-500" />
-                                        </div>
-                                        <h3 className="text-xl font-medium">Check your inbox</h3>
-                                        <p className="text-muted-foreground">
-                                            We've sent a password reset link to{" "}
-                                            <span className="font-medium text-foreground">
-                        {email}
-                      </span>
-                                        </p>
-                                        <p className="text-sm text-muted-foreground">
-                                            Didn't receive the email? Check your spam or try again.
-                                        </p>
-                                        <Button
-                                            variant="outline"
-                                            className="glass-card"
-                                            onClick={() => setIsSubmitted(false)}
-                                        >
-                                            Try again
-                                        </Button>
-                                        <Link
-                                            to="/auth"
-                                            className="flex items-center justify-center gap-2 text-sm text-purple-400 hover:text-purple-300 transition-colors mt-4"
-                                        >
-                                            <ArrowLeft size={16} /> Back to login
-                                        </Link>
-                                    </div>
-                                )}
-                            </div>
-                        </CardContent>
-                    </Card>
+            {/* Form */}
+            <div ref={cardRef} className="w-full max-w-md lg:w-1/2 space-y-6">
+                <div className="flex items-center justify-between mb-3">
+                    <ThreeDLogoSection isMobile={true} />
+                    <ThemeToggle />
                 </div>
+
+                <Card className="border-white/10 shadow-xl">
+                    <CardHeader className="space-y-2">
+                        <CardTitle className="text-2xl font-semibold text-center">
+                            Reset Password
+                        </CardTitle>
+                        <CardDescription className="text-center">
+                            Enter your email to receive reset instructions
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div ref={contentRef}>
+                            {!isSubmitted ? (
+                                <form
+                                    ref={formRef}
+                                    onSubmit={handleSubmit}
+                                    className="space-y-4"
+                                >
+                                    <div className="space-y-2">
+                                        <Label htmlFor="email">Email address</Label>
+                                        <div className="relative">
+                                            <Mail
+                                                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+                                                size={16}
+                                            />
+                                            <Input
+                                                id="email"
+                                                type="email"
+                                                placeholder="name@company.com"
+                                                required
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                className=" pl-10"
+                                            />
+                                        </div>
+                                    </div>
+                                    <Button
+                                        type="submit"
+                                        className="w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300 mt-6"
+                                        disabled={isLoading}
+                                    >
+                                        {isLoading ? "Sending..." : "Send reset instructions"}
+                                        <ArrowRight className="ml-2" />
+                                    </Button>
+                                </form>
+                            ) : (
+                                <div className="text-center space-y-6 py-4">
+                                    <div className="w-16 h-16 mx-auto bg-green-500/10 rounded-full flex items-center justify-center">
+                                        <CheckCircle className="h-8 w-8 text-green-500" />
+                                    </div>
+                                    <h3 className="text-xl font-medium">Check your inbox</h3>
+                                    <p className="text-muted-foreground">
+                                        We've sent a password reset link to{" "}
+                                        <span className="font-medium text-foreground">
+                                            {email}
+                                        </span>
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                        Didn't receive the email? Check your spam or try again.
+                                    </p>
+                                    <Button
+                                        variant="outline"
+                                        className="glass-card"
+                                        onClick={() => setIsSubmitted(false)}
+                                    >
+                                        Try again
+                                    </Button>
+                                    <Link
+                                        to="/auth"
+                                        className="flex items-center justify-center gap-2 text-sm text-purple-400 hover:text-purple-300 transition-colors mt-4"
+                                    >
+                                        <ArrowLeft size={16} /> Back to login
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+                <Link
+                    to="/auth"
+                    className="flex justify-start gap-2 text-sm text-primary hover:primary/70 transition-colors mt-4"
+                >
+                    <ArrowLeft size={16} /> Back to login
+                </Link>
             </div>
+            {/* </div> */}
         </div>
     );
 };
