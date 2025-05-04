@@ -20,10 +20,12 @@ import Interview from "./features/interview/Interview";
 import AdminAuthRoutes from "./routes/adnin-auth-route/AdminRoutes";
 import JobApplicationPage from "@/features/jobs/form/JobApplicationPage.jsx";
 import {InviteJob} from "@/features/jobs/inviteJob/InviteJob.jsx";
+import {StartScreen} from "@/components/interview/StartScreen.jsx";
 
 const RootRedirect = () => {
     const {isAuthenticated, isLoading} = useAuth();
     const {data: user, isLoading: isUserLoading} = useUser();
+
 
     if (isLoading || isUserLoading) return <FullPageSpinner/>;
 
@@ -71,6 +73,14 @@ function App() {
             PublicRoutes,
             {
                 path: "interviews/:interviewId",
+                element: (
+                    <Suspense fallback={<FullPageSpinner/>}>
+                        <StartScreen/>
+                    </Suspense>
+                ),
+            },
+            {
+                path: "interviews/:interviewId/live",
                 element: (
                     <Suspense fallback={<FullPageSpinner/>}>
                         <Interview/>

@@ -43,7 +43,6 @@ export function InterviewCompletedDialog({
 
         // In a real implementation, you would send the data to your backend
         // const result = await submitInterviewData('https://your-api-endpoint.com/interviews');
-        navigate("/")
     }
 
     return (
