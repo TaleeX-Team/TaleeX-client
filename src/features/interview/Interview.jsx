@@ -67,6 +67,7 @@ export default function Interview() {
             setIsInterviewComplete,
             setConclusionDetected,
             captureScreenshot,
+            formatTranscriptForSubmission,
             takeManualScreenshot,
         },
         refs: {
@@ -223,6 +224,7 @@ export default function Interview() {
                 questionsAsked={progress.current}
                 totalQuestions={questionsData.length}
                 screenshots={screenshots}
+                transcript={formatTranscriptForSubmission()}
             />
         </div>
     );
