@@ -62,13 +62,14 @@ export default function Interview() {
             handleEndInterview,
             toggleTranscript,
             toggleTranscriptExpanded,
+            retrieveInterviewData,
             toggleAudio,
             stopVAPICall,
             setIsInterviewComplete,
             setConclusionDetected,
             captureScreenshot,
-            formatTranscriptForSubmission,
-            takeManualScreenshot,
+            getInterviewTranscript,
+            saveAndGetTranscript,
         },
         refs: {
             videoRef,
@@ -78,7 +79,7 @@ export default function Interview() {
             mainContentRef,
             vapiClientRef,
         },
-    } = useInterviewState(questionsData);
+    } = useInterviewState(questionsData,interviewId);
 
     // Start interview automatically if not started and questions are available
     useEffect(() => {
@@ -224,7 +225,7 @@ export default function Interview() {
                 questionsAsked={progress.current}
                 totalQuestions={questionsData.length}
                 screenshots={screenshots}
-                transcript={formatTranscriptForSubmission()}
+                transcript={saveAndGetTranscript(interviewId)}
             />
         </div>
     );

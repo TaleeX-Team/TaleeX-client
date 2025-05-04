@@ -19,7 +19,7 @@ const WARNING_TIME_MINUTES = 5
 const FINAL_WARNING_MINUTES = 1
 const RESPONSE_TIMEOUT = 15000 // 15 seconds for response timeout
 
-export function useInterviewState(questions) {
+export function useInterviewState(questions, interviewId) {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
     const [displayedQuestion, setDisplayedQuestion] = useState(questions.length > 0 ? questions[0] : "")
     const [progress, setProgress] = useState({ current: 1, total: questions.length })
@@ -223,7 +223,10 @@ export function useInterviewState(questions) {
             durationTimerRef.current = setInterval(() => {
                 setInterviewDuration((prev) => prev + 1)
                 if (debugMode)
-                    console.log("Duration timer tick", { interviewDuration: interviewDuration + 1, timestamp: new Date().toISOString() })
+                    console.log("Duration timer tick", {
+                        interviewDuration: interviewDuration + 1,
+                        timestamp: new Date().toISOString(),
+                    })
             }, 1000)
         }
         return () => {
@@ -378,7 +381,8 @@ export function useInterviewState(questions) {
                 if (responseTimeoutRef.current) {
                     clearTimeout(responseTimeoutRef.current)
                     responseTimeoutRef.current = null
-                    if (debugMode) console.log("Response timeout cleared during question transition", { timestamp: new Date().toISOString() })
+                    if (debugMode)
+                        console.log("Response timeout cleared during question transition", { timestamp: new Date().toISOString() })
                 }
 
                 setQuestionStates((prevStates) => {
@@ -694,6 +698,9 @@ export function useInterviewState(questions) {
                 captureScreenshot()
             }
 
+            // Save transcript data before completing the interview
+            const transcriptData = saveAndGetTranscript(interviewId)
+
             setQuestionStates((prevStates) => {
                 const newStates = [...prevStates]
                 const currentState = newStates.find((state) => state.status === "current")
@@ -714,11 +721,10 @@ export function useInterviewState(questions) {
             setIsUserTalking(false)
             setConclusionDetected(true)
             setIsLoading(false)
-            setMessages([])
-            setTranscript("")
             clearAllTimers()
 
-            console.log("Dialog completed interview")
+            if (debugMode)
+                console.log("Interview completed with transcript data", { transcriptData, timestamp: new Date().toISOString() })
         } catch (error) {
             setError(`Call termination error: ${error.message}`)
             setIsInterviewComplete(true)
@@ -730,7 +736,6 @@ export function useInterviewState(questions) {
             setMessages([])
             setTranscript("")
             clearAllTimers()
-            console.log("Dialog completed interview")
             if (debugMode) console.error("End call error:", { error, timestamp: new Date().toISOString() })
         }
     }
@@ -955,7 +960,24 @@ ${formattedQuestions}
 
         if (debugMode) console.log("Interview ended manually", { timestamp: new Date().toISOString() })
     }
-
+    const saveTranscriptToLocalStorage = (interviewId) => {
+        try {
+            const transcript = formatTranscriptForSubmission()
+            const transcriptData = {
+                interviewId,
+                transcript,
+                timestamp: new Date().toISOString(),
+            }
+            localStorage.setItem(`interview_transcript_${interviewId}`, JSON.stringify(transcriptData))
+            if (debugMode)
+                console.log("Full transcript saved to localStorage", { interviewId, timestamp: new Date().toISOString() })
+            return transcriptData
+        } catch (error) {
+            if (debugMode)
+                console.error("Failed to save full transcript to localStorage:", { error, timestamp: new Date().toISOString() })
+            return null
+        }
+    }
     // Force next question
     const forceNextQuestion = () => {
         if (!vapiClientRef.current || callStatus !== CallStatus.ACTIVE) {
@@ -1013,24 +1035,174 @@ ${formattedQuestions}
         if (debugMode) console.log("Audio toggled", { isAudioOn: !currentMuted, timestamp: new Date().toISOString() })
     }
 
-    // Format transcript for submission
-    const formatTranscriptForSubmission = () => {
-        const formattedTranscript = messages
+    const getInterviewTranscript = () => {
+        const validMessages = messages.filter(
+            (msg) => msg.content && msg.content.trim() !== "" && ["assistant", "user"].includes(msg.role),
+        )
+
+        // Deduplicate messages based on role and content
+        const deduplicatedMessages = []
+        const seenContent = new Set()
+
+        for (const msg of validMessages) {
+            const key = `${msg.role}:${msg.content.trim()}`
+            if (!seenContent.has(key)) {
+                seenContent.add(key)
+                deduplicatedMessages.push(msg)
+            }
+        }
+
+        // Generate transcript
+        const transcript = deduplicatedMessages
             .map((msg) => {
-                const speaker = msg.role === "assistant" ? "AI Interviewer" : "Candidate"
-                const timestamp = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : "unknown time"
-                return `[${timestamp}] ${speaker}: ${msg.content || "[No content]"}`
+                const speaker = msg.role === "assistant" ? "AI" : "Candidate"
+                return `${speaker}: ${msg.content.trim()}`
             })
-            .join("\n\n")
-        const header =
-            `Interview Transcript\n` +
-            `Date: ${new Date().toLocaleDateString()}\n` +
-            `Duration: ${formatDuration(interviewDuration)}\n` +
-            `Questions: ${questionStates.filter((s) => s.status === "completed").length} of ${questions.length}\n` +
-            `--------------------------------\n\n`
-        return header + formattedTranscript
+            .join("\n")
+
+        if (debugMode) {
+            console.log("Generated clean transcript:", {
+                transcript,
+                originalMessageCount: messages.length,
+                validMessageCount: validMessages.length,
+                deduplicatedMessageCount: deduplicatedMessages.length,
+                timestamp: new Date().toISOString(),
+            })
+        }
+
+        return transcript
     }
 
+    const saveCleanTranscriptToLocalStorage = (interviewId) => {
+        try {
+            const transcript = getInterviewTranscript()
+            const transcriptData = {
+                interviewId,
+                transcript,
+                timestamp: new Date().toISOString(),
+            }
+            localStorage.setItem(`interview_clean_transcript_${interviewId}`, JSON.stringify(transcriptData))
+            if (debugMode)
+                console.log("Clean transcript saved to localStorage", {
+                    interviewId,
+                    transcriptLength: transcript.length,
+                    timestamp: new Date().toISOString(),
+                })
+            return transcriptData
+        } catch (error) {
+            if (debugMode)
+                console.error("Failed to save clean transcript to localStorage:", {
+                    error,
+                    timestamp: new Date().toISOString(),
+                })
+            return null
+        }
+    }
+    const getCompleteTranscript = () => {
+        const validMessages = messages.filter(
+            (msg) => msg.content && msg.content.trim() !== "" && ["assistant", "user"].includes(msg.role),
+        )
+
+        // Deduplicate messages based on role and content
+        const deduplicatedMessages = []
+        const seenContent = new Set()
+
+        for (const msg of validMessages) {
+            const key = `${msg.role}:${msg.content.trim()}`
+            if (!seenContent.has(key)) {
+                seenContent.add(key)
+                deduplicatedMessages.push(msg)
+            }
+        }
+
+        // Generate transcript with timestamps
+        const transcript = deduplicatedMessages
+            .map((msg) => {
+                const speaker = msg.role === "assistant" ? "AI" : "Candidate"
+                return `${speaker}: ${msg.content.trim()}`
+            })
+            .join("\n\n")
+
+        if (debugMode) {
+            console.log("Generated complete transcript:", {
+                transcriptLength: transcript.length,
+                originalMessageCount: messages.length,
+                validMessageCount: validMessages.length,
+                deduplicatedMessageCount: deduplicatedMessages.length,
+                timestamp: new Date().toISOString(),
+            })
+        }
+
+        return transcript
+    }
+
+    // 2. Function to get a structured transcript (JSON format)
+    const getStructuredTranscript = () => {
+        const validMessages = messages.filter(
+            (msg) => msg.content && msg.content.trim() !== "" && ["assistant", "user"].includes(msg.role),
+        )
+
+        // Deduplicate messages based on role and content
+        const deduplicatedMessages = []
+        const seenContent = new Set()
+
+        for (const msg of validMessages) {
+            const key = `${msg.role}:${msg.content.trim()}`
+            if (!seenContent.has(key)) {
+                seenContent.add(key)
+                deduplicatedMessages.push(msg)
+            }
+        }
+
+        // Return structured data
+        return deduplicatedMessages.map((msg) => ({
+            role: msg.role,
+            speaker: msg.role === "assistant" ? "AI" : "Candidate",
+            content: msg.content.trim(),
+            timestamp: msg.timestamp ? new Date(msg.timestamp).toISOString() : new Date().toISOString(),
+        }))
+    }
+
+    const saveAndGetTranscript = (interviewId) => {
+        try {
+            const plainTextTranscript = getCompleteTranscript()
+            const structuredTranscript = getStructuredTranscript()
+
+            const transcriptData = {
+                interviewId,
+                plainText: plainTextTranscript,
+                structured: structuredTranscript,
+                timestamp: new Date().toISOString(),
+                metadata: {
+                    questionCount: questions.length,
+                    completedQuestions: getCompletedQuestionsSummary().length,
+                    interviewDuration: interviewDuration,
+                },
+            }
+
+            // Save to localStorage
+            localStorage.setItem(`interview_transcript_${interviewId}`, JSON.stringify(transcriptData))
+
+            if (debugMode) {
+                console.log("Complete transcript saved and ready to send:", {
+                    interviewId,
+                    transcriptLength: plainTextTranscript.length,
+                    messageCount: structuredTranscript.length,
+                    timestamp: new Date().toISOString(),
+                })
+            }
+
+            return transcriptData
+        } catch (error) {
+            if (debugMode) {
+                console.error("Failed to save/get transcript:", {
+                    error,
+                    timestamp: new Date().toISOString(),
+                })
+            }
+            return null
+        }
+    }
     // Format duration
     const formatDuration = (seconds) => {
         const minutes = Math.floor(seconds / 60)
@@ -1152,25 +1324,26 @@ ${formattedQuestions}
         }))
     }
 
-    // Retrieve saved data
     const retrieveInterviewData = (interviewId) => {
         try {
-            const transcriptData = JSON.parse(localStorage.getItem(`interview_transcript_${interviewId}`))
+            const fullTranscriptData = JSON.parse(localStorage.getItem(`interview_transcript_${interviewId}`))
+            const cleanTranscriptData = JSON.parse(localStorage.getItem(`interview_clean_transcript_${interviewId}`))
             const screenshotData = []
             for (let i = 0; i < maxScreenshots; i++) {
                 const data = JSON.parse(localStorage.getItem(`interview_screenshot_${interviewId}_${i}`))
                 if (data) screenshotData.push(data)
             }
             return {
-                transcript: transcriptData,
+                fullTranscript: fullTranscriptData,
+                cleanTranscript: cleanTranscriptData,
                 screenshots: screenshotData,
             }
         } catch (error) {
             setError(`Failed to retrieve interview data: ${error.message}`)
+            if (debugMode) console.error("Retrieve interview data error:", { error, timestamp: new Date().toISOString() })
             return null
         }
     }
-
     // Monitor interview completion state
     useEffect(() => {
         if (isInterviewComplete && conclusionDetected) {
@@ -1179,7 +1352,7 @@ ${formattedQuestions}
 
             const event = new CustomEvent("interviewCompleted", {
                 detail: {
-                    transcript: formatTranscriptForSubmission(),
+                    transcript: getInterviewTranscript(),
                     screenshots: screenshots,
                     questionStates: formatQuestionStateForUI(),
                 },
@@ -1254,8 +1427,10 @@ ${formattedQuestions}
             takeManualScreenshot,
             retrieveInterviewData,
             setDebugMode,
+            getInterviewTranscript,
             forceNextQuestion,
             resetQuestionStates,
+            saveAndGetTranscript,
             retryQuestion,
         },
         refs: {
