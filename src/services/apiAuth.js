@@ -677,14 +677,7 @@ export const getJobApplicationForm = async (jobId) => {
     console.log(`Fetching application form for job: ${jobId}`);
     const response = await api.get(`/jobs/${jobId}/applications/form`);
     return response.data;
-    console.log(`Fetching application form for job: ${jobId}`);
-    const response = await api.get(`/jobs/${jobId}/applications/form`);
-    return response.data;
   } catch (error) {
-    console.error(
-      "Failed to fetch job application details:",
-      error.response?.data || error.message
-    );
     console.error(
       "Failed to fetch job application details:",
       error.response?.data || error.message
@@ -692,9 +685,7 @@ export const getJobApplicationForm = async (jobId) => {
 
     if (error.response) {
       const { status, data } = error.response;
-      const { status, data } = error.response;
       if (data.message) {
-        throw new Error(data.message);
         throw new Error(data.message);
       }
     }
@@ -703,21 +694,15 @@ export const getJobApplicationForm = async (jobId) => {
       throw new Error(
         "Unable to connect to the server. Please check your internet connection."
       );
-      throw new Error(
-        "Unable to connect to the server. Please check your internet connection."
-      );
     }
 
     throw new Error(error.message || "Failed to fetch job application details");
-    throw new Error(error.message || "Failed to fetch job application details");
   }
-};
 };
 
 // Submit job application
 export const submitJobApplication = async (jobId, applicationData) => {
   try {
-    console.log(`Submitting application for job: ${jobId}`);
     console.log(`Submitting application for job: ${jobId}`);
 
     // Ensure we're using the correct content type for file uploads
@@ -730,18 +715,7 @@ export const submitJobApplication = async (jobId, applicationData) => {
         },
       }
     );
-    const response = await api.post(
-      `/jobs/${jobId}/applications/apply`,
-      applicationData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
 
-    console.log("Application submitted successfully:", response.status);
-    return response.data;
     console.log("Application submitted successfully:", response.status);
     return response.data;
   } catch (error) {
@@ -749,20 +723,13 @@ export const submitJobApplication = async (jobId, applicationData) => {
       "Application submission failed:",
       error.response?.data || error.message
     );
-    console.error(
-      "Application submission failed:",
-      error.response?.data || error.message
-    );
 
     if (error.response) {
       const { status, data } = error.response;
-      const { status, data } = error.response;
       if (status === 400 && data.errors) {
-        throw new Error(Object.values(data.errors).join(", "));
         throw new Error(Object.values(data.errors).join(", "));
       }
       if (data.message) {
-        throw new Error(data.message);
         throw new Error(data.message);
       }
     }
@@ -771,27 +738,16 @@ export const submitJobApplication = async (jobId, applicationData) => {
       throw new Error(
         "Unable to connect to the server. Please check your internet connection."
       );
-      throw new Error(
-        "Unable to connect to the server. Please check your internet connection."
-      );
     }
 
     throw new Error(
       error.message ||
         "An unexpected error occurred when submitting your application."
     );
-    throw new Error(
-      error.message ||
-        "An unexpected error occurred when submitting your application."
-    );
   }
-};
 };
 export const shareJobOnLinkedIn = async (jobId) => {
   try {
-    console.log(`Sharing job ${jobId} on LinkedIn`);
-    const response = await api.get(`/jobs/${jobId}/share/linkedin`);
-    return response.data;
     console.log(`Sharing job ${jobId} on LinkedIn`);
     const response = await api.get(`/jobs/${jobId}/share/linkedin`);
     return response.data;
@@ -800,21 +756,14 @@ export const shareJobOnLinkedIn = async (jobId) => {
       "Failed to share job on LinkedIn:",
       error.response?.data || error.message
     );
-    console.error(
-      "Failed to share job on LinkedIn:",
-      error.response?.data || error.message
-    );
 
     if (error.response) {
       const { data } = error.response;
-      const { data } = error.response;
       if (data.message) {
-        throw new Error(data.message);
         throw new Error(data.message);
       }
     }
 
-    throw new Error("Failed to share job on LinkedIn");
     throw new Error("Failed to share job on LinkedIn");
   }
 };
@@ -822,21 +771,16 @@ export const shareJobOnLinkedIn = async (jobId) => {
 export const getInterviewHeaderInfo = async (interviewId) => {
   const response = await apiClient.get(
     `https://hirex-production.up.railway.app/api/v1/interviews/${interviewId}`
-    `https://hirex-production.up.railway.app/api/v1/interviews/${interviewId}`
   );
   return response.data;
-};
 };
 export const getInterviewQuestions = async (interviewId) => {
   const response = await apiClient.get(
     `https://hirex-production.up.railway.app/api/v1/interviews/${interviewId}/start`
-    `https://hirex-production.up.railway.app/api/v1/interviews/${interviewId}/start`
   );
   return response.data;
 };
-};
 
-// Assuming this returns questions or related data
 // Assuming this returns questions or related data
 
 export default apiClient;

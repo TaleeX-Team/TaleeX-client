@@ -58,7 +58,7 @@ export const useAuth = () => {
       if (data.user) {
         queryClient.setQueryData(["user"], data.user);
         localStorage.setItem("userId", JSON.stringify(data.user._id));
-        Cookies.set("hasPassword", data.hasPassword);
+        // Cookies.set("hasPassword", data.hasPassword);
       } else {
         queryClient.invalidateQueries({ queryKey: ["user"] });
       }
@@ -76,8 +76,8 @@ export const useAuth = () => {
       TokenService.setOAuthAuthenticated(false);
       queryClient.removeQueries({ queryKey: ["user"] });
       queryClient.invalidateQueries({ queryKey: ["auth"] });
-      localStorage.removeItem("userId");
-      Cookies.remove("hasPassword");
+      // localStorage.removeItem("userId");
+      // Cookies.remove("hasPassword");
     },
     onError: () => {
       // even on error, clear local
