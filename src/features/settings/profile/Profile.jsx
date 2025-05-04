@@ -18,6 +18,7 @@ import { useProfile } from "../features";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {LoadingIndicator} from "@/components/LoadingButton.jsx";
 
 // Create a schema for form validation with the new requirements
 // All fields are optional for update, but if provided must follow validation rules
@@ -328,7 +329,10 @@ export default function ProfilePage() {
           <CardFooter className="flex justify-between">
             <Button className="ml-auto" type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLoading ? "Saving..." : "Save Changes"}
+              {isLoading ?   <>
+                <LoadingIndicator className="mr-2" />
+                Processing
+              </>: "Save Changes"}
             </Button>
           </CardFooter>
         </form>
