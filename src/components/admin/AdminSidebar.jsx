@@ -12,7 +12,7 @@ import {
     ChevronRight,
     Moon,
     Sun,
-    Laptop, Building2
+    Laptop, Building2, ScrollText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -121,6 +121,12 @@ const AdminSidebar = () => {
             label: "Jobs",
             href: "/admin/jobs",
             active: currentPath.includes("/admin/jobs")
+        },
+        {
+            icon: <ScrollText size={collapsed ? 20 : 18} />,
+            label: "Reports",
+            href: "/admin/reports",
+            active: currentPath.includes("/admin/reports")
         },
         {
             icon: <BarChart size={collapsed ? 20 : 18} />,
