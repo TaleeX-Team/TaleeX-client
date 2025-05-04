@@ -34,6 +34,7 @@ import { Link } from "react-router-dom";
 import CVFeedbackPage from "@/features/feedback/cv-feedback";
 import BehavioralFeedbackPage from "@/features/feedback/behavioral-feedback";
 import FinalFeedbackPage from "@/features/feedback/final-feedback";
+import TechnicalFeedbackPage from "@/features/feedback/technicall-feedback";
 
 export function ApplicantsTab({
   PHASES,
@@ -369,39 +370,53 @@ export function ApplicantsTab({
                           </DialogContent>
                         </Dialog>
                       )}
-                      {activePhase !== "Applications" && (
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 px-3"
-                            >
-                              Interview
-                            </Button>
-                          </DialogTrigger>
+                      {activePhase !== "Applications" &&
+                        activePhase !== "CV Review" &&
+                        activePhase !== "Sending Interview" && (
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 px-3"
+                              >
+                                Feedback
+                              </Button>
+                            </DialogTrigger>
 
-                          <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
-                            <BehavioralFeedbackPage />
-                          </DialogContent>
-                        </Dialog>
-                      )}
-                      {activePhase !== "Applications" && (
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 px-3"
-                            >
-                              Final Feedback
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
-                            <FinalFeedbackPage />
-                          </DialogContent>
-                        </Dialog>
-                      )}
+                            <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
+                              {applicant?.feedback?.interview?.type ===
+                              "behavioral" ? (
+                                <BehavioralFeedbackPage
+                                  feedback={applicant?.feedback?.interview}
+                                />
+                              ) : (
+                                <TechnicalFeedbackPage
+                                  feedback={applicant?.feedback?.interview}
+                                />
+                              )}
+                            </DialogContent>
+                          </Dialog>
+                        )}
+                      {activePhase !== "Applications" &&
+                        activePhase !== "CV Review" &&
+                        activePhase !== "Sending Interview" &&
+                        activePhase !== "Interview Feedback" && (
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 px-3"
+                              >
+                                Final Feedback
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
+                              <FinalFeedbackPage />
+                            </DialogContent>
+                          </Dialog>
+                        )}
                     </div>
                   </td>
                   <td className="py-3 px-4">
