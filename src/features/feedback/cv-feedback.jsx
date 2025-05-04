@@ -294,7 +294,12 @@ function RecommendationCard({ recommendation }) {
               </p>
             </div>
           )}
+          {/* AI Note */}
+          <div className="text-xs text-muted-foreground text-center mt-6">
+                TaleeX AI can make mistakes.
+              </div>
         </div>
+                      
       </CardContent>
     </Card>
   );

@@ -31,9 +31,8 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import CVFeedbackPage from "@/features/feedback/cv-feedback";
-import CVFeedbackDialog from "@/features/feedback/cv-feedback";
 import BehavioralFeedbackPage from "@/features/feedback/behavioral-feedback";
-import TechnicalFeedbackPage from "@/features/feedback/final-feedback";
+import FinalFeedbackPage from "@/features/feedback/final-feedback";
 
 export function ApplicantsTab({
   PHASES,
@@ -366,7 +365,7 @@ export function ApplicantsTab({
                             size="sm"
                             className="h-8 px-3"
                           >
-                            Behavioral
+                            Interview
                           </Button>
                         </DialogTrigger>
 
@@ -381,12 +380,11 @@ export function ApplicantsTab({
                             size="sm"
                             className="h-8 px-3"
                           >
-                            Technical
+                            Final Feedback
                           </Button>
                         </DialogTrigger>
-
                         <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
-                          <TechnicalFeedbackPage />
+                          <FinalFeedbackPage/>
                         </DialogContent>
                       </Dialog>
                     </div>
