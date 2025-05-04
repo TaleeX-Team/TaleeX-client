@@ -1,13 +1,19 @@
 "use client"
 
 import { getJobs, createJob, deleteJob, updateJob, shareJobToLinkedIn, filterJobs } from "@/services/apiJobs"
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 
 export const useJobs = (initialFilters = {}) => {
-  const queryClient = useQueryClient()
-  const [filters, setFilters] = useState(initialFilters)
+  const queryClient = useQueryClient();
+  const [filters, setFilters] = useState(initialFilters);
+
+  // Check if there are active filters
+  const hasFilters = Object.values(filters).some((value) => {
+    if (value === null || value === undefined || value === "") return false;
+    if (Array.isArray(value)) return value.length > 0;
+    return true;
+  });
 
   // Fetch all jobs
   const jobsQuery = useQuery({
@@ -16,13 +22,48 @@ export const useJobs = (initialFilters = {}) => {
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     retry: false,
-    onSuccess: (data) => {
-      console.log("Jobs fetched:", data)
-    },
-    onError: (error) => {
-      console.error("Fetch jobs failed:", error.message)
-    },
-  })
+  });
+
+  // Clean up filters for the API
+  const cleanFilters = Object.fromEntries(
+      Object.entries(filters).filter(([_, value]) => {
+        if (value === null || value === undefined || value === "") return false;
+        if (Array.isArray(value)) return value.length > 0;
+        return true;
+      })
+  );
+
+  // Fetch filtered jobs only if filters are active
+  const filteredJobsQuery = useQuery({
+    queryKey: ["jobs", "filter", cleanFilters],
+    queryFn: () => filterJobs(cleanFilters),
+    enabled: hasFilters,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  // Set or update filters
+  const setFilter = (newFilters) => {
+    const updatedFilters = { ...filters, ...newFilters };
+    const cleanedUpdatedFilters = Object.fromEntries(
+        Object.entries(updatedFilters).filter(([_, value]) => {
+          if (value === null || value === undefined || value === "") return false;
+          if (Array.isArray(value)) return value.length > 0;
+          return true;
+        })
+    );
+    setFilters(cleanedUpdatedFilters);
+    queryClient.invalidateQueries({ queryKey: ["jobs", "filter"] });
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setFilters({});
+    queryClient.invalidateQueries({ queryKey: ["jobs", "filter"] });
+  };
+
+
 
   // Create a job
   const createJobMutation = useMutation({
@@ -74,46 +115,17 @@ export const useJobs = (initialFilters = {}) => {
     },
   })
 
-  // Clean up filters by removing empty values
-  const cleanFilters = Object.fromEntries(
-      Object.entries(filters).filter(([_, value]) => {
-        // Keep values that are not empty strings, null, or undefined
-        if (value === null || value === undefined || value === "") return false
-        // For arrays, keep only if they have items
-        if (Array.isArray(value)) return value.length > 0
-        return true
-      }),
-  )
 
-  // Check if we have any filters to apply
-  const hasFilters = Object.keys(cleanFilters).length > 0
-
-  const filteredJobsQuery = useQuery({
-    queryKey: ["jobs", "filter", cleanFilters],
-    queryFn: () => filterJobs(cleanFilters),
-    enabled: hasFilters, // Only run if we have filters
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    retry: false,
-    onSuccess: (data) => {
-      console.log("Filtered jobs fetched:", data)
-    },
-    onError: (error) => {
-      console.error("Filter jobs failed:", error.message)
-    },
-  })
-
-  const setFilter = (newFilters) => {
-    setFilters((prevFilters) => ({ ...prevFilters, ...newFilters }))
-  }
 
   return {
-    jobsQuery, // { data, isLoading, isError }
+    jobsQuery,
     createJobMutation,
     deleteJobMutation,
     updateJobMutation,
     shareJobMutation,
     filteredJobsQuery,
+    clearFilters,
     setFilter,
+    hasFilters,
   }
 }
