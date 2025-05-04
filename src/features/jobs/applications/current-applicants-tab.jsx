@@ -188,6 +188,75 @@ export function ApplicantsTab({
               Move to CV Review
             </Button>
           )}
+
+        {(activePhase === "CV Review" || activePhase === "Applications") && (
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800"
+                disabled={selectedApplicants.length === 0}
+              >
+                <Video className="h-4 w-4" />
+                Send Video Interview
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px] dark:bg-gray-800 dark:text-gray-200">
+              <DialogHeader>
+                <DialogTitle>Send Video Interview</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label>Interview Type</Label>
+                  <div className="flex gap-4">
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id="technical"
+                        checked={interviewTypes.includes("technical")}
+                        onCheckedChange={() => toggleInterviewType("technical")}
+                        className="dark:border-gray-600"
+                      />
+                      <Label htmlFor="technical">Technical</Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id="behavioral"
+                        checked={interviewTypes.includes("behavioral")}
+                        onCheckedChange={() =>
+                          toggleInterviewType("behavioral")
+                        }
+                        className="dark:border-gray-600"
+                      />
+                      <Label htmlFor="behavioral">Behavioral</Label>
+                    </div>
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label>Number of Questions: {questionCount}</Label>
+                  <Slider
+                    value={[questionCount]}
+                    onValueChange={(value) => setQuestionCount(value[0])}
+                    min={5}
+                    max={15}
+                    step={1}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setOpen(false)}
+                  className="dark:text-gray-300 dark:border-gray-700"
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleSubmitInterview}>Send</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
         <Button
           variant="outline"
           size="sm"
@@ -197,77 +266,15 @@ export function ApplicantsTab({
         >
           Reject
         </Button>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-1 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800"
-              disabled={selectedApplicants.length === 0}
-            >
-              <Video className="h-4 w-4" />
-              Send Video Interview
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px] dark:bg-gray-800 dark:text-gray-200">
-            <DialogHeader>
-              kardeş <DialogTitle>Send Video Interview</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label>Interview Type</Label>
-                <div className="flex gap-4">
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      id="technical"
-                      checked={interviewTypes.includes("technical")}
-                      onCheckedChange={() => toggleInterviewType("technical")}
-                      className="dark:border-gray-600"
-                    />
-                    <Label htmlFor="technical">Technical</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      id="behavioral"
-                      checked={interviewTypes.includes("behavioral")}
-                      onCheckedChange={() => toggleInterviewType("behavioral")}
-                      className="dark:border-gray-600"
-                    />
-                    <Label htmlFor="behavioral">Behavioral</Label>
-                  </div>
-                </div>
-              </div>
-              <div className="grid gap-2">
-                <Label>Number of Questions: {questionCount}</Label>
-                <Slider
-                  value={[questionCount]}
-                  onValueChange={(value) => setQuestionCount(value[0])}
-                  min={5}
-                  max={15}
-                  step={1}
-                  className="w-full"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setOpen(false)}
-                className="dark:text-gray-300 dark:border-gray-700"
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleSubmitInterview}>Send</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
         <Button
           variant="outline"
           size="sm"
-          className="flex items-center gap-1 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800"
+          //success
+          className="flex items-center gap-1 text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-50 dark:disabled:hover:bg-transparent"
+          // onClick={rejectApplicants}
+          disabled={selectedApplicants.length === 0}
         >
-          <Download className="h-4 w-4" />
-          Export
+          Offer
         </Button>
       </div>
 
@@ -296,7 +303,7 @@ export function ApplicantsTab({
                 Applied at
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Actions
+                Feedbacks
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
                 CV

@@ -72,3 +72,25 @@ export const scheduleInterviews = async (
     throw error;
   }
 };
+export const changeApplicationStage = async (applicationIds, stage) => {
+  try {
+    console.log("Changing application stage:", {
+      applicationIds,
+      stage,
+    });
+    const response = await apiClient.post(
+      `/applications/change-stage`,
+      { applicationIds, stage },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("Application stage changed successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to change application stage:", error.message);
+    throw error;
+  }
+};

@@ -12,6 +12,7 @@ import {
   getJobApplications,
   advanceToCVReview,
   scheduleInterviews,
+  changeApplicationStage,
   // sendVideoInterview,
 } from "@/services/apiApplications";
 import { getJobById } from "@/services/apiJobs.js";
@@ -152,6 +153,53 @@ export default function JobApplicationManager() {
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
     },
   });
+  const rejectApplicationsMutation = useMutation({
+    mutationFn: ({ applicantIds }) =>
+      changeApplicationStage(applicantIds, "reject"),
+    onMutate: async ({ applicantIds }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["job/applicants", id] });
+
+      // Snapshot the previous value
+      const previousData = queryClient.getQueryData(["job/applicants", id]);
+
+      // Optimistically update the cache
+      queryClient.setQueryData(["job/applicants", id], (old) => {
+        if (!old || !old.applications) return old;
+        return {
+          ...old,
+          applications: old.applications.map((app) =>
+            applicantIds.includes(app._id)
+              ? {
+                  ...app,
+                  stage: "rejected",
+                  updatedAt: new Date().toISOString(),
+                }
+              : app
+          ),
+        };
+      });
+
+      // Clear selected applicants optimistically
+      setSelectedApplicants([]);
+
+      // Return context with previous data for rollback
+      return { previousData };
+    },
+    onSuccess: () => {
+      // Invalidate to refetch and sync with server
+      queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
+    },
+    onError: (err, variables, context) => {
+      // Rollback to previous data on error
+      queryClient.setQueryData(["job/applicants", id], context.previousData);
+      console.error("Failed to reject applications:", err.message);
+    },
+    onSettled: () => {
+      // Ensure queries are invalidated after success or error
+      queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
+    },
+  });
 
   // Map fetched data to match component's expected structure
   const applicants =
@@ -218,27 +266,11 @@ export default function JobApplicationManager() {
   // Handle rejecting applicants
   const rejectApplicants = () => {
     if (selectedApplicants.length === 0) return;
-
-    queryClient.setQueryData(["job/applicants", id], (old) => {
-      if (!old || !old.applications) return old;
-      return {
-        ...old,
-        applications: old.applications.map((app) =>
-          selectedApplicants.includes(app._id)
-            ? {
-                ...app,
-                stage: "rejected",
-                updatedAt: new Date().toISOString(),
-              }
-            : app
-        ),
-      };
+    rejectApplicationsMutation.mutate({
+      applicantIds: selectedApplicants,
+      stage: "reject",
     });
-
-    setSelectedApplicants([]);
-    queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
   };
-
   // Handle sending video interviews
   const handleSendInterview = ({
     interviewTypes,
