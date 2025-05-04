@@ -424,6 +424,14 @@
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.35);
   }
 
+  .dark input:-webkit-autofill,
+  .dark input:-webkit-autofill:hover,
+  .dark input:-webkit-autofill:focus,
+  .darkinput:-webkit-autofill:active {
+    box-shadow: 0 0 0 1000px #222 inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+
   /* Enhanced button styling with improved hover effects */
   .glass-card .shadcn-button,
   .glass-card .shadcn-btn,

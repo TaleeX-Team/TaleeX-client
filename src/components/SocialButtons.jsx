@@ -14,16 +14,16 @@ export const SocialButtons = ({ disabled }) => {
         <div className="flex flex-col gap-4 w-full mt-2">
             <div className="relative flex items-center justify-center">
                 <span className="absolute inset-x-0 border-t border-gray-300 dark:border-gray-700" />
-                <span className="relative px-4 text-sm text-muted-foreground bg-background dark:bg-background">
-          Or continue with
-        </span>
+                <span className="relative px-4 text-sm text-muted-foreground bg-card">
+                    Or continue with
+                </span>
             </div>
 
             <div className="flex gap-3 mt-3">
                 <Button
                     type="button"
                     variant="outline"
-                    className="w-full flex items-center justify-center gap-2 glass-card border bg-white/40 dark:bg-[#2C2744]/80 hover:bg-white/60 dark:hover:bg-[#2C2744]/90 transition-all"
+                    className="w-full flex items-center justify-center gap-2 border bg-white/40 dark:bg-[#333]/80 hover:bg-accent/60 dark:hover:bg-[#444]/90 transition-all"
                     onClick={() => handleClick('google')}
                     disabled={disabled || isProcessingOAuth}
                 >
@@ -34,7 +34,7 @@ export const SocialButtons = ({ disabled }) => {
                 <Button
                     type="button"
                     variant="outline"
-                    className="w-full flex items-center justify-center gap-2 glass-card border bg-white/40 dark:bg-[#2C2744]/80 hover:bg-white/60 dark:hover:bg-[#2C2744]/90 transition-all"
+                    className="w-full flex items-center justify-center gap-2 border bg-white/40 dark:bg-[#333]/80 hover:bg-accent/60 dark:hover:bg-[#444]/90 transition-all"
                     onClick={() => handleClick('linkedin')}
                     disabled={disabled || isProcessingOAuth}
                 >

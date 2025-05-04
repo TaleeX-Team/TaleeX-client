@@ -76,7 +76,7 @@ export const LoginForm = ({ isLoading, handleAuthSubmit, handleOAuthSuccess }) =
                                         className={`pl-10 ${isDark
                                             ? "bg-input text-foreground border-border focus:border-primary focus:ring-primary/30"
                                             : "bg-input text-foreground border-border focus:border-primary focus:ring-primary/20"
-                                        }`}
+                                            }`}
                                         {...field}
                                     />
                                 </div>
@@ -100,7 +100,7 @@ export const LoginForm = ({ isLoading, handleAuthSubmit, handleOAuthSuccess }) =
                                         className={`pl-10 pr-10 ${isDark
                                             ? "bg-input text-foreground border-border focus:border-primary focus:ring-primary/30"
                                             : "bg-input text-foreground border-border focus:border-primary focus:ring-primary/20"
-                                        }`}
+                                            }`}
                                         {...field}
                                     />
                                     <button
