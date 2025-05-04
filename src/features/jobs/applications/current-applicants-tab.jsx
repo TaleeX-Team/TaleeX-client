@@ -28,6 +28,7 @@ import {
   Video,
   Download,
   ArrowUpDown,
+  Newspaper,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import CVFeedbackPage from "@/features/feedback/cv-feedback";
@@ -343,70 +344,85 @@ export function ApplicantsTab({
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex gap-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 px-3"
-                          >
-                            CV
-                          </Button>
-                        </DialogTrigger>
+                      {activePhase !== "Applications" && (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 px-3"
+                            >
+                              CV
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
+                            <CVFeedbackPage
+                              feedback={applicant?.feedback?.cv}
+                            />
+                          </DialogContent>
+                        </Dialog>
+                      )}
+                      {activePhase !== "Applications" && (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 px-3"
+                            >
+                              Interview
+                            </Button>
+                          </DialogTrigger>
 
-                        <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
-                          <CVFeedbackPage feedback={applicant?.feedback?.cv} />
-                        </DialogContent>
-                      </Dialog>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 px-3"
-                          >
-                            Interview
-                          </Button>
-                        </DialogTrigger>
-
-                        <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
-                          <BehavioralFeedbackPage />
-                        </DialogContent>
-                      </Dialog>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 px-3"
-                          >
-                            Final Feedback
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
-                          <FinalFeedbackPage/>
-                        </DialogContent>
-                      </Dialog>
+                          <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
+                            <BehavioralFeedbackPage />
+                          </DialogContent>
+                        </Dialog>
+                      )}
+                      {activePhase !== "Applications" && (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 px-3"
+                            >
+                              Final Feedback
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
+                            <FinalFeedbackPage />
+                          </DialogContent>
+                        </Dialog>
+                      )}
                     </div>
                   </td>
                   <td className="py-3 px-4">
                     {applicant.cvUrl ? (
-                      <a
-                        href={applicant.cvUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8 gap-1"
-                        >
-                          <Link className="h-3.5 w-3.5" />
-                          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                            Open CV
-                          </span>
-                        </Button>
-                      </a>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 p-2"
+                              asChild
+                            >
+                              <a
+                                href={applicant.cvUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <Newspaper className="h-3.5 w-3.5" />
+                                <span className="sr-only">Open CV</span>
+                              </a>
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Open CV</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     ) : (
                       <span className="text-gray-400 dark:text-gray-500">
                         No CV

@@ -35,13 +35,10 @@ const formSchema = z
         message: "Last name can only contain letters and spaces.",
       }),
     email: z.string().email({ message: "Please enter a valid email address." }),
-    phone: z
-      .string()
-      .min(10, { message: "Phone number must be at least 10 digits." })
-      .regex(/^\+?[0-9]+$/, {
-        message:
-          "Phone number must contain only digits with an optional + prefix.",
-      }),
+    phone: z.string().regex(/^\+20[0-9]{10}$/, {
+      message:
+        "Phone number must be an Egyptian number starting with +20 followed by 9 digits.",
+    }),
     password: z
       .string()
       .min(6, { message: "Password must be at least 6 characters." }),
@@ -281,17 +278,11 @@ export const SignupForm = ({
               <div className="space-y-1 leading-none">
                 <FormLabel htmlFor="terms" className="text-xs">
                   I agree to the{" "}
-                  <Link
-                    to="#"
-                    className="text-primary hover:text-primary/70"
-                  >
+                  <Link to="#" className="text-primary hover:text-primary/70">
                     Terms of Service
                   </Link>{" "}
                   and{" "}
-                  <Link
-                    to="#"
-                    className="text-primary hover:text-primary/70"
-                  >
+                  <Link to="#" className="text-primary hover:text-primary/70">
                     Privacy Policy
                   </Link>
                 </FormLabel>
