@@ -4,6 +4,7 @@ import {
   getCompanies,
   requestDomainVerification,
   confirmDomainVerification,
+  requestVerification,
 } from "@/services/apiCompanies";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -161,7 +162,44 @@ export const useCompanies = () => {
       );
     },
   });
+  const requestVerificationMutation = useMutation({
+    mutationFn: ({ companyId, document }) =>
+      requestVerification(companyId, document),
+    onSuccess: (response, variables) => {
+      console.log(
+        `Verification requested successfully for company ID: ${variables.companyId}`,
+        response
+      );
 
+      // Update the company's verification status in the cache if needed
+      queryClient.setQueryData(["companies"], (oldData) => {
+        if (!oldData || !oldData.companies) return oldData;
+
+        return {
+          ...oldData,
+          companies: oldData.companies.map((company) => {
+            if (company._id === variables.companyId) {
+              return {
+                ...company,
+                verificationRequested: true,
+                // Add any other fields that might be updated in the response
+              };
+            }
+            return company;
+          }),
+        };
+      });
+
+      // Optionally invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+    },
+    onError: (error, variables) => {
+      console.error(
+        `Failed to request verification for company ID: ${variables.companyId}`,
+        error.response.data.message
+      );
+    },
+  });
   return {
     createCompanyMutation: {
       mutate: createCompanyMutation.mutate,
@@ -189,6 +227,13 @@ export const useCompanies = () => {
       isError: confirmDomainVerificationMutation.isError,
       error: confirmDomainVerificationMutation.error,
       isSuccess: confirmDomainVerificationMutation.isSuccess,
+    },
+    requestVerificationMutation: {
+      mutate: requestVerificationMutation.mutate,
+      isLoading: requestVerificationMutation.isPending,
+      isError: requestVerificationMutation.isError,
+      error: requestVerificationMutation.error,
+      isSuccess: requestVerificationMutation.isSuccess,
     },
   };
 };

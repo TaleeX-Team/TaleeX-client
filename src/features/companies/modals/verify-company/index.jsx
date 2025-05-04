@@ -19,23 +19,52 @@ import { toast } from "sonner";
 import { useCompanies } from "../../features";
 import { useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { FileUpload } from "@/features/jobs/form/components/FileUpload.jsx";
 
-export default function VerifyCompany({}) {
+// Define the form schema with Zod
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ACCEPTED_FILE_TYPES = ["application/pdf"];
+
+const documentFormSchema = z.object({
+  document: z
+    .instanceof(File, { message: "Please upload a document" })
+    .refine((file) => file.size <= MAX_FILE_SIZE, {
+      message: "File size must be less than 5MB",
+    })
+    .refine((file) => ACCEPTED_FILE_TYPES.includes(file.type), {
+      message: "Only PDF files are accepted",
+    }),
+});
+
+export default function VerifyCompany() {
   const queryClient = useQueryClient();
 
   // Dialog state
   const [open, setOpen] = useState(false);
 
-  // Get the company data and domain verification mutations from our hook
+  // Get the company data and mutations from our hook
   const {
     requestDomainVerificationMutation,
     confirmDomainVerificationMutation,
+    requestVerificationMutation,
   } = useCompanies();
   const { companyId } = useParams();
   // Find the company with the matching ID
   const companies = queryClient.getQueryData(["companies"])?.companies || [];
   const company = companies.find((company) => company._id === companyId);
-  const companyName = company.name || "Your Company";
+  const companyName = company?.name || "Your Company";
   const isAwaitingDomainVerification = company?.verification?.method || false;
 
   // State for email verification
@@ -50,16 +79,23 @@ export default function VerifyCompany({}) {
   // State for document verification
   const [file, setFile] = useState(null);
   const [fileUploaded, setFileUploaded] = useState(false);
-  const [fileError, setFileError] = useState(null);
+
+  // Initialize the form with react-hook-form and zod resolver
+  const form = useForm({
+    resolver: zodResolver(documentFormSchema),
+    defaultValues: {
+      document: undefined,
+    },
+  });
 
   // Set domain from company data if available
   useEffect(() => {
-    if (company.domain) {
+    if (company?.domain) {
       setDomain(company.domain);
     }
   }, [company]);
 
-  // Update state when request verification is successful
+  // Update state when request domain verification is successful
   useEffect(() => {
     if (requestDomainVerificationMutation.isSuccess) {
       setOtpSent(true);
@@ -67,12 +103,11 @@ export default function VerifyCompany({}) {
     }
   }, [requestDomainVerificationMutation.isSuccess, email]);
 
-  // Update state when confirmation is successful
+  // Update state when confirm domain verification is successful
   useEffect(() => {
     if (confirmDomainVerificationMutation.isSuccess) {
       setEmailVerified(true);
       toast.success("Email verified successfully!");
-
       // Close dialog after a delay
       setTimeout(() => {
         setOpen(false);
@@ -80,6 +115,16 @@ export default function VerifyCompany({}) {
       }, 2000);
     }
   }, [confirmDomainVerificationMutation.isSuccess]);
+
+  // Update state when document verification is successful
+  useEffect(() => {
+    if (requestVerificationMutation.isSuccess) {
+      setFileUploaded(true);
+      toast.success("Document uploaded successfully!");
+      form.reset();
+      setFile(null);
+    }
+  }, [requestVerificationMutation.isSuccess, form]);
 
   // Handle email submission
   const handleSendOtp = () => {
@@ -131,63 +176,32 @@ export default function VerifyCompany({}) {
     });
   };
 
-  // Handle file change
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files?.[0];
-
-    if (selectedFile) {
-      if (selectedFile.type !== "application/pdf") {
-        setFileError("Please upload a PDF document");
-        setFile(null);
-        return;
-      }
-
-      if (selectedFile.size > 5 * 1024 * 1024) {
-        // 5MB limit
-        setFileError("File size should be less than 5MB");
-        setFile(null);
-        return;
-      }
-
-      setFile(selectedFile);
-      setFileError(null);
-    }
-  };
-
-  // Handle file upload
-  const handleFileUpload = () => {
-    if (!file) {
-      setFileError("Please select a file to upload");
-      return;
+  // Handle form submission for document upload
+  const onSubmit = (values) => {
+    const formData = new FormData();
+    if (file) {
+      formData.append("document", file);
     }
 
-    // This would be connected to a document verification API
-    // For now, we'll just simulate it like before
-    setTimeout(() => {
-      setFileError(null);
-      setFileUploaded(true);
-      toast.success("Document uploaded successfully!");
-
-      // Close dialog after a delay
-      setTimeout(() => {
-        setOpen(false);
-        resetForm();
-      }, 2000);
-    }, 1500);
+    // Call the mutation to request document verification
+    requestVerificationMutation.mutate({
+      companyId,
+      document: formData,
+    });
   };
 
   // Reset form state
   const resetForm = () => {
     setEmail("");
-    setDomain(company.domain || "");
+    setDomain(company?.domain || "");
     setOtp("");
     setOtpSent(false);
     setEmailVerified(false);
     setEmailError(null);
     setDomainError(null);
+    form.reset();
     setFile(null);
     setFileUploaded(false);
-    setFileError(null);
   };
 
   // Handle errors from mutations
@@ -206,16 +220,30 @@ export default function VerifyCompany({}) {
           "Invalid verification code"
       );
     }
+
+    if (requestVerificationMutation.isError) {
+      toast.error("Failed to upload document");
+      form.setError("document", {
+        type: "manual",
+        message:
+          requestVerificationMutation.error?.response?.data?.message ||
+          "An error occurred",
+      });
+    }
   }, [
     requestDomainVerificationMutation.isError,
     requestDomainVerificationMutation.error,
     confirmDomainVerificationMutation.isError,
     confirmDomainVerificationMutation.error,
+    requestVerificationMutation.isError,
+    requestVerificationMutation.error,
+    form,
   ]);
 
   const isLoadingRequest = requestDomainVerificationMutation.isLoading;
   const isLoadingConfirm = confirmDomainVerificationMutation.isLoading;
-  const isLoading = isLoadingRequest || isLoadingConfirm;
+  const isLoadingDocument = requestVerificationMutation.isLoading;
+  const isLoading = isLoadingRequest || isLoadingConfirm || isLoadingDocument;
 
   return (
     <Dialog
@@ -367,9 +395,9 @@ export default function VerifyCompany({}) {
               )}
             </TabsContent>
 
-            {/* Document Upload Tab */}
+            {/* Document Upload Tab with React Hook Form + Zod */}
             <TabsContent value="document" className="space-y-4">
-              {fileUploaded ? (
+              {fileUploaded || company?.verification?.document ? (
                 <Alert className="bg-green-50 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-900">
                   <Check className="h-4 w-4 mr-2" />
                   <AlertDescription>
@@ -378,53 +406,51 @@ export default function VerifyCompany({}) {
                   </AlertDescription>
                 </Alert>
               ) : (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="document">
-                      Upload Verification Document
-                    </Label>
-                    <div className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center text-center cursor-pointer">
-                      <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-                      <p className="text-sm font-medium mb-1">
-                        {file ? file.name : "Drag and drop or click to upload"}
-                      </p>
-                      <p className="text-xs text-muted-foreground mb-4">
-                        Upload a document that proves your affiliation with{" "}
-                        {companyName}
-                      </p>
-                      <input
-                        id="document"
-                        type="file"
-                        accept="application/pdf"
-                        className="hidden"
-                        onChange={handleFileChange}
-                      />
-                      <label htmlFor="document">
-                        <Button type="button" variant="outline" size="sm">
-                          Select PDF
-                        </Button>
-                      </label>
-                    </div>
-                    {fileError && (
-                      <p className="text-sm text-destructive">{fileError}</p>
-                    )}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Accepted documents: Company ID, Business card, Employment
-                    letter, or any official document with your name and the
-                    company name.
-                  </div>
-                  <Button
-                    onClick={handleFileUpload}
-                    className="w-full bg-primary text-primary-foreground"
-                    disabled={!file || isLoading}
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-4"
                   >
-                    {isLoading && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    {isLoading ? "Uploading..." : "Upload Document"}
-                  </Button>
-                </div>
+                    <FormField
+                      control={form.control}
+                      name="document"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Verification Document</FormLabel>
+                          <FormControl>
+                            <FileUpload
+                              value={file}
+                              onChange={(file) => {
+                                setFile(file);
+                                field.onChange(file);
+                              }}
+                              accept=".pdf"
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Upload a document that proves your affiliation with{" "}
+                            {companyName} (PDF files only, max 5MB). Accepted
+                            documents: Company ID, Business card, Employment
+                            letter, or any official document with your name and
+                            the company name.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button
+                      type="submit"
+                      className="w-full bg-primary text-primary-foreground"
+                      disabled={isLoadingDocument}
+                    >
+                      {isLoadingDocument && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      {isLoadingDocument ? "Uploading..." : "Upload Document"}
+                    </Button>
+                  </form>
+                </Form>
               )}
             </TabsContent>
           </div>

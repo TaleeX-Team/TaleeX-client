@@ -155,7 +155,7 @@ export default function JobApplicationManager() {
   });
   const rejectApplicationsMutation = useMutation({
     mutationFn: ({ applicantIds }) =>
-      changeApplicationStage(applicantIds, "reject"),
+      changeApplicationStage(applicantIds, "rejected"),
     onMutate: async ({ applicantIds }) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ["job/applicants", id] });

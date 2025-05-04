@@ -83,3 +83,25 @@ export const confirmDomainVerification = async (companyId, data) => {
     throw error;
   }
 };
+export const requestVerification = async (companyId, document) => {
+  try {
+    console.log(
+      `Requesting verification for company ID: ${companyId}`,
+      document
+    );
+    const response = await apiClient.post(
+      `/companies/${companyId}/verification/request`,
+      document,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    console.log("Verification requested successfully");
+    return response.data;
+  } catch (error) {
+    console.error("Failed to request verification:", error);
+    throw error;
+  }
+};
