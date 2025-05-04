@@ -217,6 +217,8 @@ export default function JobApplicationManager() {
           ? "CV Review"
           : app.stage === "sending interview"
           ? "Sending Interview"
+          : app.stage === "completed interview"
+          ? "Interview Feedback"
           : app.stage,
       rejected: app.stage === "rejected",
       rejectedOn: app.stage === "rejected" ? app.createdAt : null,
