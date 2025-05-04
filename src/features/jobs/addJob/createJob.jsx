@@ -52,7 +52,7 @@ const formSchema = z.object({
 
   jobType: z.enum(["full-time", "part-time","contract","internship","temporary","freelance"]),
 
-  experienceLevel: z.enum(["intern","Entry-Level", "Junior", "Mid-Level", "Senior","Lead", "Staff","Principal", "Manager", "Director", "Vice President", "C-Level"]),
+  experienceLevel: z.enum(["Intern","Entry-Level", "Junior", "Mid-Level", "Senior","Lead", "Staff","Principal", "Manager", "Director", "Vice President", "C-Level"]),
 
   tags: z.array(z.string()).optional(),
 
@@ -86,7 +86,7 @@ export default function AddJob() {
       company: "",
       workPlaceType: "remote",
       jobType: "full-time",
-      experienceLevel: "intern",
+      experienceLevel: "Intern",
       tags: [],
       salary: {
         min: "",
@@ -274,7 +274,7 @@ export default function AddJob() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                      <SelectItem  value="intern">Intern</SelectItem>
+                      <SelectItem  value="Intern">Intern</SelectItem>
         <SelectItem value="Entry-Level">Entry-Level</SelectItem>
         <SelectItem value="Junior">Junior</SelectItem>
         <SelectItem value="Mid-Level">Mid-Level</SelectItem>
