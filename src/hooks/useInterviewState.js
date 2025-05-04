@@ -13,14 +13,11 @@ const CallStatus = {
 
 const VAPI_ASSISTANT_ID = "a7939f6e-e04e-4bce-ac30-c6e7e35655a6"
 const VAPI_API_KEY = "d4ecde21-8c7d-4f5c-9996-5c2b306d9ccf"
-const ENDING_PHRASE = "That concludes our interview today. Thank you for your time."
+const ENDING_PHRASE = "That concludes our interview today Thank you for your time"
 const INTERVIEW_DURATION_MINUTES = 20
 const WARNING_TIME_MINUTES = 5
 const FINAL_WARNING_MINUTES = 1
-const RESPONSE_TIMEOUT = 15000 // Increased to 15 seconds
-const SPEAKING_FALLBACK_DURATION = 3000 // 3 seconds for message-based fallback
-const SPEECH_END_TIMEOUT = 500 // 500ms timeout for speech-end
-const MAX_RETRIES = 3 // Maximum call retry attempts
+const RESPONSE_TIMEOUT = 15000 // 15 seconds for response timeout
 
 export function useInterviewState(questions) {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -53,7 +50,6 @@ export function useInterviewState(questions) {
     const [timeRemaining, setTimeRemaining] = useState(INTERVIEW_DURATION_MINUTES * 60)
     const [timerWarningGiven, setTimerWarningGiven] = useState(false)
     const [finalWarningGiven, setFinalWarningGiven] = useState(false)
-    const [retryCount, setRetryCount] = useState(0)
 
     // Question tracking system
     const [questionStates, setQuestionStates] = useState(
@@ -83,8 +79,6 @@ export function useInterviewState(questions) {
     const interviewTimerRef = useRef(null)
     const responseTimeoutRef = useRef(null)
     const screenshotIntervalRef = useRef(null)
-    const speechEndTimeoutRef = useRef(null)
-    const userSpeechEndTimeoutRef = useRef(null)
 
     // Initialize VAPI client
     useEffect(() => {
@@ -95,31 +89,26 @@ export function useInterviewState(questions) {
             // Add WebRTC connection state listener
             vapiClientRef.current.on("call-state", (state) => {
                 if (debugMode) console.log("VAPI call state changed:", { state, timestamp: new Date().toISOString() })
-                if (state === "disconnected" && callStatus === CallStatus.ACTIVE && retryCount < MAX_RETRIES) {
-                    setError("WebRTC connection lost. Attempting to reconnect...")
-                    setRetryCount((prev) => prev + 1)
-                    setTimeout(() => startVAPICall(), 2000)
+                if (state === "disconnected" && callStatus === CallStatus.ACTIVE) {
+                    setError("WebRTC connection lost. Ending call...")
+                    endCallImmediately()
                 }
             })
         } else if (!Vapi) {
             setError("VAPI SDK failed to load")
         }
-    }, [debugMode, callStatus, retryCount])
+    }, [debugMode, callStatus])
 
     // Monitor network status
     useEffect(() => {
         const handleOnline = () => {
-            if (callStatus === CallStatus.FINISHED && retryCount < MAX_RETRIES) {
-                if (debugMode)
-                    console.log("Network restored, attempting to restart call", { timestamp: new Date().toISOString() })
-                startVAPICall()
-            }
+            if (debugMode) console.log("Network restored", { timestamp: new Date().toISOString() })
         }
 
         const handleOffline = () => {
             if (callStatus === CallStatus.ACTIVE) {
-                if (debugMode) console.log("Network lost, pausing call", { timestamp: new Date().toISOString() })
-                setError("Network connection lost. Attempting to reconnect...")
+                if (debugMode) console.log("Network lost, ending call", { timestamp: new Date().toISOString() })
+                setError("Network connection lost. Ending call...")
                 endCallImmediately()
             }
         }
@@ -131,14 +120,13 @@ export function useInterviewState(questions) {
             window.removeEventListener("online", handleOnline)
             window.removeEventListener("offline", handleOffline)
         }
-    }, [callStatus, retryCount, debugMode])
+    }, [callStatus, debugMode])
 
     // Synchronize question states and progress
     useEffect(() => {
         if (questions.length > 0) {
             setQuestionStates((prevStates) => {
                 const newStates = questions.map((question, idx) => {
-                    console.log(questions, "map question")
                     const existingState = prevStates.find((qs) => qs.index === idx) || {}
                     return {
                         question,
@@ -192,23 +180,12 @@ export function useInterviewState(questions) {
                         ]
                         setLastUserResponseTime(new Date())
                         setLastSpeakingRole("user")
-                        if (!isUserTalking) {
-                            setIsUserTalking(true)
-                            setIsAITalking(false)
-                            if (debugMode)
-                                console.log("User message received, isUserTalking: true, isAITalking: false", {
-                                    timestamp: new Date().toISOString(),
-                                })
-                            setTimeout(() => {
-                                if (isUserTalking && !isAITalking) {
-                                    setIsUserTalking(false)
-                                    if (debugMode)
-                                        console.log("User talking fallback timeout, isUserTalking: false", {
-                                            timestamp: new Date().toISOString(),
-                                        })
-                                }
-                            }, SPEAKING_FALLBACK_DURATION)
-                        }
+                        setIsUserTalking(true)
+                        setIsAITalking(false)
+                        if (debugMode)
+                            console.log("User message received, isUserTalking: true, isAITalking: false", {
+                                timestamp: new Date().toISOString(),
+                            })
                         if (responseTimeoutRef.current) {
                             clearTimeout(responseTimeoutRef.current)
                             responseTimeoutRef.current = null
@@ -226,30 +203,76 @@ export function useInterviewState(questions) {
                             },
                         ]
                         setLastSpeakingRole("assistant")
-                        if (!isAITalking) {
-                            setIsAITalking(true)
-                            setIsUserTalking(false)
-                            if (debugMode)
-                                console.log("Assistant message received, isAITalking: true, isUserTalking: false", {
-                                    timestamp: new Date().toISOString(),
-                                })
-                            setTimeout(() => {
-                                if (isAITalking && !isUserTalking) {
-                                    setIsAITalking(false)
-                                    if (debugMode)
-                                        console.log("AI talking fallback timeout, isAITalking: false", {
-                                            timestamp: new Date().toISOString(),
-                                        })
-                                }
-                            }, SPEAKING_FALLBACK_DURATION)
-                        }
+                        setIsAITalking(true)
+                        setIsUserTalking(false)
+                        if (debugMode)
+                            console.log("Assistant message received, isAITalking: true, isUserTalking: false", {
+                                timestamp: new Date().toISOString(),
+                            })
                     }
 
                     return newStates
                 })
             }
         }
-    }, [messages, currentQuestionIndex, isAITalking, isUserTalking, debugMode])
+    }, [messages, currentQuestionIndex, debugMode])
+
+    // Duration timer
+    useEffect(() => {
+        if (isInterviewStarted && callStatus === CallStatus.ACTIVE) {
+            durationTimerRef.current = setInterval(() => {
+                setInterviewDuration((prev) => prev + 1)
+                if (debugMode)
+                    console.log("Duration timer tick", { interviewDuration: interviewDuration + 1, timestamp: new Date().toISOString() })
+            }, 1000)
+        }
+        return () => {
+            if (durationTimerRef.current) {
+                clearInterval(durationTimerRef.current)
+                durationTimerRef.current = null
+                if (debugMode) console.log("Duration timer cleared", { timestamp: new Date().toISOString() })
+            }
+        }
+    }, [isInterviewStarted, callStatus, debugMode])
+
+    // Interview timer (for warnings and time remaining)
+    useEffect(() => {
+        if (isInterviewStarted && callStatus === CallStatus.ACTIVE) {
+            interviewTimerRef.current = setInterval(() => {
+                setTimeRemaining((prev) => {
+                    const newTime = prev - 1
+                    const canSpeak =
+                        !isAITalking && !isUserTalking && (!lastUserResponseTime || new Date() - lastUserResponseTime > 2000)
+
+                    if (newTime <= WARNING_TIME_MINUTES * 60 && !timerWarningGiven && canSpeak) {
+                        vapiClientRef.current.say(
+                            `We have five minutes remaining in the interview. Please continue with your response or prepare to wrap up.`,
+                        )
+                        setTimerWarningGiven(true)
+                        if (debugMode) console.log("5-minute warning given", { timestamp: new Date().toISOString() })
+                    }
+
+                    if (newTime <= FINAL_WARNING_MINUTES * 60 && !finalWarningGiven && canSpeak) {
+                        vapiClientRef.current.say(`We have one minute remaining. Please conclude your current response.`)
+                        setFinalWarningGiven(true)
+                        if (debugMode) console.log("1-minute warning given", { timestamp: new Date().toISOString() })
+                    }
+
+                    if (debugMode)
+                        console.log("Time remaining timer tick", { timeRemaining: newTime, timestamp: new Date().toISOString() })
+
+                    return newTime
+                })
+            }, 1000)
+        }
+        return () => {
+            if (interviewTimerRef.current) {
+                clearInterval(interviewTimerRef.current)
+                interviewTimerRef.current = null
+                if (debugMode) console.log("Interview timer cleared", { timestamp: new Date().toISOString() })
+            }
+        }
+    }, [isInterviewStarted, callStatus, debugMode])
 
     // Setup VAPI client listeners
     useEffect(() => {
@@ -278,7 +301,7 @@ export function useInterviewState(questions) {
 
                 setMessages((prev) => [...prev, { ...message, content: messageContent }])
 
-                // End call if the ending phrase is contained in the message, call is active, and message is from assistant
+                // End call if the ending phrase is detected from the assistant
                 if (
                     message.role === "assistant" &&
                     (normalizedMessage.includes(normalizedEndingPhrase) || messageContent.includes(ENDING_PHRASE)) &&
@@ -351,7 +374,12 @@ export function useInterviewState(questions) {
             }
 
             const updateQuestionState = (newIndex) => {
-                clearAllTimers()
+                // Only clear response timeout timer, not duration or interview timers
+                if (responseTimeoutRef.current) {
+                    clearTimeout(responseTimeoutRef.current)
+                    responseTimeoutRef.current = null
+                    if (debugMode) console.log("Response timeout cleared during question transition", { timestamp: new Date().toISOString() })
+                }
 
                 setQuestionStates((prevStates) => {
                     const newStates = [...prevStates]
@@ -388,22 +416,20 @@ export function useInterviewState(questions) {
             }
 
             const handleSpeechStart = () => {
-                if (!isAITalking) {
-                    setIsAITalking(true)
-                    setIsUserTalking(false)
-                    setLastSpeakingRole("assistant")
-                    if (responseTimeoutRef.current) {
-                        clearTimeout(responseTimeoutRef.current)
-                        responseTimeoutRef.current = null
-                        if (debugMode)
-                            console.log("Response timeout cleared due to AI speech start", { timestamp: new Date().toISOString() })
-                    }
+                setIsAITalking(true)
+                setIsUserTalking(false)
+                setLastSpeakingRole("assistant")
+                if (responseTimeoutRef.current) {
+                    clearTimeout(responseTimeoutRef.current)
+                    responseTimeoutRef.current = null
                     if (debugMode)
-                        console.log("AI speech started, isAITalking: true, isUserTalking: false", {
-                            questionIndex: currentQuestionIndex,
-                            timestamp: new Date().toISOString(),
-                        })
+                        console.log("Response timeout cleared due to AI speech start", { timestamp: new Date().toISOString() })
                 }
+                if (debugMode)
+                    console.log("AI speech started, isAITalking: true, isUserTalking: false", {
+                        questionIndex: currentQuestionIndex,
+                        timestamp: new Date().toISOString(),
+                    })
             }
 
             const handleSpeechEnd = () => {
@@ -414,17 +440,6 @@ export function useInterviewState(questions) {
                         questionIndex: currentQuestionIndex,
                         timestamp: new Date().toISOString(),
                     })
-
-                if (speechEndTimeoutRef.current) clearTimeout(speechEndTimeoutRef.current)
-                speechEndTimeoutRef.current = setTimeout(() => {
-                    if (isAITalking) {
-                        setIsAITalking(false)
-                        if (debugMode)
-                            console.log("Forced isAITalking to false after speech-end timeout", {
-                                timestamp: new Date().toISOString(),
-                            })
-                    }
-                }, SPEECH_END_TIMEOUT)
 
                 if (callStatus === CallStatus.ACTIVE) {
                     if (debugMode)
@@ -466,38 +481,25 @@ export function useInterviewState(questions) {
             }
 
             const handleUserSpeechStart = () => {
-                if (!isUserTalking) {
-                    setIsUserTalking(true)
-                    setIsAITalking(false)
-                    setLastSpeakingRole("user")
-                    if (responseTimeoutRef.current) {
-                        clearTimeout(responseTimeoutRef.current)
-                        responseTimeoutRef.current = null
-                        if (debugMode)
-                            console.log("Response timeout cleared due to user speech start", { timestamp: new Date().toISOString() })
-                    }
+                setIsUserTalking(true)
+                setIsAITalking(false)
+                setLastSpeakingRole("user")
+                if (responseTimeoutRef.current) {
+                    clearTimeout(responseTimeoutRef.current)
+                    responseTimeoutRef.current = null
                     if (debugMode)
-                        console.log("User speech started, isUserTalking: true, isAITalking: false", {
-                            timestamp: new Date().toISOString(),
-                        })
+                        console.log("Response timeout cleared due to user speech start", { timestamp: new Date().toISOString() })
                 }
+                if (debugMode)
+                    console.log("User speech started, isUserTalking: true, isAITalking: false", {
+                        timestamp: new Date().toISOString(),
+                    })
             }
 
             const handleUserSpeechEnd = () => {
                 setIsUserTalking(false)
                 setLastSpeakingRole(null)
                 if (debugMode) console.log("User speech ended, isUserTalking: false", { timestamp: new Date().toISOString() })
-
-                if (userSpeechEndTimeoutRef.current) clearTimeout(userSpeechEndTimeoutRef.current)
-                userSpeechEndTimeoutRef.current = setTimeout(() => {
-                    if (isUserTalking) {
-                        setIsUserTalking(false)
-                        if (debugMode)
-                            console.log("Forced isUserTalking to false after user speech-end timeout", {
-                                timestamp: new Date().toISOString(),
-                            })
-                    }
-                }, SPEECH_END_TIMEOUT)
             }
 
             const handleError = (error) => {
@@ -505,6 +507,31 @@ export function useInterviewState(questions) {
                 if (errorMessage.includes("microphone")) {
                     errorMessage =
                         "Microphone access issue. Please ensure your microphone is enabled and permissions are granted."
+                } else if (errorMessage.includes("Meeting has ended")) {
+                    // Handle "Meeting has ended" error by ensuring interview completion
+                    if (debugMode)
+                        console.log("Meeting ended error detected, ensuring interview completion", {
+                            timestamp: new Date().toISOString(),
+                        })
+                    setIsInterviewComplete(true)
+                    setConclusionDetected(true)
+                    setCallStatus(CallStatus.FINISHED)
+                    setIsAITalking(false)
+                    setIsUserTalking(false)
+                    setIsLoading(false)
+                    setMessages([])
+                    setTranscript("")
+                    clearAllTimers()
+                    if (debugMode)
+                        console.error("Detailed VAPI error:", {
+                            message: error.message,
+                            stack: error.stack,
+                            callStatus,
+                            isAITalking,
+                            isUserTalking,
+                            timestamp: new Date().toISOString(),
+                        })
+                    return
                 }
                 setError(`VAPI error: ${errorMessage}`)
                 setIsAITalking(false)
@@ -540,63 +567,9 @@ export function useInterviewState(questions) {
                     clearTimeout(responseTimeoutRef.current)
                     if (debugMode) console.log("Response timeout cleared on cleanup", { timestamp: new Date().toISOString() })
                 }
-                if (speechEndTimeoutRef.current) {
-                    clearTimeout(speechEndTimeoutRef.current)
-                    if (debugMode)
-                        console.log("AI speech end timeout cleared on cleanup", { timestamp: new Date().toISOString() })
-                }
-                if (userSpeechEndTimeoutRef.current) {
-                    clearTimeout(userSpeechEndTimeoutRef.current)
-                    if (debugMode)
-                        console.log("User speech end timeout cleared on cleanup", { timestamp: new Date().toISOString() })
-                }
             }
         }
     }, [vapiClientRef.current, currentQuestionIndex, questions, callStatus, debugMode])
-
-    // Interview timer (for warnings only)
-    useEffect(() => {
-        if (isInterviewStarted && callStatus === CallStatus.ACTIVE) {
-            interviewTimerRef.current = setInterval(() => {
-                setTimeRemaining((prev) => {
-                    const newTime = prev - 1
-                    const canSpeak =
-                        !isAITalking && !isUserTalking && (!lastUserResponseTime || new Date() - lastUserResponseTime > 2000)
-
-                    if (newTime <= WARNING_TIME_MINUTES * 60 && !timerWarningGiven && canSpeak) {
-                        vapiClientRef.current.say(
-                            `We have five minutes remaining in the interview. Please continue with your response or prepare to wrap up.`,
-                        )
-                        setTimerWarningGiven(true)
-                        if (debugMode) console.log("5-minute warning given", { timestamp: new Date().toISOString() })
-                    }
-
-                    if (newTime <= FINAL_WARNING_MINUTES * 60 && !finalWarningGiven && canSpeak) {
-                        vapiClientRef.current.say(`We have one minute remaining. Please conclude your current response.`)
-                        setFinalWarningGiven(true)
-                        if (debugMode) console.log("1-minute warning given", { timestamp: new Date().toISOString() })
-                    }
-
-                    return newTime
-                })
-            }, 1000)
-        }
-        return () => {
-            if (interviewTimerRef.current) {
-                clearInterval(interviewTimerRef.current)
-                if (debugMode) console.log("Interview timer cleared", { timestamp: new Date().toISOString() })
-            }
-        }
-    }, [
-        isInterviewStarted,
-        callStatus,
-        isAITalking,
-        isUserTalking,
-        lastUserResponseTime,
-        timerWarningGiven,
-        finalWarningGiven,
-        debugMode,
-    ])
 
     // Capture screenshot
     const captureScreenshot = () => {
@@ -665,21 +638,6 @@ export function useInterviewState(questions) {
             }
         }
     }, [isInterviewStarted, callStatus, debugMode])
-
-    // Duration timer
-    useEffect(() => {
-        if (isInterviewStarted) {
-            durationTimerRef.current = setInterval(() => {
-                setInterviewDuration((prev) => prev + 1)
-            }, 1000)
-        }
-        return () => {
-            if (durationTimerRef.current) {
-                clearInterval(durationTimerRef.current)
-                if (debugMode) console.log("Duration timer cleared", { timestamp: new Date().toISOString() })
-            }
-        }
-    }, [isInterviewStarted, debugMode])
 
     // Monitor conclusion
     useEffect(() => {
@@ -760,13 +718,7 @@ export function useInterviewState(questions) {
             setTranscript("")
             clearAllTimers()
 
-            // Retry if call ended unexpectedly and retry limit not reached
-            if (!conclusionDetected && retryCount < MAX_RETRIES) {
-                if (debugMode)
-                    console.log(`Retrying VAPI call, attempt ${retryCount + 1}`, { timestamp: new Date().toISOString() })
-                setRetryCount((prev) => prev + 1)
-                setTimeout(() => startVAPICall(), 2000)
-            }
+            console.log("Dialog completed interview")
         } catch (error) {
             setError(`Call termination error: ${error.message}`)
             setIsInterviewComplete(true)
@@ -778,6 +730,7 @@ export function useInterviewState(questions) {
             setMessages([])
             setTranscript("")
             clearAllTimers()
+            console.log("Dialog completed interview")
             if (debugMode) console.error("End call error:", { error, timestamp: new Date().toISOString() })
         }
     }
@@ -785,34 +738,24 @@ export function useInterviewState(questions) {
     const clearAllTimers = () => {
         if (durationTimerRef.current) {
             clearInterval(durationTimerRef.current)
+            durationTimerRef.current = null
             if (debugMode) console.log("Duration timer cleared", { timestamp: new Date().toISOString() })
         }
         if (responseTimeoutRef.current) {
             clearTimeout(responseTimeoutRef.current)
+            responseTimeoutRef.current = null
             if (debugMode) console.log("Response timeout cleared", { timestamp: new Date().toISOString() })
         }
         if (screenshotIntervalRef.current) {
             clearInterval(screenshotIntervalRef.current)
+            screenshotIntervalRef.current = null
             if (debugMode) console.log("Screenshot interval cleared", { timestamp: new Date().toISOString() })
         }
         if (interviewTimerRef.current) {
             clearInterval(interviewTimerRef.current)
+            interviewTimerRef.current = null
             if (debugMode) console.log("Interview timer cleared", { timestamp: new Date().toISOString() })
         }
-        if (speechEndTimeoutRef.current) {
-            clearTimeout(speechEndTimeoutRef.current)
-            if (debugMode) console.log("AI speech end timeout cleared", { timestamp: new Date().toISOString() })
-        }
-        if (userSpeechEndTimeoutRef.current) {
-            clearTimeout(userSpeechEndTimeoutRef.current)
-            if (debugMode) console.log("User speech end timeout cleared", { timestamp: new Date().toISOString() })
-        }
-        durationTimerRef.current = null
-        responseTimeoutRef.current = null
-        screenshotIntervalRef.current = null
-        interviewTimerRef.current = null
-        speechEndTimeoutRef.current = null
-        userSpeechEndTimeoutRef.current = null
         setScreenshotInterval(null)
         if (debugMode) console.log("All timers cleared", { timestamp: new Date().toISOString() })
     }
@@ -850,13 +793,11 @@ export function useInterviewState(questions) {
                 setLastSpeakingRole("assistant")
                 if (debugMode) console.log("Intro message added", { timestamp: new Date().toISOString() })
             }
-            console.log(questions, "questions2")
 
             const formattedQuestions = questions.map((q, i) => `Question ${i + 1}: ${q}`).join("\n\n")
-            console.log(formattedQuestions, "formatedQuestions2")
             const assistantOverrides = {
                 name: "AI Technical Interviewer",
-                firstMessage: `Hello! I'm TaleX AI, your interviewer today. I'll be asking you ${questions.length} technical questions to assess your skills. The interview will last up to ${INTERVIEW_DURATION_MINUTES} minutes. Let's begin with the first question: "${questions[0]},Are you Ready?!"`,
+                firstMessage: `Hello! I'm TaleX AI, your interviewer today. I'll be asking you ${questions.length} technical questions to assess your skills. The interview will last up to ${INTERVIEW_DURATION_MINUTES} minutes. Are you ready?!"`,
                 transcriber: {
                     provider: "deepgram",
                     model: "nova-2",
@@ -881,8 +822,9 @@ export function useInterviewState(questions) {
 2. Maintain a professional, friendly, yet firm tone.
 3. Analyze responses for accuracy, depth, clarity, and relevance.
 4. Detect evasive or off-topic responses and redirect politely with: "Could you focus on the question?"
-5. Ask follow-up questions if the response is incomplete (e.g., "Can you elaborate on X?").
-6. After receiving a response, a declined answer, or exactly 10 seconds of silence, transition to the next question by saying: "Moving to question X: [question]".
+5. Dont Explain any concepts  . you could just give small hints that  could help him and give small feedback on each candidate answer.
+6. Ask follow-up questions if the response is incomplete (e.g., "Can you elaborate on X?").
+7. After receiving a response, a declined answer, or exactly 10 seconds of silence, transition to the next question by saying: "Moving to question X: [question]".
 
 **INTERVIEW GUIDELINES**:
 - **Introduction**: Greet the candidate, state the number of questions, and set expectations for the interview duration.
@@ -985,7 +927,6 @@ ${formattedQuestions}
         setTimeRemaining(INTERVIEW_DURATION_MINUTES * 60)
         setTimerWarningGiven(false)
         setFinalWarningGiven(false)
-        setRetryCount(0)
 
         setQuestionStates(
             questions.map((question, idx) => ({
@@ -1233,14 +1174,9 @@ ${formattedQuestions}
     // Monitor interview completion state
     useEffect(() => {
         if (isInterviewComplete && conclusionDetected) {
-            // This is where you would show the interviewCompletedAttachment dialog
             if (debugMode)
                 console.log("Interview completed, should show completion dialog", { timestamp: new Date().toISOString() })
 
-            // If you have a navigate function from react-router, you can use it to navigate to a completion page
-            // navigate('/interview-complete');
-
-            // Or you can trigger a custom event that your parent component can listen for
             const event = new CustomEvent("interviewCompleted", {
                 detail: {
                     transcript: formatTranscriptForSubmission(),

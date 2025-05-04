@@ -1,5 +1,3 @@
-"use client"
-
 import {
     Dialog,
     DialogContent,
@@ -8,12 +6,14 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Clock, CheckCircle, Camera } from "lucide-react"
-import { useState } from "react"
-import {useNavigate} from "react-router-dom";
+import {Button} from "@/components/ui/button"
+import {Clock, CheckCircle, Camera} from "lucide-react"
+import {useState} from "react"
+import {useNavigate} from "react-router-dom"
+import {useEndInterview} from "@/hooks/useInterviewData.js";
 
 export function InterviewCompletedDialog({
+                                             interviewId,
                                              open,
                                              onOpenChange,
                                              onClose,
@@ -21,10 +21,14 @@ export function InterviewCompletedDialog({
                                              questionsAsked,
                                              totalQuestions,
                                              screenshots,
+                                             transcript, // Add transcript as a prop
                                          }) {
-    const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSubmitted, setIsSubmitted] = useState(false)
-    const  navigate = useNavigate()
+    const navigate = useNavigate()
+
+    // Use the end interview hook with loading state and error handling
+    const { mutateAsync, isPending, isError, error } = useEndInterview()
+
     // Format duration from seconds to minutes:seconds
     const formatDuration = (seconds) => {
         const minutes = Math.floor(seconds / 60)
@@ -33,20 +37,32 @@ export function InterviewCompletedDialog({
     }
 
     const handleSubmit = async () => {
-        setIsSubmitting(true)
+        try {
+            // Submit the interview data using the hook
+            await mutateAsync({
+                interviewId,
+                transcript,
+                images: screenshots || []
+            })
 
-        // Simulate submission to backend
-        setTimeout(() => {
-            setIsSubmitting(false)
             setIsSubmitted(true)
-        }, 1500)
-
-        // In a real implementation, you would send the data to your backend
-        // const result = await submitInterviewData('https://your-api-endpoint.com/interviews');
+        } catch (error) {
+            console.error("Error submitting interview data:", error)
+            // Error is already handled by the hook and will be displayed in UI
+        }
     }
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog
+            open={open}
+            onOpenChange={(newOpen) => {
+                // Only allow closing if submitted or through the buttons
+                if (newOpen === false && !isSubmitted) {
+                    return; // Prevent dialog from closing
+                }
+                onOpenChange(newOpen);
+            }}
+        >
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle className="text-xl">Interview Completed</DialogTitle>
@@ -55,7 +71,7 @@ export function InterviewCompletedDialog({
 
                 <div className="grid gap-4 py-4">
                     <div className="flex items-center gap-4">
-                        <Clock className="h-5 w-5 text-gray-500" />
+                        <Clock className="h-5 w-5 text-gray-500"/>
                         <div>
                             <p className="font-medium">Duration</p>
                             <p className="text-sm text-gray-500">{formatDuration(interviewDuration)}</p>
@@ -63,7 +79,7 @@ export function InterviewCompletedDialog({
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <CheckCircle className="h-5 w-5 text-gray-500" />
+                        <CheckCircle className="h-5 w-5 text-gray-500"/>
                         <div>
                             <p className="font-medium">Questions</p>
                             <p className="text-sm text-gray-500">
@@ -73,7 +89,7 @@ export function InterviewCompletedDialog({
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <Camera className="h-5 w-5 text-gray-500" />
+                        <Camera className="h-5 w-5 text-gray-500"/>
                         <div>
                             <p className="font-medium">Screenshots</p>
                             <p className="text-sm text-gray-500">{screenshots?.length || 0} screenshots captured</p>
@@ -90,7 +106,7 @@ export function InterviewCompletedDialog({
                                         className="relative min-w-[100px] h-[75px] rounded-md overflow-hidden border border-gray-200"
                                     >
                                         <img
-                                            src={screenshot || "/placeholder.svg"}
+                                            src={typeof screenshot === 'string' ? screenshot : URL.createObjectURL(screenshot)}
                                             alt={`Screenshot ${index + 1}`}
                                             className="w-full h-full object-cover"
                                         />
@@ -103,18 +119,34 @@ export function InterviewCompletedDialog({
 
                 <DialogFooter className="flex flex-col sm:flex-row gap-2">
                     {!isSubmitted ? (
-                        <>
-                            <Button variant="outline" onClick={onClose} className="sm:w-auto w-full">
-                                Close
-                            </Button>
-                            <Button onClick={handleSubmit} className="sm:w-auto w-full" disabled={isSubmitting}>
-                                {isSubmitting ? "Submitting..." : "Submit Interview Data"}
-                            </Button>
-                        </>
+                        <Button
+                            onClick={handleSubmit}
+                            className="sm:w-auto w-full"
+                            disabled={isPending}
+                        >
+                            {isPending ? (
+                                <>
+                                    <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-b-transparent border-white"></span>
+                                    Submitting...
+                                </>
+                            ) : (
+                                "Submit Interview Data"
+                            )}
+                        </Button>
                     ) : (
-                        <Button onClick={onClose} className="sm:w-auto w-full">
+                        <Button onClick={() => {
+                            onClose();
+                            // Optionally navigate somewhere after submission
+                            // navigate("/dashboard");
+                        }} className="sm:w-auto w-full">
                             Done
                         </Button>
+                    )}
+
+                    {isError && (
+                        <p className="text-sm text-red-500 mt-2">
+                            {error?.message || "Failed to submit interview data. Please try again."}
+                        </p>
                     )}
                 </DialogFooter>
             </DialogContent>

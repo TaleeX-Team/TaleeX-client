@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -95,14 +95,6 @@ export default function Interview() {
         }
     }, [lastCapturedScreenshot, screenshots.length]);
 
-    // Handle interview completion
-    useEffect(() => {
-        if (isInterviewComplete) {
-            console.log("Interview completed, navigating to home", { timestamp: new Date().toISOString() });
-            navigate(`/`);
-        }
-    }, [isInterviewComplete, navigate]);
-
     // Handle errors from startInterview
     useEffect(() => {
         if (startError) {
@@ -110,6 +102,13 @@ export default function Interview() {
             setError(`Failed to load interview questions: ${startError.message}`);
         }
     }, [startError, setError]);
+
+    // Handle dialog close and navigation
+    const handleDialogClose = () => {
+        setIsInterviewComplete(false);
+        handleEndInterview();
+        navigate('/');
+    };
 
     // Handle case where no questions are available
     if (!questionsData.length && !isStartingInterview) {
@@ -217,8 +216,9 @@ export default function Interview() {
 
             <InterviewCompletedDialog
                 open={isInterviewComplete}
+                interviewId={interviewId}
                 onOpenChange={setIsInterviewComplete}
-                onClose={handleEndInterview}
+                onClose={handleDialogClose}
                 interviewDuration={interviewDuration}
                 questionsAsked={progress.current}
                 totalQuestions={questionsData.length}
