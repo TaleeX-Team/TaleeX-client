@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import Vapi from "@vapi-ai/web"
 
@@ -960,6 +960,11 @@ ${formattedQuestions}
 
         if (debugMode) console.log("Interview ended manually", { timestamp: new Date().toISOString() })
     }
+    const formatTranscriptForSubmission = () => {
+        // Implement your transcript formatting logic here
+        // This is a placeholder, replace with your actual formatting
+        return messages.map((msg) => `${msg.role}: ${msg.content}`).join("\n")
+    }
     const saveTranscriptToLocalStorage = (interviewId) => {
         try {
             const transcript = formatTranscriptForSubmission()
@@ -1023,17 +1028,78 @@ ${formattedQuestions}
     }
 
     // Toggle audio
-    const toggleAudio = () => {
+    const toggleAudio = useCallback(() => {
         if (!vapiClientRef.current || callStatus !== CallStatus.ACTIVE) {
-            setError("Cannot toggle audio: Call is not active or VAPI client is unavailable.")
-            if (debugMode) console.log("Audio toggle aborted", { callStatus, timestamp: new Date().toISOString() })
+            if (debugMode)
+                console.log("Audio toggle aborted: Call not active or VAPI client unavailable", {
+                    callStatus,
+                    hasVapiClient: !!vapiClientRef.current,
+                    timestamp: new Date().toISOString(),
+                })
             return
         }
-        const currentMuted = vapiClientRef.current.isMuted()
-        vapiClientRef.current.setMuted(!currentMuted)
-        setIsAudioOn(!currentMuted)
-        if (debugMode) console.log("Audio toggled", { isAudioOn: !currentMuted, timestamp: new Date().toISOString() })
-    }
+
+        try {
+            // Get the current mute state from VAPI client
+            const currentMuted = vapiClientRef.current.isMuted()
+
+            // Toggle VAPI mute state
+            vapiClientRef.current.setMuted(!currentMuted)
+
+            // Get the WebRTC connection from VAPI client to access the actual audio tracks
+            const peerConnection = vapiClientRef.current.getPeerConnection?.() || null
+
+            if (peerConnection) {
+                // Get all senders (outgoing tracks)
+                const senders = peerConnection.getSenders() || []
+
+                // Find audio tracks and disable/enable them
+                senders.forEach((sender) => {
+                    if (sender.track && sender.track.kind === "audio") {
+                        // This actually stops the audio from being sent
+                        sender.track.enabled = currentMuted
+
+                        if (debugMode)
+                            console.log(`Audio track ${currentMuted ? "enabled" : "disabled"}`, {
+                                trackId: sender.track.id,
+                                timestamp: new Date().toISOString(),
+                            })
+                    }
+                })
+            } else if (videoRef.current && videoRef.current.srcObject) {
+                // Fallback: If we can't access the peer connection, try to mute via the video element's stream
+                const audioTracks = videoRef.current.srcObject.getAudioTracks()
+
+                if (audioTracks && audioTracks.length > 0) {
+                    audioTracks.forEach((track) => {
+                        track.enabled = currentMuted
+
+                        if (debugMode)
+                            console.log(`Audio track ${currentMuted ? "enabled" : "disabled"} (fallback)`, {
+                                trackId: track.id,
+                                timestamp: new Date().toISOString(),
+                            })
+                    })
+                }
+            }
+
+            // Update state to reflect new audio status
+            setIsAudioOn(!currentMuted)
+
+            if (debugMode)
+                console.log("Audio toggled completely", {
+                    newAudioState: !currentMuted,
+                    timestamp: new Date().toISOString(),
+                })
+        } catch (error) {
+            setError(`Warning: Could not toggle microphone: ${error.message}`)
+            if (debugMode)
+                console.error("Error toggling audio:", {
+                    error,
+                    timestamp: new Date().toISOString(),
+                })
+        }
+    }, [vapiClientRef, callStatus, debugMode, videoRef])
 
     const getInterviewTranscript = () => {
         const validMessages = messages.filter(
