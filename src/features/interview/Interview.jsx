@@ -8,11 +8,12 @@ import { X } from 'lucide-react';
 import { VideoContainer } from "@/components/interview/VideoContainer";
 import { TranscriptPanel } from "@/components/interview/TranscriptPanel";
 import { InterviewCompletedDialog } from "@/components/interview/InterviewCompletedDialog";
-import { useInterviewState } from "@/hooks/useInterviewState";
+import { useInterviewState2 } from "@/hooks/interview/useInterviewState2.js";
 import { globalStyles } from "@/lib/globalStyles";
 import { toast } from "sonner";
 import InterviewHeader from "@/components/interview/InterviewHeader.jsx";
 import { useStartInterview } from "@/hooks/useInterviewData.js";
+import {useInterviewState} from "@/hooks/useInterviewState.js";
 
 export default function Interview() {
     const { interviewId } = useParams();
