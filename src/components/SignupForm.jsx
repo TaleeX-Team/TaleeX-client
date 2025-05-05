@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/form";
 import gsap from "gsap";
 import { useTheme } from "@/layouts/theme_provider/ThemeProvider.jsx";
+import {LoadingIndicator} from "@/components/LoadingButton.jsx";
 
 const formSchema = z
   .object({
@@ -297,7 +298,10 @@ export const SignupForm = ({
           className={`w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300`}
           disabled={isLoading}
         >
-          {isLoading ? "Creating account..." : "Create account"}{" "}
+          {isLoading ?   <>
+              <LoadingIndicator className="mr-2" />
+              Processing
+          </> : "Create account"}{" "}
           <ArrowRight className="ml-2" size={14} />
         </Button>
 

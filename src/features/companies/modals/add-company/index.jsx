@@ -41,6 +41,7 @@ import { useCompanies } from "../../features";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {Link} from "react-router-dom";
+import {LoadingIndicator} from "@/components/LoadingButton.jsx";
 
 const formSchema = z.object({
   image: z.any().refine((file) => file instanceof File || file === null, {
@@ -402,7 +403,10 @@ export default function AddCompany() {
                       {isLoading && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
-                      {isLoading ? "Creating..." : "Create Company"}
+                      {isLoading ?   <>
+                        <LoadingIndicator className="mr-2" />
+                        Processing
+                      </> : "Create Company"}
                     </Button>
                   </DialogFooter>
                 </form>

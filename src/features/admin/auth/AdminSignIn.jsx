@@ -8,6 +8,7 @@ import AnimatedBackground from "@/components/AnimatedBackground.jsx";
 import { ThemeToggle } from "@/components/ThemeToggle.jsx";
 import { useAuth } from "@/hooks/useAuth";
 import gsap from "gsap";
+import {LoadingIndicator} from "@/components/LoadingButton.jsx";
 
 const AdminSignIn = () => {
     const [formData, setFormData] = useState({
@@ -168,7 +169,7 @@ const AdminSignIn = () => {
                                 className="w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300"
                                 disabled={login.isLoading}
                             >
-                                {login.isLoading ? 'Signing In...' : 'Sign In'}
+                                {login.isLoading ? <> <LoadingIndicator/>  Processing </> : 'Sign In'}
                             </Button>
                         </div>
                     </form>

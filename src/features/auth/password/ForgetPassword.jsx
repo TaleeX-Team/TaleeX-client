@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
-import { Building2, Mail, ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import {useState, useEffect, useRef} from "react";
+import {Link} from "react-router-dom";
+import {Building2, Mail, ArrowLeft, ArrowRight, CheckCircle} from "lucide-react";
+import {Input} from "@/components/ui/input";
+import {Button} from "@/components/ui/button";
 import {
     Card,
     CardContent,
@@ -10,14 +10,15 @@ import {
     CardTitle,
     CardDescription,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import {Label} from "@/components/ui/label";
+import {ThemeToggle} from "@/components/ThemeToggle";
 import gsap from "gsap";
 import ThreeDLogo from "@/components/ThreeDLogo";
-import { toast } from "sonner";
-import { useForgotPassword } from "@/hooks/useForgotPassoword.js";
-import { AnimatedBackground } from "@/components/AnimatedBackground.jsx";
-import { ThreeDLogoSection } from "@/components/TheeDLogoSection.jsx";
+import {toast} from "sonner";
+import {useForgotPassword} from "@/hooks/useForgotPassoword.js";
+import {AnimatedBackground} from "@/components/AnimatedBackground.jsx";
+import {ThreeDLogoSection} from "@/components/TheeDLogoSection.jsx";
+import {LoadingIndicator} from "@/components/LoadingButton.jsx";
 
 const ForgotPassword = () => {
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -27,19 +28,19 @@ const ForgotPassword = () => {
     const headingRef = useRef(null);
     const contentRef = useRef(null);
 
-    const { sendReset, isLoading, isError, error } = useForgotPassword();
+    const {sendReset, isLoading, isError, error} = useForgotPassword();
 
     useEffect(() => {
         const tl = gsap.timeline();
         tl.fromTo(
             headingRef.current,
-            { y: -30, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
+            {y: -30, opacity: 0},
+            {y: 0, opacity: 1, duration: 0.8, ease: "power3.out"}
         );
         tl.fromTo(
             cardRef.current,
-            { y: 30, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
+            {y: 30, opacity: 0},
+            {y: 0, opacity: 1, duration: 0.8, ease: "power3.out"},
             "-=0.4"
         );
         gsap.to(".logo-container", {
@@ -55,8 +56,8 @@ const ForgotPassword = () => {
         if (isSubmitted) {
             gsap.fromTo(
                 contentRef.current,
-                { opacity: 0, y: 10 },
-                { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
+                {opacity: 0, y: 10},
+                {opacity: 1, y: 0, duration: 0.5, ease: "power2.out"}
             );
         }
     }, [isSubmitted]);
@@ -97,8 +98,8 @@ const ForgotPassword = () => {
             {/* Form */}
             <div ref={cardRef} className="w-full max-w-md lg:w-1/2 space-y-6">
                 <div className="flex items-center justify-between mb-3">
-                    <ThreeDLogoSection isMobile={true} />
-                    <ThemeToggle />
+                    <ThreeDLogoSection isMobile={true}/>
+                    <ThemeToggle/>
                 </div>
 
                 <Card className="border-white/10 shadow-xl">
@@ -141,14 +142,18 @@ const ForgotPassword = () => {
                                         className="w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300 mt-6"
                                         disabled={isLoading}
                                     >
-                                        {isLoading ? "Sending..." : "Send reset instructions"}
-                                        <ArrowRight className="ml-2" />
+                                        {isLoading ? <>
+                                            <LoadingIndicator className="mr-2"/>
+                                            Processing
+                                        </> : "Send reset instructions"}
+                                        <ArrowRight className="ml-2"/>
                                     </Button>
                                 </form>
                             ) : (
                                 <div className="text-center space-y-6 py-4">
-                                    <div className="w-16 h-16 mx-auto bg-green-500/10 rounded-full flex items-center justify-center">
-                                        <CheckCircle className="h-8 w-8 text-green-500" />
+                                    <div
+                                        className="w-16 h-16 mx-auto bg-green-500/10 rounded-full flex items-center justify-center">
+                                        <CheckCircle className="h-8 w-8 text-green-500"/>
                                     </div>
                                     <h3 className="text-xl font-medium">Check your inbox</h3>
                                     <p className="text-muted-foreground">
@@ -171,7 +176,7 @@ const ForgotPassword = () => {
                                         to="/auth"
                                         className="flex items-center justify-center gap-2 text-sm text-purple-400 hover:text-purple-300 transition-colors mt-4"
                                     >
-                                        <ArrowLeft size={16} /> Back to login
+                                        <ArrowLeft size={16}/> Back to login
                                     </Link>
                                 </div>
                             )}
@@ -182,7 +187,7 @@ const ForgotPassword = () => {
                     to="/auth"
                     className="flex justify-start gap-2 text-sm text-primary hover:primary/70 transition-colors mt-4"
                 >
-                    <ArrowLeft size={16} /> Back to login
+                    <ArrowLeft size={16}/> Back to login
                 </Link>
             </div>
             {/* </div> */}

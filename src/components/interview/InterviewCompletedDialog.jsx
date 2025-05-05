@@ -11,9 +11,11 @@ import {
 import { Button } from "@/components/ui/button"
 import { Clock, CheckCircle, Camera } from "lucide-react"
 import { useState } from "react"
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom"
+import { useEndInterview } from "@/hooks/useInterviewData.js"
 
 export function InterviewCompletedDialog({
+                                             interviewId,
                                              open,
                                              onOpenChange,
                                              onClose,
@@ -21,33 +23,112 @@ export function InterviewCompletedDialog({
                                              questionsAsked,
                                              totalQuestions,
                                              screenshots,
+                                             transcript,
                                          }) {
-    const [isSubmitting, setIsSubmitting] = useState(false)
     const [isSubmitted, setIsSubmitted] = useState(false)
-    const  navigate = useNavigate()
+    const navigate = useNavigate()
+    const { mutateAsync, isPending, isError, error } = useEndInterview()
+    const debugMode = true // Enable debug logging for verification
+
     // Format duration from seconds to minutes:seconds
     const formatDuration = (seconds) => {
         const minutes = Math.floor(seconds / 60)
         const remainingSeconds = seconds % 60
         return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`
     }
+    // Clear localStorage entries for transcript and screenshots
+    const clearLocalStorage = () => {
+        try {
+            // Remove full transcript
+            localStorage.removeItem(`interview_transcript_${interviewId}`)
+            // Remove clean transcript
+            localStorage.removeItem(`interview_clean_transcript_${interviewId}`)
+            // Remove screenshots
+            for (let i = 0; i < screenshots.length; i++) {
+                localStorage.removeItem(`interview_screenshot_${interviewId}_${i}`)
+            }
+            if (debugMode) {
+                console.log("Cleared localStorage entries", {
+                    interviewId,
+                    clearedItems: [
+                        `interview_transcript_${interviewId}`,
+                        `interview_clean_transcript_${interviewId}`,
+                        ...screenshots.map((_, i) => `interview_screenshot_${interviewId}_${i}`),
+                    ],
+                    timestamp: new Date().toISOString(),
+                })
+            }
+        } catch (error) {
+            console.error("Failed to clear localStorage:", {
+                error: error.message,
+                timestamp: new Date().toISOString(),
+            })
+        }
+    }
 
     const handleSubmit = async () => {
-        setIsSubmitting(true)
+        try {
+            if (debugMode) {
+                console.log("Submitting interview data:", {
+                    interviewId,
+                    transcript: transcript,
+                    screenshotCount: screenshots?.length || 0,
+                    timestamp: new Date().toISOString(),
+                })
+            }
 
-        // Simulate submission to backend
-        setTimeout(() => {
-            setIsSubmitting(false)
+            // Check if transcript is available and has the expected structure
+            const transcriptText =
+                transcript && typeof transcript === "object" && transcript.plainText
+                    ? transcript.plainText
+                    : typeof transcript === "string"
+                        ? transcript
+                        : ""
+
+            if (debugMode) {
+                console.log("Processed transcript for submission:", {
+                    transcriptLength: transcriptText.length,
+                    transcriptType: typeof transcriptText,
+                    timestamp: new Date().toISOString(),
+                })
+            }
+
+            await mutateAsync({
+                interviewId,
+                transcript: transcriptText,
+                images: screenshots || [],
+            })
+
+            clearLocalStorage()
             setIsSubmitted(true)
-        }, 1500)
 
-        // In a real implementation, you would send the data to your backend
-        // const result = await submitInterviewData('https://your-api-endpoint.com/interviews');
-        navigate("/")
+            if (debugMode) {
+                console.log("Interview data submitted successfully", {
+                    interviewId,
+                    timestamp: new Date().toISOString(),
+                })
+            }
+        } catch (error) {
+            console.error("Error submitting interview data:", {
+                error: error.message,
+                interviewId,
+                timestamp: new Date().toISOString(),
+            })
+            // Error is handled by the hook and displayed in UI
+        }
     }
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog
+            open={open}
+            onOpenChange={(newOpen) => {
+                // Only allow closing if submitted or through the buttons
+                if (newOpen === false && !isSubmitted) {
+                    return // Prevent dialog from closing
+                }
+                onOpenChange(newOpen)
+            }}
+        >
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle className="text-xl">Interview Completed</DialogTitle>
@@ -91,7 +172,7 @@ export function InterviewCompletedDialog({
                                         className="relative min-w-[100px] h-[75px] rounded-md overflow-hidden border border-gray-200"
                                     >
                                         <img
-                                            src={screenshot || "/placeholder.svg"}
+                                            src={typeof screenshot === "string" ? screenshot : URL.createObjectURL(screenshot)}
                                             alt={`Screenshot ${index + 1}`}
                                             className="w-full h-full object-cover"
                                         />
@@ -104,18 +185,33 @@ export function InterviewCompletedDialog({
 
                 <DialogFooter className="flex flex-col sm:flex-row gap-2">
                     {!isSubmitted ? (
-                        <>
-                            <Button variant="outline" onClick={onClose} className="sm:w-auto w-full">
-                                Close
-                            </Button>
-                            <Button onClick={handleSubmit} className="sm:w-auto w-full" disabled={isSubmitting}>
-                                {isSubmitting ? "Submitting..." : "Submit Interview Data"}
-                            </Button>
-                        </>
+                        <Button onClick={handleSubmit} className="sm:w-auto w-full" disabled={isPending}>
+                            {isPending ? (
+                                <>
+                                    <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-b-transparent border-white"></span>
+                                    Submitting...
+                                </>
+                            ) : (
+                                "Submit Interview Data"
+                            )}
+                        </Button>
                     ) : (
-                        <Button onClick={onClose} className="sm:w-auto w-full">
+                        <Button
+                            onClick={() => {
+                                onClose()
+                                // Optionally navigate somewhere after submission
+                                // navigate("/dashboard")
+                            }}
+                            className="sm:w-auto w-full"
+                        >
                             Done
                         </Button>
+                    )}
+
+                    {isError && (
+                        <p className="text-sm text-red-500 mt-2">
+                            {error?.message || "Failed to submit interview data. Please try again."}
+                        </p>
                     )}
                 </DialogFooter>
             </DialogContent>
