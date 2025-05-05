@@ -48,9 +48,9 @@ const PublicRoutes = {
     {
       path: "verify-email/:verificationToken",
       element: (
-          <Suspense fallback={<FullPageSpinner />}>
-            <VerifiedEmail />
-          </Suspense>
+        <Suspense fallback={<FullPageSpinner />}>
+          <VerifiedEmail />
+        </Suspense>
       ),
     },
     {

@@ -30,10 +30,10 @@ const VerifyEmail = () => {
     if (verifyEmail.isLoading) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-background px-4">
-                <Card className="w-full max-w-md border-t-4 border-primary">
+                <Card className="w-full max-w-lg py-5">
                     <CardHeader className="text-center">
-                        <h2 className="text-3xl font-extrabold">Verifying Email</h2>
-                        <p className="text-sm text-muted-foreground mt-2">
+                        <h2 className="mt-2 text-2xl font-extrabold">Verifying Email</h2>
+                        <p className="text-sm text-muted-foreground">
                             Please wait while we verify your email address
                         </p>
                     </CardHeader>
@@ -48,21 +48,21 @@ const VerifyEmail = () => {
     if (verifyEmail.isError) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen bg-background px-4">
-                <Card className="w-full max-w-md border-t-4 border-destructive">
+                <Card className="w-full max-w-lg py-5">
                     <CardHeader className="text-center">
-                        <XCircle className="mx-auto h-16 w-16 text-destructive" />
-                        <h2 className="mt-4 text-3xl font-extrabold">Verification Failed</h2>
-                        <p className="mt-2 text-sm text-muted-foreground">
+                        <XCircle className="mx-auto h-12 w-12 text-destructive" />
+                        <h2 className="mt-2 text-2xl font-extrabold">Email Verification Failed</h2>
+                        <p className="text-sm text-muted-foreground">
                             {verifyEmail.error?.message ||
                                 verifyEmail.error?.response?.data?.message ||
                                 "We couldn't verify your email address. The link may have expired or is invalid."}
                         </p>
                     </CardHeader>
-                    <CardFooter className="flex justify-center pb-6">
+                    <CardFooter className="flex justify-center">
                         <Button
                             onClick={handleGoHome}
-                            variant="destructive"
-                            className="mt-4 px-8"
+                            variant="outline"
+                            className="mt-3 px-8"
                         >
                             <Home className="mr-2 h-5 w-5" />
                             Return to Home
@@ -73,29 +73,58 @@ const VerifyEmail = () => {
         )
     }
 
-    return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-background px-4">
-            <Card className="w-full max-w-md border-t-4 border-green-500 dark:border-green-400">
-                <CardHeader className="text-center">
-                    <CheckCircle className="mx-auto h-16 w-16 text-green-500 dark:text-green-400" />
-                    <h2 className="mt-4 text-3xl font-extrabold">Email Verified!</h2>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                        {verifyEmail.data?.message ||
-                            "Your email has been successfully verified. You can now access all features of your account."}
-                    </p>
-                </CardHeader>
-                <CardFooter className="flex justify-center pb-6">
-                    <Button
-                        onClick={handleGoHome}
-                        className="mt-4 bg-green-600 hover:bg-green-700 text-white px-8"
-                    >
-                        <Home className="mr-2 h-5 w-5" />
-                        Go to Dashboard
-                    </Button>
-                </CardFooter>
-            </Card>
-        </div>
-    )
+    if (verifyEmail.isSuccess) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen bg-background px-4">
+                <Card className="w-full max-w-lg py-5">
+                    <CardHeader className="text-center">
+                        <CheckCircle className="mx-auto h-12 w-12 text-green-500 dark:text-green-400" />
+                        <h2 className="mt-2 text-2xl font-extrabold">Email Verified!</h2>
+                        <p className="text-sm text-muted-foreground">
+                            {verifyEmail.data?.message ||
+                                "Your email has been successfully verified. You can now access all features of your account."}
+                        </p>
+                    </CardHeader>
+                    <CardFooter className="flex justify-center">
+                        <Button
+                            onClick={handleGoHome}
+                            variant="outline"
+                            className="mt-3 px-8"
+                        >
+                            <Home className="mr-2 h-5 w-5" />
+                            Go to Dashboard
+                        </Button>
+                    </CardFooter>
+                </Card>
+            </div>
+        )
+    }
+    return <div className="flex flex-col items-center justify-center min-h-screen bg-background px-4" />
+
+
+    // return (
+    //     <div className="flex flex-col items-center justify-center min-h-screen bg-background px-4">
+    //         <Card className="w-full max-w-md border-t-4 border-green-500 dark:border-green-400">
+    //             <CardHeader className="text-center">
+    //                 <CheckCircle className="mx-auto h-16 w-16 text-green-500 dark:text-green-400" />
+    //                 <h2 className="mt-4 text-3xl font-extrabold">Email Verified!</h2>
+    //                 <p className="mt-2 text-sm text-muted-foreground">
+    //                     {verifyEmail.data?.message ||
+    //                         "Your email has been successfully verified. You can now access all features of your account."}
+    //                 </p>
+    //             </CardHeader>
+    //             <CardFooter className="flex justify-center pb-6">
+    //                 <Button
+    //                     onClick={handleGoHome}
+    //                     className="mt-4 bg-green-600 hover:bg-green-700 text-white px-8"
+    //                 >
+    //                     <Home className="mr-2 h-5 w-5" />
+    //                     Go to Dashboard
+    //                 </Button>
+    //             </CardFooter>
+    //         </Card>
+    //     </div>
+    // )
 }
 
 export default VerifyEmail

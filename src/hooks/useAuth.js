@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {loginUser, logoutUser, registerUser, verifyEmail} from "../services/apiAuth.js";
+import { loginUser, logoutUser, registerUser, verifyEmail } from "../services/apiAuth.js";
 import { useEffect } from "react";
 import TokenService from "@/lib/TokenService";
 import Cookies from "js-cookie";
@@ -78,8 +78,8 @@ export const useAuth = () => {
       localStorage.removeItem("userId");
 
       queryClient.invalidateQueries({ queryKey: ["auth"] });
-       Cookies.remove("hasPassword");
-       Cookies.remove("userId");
+      Cookies.remove("hasPassword");
+      Cookies.remove("userId");
     },
     onError: () => {
       // even on error, clear local
@@ -95,7 +95,7 @@ export const useAuth = () => {
   const registerMutation = useMutation({
     mutationFn: registerUser,
     onSuccess: (data) => {
-      console.log(data,"Registered");
+      console.log(data, "Registered");
       if (data.accessToken) {
         TokenService.setAccessToken(data.accessToken);
       }
@@ -162,6 +162,7 @@ export const useAuth = () => {
       isLoading: verifyEmailMutation.isPending,
       isError: verifyEmailMutation.isError,
       error: verifyEmailMutation.error,
+      isSuccess: verifyEmailMutation.isSuccess,
       data: verifyEmailMutation.data,
     },
     processOAuthCallback,
