@@ -5,7 +5,7 @@ import {
     updateUser,
     deleteUser,
     promoteUser,
-    getAllCompanies, verifyCompany, filterCompanies, getCompanyStatistics,
+    getAllCompanies, verifyCompany, filterCompanies, getCompanyStatistics, deleteAdminUser,
 
 } from '../services/apiAuth.js';
 
@@ -48,14 +48,12 @@ export const useUserUpdate = () => {
     });
 };
 
-// Hook for deleting a user
 export const useDeleteUser = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: deleteUser,
+        mutationFn: deleteAdminUser,
         onSuccess: () => {
-            // Invalidate and refetch the users list
             queryClient.invalidateQueries({ queryKey: ['users'] });
         },
     });

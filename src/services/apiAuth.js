@@ -229,6 +229,27 @@ export const loginUser = async (credentials) => {
   return response.data;
 };
 
+export const loginAdmin = async (credentials) => {
+  console.log("Attempting login");
+  const response = await adminApiClient.post("/auth/login", credentials);
+
+  // If the response includes tokens, store them in localStorage
+  if (response.data) {
+    if (response.data.accessToken) {
+      console.log("Login successful, storing access token");
+      TokenService.setAccessToken(response.data.accessToken);
+    }
+
+    if (response.data.refreshToken) {
+      console.log("Storing refresh token");
+      TokenService.setRefreshToken(response.data.refreshToken);
+    }
+  } else {
+    console.log("Login successful but no token in response");
+  }
+
+  return response.data;
+};
 // Register API
 export const registerUser = async (userData) => {
   try {
@@ -543,17 +564,21 @@ export const updateUser = async ({ userId, userData }) => {
 };
 
 // Delete user
-export const deleteUser = async ({ userId, password }) => {
-  const formData = new URLSearchParams();
-  formData.append("password", password);
-
+export const deleteUser = async ({ userId }) => {
   const response = await api.delete(`/users/${userId}`, {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
-    },
-    data: formData.toString(),
+    }
   });
+  return response.data;
+};
 
+export const deleteAdminUser = async ({ userId }) => {
+  const response = await adminApiClient.delete(`/users/${userId}`, {
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    }
+  });
   return response.data;
 };
 
