@@ -14,8 +14,8 @@ const AdminDashboard = lazy(() =>
 const UsersPage = lazy(() =>
   import("../../features/admin/pages/UsersPage.jsx")
 );
-const ContentManagement = lazy(() =>
-  import("../../features/admin/ContentManagement.jsx")
+const ReportsPage = lazy(() =>
+  import("../../features/admin/pages/ReportsPage.jsx")
 );
 const JobsPage = lazy(() => import("../../features/admin/pages/JobsPage.jsx"));
 const CompaniesPage = lazy(() =>
@@ -76,10 +76,10 @@ const AdminRoutes = {
       ),
     },
     {
-      path: "content",
+      path: "reports",
       element: (
         <Suspense fallback={<FullPageSpinner />}>
-          <ContentManagement />
+          <ReportsPage />
         </Suspense>
       ),
     },
