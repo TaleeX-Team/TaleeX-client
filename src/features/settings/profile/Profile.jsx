@@ -18,7 +18,7 @@ import { useProfile } from "../features";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {LoadingIndicator} from "@/components/LoadingButton.jsx";
+import { LoadingIndicator } from "@/components/LoadingButton.jsx";
 
 // Create a schema for form validation with the new requirements
 // All fields are optional for update, but if provided must follow validation rules
@@ -48,7 +48,7 @@ const profileSchema = z.object({
     })
     .optional()
     .or(z.literal("")),
-  image: z.any().optional(),
+  imageUrl: z.any().optional(),
 });
 
 export default function ProfilePage() {
@@ -68,7 +68,7 @@ export default function ProfilePage() {
       firstName: "",
       lastName: "",
       phone: "",
-      image: null,
+      imageUrl: null,
     },
   });
 
@@ -84,7 +84,7 @@ export default function ProfilePage() {
     const file = e.target.files[0];
     if (file) {
       setAvatarPreview(URL.createObjectURL(file));
-      form.setValue("image", file);
+      form.setValue("imageUrl", file);
     }
   };
 
@@ -111,7 +111,7 @@ export default function ProfilePage() {
     );
 
     // Don't submit if no changes were made
-    if (Object.keys(cleanedData).length === 0 && !data.image) {
+    if (Object.keys(cleanedData).length === 0 && !data.imageUrl) {
       toast.info("No changes to save");
       return;
     }
@@ -119,9 +119,9 @@ export default function ProfilePage() {
     // Create a FormData object if there's an avatar to upload
     let formData = null;
 
-    if (data.image) {
+    if (data.imageUrl) {
       formData = new FormData();
-      formData.append("image", data.image);
+      formData.append("imageUrl", data.imageUrl);
 
       // Add other fields to the FormData only if they have values
       if (data.firstName) formData.append("firstName", data.firstName);
@@ -196,7 +196,8 @@ export default function ProfilePage() {
                       <>
                         <AvatarImage
                           src={
-                            user?.image || "/placeholder.svg?height=96&width=96"
+                            user?.imageUrl ||
+                            "/placeholder.svg?height=96&width=96"
                           }
                           alt="Profile"
                         />
@@ -229,9 +230,9 @@ export default function ProfilePage() {
                 <p className="text-xs text-muted-foreground text-center mt-1">
                   Recommended: Square image, JPG or PNG
                 </p>
-                {form.formState.errors.image && (
+                {form.formState.errors.imageUrl && (
                   <p className="text-xs text-destructive">
-                    {form.formState.errors.image.message}
+                    {form.formState.errors.imageUrl.message}
                   </p>
                 )}
               </div>
@@ -329,10 +330,14 @@ export default function ProfilePage() {
           <CardFooter className="flex justify-between">
             <Button className="ml-auto" type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLoading ?   <>
-                <LoadingIndicator className="mr-2" />
-                Processing
-              </>: "Save Changes"}
+              {isLoading ? (
+                <>
+                  <LoadingIndicator className="mr-2" />
+                  Processing
+                </>
+              ) : (
+                "Save Changes"
+              )}
             </Button>
           </CardFooter>
         </form>

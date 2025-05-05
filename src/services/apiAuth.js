@@ -2,7 +2,7 @@ import axios from "axios";
 import TokenService from "@/lib/TokenService.js";
 
 // Base URL without the path prefix
-const BASE_URL = "https://9e59-156-209-53-244.ngrok-free.app";
+const BASE_URL = "https://hirex-production.up.railway.app";
 
 // Create a function to generate an axios instance with the right configuration
 const createApiClient = (pathPrefix = "/api/v1") => {
@@ -209,7 +209,7 @@ const api = {
 // Login API - keeping the same implementation but using the unified api object
 export const loginUser = async (credentials) => {
   console.log("Attempting login");
-  const response = await api.post("/auth/login", credentials);
+  const response = await apiClient.post("/auth/login", credentials);
 
   // If the response includes tokens, store them in localStorage
   if (response.data) {
@@ -274,9 +274,9 @@ export const verifyEmail = async (verificationToken) => {
     return response.data;
   } catch (error) {
     if (error.response?.data) {
-      throw error.response.data
+      throw error.response.data;
     }
-    throw new Error(error.message || "Verification failed")
+    throw new Error(error.message || "Verification failed");
   }
 };
 
@@ -513,7 +513,7 @@ export const changePassword = async ({ oldPassword, newPassword }) => {
 };
 
 export const getUsers = async () => {
-  const response = await api.get("/users");
+  const response = await adminApiClient.get("/users");
   return response.data;
 };
 
@@ -559,7 +559,7 @@ export const deleteUser = async ({ userId, password }) => {
 
 // Promote user
 export const promoteUser = async (userId) => {
-  const response = await api.patch(`/users/promote/${userId}`);
+  const response = await adminApiClient.patch(`/users/promote/${userId}`);
   return response.data;
 };
 
