@@ -16,7 +16,7 @@ const AdminSignIn = () => {
         password: ''
     });
 
-    const { login, isAuthenticated } = useAuth();
+    const { loginAdmin, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const formRef = useRef(null);
     const headerRef = useRef(null);
@@ -70,7 +70,7 @@ const AdminSignIn = () => {
         e.preventDefault();
 
         // Show button loading state through the useAuth hook's isLoading state
-        login.mutate({
+        loginAdmin.mutate({
             email: formData.email,
             password: formData.password
         });
@@ -80,14 +80,14 @@ const AdminSignIn = () => {
 
     // Animation for error message when it appears
     useEffect(() => {
-        if (login.isError && errorRef.current) {
+        if (loginAdmin.isError && errorRef.current) {
             gsap.fromTo(
                 errorRef.current,
                 { opacity: 0, y: -10 },
                 { opacity: 1, y: 0, duration: 0.3 }
             );
         }
-    }, [login.isError]);
+    }, [loginAdmin.isError]);
 
     return (
         <main className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
@@ -158,18 +158,18 @@ const AdminSignIn = () => {
                                 </div>
                             </div>
 
-                            {login.isError && (
+                            {loginAdmin.isError && (
                                 <div ref={errorRef} className="form-error text-sm text-red-500">
-                                    {login.error?.message || "Invalid email or password. Please try again."}
+                                    {loginAdmin.error?.message || "Invalid email or password. Please try again."}
                                 </div>
                             )}
 
                             <Button
                                 type="submit"
                                 className="w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300"
-                                disabled={login.isLoading}
+                                disabled={loginAdmin.isLoading}
                             >
-                                {login.isLoading ? <> <LoadingIndicator/>  Processing </> : 'Sign In'}
+                                {loginAdmin.isLoading ? <> <LoadingIndicator/>  Processing </> : 'Sign In'}
                             </Button>
                         </div>
                     </form>
