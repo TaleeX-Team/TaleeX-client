@@ -33,6 +33,8 @@ export default function Companies() {
 
   const [selectedCompany, setSelectedCompany] = useState(null);
 
+  const emptyCompanies =[]
+
   const handleDelete = (company) => {
     setSelectedCompany(company);
   };
@@ -150,13 +152,14 @@ export default function Companies() {
                 Error loading companies
               </h2>
               <p className="text-muted-foreground mb-4">
-                There was an error fetching your company data. Please try again.
+                There was an error fetching your company data. You are not Verified , Please try again.
               </p>
               <Button variant="outline" className="mx-auto">
                 Retry
               </Button>
             </div>
           )}
+
           {!isLoading && !isError && (
             <>
               {companies?.companies?.length > 0 ? (

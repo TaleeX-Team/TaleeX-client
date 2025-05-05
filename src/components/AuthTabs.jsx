@@ -8,9 +8,9 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
 export const AuthTabs = ({
-    activeTab,
-    setActiveTab
-}) => {
+                             activeTab,
+                             setActiveTab
+                         }) => {
     const contentRef = useRef();
     const navigate = useNavigate();
     const { login, register } = useAuth();
@@ -23,17 +23,27 @@ export const AuthTabs = ({
         );
     }, [activeTab]);
 
+    // Check authentication status and redirect if already logged in
+    useEffect(() => {
+        const checkAuthAndRedirect = () => {
+            if (login.isSuccess || register.isSuccess) {
+                navigate("/app/companies", { replace: true });
+            }
+        };
+
+        checkAuthAndRedirect();
+    }, [login.isSuccess, register.isSuccess, navigate]);
+
     const handleError = (error, fallbackMessage) => {
-        console.error("Auth failed:", error?.message);
-        const details = error?.response?.data?.details;
-        const message = error?.response?.data?.message;
+        const details = error.details;
+        const message = error.message;
 
         if (details && typeof details === "object") {
             Object.values(details).forEach((msg) => toast.error(msg));
         } else if (message) {
             toast.error(message);
         } else {
-            toast.error(fallbackMessage);
+            toast.error(fallbackMessage || "Authentication failed. Please try again.");
         }
     };
 
@@ -46,31 +56,29 @@ export const AuthTabs = ({
                 onSuccess: (data) => {
                     console.log("Login mutation successful");
                     toast.success(data.message || "Logged in successfully!");
-                    navigate("/");
+                    navigate("/app/companies", { replace: true });
                 },
                 onError: (error) => {
-                    console.log("Login mutation failed");
-                    handleError(error, "Something went wrong during login.");
+                    handleError(error);
                 }
             });
         } else if (type === "signup") {
             console.log("Register loading state:", register.isLoading);
             register.mutate(data, {
                 onSuccess: (data) => {
-                    console.log("Signup mutation successful");
+                    console.log("Registration successful");
                     toast.success(data.message || "Account created successfully!");
-                    setActiveTab("login");
+                    navigate("/app/companies", { replace: true });
                 },
                 onError: (error) => {
-                    console.log("Signup mutation failed");
-                    handleError(error, "Something went wrong during registration.");
+                    handleError(error);
                 }
             });
         }
     };
 
     const handleOAuthSuccess = () => {
-        navigate("/");
+        navigate("/app/companies", { replace: true });
     };
 
     return (

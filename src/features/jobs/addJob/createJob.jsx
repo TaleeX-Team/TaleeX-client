@@ -154,7 +154,6 @@ export default function AddJob() {
       workPlaceType: "remote",
       jobType: "full-time",
       experienceLevel: "Intern",
-      experienceLevel: "Intern",
       tags: [],
       salary: {
         min: "",

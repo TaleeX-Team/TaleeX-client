@@ -2,7 +2,7 @@ import axios from "axios";
 import TokenService from "@/lib/TokenService.js";
 
 // Base URL without the path prefix
-const BASE_URL = "https://hirex-production.up.railway.app";
+const BASE_URL = "https://9e59-156-209-53-244.ngrok-free.app";
 
 // Create a function to generate an axios instance with the right configuration
 const createApiClient = (pathPrefix = "/api/v1") => {
@@ -243,7 +243,6 @@ export const registerUser = async (userData) => {
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
-
     return response.data;
   } catch (error) {
     // Graceful error parsing
@@ -267,6 +266,17 @@ export const registerUser = async (userData) => {
     }
 
     throw new Error(error.message || "An unexpected error occurred.");
+  }
+};
+export const verifyEmail = async (verificationToken) => {
+  try {
+    const response = await api.get(`/auth/verify-email/${verificationToken}`);
+    return response.data;
+  } catch (error) {
+    if (error.response?.data) {
+      throw error.response.data
+    }
+    throw new Error(error.message || "Verification failed")
   }
 };
 

@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { loginUser, logoutUser, registerUser } from "../services/apiAuth.js";
+import {loginUser, logoutUser, registerUser, verifyEmail} from "../services/apiAuth.js";
 import { useEffect } from "react";
 import TokenService from "@/lib/TokenService";
-import Cookies from "js-cookie";
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
@@ -13,7 +12,7 @@ export const useAuth = () => {
     queryFn: () => ({
       isAuthenticated: TokenService.isAuthenticated(),
     }),
-    // we’ll manually invalidate whenever tokens change:
+    // we'll manually invalidate whenever tokens change:
     staleTime: Infinity,
     cacheTime: Infinity,
   });
@@ -57,13 +56,11 @@ export const useAuth = () => {
       }
       if (data.user) {
         queryClient.setQueryData(["user"], data.user);
-        localStorage.setItem("userId", JSON.stringify(data.user._id));
-        // Cookies.set("hasPassword", data.hasPassword);
+        localStorage.setItem("userId", JSON.stringify(data.user.id));
       } else {
         queryClient.invalidateQueries({ queryKey: ["user"] });
       }
       queryClient.invalidateQueries({ queryKey: ["auth"] });
-
       queryClient.invalidateQueries({ queryKey: ["companies"] });
     },
   });
@@ -75,6 +72,9 @@ export const useAuth = () => {
       TokenService.clearTokens();
       TokenService.setOAuthAuthenticated(false);
       queryClient.removeQueries({ queryKey: ["user"] });
+      queryClient.removeQueries({ queryKey: ["userId"] });
+      localStorage.removeItem("userId");
+
       queryClient.invalidateQueries({ queryKey: ["auth"] });
       // localStorage.removeItem("userId");
       // Cookies.remove("hasPassword");
@@ -93,17 +93,35 @@ export const useAuth = () => {
   const registerMutation = useMutation({
     mutationFn: registerUser,
     onSuccess: (data) => {
-      if (data.user) {
-        queryClient.setQueryData(["user"], data.user);
-      }
+      console.log(data,"Registered");
       if (data.accessToken) {
         TokenService.setAccessToken(data.accessToken);
-        queryClient.invalidateQueries({ queryKey: ["auth"] });
       }
+      if (data.refreshToken) {
+        TokenService.setRefreshToken(data.refreshToken);
+      }
+      if (data.user) {
+        queryClient.setQueryData(["user"], data.user);
+        localStorage.setItem("userId", JSON.stringify(data.user.id));
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+      }
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
     },
   });
 
-  // 5) OAuth callback helper
+  // 5) Verify Email
+  const verifyEmailMutation = useMutation({
+    mutationFn: verifyEmail,
+    onSuccess: (data) => {
+      // Update user data or auth state after verification
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
+    },
+  });
+
+  // 6) OAuth callback helper
   const processOAuthCallback = async () => {
     const ok = TokenService.processOAuthTokens();
     if (ok) {
@@ -122,6 +140,7 @@ export const useAuth = () => {
       isLoading: loginMutation.isPending,
       isError: loginMutation.isError,
       error: loginMutation.error,
+      isSuccess: loginMutation.isSuccess,
     },
     logout: {
       mutate: logoutMutation.mutate,
@@ -134,6 +153,14 @@ export const useAuth = () => {
       isLoading: registerMutation.isPending,
       isError: registerMutation.isError,
       error: registerMutation.error,
+      isSuccess: registerMutation.isSuccess,
+    },
+    verifyEmail: {
+      mutate: verifyEmailMutation.mutate,
+      isLoading: verifyEmailMutation.isPending,
+      isError: verifyEmailMutation.isError,
+      error: verifyEmailMutation.error,
+      data: verifyEmailMutation.data,
     },
     processOAuthCallback,
   };

@@ -5,6 +5,7 @@ import ErrorPage from "@/pages/ErrorPage";
 import ResetPassword from "@/features/auth/password/ResetPassword";
 import OAuthCallback from "@/components/OAuthCallback";
 import FullPageSpinner from "@/components/FullPageSpinner";
+import VerifiedEmail from "@/features/auth/verified-email/VerifiedEmail.jsx";
 const Auth = lazy(() => import("../../features/auth/Auth"));
 const ForgetPassword = lazy(() =>
   import("../../features/auth/password/ForgetPassword.jsx")
@@ -42,6 +43,14 @@ const PublicRoutes = {
         <Suspense fallback={<FullPageSpinner />}>
           <ResetPassword />
         </Suspense>
+      ),
+    },
+    {
+      path: "verify-email/:verificationToken",
+      element: (
+          <Suspense fallback={<FullPageSpinner />}>
+            <VerifiedEmail />
+          </Suspense>
       ),
     },
     {
