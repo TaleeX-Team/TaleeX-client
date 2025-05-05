@@ -32,12 +32,12 @@ export default function Companies() {
   } = useCompanies();
 
   const [selectedCompany, setSelectedCompany] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const emptyCompanies =[]
+  const emptyCompanies = [];
 
-  const handleDelete = (company) => {
-    setSelectedCompany(company);
-  };
+  const handleDelete = (company) => setSelectedCompany(company);
 
   const confirmDelete = () => {
     if (selectedCompany) {
@@ -56,6 +56,17 @@ export default function Companies() {
       });
     }
   };
+
+  const filteredCompanies =
+    companies?.companies?.filter((company) => {
+      const matchesStatus =
+        selectedStatus === "all" ||
+        company.verification?.status === selectedStatus;
+      const matchesSearch = company.name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      return matchesStatus && matchesSearch;
+    }) || [];
 
   return (
     <div className="bg-background p-4 md:p-8 min-h-screen">
@@ -84,39 +95,24 @@ export default function Companies() {
         <div className="flex flex-col sm:flex-row gap-4 mb-8 bg-card p-4 rounded-lg shadow-sm border border-border/50">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search companies..." className="pl-10 w-full" />
+            <Input
+              placeholder="Search companies..."
+              className="pl-10 w-full"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
-          <div className="flex gap-3">
-            <Select>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Companies</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-                <SelectItem value="favorite">Favorites</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline" size="icon">
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 15 15"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-              >
-                <path
-                  d="M3.5 8.5L7.5 12.5L11.5 8.5M3.5 2.5L7.5 6.5L11.5 2.5"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                ></path>
-              </svg>
-            </Button>
-          </div>
+          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Companies</SelectItem>
+              <SelectItem value="verified">Verified</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Company Cards */}
@@ -128,6 +124,7 @@ export default function Companies() {
               <CompanySkeleton />
             </div>
           )}
+
           {isError && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-destructive/5 rounded-lg border border-destructive/20 p-4 z-50">
               <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
@@ -136,7 +133,6 @@ export default function Companies() {
                   height="24"
                   viewBox="0 0 24 24"
                   fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
                   className="text-destructive"
                 >
                   <path
@@ -152,7 +148,8 @@ export default function Companies() {
                 Error loading companies
               </h2>
               <p className="text-muted-foreground mb-4">
-                There was an error fetching your company data. You are not Verified , Please try again.
+                There was an error fetching your company data. You are not
+                Verified , Please try again.
               </p>
               <Button variant="outline" className="mx-auto">
                 Retry
@@ -162,61 +159,52 @@ export default function Companies() {
 
           {!isLoading && !isError && (
             <>
-              {companies?.companies?.length > 0 ? (
+              {filteredCompanies.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {companies.companies.map((company) => (
-                    <div key={company._id}>
-                      <CompanyCard
-                        company={company}
-                        handleDelete={handleDelete}
-                      />
-                    </div>
+                  {filteredCompanies.map((company) => (
+                    <CompanyCard
+                      key={company._id}
+                      company={company}
+                      handleDelete={handleDelete}
+                    />
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-16 px-4 text-center bg-card rounded-xl border border-dashed border-muted-foreground/20">
-                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                    <FolderPlus className="h-10 w-10 text-primary" />
-                  </div>
-                  <h3 className="text-2xl font-semibold mb-3">
-                    No companies yet
-                  </h3>
-                  <p className="text-muted-foreground max-w-md mb-8">
-                    Your company directory is empty. Add your first company to
-                    get started tracking clients, partners, and opportunities.
-                  </p>
-                  <AddCompany />
+                <div className="text-center text-muted-foreground py-12">
+                  No companies found with this filter or search term.
                 </div>
               )}
             </>
           )}
         </div>
+
+        {/* Delete confirmation dialog */}
+        <AlertDialog
+          open={!!selectedCompany}
+          onOpenChange={() => setSelectedCompany(null)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Delete {selectedCompany?.name || "this company"}?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the
+                company and all related data.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmDelete}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
-      <AlertDialog
-        open={!!selectedCompany}
-        onOpenChange={() => setSelectedCompany(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              Delete {selectedCompany?.name || "this company"}?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              company and all related data.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

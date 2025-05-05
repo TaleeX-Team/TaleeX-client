@@ -160,9 +160,11 @@ export default function CompanyDetails() {
             website={website}
             address={address}
             name={name}
+            verification={verification}
           />
           {/* Jobs tab */}
           <JobsTab jobs={jobs} />
+
         </Tabs>
       </div>
     </div>
