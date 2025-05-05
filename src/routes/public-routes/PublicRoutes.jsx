@@ -45,14 +45,14 @@ const PublicRoutes = {
         </Suspense>
       ),
     },
-    {
-      path: "verify-email/:verificationToken",
-      element: (
-          <Suspense fallback={<FullPageSpinner />}>
-            <VerifiedEmail />
-          </Suspense>
-      ),
-    },
+    // {
+    //   path: "verify-email/:verificationToken",
+    //   element: (
+    //     <Suspense fallback={<FullPageSpinner />}>
+    //       <VerifiedEmail />
+    //     </Suspense>
+    //   ),
+    // },
     {
       path: "callback",
       element: <OAuthCallback />,

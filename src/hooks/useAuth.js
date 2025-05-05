@@ -1,5 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {loginAdmin, loginUser, logoutUser, registerUser, verifyEmail} from "../services/apiAuth.js";
+import {
+  loginAdmin,
+  loginUser,
+  logoutUser,
+  registerUser,
+  verifyEmail,
+} from "../services/apiAuth.js";
 import { useEffect } from "react";
 import TokenService from "@/lib/TokenService";
 import Cookies from "js-cookie";
@@ -97,8 +103,8 @@ export const useAuth = () => {
       localStorage.removeItem("userId");
 
       queryClient.invalidateQueries({ queryKey: ["auth"] });
-       Cookies.remove("hasPassword");
-       Cookies.remove("userId");
+      Cookies.remove("hasPassword");
+      Cookies.remove("userId");
     },
     onError: () => {
       // even on error, clear local
@@ -114,7 +120,7 @@ export const useAuth = () => {
   const registerMutation = useMutation({
     mutationFn: registerUser,
     onSuccess: (data) => {
-      console.log(data,"Registered");
+      console.log(data, "Registered");
       if (data.accessToken) {
         TokenService.setAccessToken(data.accessToken);
       }
@@ -123,7 +129,8 @@ export const useAuth = () => {
       }
       if (data.user) {
         queryClient.setQueryData(["user"], data.user);
-        localStorage.setItem("userId", JSON.stringify(data.user.id));
+        Cookies.set("userId", data.user.id);
+        Cookies.set("hasPassword", data.user.hasPassword);
       } else {
         queryClient.invalidateQueries({ queryKey: ["user"] });
       }
@@ -156,7 +163,7 @@ export const useAuth = () => {
 
   return {
     isAuthenticated: authQuery.data?.isAuthenticated ?? false,
-    loginAdmin:{
+    loginAdmin: {
       mutate: loginAdminMutation.mutate,
       isLoading: loginAdminMutation.isPending,
       isError: loginAdminMutation.isError,
