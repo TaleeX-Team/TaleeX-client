@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "./useAuth";
 import { getUserById } from "@/services/apiAuth";
+import Cookies from "js-cookie";
 
 export const useUser = () => {
   const { isAuthenticated } = useAuth();
@@ -14,8 +15,7 @@ export const useUser = () => {
       if (cached) return cached;
 
       // Get userId from localStorage
-      const userId = JSON.parse(localStorage.getItem("userId")); //parse the userId from localStorage
-      //remove the quotes that i get from localStorage
+      const userId = Cookies.get("userId")
 
       if (!userId) {
         throw new Error("No user ID found");
