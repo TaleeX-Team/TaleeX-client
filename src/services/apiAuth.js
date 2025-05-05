@@ -2,7 +2,7 @@ import axios from "axios";
 import TokenService from "@/lib/TokenService.js";
 
 // Base URL without the path prefix
-const BASE_URL = "https://9e59-156-209-53-244.ngrok-free.app";
+const BASE_URL = "https://hirex-production.up.railway.app";
 
 // Create a function to generate an axios instance with the right configuration
 const createApiClient = (pathPrefix = "/api/v1") => {

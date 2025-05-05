@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {loginUser, logoutUser, registerUser, verifyEmail} from "../services/apiAuth.js";
 import { useEffect } from "react";
 import TokenService from "@/lib/TokenService";
+import Cookies from "js-cookie";
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
@@ -56,7 +57,8 @@ export const useAuth = () => {
       }
       if (data.user) {
         queryClient.setQueryData(["user"], data.user);
-        localStorage.setItem("userId", JSON.stringify(data.user.id));
+        Cookies.set("userId", data.user.id);
+        Cookies.set("hasPassword", data.user.hasPassword);
       } else {
         queryClient.invalidateQueries({ queryKey: ["user"] });
       }
@@ -76,8 +78,8 @@ export const useAuth = () => {
       localStorage.removeItem("userId");
 
       queryClient.invalidateQueries({ queryKey: ["auth"] });
-      // localStorage.removeItem("userId");
-      // Cookies.remove("hasPassword");
+       Cookies.remove("hasPassword");
+       Cookies.remove("userId");
     },
     onError: () => {
       // even on error, clear local
