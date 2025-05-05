@@ -57,7 +57,7 @@ const processQueue = (error, token = null) => {
 
 // Create the main API client instances
 const apiClient = createApiClient("/api/v1");
-const adminApiClient = createApiClient("/admin/v1");
+export const adminApiClient = createApiClient("/admin/v1");
 
 // Setup response interceptor for both clients
 [apiClient, adminApiClient].forEach((client) => {

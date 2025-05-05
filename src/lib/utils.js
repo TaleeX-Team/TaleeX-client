@@ -29,3 +29,14 @@ export function dataURLtoFile(dataURL, filename) {
   const blob = dataURLtoBlob(dataURL)
   return new File([blob], filename, { type: blob.type })
 }
+
+
+export const formatOpenTime = (openTime) => {
+  if (openTime.days > 0) {
+    return `${openTime.days} day${openTime.days > 1 ? "s" : ""} ago`
+  } else if (openTime.hours > 0) {
+    return `${openTime.hours} hour${openTime.hours > 1 ? "s" : ""} ago`
+  } else {
+    return `${openTime.minutes} minute${openTime.minutes > 1 ? "s" : ""} ago`
+  }
+}

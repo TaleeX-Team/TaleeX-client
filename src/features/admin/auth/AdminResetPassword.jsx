@@ -15,6 +15,7 @@ import {ThemeToggle} from "@/components/ThemeToggle";
 import {Alert, AlertDescription} from "@/components/ui/alert";
 import gsap from "gsap";
 import {toast} from "sonner";
+import {LoadingIndicator} from "@/components/LoadingButton.jsx";
 
 const AdminResetPassword = () => {
     const {verificationToken} = useParams();
@@ -189,7 +190,10 @@ const AdminResetPassword = () => {
                                         className="w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300"
                                         disabled={isLoading || !newPassword || !confirmPassword}
                                     >
-                                        {isLoading ? "Resetting..." : "Reset Password"}
+                                        {isLoading ?   <>
+                                            <LoadingIndicator className="mr-2" />
+                                            Processing
+                                        </> : "Reset Password"}
                                         <ArrowRight className="ml-2"/>
                                     </Button>
 

@@ -286,7 +286,7 @@ export default function InterviewHeader({
                                             : "bg-slate-700 text-red-400 hover:bg-slate-700/80",
                                     )}
                                 >
-                                    {isAudioOn ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
+                                    {isAudioOn ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent side="bottom" className="bg-slate-800 text-slate-200">

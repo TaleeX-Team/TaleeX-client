@@ -15,6 +15,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import gsap from "gsap";
 import { toast } from "sonner";
 import { useForgotPassword } from "@/hooks/useForgotPassoword.js";
+import {LoadingIndicator} from "@/components/LoadingButton.jsx";
 
 const AdminForgetPassword = () => {
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -129,7 +130,10 @@ const AdminForgetPassword = () => {
                                         className="w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300"
                                         disabled={isLoading}
                                     >
-                                        {isLoading ? "Sending..." : "Send reset instructions"}
+                                        {isLoading ?   <>
+                                            <LoadingIndicator className="mr-2" />
+                                            Processing
+                                        </> : "Send reset instructions"}
                                         <ArrowRight className="ml-2" />
                                     </Button>
                                     <Link
