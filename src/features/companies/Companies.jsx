@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { Search, FolderPlus, Building2 } from "lucide-react";
+import {
+  Search,
+  FolderPlus,
+  Building2,
+  AlertTriangle,
+  ShieldAlert,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import CompanyCard from "./company-card/CompanyCard";
 import AddCompany from "./modals/add-company";
@@ -23,7 +29,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
+import { useUser } from "@/hooks/useUser.js";
 
 export default function Companies() {
   const {
@@ -57,6 +65,101 @@ export default function Companies() {
     }
   };
 
+  // Function to render the content based on loading, error, verification status
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <CompanySkeleton />
+          <CompanySkeleton />
+          <CompanySkeleton />
+        </div>
+      );
+    }
+
+    if (isError && user.isVerified) {
+      return (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-destructive/5 rounded-lg border border-destructive/20 p-4 z-50">
+          <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+            <ShieldAlert className="h-8 w-8 text-destructive" />
+          </div>
+          <h2 className="text-xl font-semibold text-destructive mb-2">
+            Error loading companies
+          </h2>
+          <p className="text-muted-foreground mb-4">
+            There was an error fetching your company data. Please try again or
+            contact support.
+          </p>
+          <Button variant="outline" className="mx-auto">
+            Retry
+          </Button>
+        </div>
+      );
+    }
+
+    if (!user?.isVerified) {
+      return (
+        <div className="flex flex-col items-center justify-center py-12 px-8 text-center bg-amber-50/50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl shadow-sm">
+          <Alert
+            variant="warning"
+            className="max-w-2xl mb-6 bg-amber-50 dark:bg-amber-900/40 border-amber-300 dark:border-amber-700"
+          >
+            <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-500" />
+            <AlertTitle className="text-amber-800 dark:text-amber-300 text-lg font-medium">
+              Account verification required
+            </AlertTitle>
+            <AlertDescription className="text-amber-700 dark:text-amber-400">
+              Your account needs to be verified to access the full company
+              management features. Verification helps us maintain security and
+              provide you with all available functionality.
+            </AlertDescription>
+          </Alert>
+
+          <div className="w-20 h-20 rounded-full bg-amber-100 dark:bg-amber-800/40 flex items-center justify-center mb-6 border-2 border-amber-300 dark:border-amber-700">
+            <AlertTriangle className="h-10 w-10 text-amber-600 dark:text-amber-500" />
+          </div>
+
+          <h3 className="text-2xl font-semibold mb-3 text-amber-800 dark:text-amber-300">
+            Limited Access
+          </h3>
+          <p className="text-amber-700 dark:text-amber-400 max-w-md mb-6">
+            You can browse the basic information, but you'll need to verify your
+            account to manage companies.
+          </p>
+          <Button className="bg-amber-600 hover:bg-amber-700 text-white border border-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 dark:border-amber-600">
+            Verify Account
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <>
+        {companies?.companies?.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {companies.companies.map((company) => (
+              <div key={company._id}>
+                <CompanyCard company={company} handleDelete={handleDelete} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-16 px-4 text-center bg-card rounded-xl border border-dashed border-muted-foreground/20">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+              <FolderPlus className="h-10 w-10 text-primary" />
+            </div>
+            <h3 className="text-2xl font-semibold mb-3">No companies yet</h3>
+            <p className="text-muted-foreground max-w-md mb-8">
+              Your company directory is empty. Add your first company to get
+              started tracking clients, partners, and opportunities.
+            </p>
+            <AddCompany />
+          </div>
+        )}
+      </>
+    );
+  };
+
   const filteredCompanies =
     companies?.companies?.filter((company) => {
       const matchesStatus =
@@ -72,7 +175,7 @@ export default function Companies() {
     <div className="bg-background p-4 md:p-8 min-h-screen">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mt-6 mb-12  rounded-xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mt-6 mb-12 rounded-xl">
           <div className="flex items-center">
             <div className="bg-primary/10 p-3 rounded-lg mr-4 hidden sm:flex">
               <Building2 className="h-8 w-8 text-primary" />
@@ -87,7 +190,7 @@ export default function Companies() {
             </div>
           </div>
           <div className="mt-4 md:mt-0">
-            <AddCompany />
+            <AddCompany isDisabled={!user?.isVerified} />
           </div>
         </div>
 

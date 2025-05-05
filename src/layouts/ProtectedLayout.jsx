@@ -13,17 +13,8 @@ const ProtectedLayout = () => {
     <SidebarProvider>
       <SidebarInset>
         <>
-          {user && !user.isVerified && (
-            <>
-              {/*<UnVerifiedHeader user={user} />*/}
-              <VerificationBanner />
-            </>
-          )}
-
-            <>
               <Header user={user} />
               <Outlet context={{ user }} />
-            </>
         </>
       </SidebarInset>
     </SidebarProvider>

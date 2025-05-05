@@ -9,7 +9,7 @@ const redirectToOAuth = async (provider) => {
     const url = OAUTH_URLS[provider];
     if (!url) throw new Error("Unsupported OAuth provider");
 
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 500));
     window.location.href = url;
 };
 

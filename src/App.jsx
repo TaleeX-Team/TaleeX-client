@@ -21,6 +21,7 @@ import AdminAuthRoutes from "./routes/adnin-auth-route/AdminRoutes";
 import JobApplicationPage from "@/features/jobs/form/JobApplicationPage.jsx";
 import {InviteJob} from "@/features/jobs/inviteJob/InviteJob.jsx";
 import {StartScreen} from "@/components/interview/StartScreen.jsx";
+import VerifiedEmail from "@/features/auth/verified-email/VerifiedEmail.jsx";
 
 const RootRedirect = () => {
     const {isAuthenticated, isLoading} = useAuth();
@@ -71,6 +72,14 @@ function App() {
             AdminRoutes,
             // User Auth Routes
             PublicRoutes,
+            {
+                path: "verify-email/:verificationToken",
+                element: (
+                    <Suspense fallback={<FullPageSpinner />}>
+                        <VerifiedEmail />
+                    </Suspense>
+                ),
+            },
             {
                 path: "interviews/:interviewId",
                 element: (
