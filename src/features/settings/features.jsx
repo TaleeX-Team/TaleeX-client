@@ -12,13 +12,12 @@ export const useProfile = () => {
       queryClient.setQueryData(["user"], (oldData) => {
         // Handle case where oldData might be null or undefined
         if (!oldData || !oldData.user) {
-          return { user: newUser };
+          return newUser.user;
         }
-        localStorage.setItem("react-query-user", JSON.stringify(newUser));
         // Update the existing user data with the new user data
         return {
-          ...oldData,
-          user: { ...oldData.user, ...newUser },
+          ...oldData.user,
+          ...newUser.user,
         };
       });
 
