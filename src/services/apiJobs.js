@@ -9,7 +9,10 @@ export const getJobs = async () => {
     console.log("Jobs fetched successfully");
     return response.data;
   } catch (error) {
-    console.error("Failed to fetch jobs:", error.response?.data || error?.response?.data?.message);
+    console.error(
+      "Failed to fetch jobs:",
+      error.response?.data || error?.response?.data?.message
+    );
     throw new Error(error.response?.data?.message || "Failed to fetch jobs");
   }
 };
@@ -22,7 +25,10 @@ export const createJob = async (jobData) => {
     console.log("Job created successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Failed to create job:", error.response?.data || error?.response?.data?.message);
+    console.error(
+      "Failed to create job:",
+      error.response?.data || error?.response?.data?.message
+    );
     throw new Error(error.response?.data?.message || "Failed to create job");
   }
 };
@@ -35,20 +41,27 @@ export const getJobById = async (id) => {
     console.log("Job fetched successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error(`Failed to fetch job ${id}:`, error.response?.data || error?.response?.data?.message);
+    console.error(
+      `Failed to fetch job ${id}:`,
+      error.response?.data || error?.response?.data?.message
+    );
     throw new Error(error.response?.data?.message || "Failed to fetch job");
   }
 };
 
 // Update a job
-export const updateJob = async ({ id, updates }) => {
+export const updateJob = async (jobData) => {
+  const { id, ...updates } = jobData;
   try {
-    console.log(`Updating job with ID: ${id}`, updates);
-    const response = await apiClient.patch(`/jobs/${id}`, updates);
+    console.log(`Updating job with ID: ${id}`, updates.updates);
+    const response = await apiClient.patch(`/jobs/${id}`, updates.updates);
     console.log("Job updated successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error(`Failed to update job ${id}:`, error.response?.data || error?.response?.data?.message);
+    console.error(
+      `Failed to update job ${id}:`,
+      error.response?.data || error?.response?.data?.message
+    );
     throw new Error(error.response?.data?.message || "Failed to update job");
   }
 };
@@ -61,7 +74,10 @@ export const deleteJob = async (id) => {
     console.log("Job deleted successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error(`Failed to delete job ${id}:`, error.response?.data || error?.response?.data?.message);
+    console.error(
+      `Failed to delete job ${id}:`,
+      error.response?.data || error?.response?.data?.message
+    );
     throw new Error(error.response?.data?.message || "Failed to delete job");
   }
 };
@@ -75,14 +91,17 @@ export async function filterJobs(filters = {}) {
     Object.entries(filters).forEach(([key, value]) => {
       // Handle arrays (like tags)
       if (Array.isArray(value)) {
-        value.forEach(item => params.append(key, item));
+        value.forEach((item) => params.append(key, item));
       } else {
         params.append(key, value);
       }
     });
 
     // Log the request for debugging
-    console.log("Filtering jobs with params:", Object.fromEntries(params.entries()));
+    console.log(
+      "Filtering jobs with params:",
+      Object.fromEntries(params.entries())
+    );
 
     const response = await apiClient.get(`/jobs/filter`, { params });
     return response.data;
@@ -100,7 +119,12 @@ export const shareJobToLinkedIn = async (id) => {
     console.log("Job shared to LinkedIn successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error(`Failed to share job ${id} on LinkedIn:`, error.response?.data || error?.response?.data?.message);
-    throw new Error(error.response?.data?.message || "Failed to share job on LinkedIn");
+    console.error(
+      `Failed to share job ${id} on LinkedIn:`,
+      error.response?.data || error?.response?.data?.message
+    );
+    throw new Error(
+      error.response?.data?.message || "Failed to share job on LinkedIn"
+    );
   }
 };
