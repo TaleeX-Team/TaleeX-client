@@ -8,9 +8,9 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
 export const AuthTabs = ({
-                             activeTab,
-                             setActiveTab
-                         }) => {
+    activeTab,
+    setActiveTab
+}) => {
     const contentRef = useRef();
     const navigate = useNavigate();
     const { login, register } = useAuth();
@@ -83,7 +83,7 @@ export const AuthTabs = ({
 
     return (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-secondary/50 backdrop-blur-sm border border-border dark:border-border rounded-lg mb-4">
+            <TabsList className="grid w-full grid-cols-2 bg-secondary/50 dark:bg-card backdrop-blur-sm border border-border dark:border-border rounded-lg mb-4 h-10">
                 <TabsTrigger
                     value="login"
                     className="data-[state=active]:bg-white dark:data-[state=active]:bg-accent data-[state=active]:text-primary dark:data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all duration-200"

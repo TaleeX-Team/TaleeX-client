@@ -15,7 +15,8 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import gsap from "gsap";
 import { toast } from "sonner";
 import { useForgotPassword } from "@/hooks/useForgotPassoword.js";
-import {LoadingIndicator} from "@/components/LoadingButton.jsx";
+import { LoadingIndicator } from "@/components/LoadingButton.jsx";
+import { ThreeDLogoSection } from "@/components/TheeDLogoSection.jsx";
 
 const AdminForgetPassword = () => {
     const [isSubmitted, setIsSubmitted] = useState(false);
@@ -34,12 +35,12 @@ const AdminForgetPassword = () => {
             { y: -30, opacity: 0 },
             { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
         );
-        tl.fromTo(
-            cardRef.current,
-            { y: 30, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
-            "-=0.4"
-        );
+        // tl.fromTo(
+        //     cardRef.current,
+        //     { y: 30, opacity: 0 },
+        //     { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
+        //     "-=0.4"
+        // );
     }, []);
 
     useEffect(() => {
@@ -77,20 +78,14 @@ const AdminForgetPassword = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center">
-            <div className="w-full max-w-md p-6 z-10">
-                <div ref={headingRef} className="flex items-center justify-center mb-6">
-                    <Link to="/admin/auth" className="flex items-center gap-3">
-                        <img
-                            src="/public/logo.svg"
-                            alt="logo"
-                            className="h-18"
-                        />
-                        <h1 className="text-2xl font-bold text-gradient">TalentSync</h1>
-                    </Link>
+        <div className="min-h-screen relative w-full flex items-start justify-center pt-20 overflow-hidden">
+            <div className="w-full max-w-md lg:w-1/2 space-y-6">
+                <div className="flex items-center justify-between mb-3">
+                    <ThreeDLogoSection isMobile={true} />
+                    <ThemeToggle />
                 </div>
 
-                <Card ref={cardRef} className="glass-card border-white/10 shadow-xl">
+                <Card ref={cardRef} className="border-white/10 shadow-xl">
                     <CardHeader className="space-y-2">
                         <CardTitle className="text-2xl font-semibold text-center">
                             Admin Password Reset
@@ -117,7 +112,7 @@ const AdminForgetPassword = () => {
                                             <Input
                                                 id="email"
                                                 type="email"
-                                                placeholder="admin@tourvisto.com"
+                                                placeholder="admin@taleex.com"
                                                 required
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
@@ -127,21 +122,15 @@ const AdminForgetPassword = () => {
                                     </div>
                                     <Button
                                         type="submit"
-                                        className="w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300"
+                                        className="w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300 mt-6"
                                         disabled={isLoading}
                                     >
-                                        {isLoading ?   <>
+                                        {isLoading ? <>
                                             <LoadingIndicator className="mr-2" />
                                             Processing
                                         </> : "Send reset instructions"}
                                         <ArrowRight className="ml-2" />
                                     </Button>
-                                    <Link
-                                        to="/admin/auth"
-                                        className="flex items-center justify-center gap-2 text-sm text-primary hover:primary/70 transition-colors mt-4"
-                                    >
-                                        <ArrowLeft size={16} /> Back to login
-                                    </Link>
                                 </form>
                             ) : (
                                 <div className="text-center space-y-6 py-4">
@@ -176,13 +165,18 @@ const AdminForgetPassword = () => {
                         </div>
                     </CardContent>
                 </Card>
-
-                <div className="mt-6 text-center">
+                <Link
+                    to="/admin/auth"
+                    className="flex justify-start gap-2 text-sm text-primary hover:primary/70 transition-colors mt-4"
+                >
+                    <ArrowLeft size={16} /> Back to login
+                </Link>
+                {/* <div className="mt-6 text-center">
                     <ThemeToggle />
                     <p className="text-sm text-muted-foreground mt-4">
                         Need help? Contact <a href="mailto:support@tourvisto.com" className="text-primary hover:underline">support@tourvisto.com</a>
                     </p>
-                </div>
+                </div> */}
             </div>
         </div>
     );

@@ -2,13 +2,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect, useRef } from "react";
-import { LockIcon, UserIcon } from "lucide-react";
+import { ArrowRight, LockIcon, UserIcon } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import AnimatedBackground from "@/components/AnimatedBackground.jsx";
 import { ThemeToggle } from "@/components/ThemeToggle.jsx";
 import { useAuth } from "@/hooks/useAuth";
 import gsap from "gsap";
-import {LoadingIndicator} from "@/components/LoadingButton.jsx";
+import { LoadingIndicator } from "@/components/LoadingButton.jsx";
+import { ThreeDLogoSection } from "@/components/TheeDLogoSection.jsx";
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+} from "@/components/ui/card";
+
 
 const AdminSignIn = () => {
     const [formData, setFormData] = useState({
@@ -42,16 +51,16 @@ const AdminSignIn = () => {
             { opacity: 0, y: -50 },
             { opacity: 1, y: 0, duration: 0.8 }
         )
-            .fromTo(
-                formRef.current,
-                { opacity: 0, y: 30 },
-                { opacity: 1, y: 0, duration: 0.6 }
-            )
-            .fromTo(
-                formElementsRef.current.children,
-                { opacity: 0, y: 20 },
-                { opacity: 1, y: 0, duration: 0.4, stagger: 0.15 }
-            );
+        // .fromTo(
+        //     formRef.current,
+        //     { opacity: 0, y: 30 },
+        //     { opacity: 1, y: 0, duration: 0.6 }
+        // )
+        // .fromTo(
+        //     formElementsRef.current.children,
+        //     { opacity: 0, y: 20 },
+        //     { opacity: 1, y: 0, duration: 0.4, stagger: 0.15 }
+        // );
 
         return () => {
             // Clean up animation
@@ -90,13 +99,17 @@ const AdminSignIn = () => {
     }, [loginAdmin.isError]);
 
     return (
-        <main className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
+        <main className="min-h-screen relative w-full flex items-start justify-center pt-20 overflow-hidden">
             {/* Animated background */}
-            <AnimatedBackground />
+            {/* <AnimatedBackground /> */}
 
-            <div className="glass-card w-full max-w-md p-6 z-10">
-                <div className="gradient-border-content">
-                    <header ref={headerRef} className="flex items-center justify-center mb-6">
+            <div className="w-full max-w-md lg:w-1/2 space-y-6">
+                <div className="flex items-center justify-between mb-3">
+                    <ThreeDLogoSection isMobile={true} />
+                    <ThemeToggle />
+                </div>
+                {/* <div className="gradient-border-content"> */}
+                {/* <header ref={headerRef} className="flex items-center justify-center mb-6">
                         <Link to="/" className="flex items-center gap-3">
                             <img
                                 src="/public/logo.svg"
@@ -105,59 +118,80 @@ const AdminSignIn = () => {
                             />
                             <h1 className="text-2xl font-bold text-gradient">TalentSync</h1>
                         </Link>
-                    </header>
-
-                    <article className="mb-8">
-                        <h2 className="text-xl font-semibold text-center mb-2">Admin Portal</h2>
-                        <p className="text-muted-foreground text-center">
+                    </header> */}
+                {/* <article className="mb-8">
+                    <h2 className="text-xl font-semibold text-center mb-2">Admin Portal</h2>
+                    <p className="text-muted-foreground text-center">
+                        Sign in to access the admin dashboard and manage your travel platform.
+                    </p>
+                </article> */}
+                <Card className="border-white/10 shadow-xl">
+                    <CardHeader className="space-y-2">
+                        <CardTitle className="text-2xl font-semibold text-center">
+                            Admin Portal
+                        </CardTitle>
+                        <CardDescription className="text-center">
                             Sign in to access the admin dashboard and manage your travel platform.
-                        </p>
-                    </article>
-
-                    <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-                        <div ref={formElementsRef} className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="email">Email</Label>
-                                <div className="relative">
-                                    <UserIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        id="email"
-                                        name="email"
-                                        type="email"
-                                        placeholder="admin@tourvisto.com"
-                                        className="pl-10"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        required
-                                    />
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
+                            <div ref={formElementsRef} className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="email">Email</Label>
+                                    <div className="relative">
+                                        <UserIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                        <Input
+                                            id="email"
+                                            name="email"
+                                            type="email"
+                                            placeholder="admin@taleex.com"
+                                            className="pl-10"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between">
+                                <div className="space-y-2">
+                                    {/* <div className="flex items-center justify-between"> */}
                                     <Label htmlFor="password">Password</Label>
-                                    <Link
-                                        to="forgot-password"
-                                        className="text-sm font-medium text-primary hover:text-primary/90"
-                                    >
-                                        Forgot password?
-                                    </Link>
+                                    {/* <Link
+                                            to="forgot-password"
+                                            className="text-sm font-medium text-primary hover:text-primary/90"
+                                        >
+                                            Forgot password?
+                                        </Link> */}
+                                    {/* </div> */}
+                                    <div className="relative">
+                                        <LockIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                        <Input
+                                            id="password"
+                                            name="password"
+                                            type="password"
+                                            placeholder="••••••••"
+                                            className="pl-10"
+                                            value={formData.password}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="flex justify-end">
+                                        <Link
+                                            to="forgot-password"
+                                            className="text-sm font-medium text-primary hover:text-primary/90"
+                                        >
+                                            Forgot password?
+                                        </Link>
+                                    </div>
                                 </div>
-                                <div className="relative">
-                                    <LockIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        id="password"
-                                        name="password"
-                                        type="password"
-                                        placeholder="••••••••"
-                                        className="pl-10"
-                                        value={formData.password}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                </div>
-                            </div>
 
+                                {login.isError && (
+                                    <div ref={errorRef} className="form-error text-sm text-red-500">
+                                        {login.error?.message || "Invalid email or password. Please try again."}
+                                    </div>
+                                )}
                             {loginAdmin.isError && (
                                 <div ref={errorRef} className="form-error text-sm text-red-500">
                                     {loginAdmin.error?.message || "Invalid email or password. Please try again."}
@@ -173,18 +207,21 @@ const AdminSignIn = () => {
                             </Button>
                         </div>
                     </form>
+                                <Button
+                                    type="submit"
+                                    className="w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300 mt-2"
+                                    disabled={login.isLoading}
+                                >
+                                    {login.isLoading ? <> <LoadingIndicator />  Processing </> : 'Sign In'}<ArrowRight className="ml-2" size={16} />
+                                </Button>
+                            </div>
+                        </form>
+                    </CardContent>
 
-                    <div className="mt-6 text-center">
-                        <p className="text-sm text-muted-foreground">
-                            Need help? Contact <a href="mailto:support@tourvisto.com" className="text-primary hover:underline">support@tourvisto.com</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div className="absolute z-20 inset-x-[50%] inset-y-[85%]">
-                <ThemeToggle />
-            </div>
-        </main>
+                </Card>
+
+               
+        </main >
     );
 };
 

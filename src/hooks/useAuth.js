@@ -105,6 +105,8 @@ export const useAuth = () => {
       queryClient.invalidateQueries({ queryKey: ["auth"] });
       Cookies.remove("hasPassword");
       Cookies.remove("userId");
+      Cookies.remove("hasPassword");
+      Cookies.remove("userId");
     },
     onError: () => {
       // even on error, clear local
@@ -120,6 +122,7 @@ export const useAuth = () => {
   const registerMutation = useMutation({
     mutationFn: registerUser,
     onSuccess: (data) => {
+      console.log(data, "Registered");
       console.log(data, "Registered");
       if (data.accessToken) {
         TokenService.setAccessToken(data.accessToken);
@@ -195,6 +198,7 @@ export const useAuth = () => {
       isLoading: verifyEmailMutation.isPending,
       isError: verifyEmailMutation.isError,
       error: verifyEmailMutation.error,
+      isSuccess: verifyEmailMutation.isSuccess,
       data: verifyEmailMutation.data,
     },
     processOAuthCallback,
