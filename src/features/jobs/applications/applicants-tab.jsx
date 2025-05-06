@@ -54,7 +54,6 @@ export default function JobApplicationManager() {
     enabled: !!id,
   });
 
-  // Mutation for advancing applications to CV Review
   const advanceToCVReviewMutation = useMutation({
     mutationFn: ({ jobId, applicationIds }) =>
       advanceToCVReview(jobId, applicationIds),
@@ -160,8 +159,7 @@ export default function JobApplicationManager() {
 
   const rejectApplicationsMutation = useMutation({
     mutationFn: ({ applicantIds, stage }) =>
-      // changeApplicationStage(applicantIds, stage),
-      console.log("??? applications:", applicantIds, stage),
+      changeApplicationStage(applicantIds, stage),
     onMutate: async ({ applicantIds, stage }) => {
       await queryClient.cancelQueries({ queryKey: ["job/applicants", id] });
       const previousData = queryClient.getQueryData(["job/applicants", id]);
