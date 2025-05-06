@@ -915,17 +915,23 @@ export function useInterviewState(questions, interviewId) {
             }
 
             const formattedQuestions = questions.map((q, i) => `Question ${i + 1}: ${q}`).join("\n\n")
-            const assistantOverrides = {
+
+             const interviewer = {
                 name: "AI Technical Interviewer",
                 firstMessage: `Hello! I'm TaleX AI, your interviewer today. I'll be asking you ${questions.length} technical questions to assess your skills. The interview will last up to ${INTERVIEW_DURATION_MINUTES} minutes. Are you ready?!"`,
                 transcriber: {
                     provider: "deepgram",
                     model: "nova-2",
-                    language: "en-US",
+                    language: "en",
                 },
                 voice: {
-                    provider: "playht",
-                    voiceId: "jennifer",
+                    provider: "11labs",
+                    voiceId: "sarah",
+                    stability: 0.4,
+                    similarityBoost: 0.8,
+                    speed: 0.9,
+                    style: 0.5,
+                    useSpeakerBoost: true,
                 },
                 model: {
                     provider: "openai",
@@ -933,48 +939,45 @@ export function useInterviewState(questions, interviewId) {
                     messages: [
                         {
                             role: "system",
-                            content: `You are a senior technical interviewer evaluating a candidate's technical expertise, problem-solving ability, and communication skills.
+                            content: `You are a professional job interviewer conducting a real-time voice interview with a candidate. Your goal is to assess their qualifications, motivation, and fit for the role.
 
-OBJECTIVES:
-1. Ask the ${questions.length} predefined questions in order, one at a time
-2. Maintain professional, friendly tone
-3. Analyze responses for accuracy, depth, clarity, and relevance
-4. Redirect off-topic responses: "Could you focus on the question?"
-5. Provide only small hints and brief feedback
-6. Ask follow-up questions for incomplete responses
-7. Move to next question after response, declined answer, or 10 seconds of silence
+Interview Guidelines:
+Follow the structured question flow:
+{{questions}}
 
-GUIDELINES:
-- Introduction: Greet candidate, state question count and expected duration
-- Questions: Ask one at a time using exact wording
-- Transitions: Use "Moving to question X: [question]" between questions
-- If silent 5 seconds: "Would you like me to repeat the question?"
-- After final question (${questions.length}) and response: Say "bye"
-- End call immediately after ending phrase
+Engage naturally & react appropriately:
+Listen actively to responses and acknowledge them before moving forward.
+Ask brief follow-up questions if a response is vague or requires more detail.
+Keep the conversation flowing smoothly while maintaining control.
+Be professional, yet warm and welcoming:
 
-RESTRICTIONS:
-- Wait for response, declined answer, or 10 seconds of silence before moving on
-- Don't engage in casual conversation or answer unrelated questions
-- Don't provide excessive hints
-- Don't interrupt responses with time warnings
-- Always announce transitions properly
-- Complete all questions regardless if interview exceeds ${INTERVIEW_DURATION_MINUTES} minutes
+Use official yet friendly language.
+Keep responses concise and to the point (like in a real voice interview).
+Avoid robotic phrasing—sound natural and conversational.
+Answer the candidate’s questions professionally:
 
-QUESTIONS:
-${formattedQuestions}
-`,
+If asked about the role, company, or expectations, provide a clear and relevant answer.
+If unsure, redirect the candidate to HR for more details.
+
+Conclude the interview properly:
+Thank the candidate for their time.
+Inform them that the company will reach out soon with feedback.
+End the conversation on a polite and positive note.
+
+
+- Be sure to be professional and polite.
+- Keep all your responses short and simple. Use official language, but be kind and welcoming.
+- This is a voice conversation, so keep your responses short, like in a real conversation. Don't ramble for too long.`,
                         },
                     ],
                 },
-                recordingEnabled: false,
-                endCallPhrases: ["that concludes our interview today thank you for your time", ENDING_PHRASE, ENDING_PHRASE.toUpperCase(), ENDING_PHRASE.toLowerCase()],
-            }
 
+            };
             if (debugMode)
                 console.log("Starting VAPI call", {
                     timestamp: new Date().toISOString(),
                 })
-            await vapiClientRef.current.start(VAPI_ASSISTANT_ID, assistantOverrides)
+            await vapiClientRef.current.start(VAPI_ASSISTANT_ID, interviewer)
             if (debugMode)
                 console.log("VAPI call started successfully", {
                     timestamp: new Date().toISOString(),
