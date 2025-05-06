@@ -1,9 +1,17 @@
-"use client"
+"use client";
 
-import {getJobs, createJob, deleteJob, updateJob, shareJobToLinkedIn, filterJobs, getJobById} from "@/services/apiJobs"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { useState } from "react"
-import {toast} from "sonner";
+import {
+  getJobs,
+  createJob,
+  deleteJob,
+  updateJob,
+  shareJobToLinkedIn,
+  filterJobs,
+  getJobById,
+} from "@/services/apiJobs";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export const useJobs = (initialFilters = {}) => {
   const queryClient = useQueryClient();
@@ -50,11 +58,11 @@ export const useJobs = (initialFilters = {}) => {
 
   // Clean up filters for the API
   const cleanFilters = Object.fromEntries(
-      Object.entries(filters).filter(([_, value]) => {
-        if (value === null || value === undefined || value === "") return false;
-        if (Array.isArray(value)) return value.length > 0;
-        return true;
-      })
+    Object.entries(filters).filter(([_, value]) => {
+      if (value === null || value === undefined || value === "") return false;
+      if (Array.isArray(value)) return value.length > 0;
+      return true;
+    })
   );
 
   // Fetch filtered jobs only if filters are active
@@ -71,11 +79,11 @@ export const useJobs = (initialFilters = {}) => {
   const setFilter = (newFilters) => {
     const updatedFilters = { ...filters, ...newFilters };
     const cleanedUpdatedFilters = Object.fromEntries(
-        Object.entries(updatedFilters).filter(([_, value]) => {
-          if (value === null || value === undefined || value === "") return false;
-          if (Array.isArray(value)) return value.length > 0;
-          return true;
-        })
+      Object.entries(updatedFilters).filter(([_, value]) => {
+        if (value === null || value === undefined || value === "") return false;
+        if (Array.isArray(value)) return value.length > 0;
+        return true;
+      })
     );
     setFilters(cleanedUpdatedFilters);
     queryClient.invalidateQueries({ queryKey: ["jobs", "filter"] });
@@ -91,52 +99,81 @@ export const useJobs = (initialFilters = {}) => {
   const createJobMutation = useMutation({
     mutationFn: createJob,
     onSuccess: (newJob) => {
-      console.log("Job created:", newJob)
-      queryClient.invalidateQueries({ queryKey: ["jobs"] })
-      queryClient.invalidateQueries({ queryKey: ["jobs", "filter"] })
+      console.log("Job created:", newJob);
+      queryClient.invalidateQueries({ queryKey: ["jobs"] });
+      queryClient.invalidateQueries({ queryKey: ["jobs", "filter"] });
     },
     onError: (error) => {
-      toast.error( error?.response?.data?.message)
+      toast.error(error?.response?.data?.message);
     },
-  })
+  });
 
   // Delete a job
   const deleteJobMutation = useMutation({
     mutationFn: deleteJob,
     onSuccess: (deletedJob) => {
-      console.log("Job deleted:", deletedJob)
-      queryClient.invalidateQueries({ queryKey: ["jobs"] })
-      queryClient.invalidateQueries({ queryKey: ["jobs", "filter"] })
+      console.log("Job deleted:", deletedJob);
+      queryClient.invalidateQueries({ queryKey: ["jobs"] });
+      queryClient.invalidateQueries({ queryKey: ["jobs", "filter"] });
     },
     onError: (error) => {
-      toast.error( error?.response?.data?.message)
+      toast.error(error?.response?.data?.message);
     },
-  })
+  });
 
   // Update a job
   const updateJobMutation = useMutation({
     mutationFn: updateJob,
     onSuccess: (updatedJob) => {
-      queryClient.invalidateQueries({ queryKey: ["jobs"] })
-      queryClient.invalidateQueries({ queryKey: ["jobs", "filter"] })
-      console.log("Job updated:", updatedJob)
+      // Update the job in the jobQuery cache
+      queryClient.setQueryData(["job", updatedJob.job._id], (oldData) => {
+        // Handle case where oldData might be null or undefined
+        console.log(updatedJob, "dsadsadsadjasndjasdjasiodj");
+        if (!oldData) {
+          return updatedJob.job;
+        }
+        // Update the existing job data with the new job data
+        return {
+          ...oldData.job,
+          ...updatedJob.job,
+        };
+      });
 
+      // Update the jobs list cache to reflect the updated job
+      queryClient.setQueryData(["jobs"], (oldData) => {
+        // Handle case where oldData might be null or undefined
+        if (!oldData || !oldData.jobs) {
+          return { jobs: [updatedJob] }; // Initialize with the updated job
+        }
+        // Update the job in the jobs array
+        return {
+          ...oldData,
+          jobs: oldData.jobs.map((job) =>
+            job._id === updatedJob._id ? { ...job, ...updatedJob } : job
+          ),
+        };
+      });
+
+      // Optionally invalidate queries to trigger a refresh in the background
+      queryClient.invalidateQueries({ queryKey: ["jobs"] });
+      queryClient.invalidateQueries({ queryKey: ["jobs", "filter"] });
+
+      console.log("Job updated:", updatedJob);
     },
     onError: (error) => {
-      toast.error( error?.response?.data?.message)
+      toast.error(error?.response?.data?.message);
     },
-  })
-
+  });
   // Share to LinkedIn
   const shareJobMutation = useMutation({
     mutationFn: shareJobToLinkedIn,
     onSuccess: (res) => {
-      console.log("Job shared to LinkedIn:", res)
+      console.log("Job shared to LinkedIn:", res);
     },
     onError: (error) => {
-      toast.error( error?.response?.data?.message)
+      toast.error(error?.response?.data?.message);
     },
-  })
+  });
 
   return {
     jobsQuery,
@@ -150,5 +187,5 @@ export const useJobs = (initialFilters = {}) => {
     clearFilters,
     setFilter,
     hasFilters,
-  }
-}
+  };
+};
