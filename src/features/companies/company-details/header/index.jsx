@@ -36,13 +36,13 @@ export default function Header({
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
           {verification.status === "pending" && <VerifyCompany />}
-          <Button
+          {/* <Button
             variant="outline"
             className="flex items-center gap-2"
             onClick={() => console.log("View Website")}
           >
             <Edit className="h-4 w-4" /> Edit Company
-          </Button>
+          </Button> */}
         </div>
       </div>
     </div>

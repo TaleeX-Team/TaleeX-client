@@ -143,7 +143,7 @@ export default function CompanyCard({ company, handleDelete }) {
         onMouseLeave={handleMouseLeave}
       >
         {/* Actions Menu */}
-        <div className="absolute top-2 right-2 flex gap-2">
+        <div className="absolute top-7 right-2 flex gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
@@ -154,13 +154,6 @@ export default function CompanyCard({ company, handleDelete }) {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem className="cursor-pointer">
-                <Info className="mr-2 h-4 w-4" /> View Details
-              </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
-                <Briefcase className="mr-2 h-4 w-4" /> Add Job
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive cursor-pointer"
                 onClick={() => handleDelete(company)}
@@ -214,7 +207,7 @@ export default function CompanyCard({ company, handleDelete }) {
           </div>
         </CardHeader>
 
-        <CardContent ref={contentRef} className="pb-2 flex-1">
+        <CardContent ref={contentRef} className="flex-1">
           <div className="space-y-2 text-sm">
             <p className="text-muted-foreground line-clamp-3">
               {description || "No description available"}
@@ -249,11 +242,11 @@ export default function CompanyCard({ company, handleDelete }) {
           )}
         </CardContent>
 
-        <CardFooter className="flex justify-between pt-4 mt-auto">
-          <Button variant="outline" size="sm" className="gap-1">
+        <CardFooter className="flex justify-end">
+          {/* <Button variant="outline" size="sm" className="gap-1">
             <Briefcase className="h-4 w-4" />
             <span>Add Job</span>
-          </Button>
+          </Button> */}
           <Link to={`${_id}`}>
             <Button variant="default" size="sm" className="gap-1">
               <Info className="h-4 w-4" />

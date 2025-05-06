@@ -18,37 +18,21 @@ export default function VerifyLayout() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-8 text-center bg-amber-50/50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl shadow-sm">
-      <Alert
-        variant="warning"
-        className="max-w-2xl mb-6 bg-amber-50 dark:bg-amber-900/40 border-amber-300 dark:border-amber-700"
-      >
-        <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-500" />
-        <AlertTitle className="text-amber-800 dark:text-amber-300 text-lg font-medium">
-          Account verification required
-        </AlertTitle>
-        <AlertDescription className="text-amber-700 dark:text-amber-400">
-          Your account needs to be verified to access the full company
-          management features. Verification helps us maintain security and
-          provide you with all available functionality.
-        </AlertDescription>
-      </Alert>
-
-      <div className="w-20 h-20 rounded-full bg-amber-100 dark:bg-amber-800/40 flex items-center justify-center mb-6 border-2 border-amber-300 dark:border-amber-700">
-        <AlertTriangle className="h-10 w-10 text-amber-600 dark:text-amber-500" />
+    <div className="flex flex-col items-center justify-center pt-5 pb-6 px-8 text-center bg-amber-50/50 dark:bg-amber-900/10 border border-dashed border-amber-200 dark:border-amber-600/30 rounded-xl shadow-sm">
+      <div className="w-17 h-17 rounded-full bg-amber-100 dark:bg-amber-700/10 flex items-center justify-center mb-6 border-2 border-amber-300 dark:border-amber-800">
+        <AlertTriangle className="h-9 w-9 text-amber-600 dark:text-amber-600" />
       </div>
 
-      <h3 className="text-2xl font-se bold mb-3 text-amber-800 dark:text-amber-300">
-        Limited Access
+      <h3 className="text-xl font-se bold mb-3 text-amber-800 dark:text-amber-500">
+        Account verification required
       </h3>
-      <p className="text-amber-700 dark:text-amber-400 max-w-md mb-6">
-        You can browse the basic information, but you'll need to verify your
-        account to manage companies.
+      <p className="text-md text-amber-700 dark:text-amber-500/80 max-w-xs mb-8">
+        To access all features without restrictions, please verify your email address.
       </p>
       <Button
         onClick={handleVerifyNow}
         disabled={verificationMutation.isPending}
-        className="bg-amber-600 hover:bg-amber-700 text-white border border-amber-700 dark:bg-amber-700 dark:hover:bg-amber-600 dark:border-amber-600"
+        className="bg-amber-600 hover:bg-amber-700 text-white border border-amber-700 dark:bg-amber-800 dark:hover:bg-amber-900 dark:border-amber-900/10"
       >
         {verificationMutation.isPending ? "Sending..." : "Verify Account"}
         {!verificationMutation.isPending && (

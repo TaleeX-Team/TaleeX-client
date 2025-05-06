@@ -83,9 +83,9 @@ export default function CompanyDetails() {
 
   return (
     <div className="min-h-screen bg-background p-6 md:p-8">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-7xl">
         {/* Header with back button */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-8 mt-6">
           <Button variant="outline" onClick={() => navigate(-1)}>
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to Companies
           </Button>
@@ -107,7 +107,7 @@ export default function CompanyDetails() {
           value={activeTab}
           onValueChange={setActiveTab}
         >
-          <TabsList className="grid w-full grid-cols-2 mb-8">
+          <TabsList className="grid w-full grid-cols-2 mb-8 dark:bg-card">
             <TabsTrigger value="about">About</TabsTrigger>
             <TabsTrigger value="jobs">Jobs ({jobs2.length})</TabsTrigger>
           </TabsList>
