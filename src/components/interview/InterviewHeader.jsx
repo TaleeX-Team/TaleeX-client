@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import {useEffect, useRef, useState} from "react"
+import {Button} from "@/components/ui/button"
+import {Badge} from "@/components/ui/badge"
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip"
+import {Avatar, AvatarImage, AvatarFallback} from "@/components/ui/avatar"
 import {
     Mic,
     MicOff,
@@ -19,9 +19,9 @@ import {
     Building,
     User,
 } from "lucide-react"
-import { formatDuration } from "@/lib/utils"
-import { cn } from "@/lib/utils"
-import { useInterviewData } from "@/hooks/useInterviewData.js"
+import {formatDuration} from "@/lib/utils"
+import {cn} from "@/lib/utils"
+import {useInterviewData} from "@/hooks/useInterviewData.js"
 
 export default function InterviewHeader({
                                             interviewId,
@@ -125,9 +125,10 @@ export default function InterviewHeader({
     // Early return if no questions are available
     if (!questionStates?.length || !progress?.total) {
         return (
-            <div className="bg-gradient-to-r from-slate-900 to-slate-800 border-b border-slate-700 shadow-md py-4 px-6 text-center text-slate-300">
+            <div
+                className="bg-gradient-to-r from-slate-900 to-slate-800 border-b border-slate-700 shadow-md py-4 px-6 text-center text-slate-300">
                 <div className="flex justify-center items-center gap-2">
-                    <FileQuestion className="h-5 w-5 text-blue-400" />
+                    <FileQuestion className="h-5 w-5 text-blue-400"/>
                     <span>No questions available</span>
                 </div>
             </div>
@@ -152,7 +153,7 @@ export default function InterviewHeader({
 
     // Generate question markers for the progress bar
     const renderQuestionMarkers = () => {
-        return Array.from({ length: totalQuestions }).map((_, idx) => {
+        return Array.from({length: totalQuestions}).map((_, idx) => {
             const isCompleted = idx < currentQuestion - 1
             const isCurrent = idx === currentQuestion - 1
 
@@ -167,14 +168,15 @@ export default function InterviewHeader({
                                 ? "bg-blue-500 scale-125 shadow-lg shadow-blue-500/50"
                                 : "bg-slate-400 scale-75 opacity-50",
                     )}
-                    style={{ left: `${(idx / (totalQuestions - 1)) * 100}%` }}
+                    style={{left: `${(idx / (totalQuestions - 1)) * 100}%`}}
                 />
             )
         })
     }
 
     return (
-        <div className="bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 shadow-lg backdrop-blur-lg sticky top-0 py-4 px-6 z-21">
+        <div
+            className="bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 shadow-lg backdrop-blur-lg sticky top-0 py-4 px-6 z-21">
 
             {/* Top section with title and controls */}
             <div className="flex justify-between items-center mb-4">
@@ -182,10 +184,11 @@ export default function InterviewHeader({
                     <div className="p-2 bg-blue-500/20 rounded-xl">
                         <Avatar className="h-8 w-8 border border-slate-600">
                             {userData.image ? (
-                                <AvatarImage src={userData.image || "/placeholder.svg"} alt={userData.userName} />
+                                <AvatarImage src={userData.image || "/placeholder.svg"} alt={userData.userName}/>
                             ) : null}
                             <AvatarFallback className="bg-blue-500/20 text-blue-400">
-                                {userData.userName ? userData.userName.charAt(0).toUpperCase() : <User className="h-4 w-4" />}
+                                {userData.userName ? userData.userName.charAt(0).toUpperCase() :
+                                    <User className="h-4 w-4"/>}
                             </AvatarFallback>
                         </Avatar>
                     </div>
@@ -193,7 +196,8 @@ export default function InterviewHeader({
                         <h1 className="text-xl font-bold text-white">
                             {formattedInterviewType}
                             {userData.questionCount > 0 && (
-                                <span className="text-slate-400 text-base font-normal ml-2">({userData.questionCount} questions)</span>
+                                <span
+                                    className="text-slate-400 text-base font-normal ml-2">({userData.questionCount} questions)</span>
                             )}
                         </h1>
                         <div className="flex items-center mt-1 gap-3">
@@ -221,8 +225,9 @@ export default function InterviewHeader({
                             </Badge>
 
                             {isInterviewStarted && (
-                                <div className="interview-timer flex items-center text-sm text-slate-300 bg-slate-700/50 px-2 py-0.5 rounded-md">
-                                    <Clock className="h-3.5 w-3.5 mr-1.5 text-slate-400" />
+                                <div
+                                    className="interview-timer flex items-center text-sm text-slate-300 bg-slate-700/50 px-2 py-0.5 rounded-md">
+                                    <Clock className="h-3.5 w-3.5 mr-1.5 text-slate-400"/>
                                     {formatDuration(interviewDuration)}
                                 </div>
                             )}
@@ -241,7 +246,7 @@ export default function InterviewHeader({
                                             getTimerClass(),
                                         )}
                                     >
-                                        <Timer className="h-4 w-4 mr-2" />
+                                        <Timer className="h-4 w-4 mr-2"/>
                                         {formatDuration(timeRemaining)}
                                     </div>
                                 </TooltipTrigger>
@@ -264,7 +269,7 @@ export default function InterviewHeader({
                                             : "hover:bg-blue-500/20 hover:text-blue-400 text-slate-300 border-slate-600",
                                     )}
                                 >
-                                    <MessageSquare className="h-4 w-4" />
+                                    <MessageSquare className="h-4 w-4"/>
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent side="bottom" className="bg-slate-800 text-slate-200">
@@ -286,7 +291,7 @@ export default function InterviewHeader({
                                             : "bg-slate-700 text-red-400 hover:bg-slate-700/80",
                                     )}
                                 >
-                                    {isAudioOn ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                                    {isAudioOn ?<Mic className="h-4 w-4"/>  :<MicOff className="h-4 w-4"/> }
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent side="bottom" className="bg-slate-800 text-slate-200">
@@ -303,7 +308,7 @@ export default function InterviewHeader({
                                     className="transition-all duration-300 rounded-full hover:bg-red-600 bg-red-500"
                                     disabled={isLoading}
                                 >
-                                    <PhoneOff className="h-4 w-4" />
+                                    <PhoneOff className="h-4 w-4"/>
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent side="bottom" className="bg-slate-800 text-slate-200">
@@ -327,7 +332,8 @@ export default function InterviewHeader({
                         />
                         <span>Previous</span>
                     </div>
-                    <div className="text-sm font-bold text-white bg-slate-800/70 px-3 py-0.5 rounded-full border border-slate-700">
+                    <div
+                        className="text-sm font-bold text-white bg-slate-800/70 px-3 py-0.5 rounded-full border border-slate-700">
                         {currentQuestion} of {totalQuestions}
                     </div>
                     <div className="flex items-center text-xs font-medium text-slate-400">
@@ -354,7 +360,7 @@ export default function InterviewHeader({
                             "absolute h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full",
                             showPulse && "pulse-animation",
                         )}
-                        style={{ width: `${progressPercentage}%` }}
+                        style={{width: `${progressPercentage}%`}}
                     >
                         {/* Animated gradient overlay */}
                         <div className="absolute inset-0 w-full h-full shimmer-animation"></div>
@@ -380,7 +386,7 @@ export default function InterviewHeader({
             {displayedQuestion && (
                 <div className="bg-slate-800/60 border border-slate-700 rounded-lg p-3 shadow-inner flex items-start">
                     <div className="mr-3 mt-1 p-1.5 bg-blue-500/20 rounded-full flex-shrink-0">
-                        <FileQuestion className="h-4 w-4 text-blue-400" />
+                        <FileQuestion className="h-4 w-4 text-blue-400"/>
                     </div>
                     <div className="flex-1">
                         <div className="text-xs text-slate-400 mb-1 font-medium">Current Question:</div>
@@ -391,8 +397,9 @@ export default function InterviewHeader({
 
             {/* Error message */}
             {callStatus === "ERROR" && (
-                <div className="mt-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-md p-3 flex items-center gap-2 text-sm">
-                    <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                <div
+                    className="mt-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-md p-3 flex items-center gap-2 text-sm">
+                    <AlertCircle className="h-5 w-5 flex-shrink-0"/>
                     <span>Connection issues detected. Try refreshing the page or check your internet connection.</span>
                 </div>
             )}
@@ -406,23 +413,33 @@ export default function InterviewHeader({
                 .shimmer-animation {
                     background: linear-gradient(
                             90deg,
-                            rgba(255,255,255,0) 0%,
-                            rgba(255,255,255,0.3) 50%,
-                            rgba(255,255,255,0) 100%
+                            rgba(255, 255, 255, 0) 0%,
+                            rgba(255, 255, 255, 0.3) 50%,
+                            rgba(255, 255, 255, 0) 100%
                     );
                     background-size: 200% 100%;
                     animation: shimmer 2s infinite linear;
                 }
 
                 @keyframes pulse {
-                    0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
-                    70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
-                    100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+                    0% {
+                        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+                    }
+                    70% {
+                        box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+                    }
+                    100% {
+                        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+                    }
                 }
 
                 @keyframes shimmer {
-                    0% { background-position: -200% 0; }
-                    100% { background-position: 200% 0; }
+                    0% {
+                        background-position: -200% 0;
+                    }
+                    100% {
+                        background-position: 200% 0;
+                    }
                 }
             `}</style>
         </div>
