@@ -72,27 +72,27 @@ export default function ResetPassword() {
     const cardRef = useRef(null);
     const contentRef = useRef(null);
 
-    useEffect(() => {
-        const tl = gsap.timeline();
-        tl.fromTo(
-            headingRef.current,
-            { y: -30, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.8 }
-        );
-        tl.fromTo(
-            cardRef.current,
-            { y: 30, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.8 },
-            "-=0.4"
-        );
-        gsap.to(".logo-container", {
-            y: 10,
-            duration: 2,
-            repeat: -1,
-            yoyo: true,
-            ease: "sine.inOut",
-        });
-    }, []);
+    // useEffect(() => {
+    //     const tl = gsap.timeline();
+    //     tl.fromTo(
+    //         headingRef.current,
+    //         { y: -30, opacity: 0 },
+    //         { y: 0, opacity: 1, duration: 0.8 }
+    //     );
+    //     tl.fromTo(
+    //         cardRef.current,
+    //         { y: 30, opacity: 0 },
+    //         { y: 0, opacity: 1, duration: 0.8 },
+    //         "-=0.4"
+    //     );
+    //     gsap.to(".logo-container", {
+    //         y: 10,
+    //         duration: 2,
+    //         repeat: -1,
+    //         yoyo: true,
+    //         ease: "sine.inOut",
+    //     });
+    // }, []);
 
     useEffect(() => {
         if (isSubmitted) {

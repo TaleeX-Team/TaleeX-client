@@ -10,6 +10,7 @@ import AboutTab from "./about-tab";
 import JobsTab from "./jobs-tab";
 import Header from "./header";
 import { useCompanies } from "../features";
+import { useJobs } from "@/features/jobs/useJobs";
 
 export default function CompanyDetails() {
   const queryClient = useQueryClient();
@@ -17,9 +18,14 @@ export default function CompanyDetails() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("about");
   const { companyData } = useCompanies();
+  const { jobsQuery } = useJobs();
   // Get current company by finding it using the companyId
   const companies = queryClient.getQueryData(["companies"])?.companies || [];
   const company = companies.find((company) => company._id === companyId);
+  //find the jobs that whose job.company._id is equal to companyId
+
+  const jobs2 =
+    jobsQuery.data?.jobs?.filter((job) => job.company._id === companyId) || [];
 
   // Loading state
   const isLoading = !queryClient.getQueryData(["companies"]);
@@ -75,54 +81,6 @@ export default function CompanyDetails() {
     verification = {},
   } = company;
 
-  // Generate fake jobs data for now
-  const fakeJobs = [
-    {
-      id: "job1",
-      title: "Senior Frontend Developer",
-      type: "Full-time",
-      location: address?.city ? `${address.city}` : "Remote",
-      salary: "$120,000 - $150,000",
-      posted: "2 days ago",
-      description:
-        "We're looking for an experienced frontend developer to join our team and help build beautiful, responsive user interfaces.",
-    },
-    {
-      id: "job2",
-      title: "Backend Engineer",
-      type: "Full-time",
-      location: address?.city ? `${address.city}` : "Remote",
-      salary: "$130,000 - $160,000",
-      posted: "1 week ago",
-      description:
-        "Help us build and maintain our server infrastructure and API services with modern technologies.",
-    },
-    {
-      id: "job3",
-      title: "Product Manager",
-      type: "Full-time",
-      location: address?.city ? `${address.city}` : "Remote",
-      salary: "$140,000 - $170,000",
-      posted: "3 days ago",
-      description:
-        "Lead product development for our enterprise solutions and work closely with our design and engineering teams.",
-    },
-    {
-      id: "job4",
-      title: "UX Designer",
-      type: "Contract",
-      location: "Remote",
-      salary: "$90,000 - $110,000",
-      posted: "Just now",
-      description:
-        "Design intuitive user experiences for our products and collaborate with our development team to implement them.",
-    },
-  ];
-
-  // Use the company's real jobs data if available, otherwise use fake jobs
-  const jobs =
-    company.jobs && company.jobs.length > 0 ? company.jobs : fakeJobs;
-
   return (
     <div className="min-h-screen bg-background p-6 md:p-8">
       <div className="mx-auto max-w-6xl">
@@ -151,7 +109,7 @@ export default function CompanyDetails() {
         >
           <TabsList className="grid w-full grid-cols-2 mb-8">
             <TabsTrigger value="about">About</TabsTrigger>
-            <TabsTrigger value="jobs">Jobs ({jobs.length})</TabsTrigger>
+            <TabsTrigger value="jobs">Jobs ({jobs2.length})</TabsTrigger>
           </TabsList>
 
           <AboutTab
@@ -163,8 +121,7 @@ export default function CompanyDetails() {
             verification={verification}
           />
           {/* Jobs tab */}
-          <JobsTab jobs={jobs} />
-
+          <JobsTab jobs={jobs2} />
         </Tabs>
       </div>
     </div>

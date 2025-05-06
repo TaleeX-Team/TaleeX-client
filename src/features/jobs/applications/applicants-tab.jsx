@@ -13,9 +13,9 @@ import {
   advanceToCVReview,
   scheduleInterviews,
   changeApplicationStage,
-  // sendVideoInterview,
 } from "@/services/apiApplications";
 import { getJobById } from "@/services/apiJobs.js";
+import { toast } from "sonner";
 
 // Define the application phases
 const PHASES = [
@@ -31,7 +31,7 @@ const generateId = () => Math.random().toString(36).substring(2, 9);
 
 export default function JobApplicationManager() {
   const [activeTab, setActiveTab] = useState("overview");
-  const [selectedApplicants, setSelectedApplicants] = useState([]);
+  const [selectedApplicants, setSelectedApplicants] = useState([]); // Now stores { id, name } objects
   const [activePhase, setActivePhase] = useState("Applications");
   const [searchQuery, setSearchQuery] = useState("");
   const { id } = useParams();
@@ -54,18 +54,12 @@ export default function JobApplicationManager() {
     enabled: !!id,
   });
 
-  // Mutation for advancing applications to CV Review
   const advanceToCVReviewMutation = useMutation({
     mutationFn: ({ jobId, applicationIds }) =>
       advanceToCVReview(jobId, applicationIds),
     onMutate: async ({ jobId, applicationIds }) => {
-      // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ["job/applicants", id] });
-
-      // Snapshot the previous value
       const previousData = queryClient.getQueryData(["job/applicants", id]);
-
-      // Optimistically update the cache
       queryClient.setQueryData(["job/applicants", id], (old) => {
         if (!old || !old.applications) return old;
         return {
@@ -81,19 +75,27 @@ export default function JobApplicationManager() {
           ),
         };
       });
-
-      // Clear selected applicants optimistically
+      toast(
+        `${selectedApplicants.length} ${
+          selectedApplicants.length === 1 ? "applicant" : "applicants"
+        } sent to CV Review`,
+        {
+          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
+            selectedApplicants.length === 1 ? "has" : "have"
+          } been sent from ${activePhase} to CV Review`,
+          style: {
+            backgroundColor: "#195f32",
+            color: "white",
+          },
+        }
+      );
       setSelectedApplicants([]);
-
-      // Return context with previous data for rollback
       return { previousData };
     },
     onSuccess: () => {
-      // Invalidate to refetch and sync with server
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
     },
     onError: (err, variables, context) => {
-      // Rollback to previous data on error
       queryClient.setQueryData(["job/applicants", id], context.previousData);
       console.error(
         "Failed to advance applications to CV review:",
@@ -101,7 +103,6 @@ export default function JobApplicationManager() {
       );
     },
     onSettled: () => {
-      // Ensure queries are invalidated after success or error
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
     },
   });
@@ -110,13 +111,8 @@ export default function JobApplicationManager() {
     mutationFn: ({ jobId, applicationIds, interviewTypes, questionCount }) =>
       scheduleInterviews(jobId, applicationIds, interviewTypes, questionCount),
     onMutate: async ({ jobId, applicationIds }) => {
-      // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ["job/applicants", id] });
-
-      // Snapshot the previous value
       const previousData = queryClient.getQueryData(["job/applicants", id]);
-
-      // Optimistically update the cache
       queryClient.setQueryData(["job/applicants", id], (old) => {
         if (!old || !old.applications) return old;
         return {
@@ -125,45 +121,48 @@ export default function JobApplicationManager() {
             applicationIds.includes(app._id)
               ? {
                   ...app,
-                  stage: "Pending Interview",
+                  stage: "Sending Interview",
                   updatedAt: new Date().toISOString(),
                 }
               : app
           ),
         };
       });
-
-      // Clear selected applicants optimistically
+      toast(
+        `${selectedApplicants.length} ${
+          selectedApplicants.length === 1 ? "applicant" : "applicants"
+        } sent to Interview`,
+        {
+          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
+            selectedApplicants.length === 1 ? "has" : "have"
+          } been sent from ${activePhase} to Interview`,
+          style: {
+            backgroundColor: "#195f32",
+            color: "white",
+          },
+        }
+      );
       setSelectedApplicants([]);
-
-      // Return context with previous data for rollback
       return { previousData };
     },
     onSuccess: () => {
-      // Invalidate to refetch and sync with server
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
     },
     onError: (err, variables, context) => {
-      // Rollback to previous data on error
       queryClient.setQueryData(["job/applicants", id], context.previousData);
       console.error("Failed to send video interviews:", err.message);
     },
     onSettled: () => {
-      // Ensure queries are invalidated after success or error
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
     },
   });
+
   const rejectApplicationsMutation = useMutation({
-    mutationFn: ({ applicantIds }) =>
-      changeApplicationStage(applicantIds, "rejected"),
-    onMutate: async ({ applicantIds }) => {
-      // Cancel any outgoing refetches
+    mutationFn: ({ applicantIds, stage }) =>
+      changeApplicationStage(applicantIds, stage),
+    onMutate: async ({ applicantIds, stage }) => {
       await queryClient.cancelQueries({ queryKey: ["job/applicants", id] });
-
-      // Snapshot the previous value
       const previousData = queryClient.getQueryData(["job/applicants", id]);
-
-      // Optimistically update the cache
       queryClient.setQueryData(["job/applicants", id], (old) => {
         if (!old || !old.applications) return old;
         return {
@@ -179,24 +178,38 @@ export default function JobApplicationManager() {
           ),
         };
       });
-
-      // Clear selected applicants optimistically
+      toast(
+        `${selectedApplicants.length} ${
+          selectedApplicants.length === 1 ? "applicant" : "applicants"
+        } moved to ${
+          stage === "rejected" ? "Rejected Applicants" : "Offered Applicants"
+        }`,
+        {
+          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
+            selectedApplicants.length === 1 ? "has" : "have"
+          } been moved from ${activePhase} to ${
+            stage === "rejected" ? "Rejected" : "Offered"
+          } Applicants`,
+          style: {
+            backgroundColor: `${stage === "rejected" ? "darkred" : "#195f32"}`,
+            color: "white",
+          },
+        }
+      );
       setSelectedApplicants([]);
-
-      // Return context with previous data for rollback
       return { previousData };
     },
     onSuccess: () => {
-      // Invalidate to refetch and sync with server
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
     },
     onError: (err, variables, context) => {
-      // Rollback to previous data on error
       queryClient.setQueryData(["job/applicants", id], context.previousData);
       console.error("Failed to reject applications:", err.message);
+      toast.error("Failed to reject applications", {
+        description: "Please try again later.",
+      });
     },
     onSettled: () => {
-      // Ensure queries are invalidated after success or error
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
     },
   });
@@ -261,7 +274,7 @@ export default function JobApplicationManager() {
     if (selectedApplicants.length === 0) return;
     advanceToCVReviewMutation.mutate({
       jobId: id,
-      applicationIds: selectedApplicants,
+      applicationIds: selectedApplicants.map((a) => a.id),
     });
   };
 
@@ -269,20 +282,29 @@ export default function JobApplicationManager() {
   const rejectApplicants = () => {
     if (selectedApplicants.length === 0) return;
     rejectApplicationsMutation.mutate({
-      applicantIds: selectedApplicants,
-      stage: "reject",
+      applicantIds: selectedApplicants.map((a) => a.id),
+      stage: "rejected",
     });
   };
+
+  const offerApplicants = () => {
+    if (selectedApplicants.length === 0) return;
+    rejectApplicationsMutation.mutate({
+      applicantIds: selectedApplicants.map((a) => a.id),
+      stage: "offer",
+    });
+  };
+
   // Handle sending video interviews
   const handleSendInterview = ({
     interviewTypes,
     questionCount,
-    selectedApplicants,
+    selectedApplicants: selected,
   }) => {
     console.log("Selected applicants for interview:", questionCount);
     sendVideoInterviewMutation.mutate({
       jobId: id,
-      applicationIds: selectedApplicants,
+      applicationIds: selected.map((a) => a.id),
       interviewTypes,
       questionCount,
     });
@@ -291,7 +313,9 @@ export default function JobApplicationManager() {
   // Handle selecting all applicants
   const toggleSelectAll = (checked) => {
     if (checked) {
-      setSelectedApplicants(filteredApplicants.map((a) => a.id));
+      setSelectedApplicants(
+        filteredApplicants.map((a) => ({ id: a.id, name: a.name }))
+      );
     } else {
       setSelectedApplicants([]);
     }
@@ -300,10 +324,16 @@ export default function JobApplicationManager() {
   // Handle selecting individual applicant
   const toggleSelectApplicant = (id, checked) => {
     if (checked) {
-      setSelectedApplicants((prev) => [...prev, id]);
+      const applicant = filteredApplicants.find((a) => a.id === id);
+      if (applicant) {
+        setSelectedApplicants((prev) => [
+          ...prev,
+          { id: applicant.id, name: applicant.name },
+        ]);
+      }
     } else {
       setSelectedApplicants((prev) =>
-        prev.filter((applicantId) => applicantId !== id)
+        prev.filter((applicant) => applicant.id !== id)
       );
     }
   };
@@ -438,6 +468,7 @@ export default function JobApplicationManager() {
             toggleSelectApplicant={toggleSelectApplicant}
             moveToCVReview={moveToCVReview}
             rejectApplicants={rejectApplicants}
+            offerApplicants={offerApplicants}
             activePhase={activePhase}
             setActivePhase={setActivePhase}
             onSendInterview={handleSendInterview}

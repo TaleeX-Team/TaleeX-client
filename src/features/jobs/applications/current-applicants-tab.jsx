@@ -50,6 +50,7 @@ export function ApplicantsTab({
   activePhase,
   setActivePhase,
   onSendInterview,
+  offerApplicants,
 }) {
   const [sortOrder, setSortOrder] = useState("desc");
   const [open, setOpen] = useState(false);
@@ -272,7 +273,7 @@ export function ApplicantsTab({
           size="sm"
           //success
           className="flex items-center gap-1 text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-50 dark:disabled:hover:bg-transparent"
-          // onClick={rejectApplicants}
+          onClick={offerApplicants}
           disabled={selectedApplicants.length === 0}
         >
           Offer
@@ -288,7 +289,11 @@ export function ApplicantsTab({
                 <Checkbox
                   checked={
                     selectedApplicants.length > 0 &&
-                    selectedApplicants.length === filteredApplicants.length
+                    filteredApplicants.every((applicant) =>
+                      selectedApplicants.some(
+                        (selected) => selected.id === applicant.id
+                      )
+                    )
                   }
                   onCheckedChange={(checked) => toggleSelectAll(checked)}
                   className="dark:border-gray-600"
@@ -330,7 +335,9 @@ export function ApplicantsTab({
                 >
                   <td className="py-3 px-4">
                     <Checkbox
-                      checked={selectedApplicants.includes(applicant.id)}
+                      checked={selectedApplicants.some(
+                        (a) => a.id === applicant.id
+                      )}
                       onCheckedChange={(checked) =>
                         toggleSelectApplicant(applicant.id, checked)
                       }

@@ -11,6 +11,7 @@ import { Briefcase, Clock, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import AddJob from "@/features/jobs/addJob/createJob";
+import JobCard from "@/features/jobs/form/components/JobCard";
 const jobTypeColors = {
   "Full-time":
     "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
@@ -32,43 +33,7 @@ export default function JobsTab({ jobs }) {
         {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {jobs.map((job) => (
-              <Card key={job._id || job.id} className="overflow-hidden">
-                <CardHeader className="pb-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">{job.title}</CardTitle>
-                      <div className="flex items-center mt-1">
-                        <MapPin className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground">
-                          {job.location || location}
-                        </span>
-                      </div>
-                    </div>
-                    <Badge className={jobTypeColors[job.type] || ""}>
-                      {job.type || "Full-time"}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="pb-3">
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {job.description}
-                  </p>
-                  {job.salary && (
-                    <div className="flex items-center mt-3">
-                      <div className="text-sm font-medium">{job.salary}</div>
-                    </div>
-                  )}
-                </CardContent>
-                <CardFooter className="flex justify-between pt-3 border-t">
-                  {job.posted && (
-                    <div className="flex items-center text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3 mr-1" />
-                      Posted {job.posted}
-                    </div>
-                  )}
-                  <Button size="sm">Apply Now</Button>
-                </CardFooter>
-              </Card>
+              <JobCard key={job.id} job={job} />
             ))}
           </div>
         }

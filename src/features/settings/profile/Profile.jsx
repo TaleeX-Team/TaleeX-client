@@ -53,7 +53,7 @@ const profileSchema = z.object({
     .email({ message: "Please enter a valid email address." })
     .optional()
     .or(z.literal("")),
-  imageUrl: z.any().optional(),
+  image: z.any().optional(),
 });
 
 export default function ProfilePage() {
@@ -74,7 +74,7 @@ export default function ProfilePage() {
       lastName: "",
       phone: "",
       email: "",
-      imageUrl: null,
+      image: null,
     },
   });
 
@@ -90,7 +90,7 @@ export default function ProfilePage() {
     const file = e.target.files[0];
     if (file) {
       setAvatarPreview(URL.createObjectURL(file));
-      form.setValue("imageUrl", file);
+      form.setValue("image", file);
     }
   };
 
@@ -117,7 +117,7 @@ export default function ProfilePage() {
     );
 
     // Don't submit if no changes were made
-    if (Object.keys(cleanedData).length === 0 && !data.imageUrl) {
+    if (Object.keys(cleanedData).length === 0 && !data.image) {
       toast.info("No changes to save");
       return;
     }
@@ -125,9 +125,9 @@ export default function ProfilePage() {
     // Create a FormData object if there's an avatar to upload
     let formData = null;
 
-    if (data.imageUrl) {
+    if (data.image) {
       formData = new FormData();
-      formData.append("imageUrl", data.imageUrl);
+      formData.append("image", data.image);
 
       // Add other fields to the FormData only if they have values
       if (data.firstName) formData.append("firstName", data.firstName);
@@ -237,9 +237,9 @@ export default function ProfilePage() {
                 <p className="text-xs text-muted-foreground text-center mt-1">
                   Recommended: Square image, JPG or PNG
                 </p>
-                {form.formState.errors.imageUrl && (
+                {form.formState.errors.image && (
                   <p className="text-xs text-destructive">
-                    {form.formState.errors.imageUrl.message}
+                    {form.formState.errors.image.message}
                   </p>
                 )}
               </div>
@@ -358,7 +358,7 @@ export default function ProfilePage() {
               </div>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-between">
+          <CardFooter className="flex justify-between mt-6">
             <Button className="ml-auto" type="submit" disabled={isLoading}>
               {isLoading ? (
                 <>
