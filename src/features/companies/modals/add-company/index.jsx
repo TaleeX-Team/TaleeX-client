@@ -40,8 +40,8 @@ import { toast } from "sonner";
 import { useCompanies } from "../../features";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {Link} from "react-router-dom";
-import {LoadingIndicator} from "@/components/LoadingButton.jsx";
+import { Link } from "react-router-dom";
+import { LoadingIndicator } from "@/components/LoadingButton.jsx";
 
 const formSchema = z.object({
   image: z.any().refine((file) => file instanceof File || file === null, {
@@ -147,7 +147,7 @@ export default function AddCompany() {
         console.error("Error creating company:", error);
         toast.error(
           error.response?.data?.message ||
-            "Failed to create company. Please try again."
+          "Failed to create company. Please try again."
         );
       },
     });
@@ -177,14 +177,17 @@ export default function AddCompany() {
               </div>
               <DialogTitle className="text-xl">Add New Company</DialogTitle>
             </div>
-            <DialogDescription>
-              Fill in the details to add a new company to your directory.
+            <DialogDescription className="text-sm text-muted-foreground text-left space-y-1">
+              <p>Please double-check all information before submitting — company details cannot be edited later.</p>
+              {/* <p>You can create as many company profiles as you like, free of charge.</p> */}
             </DialogDescription>
+
+
           </DialogHeader>
 
           <Tabs defaultValue="basic" className="w-full">
             <div className="px-6">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-2 bg-secondary/50 dark:bg-card">
                 <TabsTrigger value="basic">Basic Info</TabsTrigger>
                 <TabsTrigger value="additional">Additional Details</TabsTrigger>
               </TabsList>
@@ -400,7 +403,7 @@ export default function AddCompany() {
                       className="bg-primary text-primary-foreground"
                       disabled={isLoading}
                     >
-                      {isLoading ?   <>
+                      {isLoading ? <>
                         <LoadingIndicator className="mr-2" />
                         Processing
                       </> : "Create Company"}

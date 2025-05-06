@@ -242,24 +242,32 @@ export default function AddJob() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="mt-4 md:mt-0 ml-2 bg-primary hover:bg-primary/90 text-primary-foreground">
+                <Button className="mt-4 md:mt-0 ml-2 bg-primary hover:bg-primary text-primary-foreground">
                     <Plus className="mr-2 h-4 w-4" /> Post a Job
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-[800px] md:max-w-[900px] p-0 bg-background">
+            <DialogContent className="sm:max-w-[600px] p-0 overflow-y-auto scrollbar-none"
+                style={{
+                    overscrollBehavior: "contain",
+                    maxHeight: "90vh",
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none",
+                }}
+            >
                 <div ref={formContainerRef}>
                     <DialogHeader className="px-6 pt-6 pb-2">
                         <DialogTitle className="text-2xl font-semibold">
-                            Create New Job Posting
+                            Create New Job
                         </DialogTitle>
                         <DialogDescription className="text-muted-foreground">
-                            Fill in the details to post a new job opportunity.
+                            Fill in the details to track applications and candidate progress.
                         </DialogDescription>
                     </DialogHeader>
 
-                    <Tabs defaultValue="basics" className="px-6">
-                        <TabsList className="grid grid-cols-3 mb-4">
+                    <Tabs defaultValue="basic" className="w-full px-6">
+
+                        <TabsList className="grid w-full grid-cols-3 mb-4 bg-secondary/50 dark:bg-card">
                             <TabsTrigger value="basics">Basic Info</TabsTrigger>
                             <TabsTrigger value="details">Job Details</TabsTrigger>
                             <TabsTrigger value="additional">Additional Info</TabsTrigger>
@@ -292,77 +300,49 @@ export default function AddJob() {
                                             )}
                                         />
 
-                                        <FormField
-                                            control={form.control}
-                                            name="company"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-sm font-medium">
-                                                        Company *
-                                                    </FormLabel>
-                                                    <Select
-                                                        onValueChange={field.onChange}
-                                                        value={field.value}
-                                                    >
-                                                        <FormControl>
-                                                            <SelectTrigger className="border-input">
-                                                                <SelectValue placeholder="Select a company" />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            {isCompaniesLoading ? (
-                                                                <SelectItem disabled value="loading">
-                                                                    <div className="flex items-center">
-                                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                                        Loading companies...
-                                                                    </div>
-                                                                </SelectItem>
-                                                            ) : isCompaniesError ? (
-                                                                <SelectItem disabled value="error">
-                                                                    Failed to load companies
-                                                                </SelectItem>
-                                                            ) : companies.length > 0 ? (
-                                                                companies.map((comp) =>
-                                                                    comp?._id && comp?.name ? (
-                                                                        <SelectItem key={comp._id} value={comp._id}>
-                                                                            {comp.name}
-                                                                        </SelectItem>
-                                                                    ) : null
-                                                                )
-                                                            ) : (
-                                                                <SelectItem disabled value="no-companies">
-                                                                    No companies available
-                                                                </SelectItem>
-                                                            )}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormMessage className="text-destructive" />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex justify-between">
                                             <FormField
                                                 control={form.control}
-                                                name="workPlaceType"
+                                                name="company"
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel className="text-sm font-medium">
-                                                            Workplace Type *
+                                                            Company *
                                                         </FormLabel>
                                                         <Select
                                                             onValueChange={field.onChange}
                                                             value={field.value}
                                                         >
                                                             <FormControl>
-                                                                <SelectTrigger className="border-input">
-                                                                    <SelectValue placeholder="Select type" />
+                                                                <SelectTrigger className="w-full sm:w-[268px] border-input">
+                                                                    <SelectValue placeholder="Select a company" />
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
-                                                                <SelectItem value="remote">Remote</SelectItem>
-                                                                <SelectItem value="hybrid">Hybrid</SelectItem>
-                                                                <SelectItem value="on-site">On-site</SelectItem>
+                                                                {isCompaniesLoading ? (
+                                                                    <SelectItem disabled value="loading">
+                                                                        <div className="flex items-center">
+                                                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                            Loading companies...
+                                                                        </div>
+                                                                    </SelectItem>
+                                                                ) : isCompaniesError ? (
+                                                                    <SelectItem disabled value="error">
+                                                                        Failed to load companies
+                                                                    </SelectItem>
+                                                                ) : companies.length > 0 ? (
+                                                                    companies.map((comp) =>
+                                                                        comp?._id && comp?.name ? (
+                                                                            <SelectItem key={comp._id} value={comp._id}>
+                                                                                {comp.name}
+                                                                            </SelectItem>
+                                                                        ) : null
+                                                                    )
+                                                                ) : (
+                                                                    <SelectItem disabled value="no-companies">
+                                                                        No companies available
+                                                                    </SelectItem>
+                                                                )}
                                                             </SelectContent>
                                                         </Select>
                                                         <FormMessage className="text-destructive" />
@@ -383,7 +363,7 @@ export default function AddJob() {
                                                             value={field.value}
                                                         >
                                                             <FormControl>
-                                                                <SelectTrigger className="border-input">
+                                                                <SelectTrigger className="w-full sm:w-[268px] border-input">
                                                                     <SelectValue placeholder="Select type" />
                                                                 </SelectTrigger>
                                                             </FormControl>
@@ -412,6 +392,35 @@ export default function AddJob() {
                                                     </FormItem>
                                                 )}
                                             />
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex justify-between">
+                                            <FormField
+                                                control={form.control}
+                                                name="workPlaceType"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="text-sm font-medium">
+                                                            Workplace Type *
+                                                        </FormLabel>
+                                                        <Select
+                                                            onValueChange={field.onChange}
+                                                            value={field.value}
+                                                        >
+                                                            <FormControl>
+                                                                <SelectTrigger className="w-full sm:w-[268px] border-input">
+                                                                    <SelectValue placeholder="Select type" />
+                                                                </SelectTrigger>
+                                                            </FormControl>
+                                                            <SelectContent>
+                                                                <SelectItem value="remote">Remote</SelectItem>
+                                                                <SelectItem value="hybrid">Hybrid</SelectItem>
+                                                                <SelectItem value="on-site">On-site</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormMessage className="text-destructive" />
+                                                    </FormItem>
+                                                )}
+                                            />
 
                                             <FormField
                                                 control={form.control}
@@ -426,7 +435,7 @@ export default function AddJob() {
                                                             value={field.value}
                                                         >
                                                             <FormControl>
-                                                                <SelectTrigger className="border-input">
+                                                                <SelectTrigger className="w-full sm:w-[268px] border-input">
                                                                     <SelectValue placeholder="Select level" />
                                                                 </SelectTrigger>
                                                             </FormControl>
@@ -579,7 +588,7 @@ export default function AddJob() {
                                             <h3 className="text-sm font-medium mb-3">
                                                 Salary Information
                                             </h3>
-                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                            <div className="grid grid-cols-3 gap-3 flex justify-between">
                                                 <FormField
                                                     control={form.control}
                                                     name="salary.min"
@@ -676,7 +685,7 @@ export default function AddJob() {
                                         />
                                     </TabsContent>
 
-                                    <DialogFooter className="px-6 py-4 flex justify-between sm:justify-end gap-2 border-t">
+                                    <DialogFooter className="py-4 flex justify-between sm:justify-end gap-2 border-t">
                                         <DialogClose asChild>
                                             <Button
                                                 type="button"
@@ -713,6 +722,6 @@ export default function AddJob() {
                     </Tabs>
                 </div>
             </DialogContent>
-        </Dialog>
+        </Dialog >
     );
 }

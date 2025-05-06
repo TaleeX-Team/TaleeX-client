@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, FolderPlus, Building2, AlertTriangle } from "lucide-react";
+import { Search, FolderPlus, Building2, AlertCircle, AlertTriangle, FileX } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import CompanyCard from "./company-card/CompanyCard";
 import AddCompany from "./modals/add-company";
@@ -54,7 +54,7 @@ export default function Companies() {
           console.error("Error deleting company:", error);
           toast.error(
             error.response?.data?.message ||
-              "Failed to delete company. Please try again."
+            "Failed to delete company. Please try again."
           );
         },
       });
@@ -112,7 +112,7 @@ export default function Companies() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mt-6 mb-12  rounded-xl">
           <div className="flex items-center">
-            <div className="bg-primary/10 p-3 rounded-lg mr-4 hidden sm:flex">
+            <div className="bg-primary/10 dark:bg-secondary/50 p-3 rounded-lg mr-4 hidden sm:flex">
               <Building2 className="h-8 w-8 text-primary" />
             </div>
             <div>
@@ -164,30 +164,16 @@ export default function Companies() {
           )}
 
           {isError && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-destructive/5 rounded-lg border border-destructive/20 p-4 z-50">
-              <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="text-destructive"
-                >
-                  <path
-                    d="M12 9V11M12 15H12.01M5.07183 19H18.9282C20.4678 19 21.4301 17.3333 20.6603 16L13.7321 4C12.9623 2.66667 11.0378 2.66667 10.268 4L3.33978 16C2.56998 17.3333 3.53223 19 5.07183 19Z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+            <div className="flex flex-col items-center bg-destructive/5 rounded-lg border border-dashed border-destructive/20 z-50 pt-9 pb-6">
+              <div className="mx-auto w-17 h-17 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+                <AlertCircle className="h-9 w-9 text-destructive" />
               </div>
               <h2 className="text-xl font-semibold text-destructive mb-2">
                 Error loading companies
               </h2>
-              <p className="text-muted-foreground mb-4">
-                There was an error fetching your company data. You are not
-                Verified , Please try again.
+              <p className="text-muted-foreground mb-8 max-w-xs">
+                There was an error fetching your company data. Please try again or
+                contact support.
               </p>
               <Button variant="outline" className="mx-auto">
                 Retry
@@ -208,8 +194,14 @@ export default function Companies() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center text-muted-foreground py-12">
-                  No companies found with this filter or search term.
+                <div className="flex flex-col items-center justify-center py-16 px-4 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/50">
+                  <FileX className="h-12 w-12 text-gray-400 dark:text-gray-500 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
+                    No companies found
+                  </h3>
+                  <p className="text-gray-500 dark:text-gray-400 text-center mb-4">
+                    No companies match your current filter criteria
+                  </p>
                 </div>
               )}
             </>

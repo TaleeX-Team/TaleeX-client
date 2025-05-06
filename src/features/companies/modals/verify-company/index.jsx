@@ -217,7 +217,7 @@ export default function VerifyCompany() {
       toast.error("Failed to verify code");
       setEmailError(
         confirmDomainVerificationMutation.error?.message ||
-          "Invalid verification code"
+        "Invalid verification code"
       );
     }
 
@@ -276,7 +276,7 @@ export default function VerifyCompany() {
 
         <Tabs defaultValue="email" className="w-full">
           <div className="px-6">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-2 dark:bg-card">
               <TabsTrigger value="email">Email Verification</TabsTrigger>
               <TabsTrigger value="document">Document Upload</TabsTrigger>
             </TabsList>
