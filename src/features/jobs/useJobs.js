@@ -1,8 +1,9 @@
 "use client"
 
-import { getJobs, createJob, deleteJob, updateJob, shareJobToLinkedIn, filterJobs } from "@/services/apiJobs"
+import {getJobs, createJob, deleteJob, updateJob, shareJobToLinkedIn, filterJobs, getJobById} from "@/services/apiJobs"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
+import {toast} from "sonner";
 
 export const useJobs = (initialFilters = {}) => {
   const queryClient = useQueryClient();
@@ -23,6 +24,29 @@ export const useJobs = (initialFilters = {}) => {
     refetchOnWindowFocus: false,
     retry: false,
   });
+
+  // Get job by ID - fixed to properly handle the job ID parameter
+  const jobQuery = useQuery({
+    queryKey: ["job", null], // Default to null ID to be replaced when needed
+    queryFn: ({ queryKey }) => {
+      const [_, jobId] = queryKey;
+      if (!jobId) return null;
+      return getJobById(jobId);
+    },
+    enabled: false, // Don't run automatically
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  // Function to fetch a specific job by ID
+  const fetchJob = async (id) => {
+    return queryClient.fetchQuery({
+      queryKey: ["job", id],
+      queryFn: () => getJobById(id),
+      staleTime: 5 * 60 * 1000,
+    });
+  };
 
   // Clean up filters for the API
   const cleanFilters = Object.fromEntries(
@@ -63,18 +87,16 @@ export const useJobs = (initialFilters = {}) => {
     queryClient.invalidateQueries({ queryKey: ["jobs", "filter"] });
   };
 
-
-
   // Create a job
   const createJobMutation = useMutation({
     mutationFn: createJob,
     onSuccess: (newJob) => {
       console.log("Job created:", newJob)
       queryClient.invalidateQueries({ queryKey: ["jobs"] })
-      queryClient.invalidateQueries({ queryKey: ["filteredJobs"] })
+      queryClient.invalidateQueries({ queryKey: ["jobs", "filter"] })
     },
     onError: (error) => {
-      console.error("Create job failed:", error?.response?.data?.message)
+      toast.error( error?.response?.data?.message)
     },
   })
 
@@ -84,10 +106,10 @@ export const useJobs = (initialFilters = {}) => {
     onSuccess: (deletedJob) => {
       console.log("Job deleted:", deletedJob)
       queryClient.invalidateQueries({ queryKey: ["jobs"] })
-      queryClient.invalidateQueries({ queryKey: ["filteredJobs"] })
+      queryClient.invalidateQueries({ queryKey: ["jobs", "filter"] })
     },
     onError: (error) => {
-      console.error("Delete job failed:", error?.response?.data?.message)
+      toast.error( error?.response?.data?.message)
     },
   })
 
@@ -95,12 +117,13 @@ export const useJobs = (initialFilters = {}) => {
   const updateJobMutation = useMutation({
     mutationFn: updateJob,
     onSuccess: (updatedJob) => {
-      console.log("Job updated:", updatedJob)
       queryClient.invalidateQueries({ queryKey: ["jobs"] })
-      queryClient.invalidateQueries({ queryKey: ["filteredJobs"] })
+      queryClient.invalidateQueries({ queryKey: ["jobs", "filter"] })
+      console.log("Job updated:", updatedJob)
+
     },
     onError: (error) => {
-      console.error("Update job failed:", error?.response?.data?.message)
+      toast.error( error?.response?.data?.message)
     },
   })
 
@@ -111,14 +134,14 @@ export const useJobs = (initialFilters = {}) => {
       console.log("Job shared to LinkedIn:", res)
     },
     onError: (error) => {
-      console.error("Share to LinkedIn failed:", error?.response?.data?.message)
+      toast.error( error?.response?.data?.message)
     },
   })
 
-
-
   return {
     jobsQuery,
+    jobQuery,
+    fetchJob, // New utility function to fetch a job by ID
     createJobMutation,
     deleteJobMutation,
     updateJobMutation,
