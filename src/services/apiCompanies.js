@@ -8,7 +8,7 @@ export const getCompanies = async () => {
     console.log("Companies fetched successfully");
     return response.data;
   } catch (error) {
-    console.error("Failed to fetch companies:", error.message);
+    console.error("Failed to fetch companies:", error?.response?.data?.message);
     throw error;
   }
 };
@@ -19,7 +19,7 @@ export const getNonRejectedCompanies = async () => {
     console.log("Companies fetched successfully");
     return response.data;
   } catch (error) {
-    console.error("Failed to fetch companies:", error.message);
+    console.error("Failed to fetch companies:", error?.response?.data?.message);
     throw error;
   }
 };
@@ -46,7 +46,7 @@ export const createCompany = async (companyData) => {
     console.log("Company created successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Failed to create company:", error.message);
+    console.error("Failed to create company:", error?.response?.data?.message);
     throw error;
   }
 };
@@ -58,7 +58,7 @@ export const deleteCompany = async (companyId) => {
     console.log("Company deleted successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Failed to delete company:", error.message);
+    console.error("Failed to delete company:", error?.response?.data?.message);
     throw error;
   }
 };
@@ -81,7 +81,7 @@ export const requestDomainVerification = async (companyId, data) => {
     console.log("Domain verification code requested successfully");
     return response.data;
   } catch (error) {
-    console.error("Failed to request domain verification code:", error.message);
+    console.error("Failed to request domain verification code:", error?.response?.data?.message);
     throw error;
   }
 };
@@ -100,7 +100,7 @@ export const confirmDomainVerification = async (companyId, data) => {
     console.log("Domain verification confirmed successfully");
     return response.data;
   } catch (error) {
-    console.error("Failed to confirm domain verification:", error.message);
+    console.error("Failed to confirm domain verification:", error?.response?.data?.message);
     throw error;
   }
 };

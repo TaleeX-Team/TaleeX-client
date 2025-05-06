@@ -240,7 +240,7 @@ export default function CompaniesManagement() {
                 },
                 onError: (error) => {
                     console.error("Rejection error:", error)
-                    setSuccessMessage(`Error: ${error.message || "Failed to reject company"}`)
+                    setSuccessMessage(`Error: ${error.response?.data?.message || "Failed to reject company"}`)
                     setShowSuccessAlert(true)
                     setTimeout(() => setShowSuccessAlert(false), 5000)
                 },
@@ -276,7 +276,7 @@ export default function CompaniesManagement() {
             queryClient.invalidateQueries({ queryKey: ["filteredCompanies"] })
         } catch (error) {
             console.error("Error deleting company:", error)
-            setSuccessMessage(`Error: ${error.message || "Failed to delete company"}`)
+            setSuccessMessage(`Error: ${error.response?.data?.message || "Failed to delete company"}`)
             setShowSuccessAlert(true)
             setTimeout(() => setShowSuccessAlert(false), 5000)
         }

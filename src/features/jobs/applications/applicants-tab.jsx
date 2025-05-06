@@ -338,7 +338,7 @@ export default function JobApplicationManager() {
 
   // Render error state
   if (isError) {
-    return <div>Error: {error.message}</div>;
+    return <div>Error: {error?.response?.data?.message}</div>;
   }
 
   return (

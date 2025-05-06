@@ -110,7 +110,7 @@ export function useEndInterview() {
         // Axios error handling
         const errorMessage =
           error.response?.data?.message ||
-          error.message ||
+          error?.response?.data?.message ||
           "Failed to end interview";
         throw new Error(errorMessage);
       }
@@ -122,7 +122,7 @@ export function useEndInterview() {
     },
     onError: (error) => {
       // Handle errors
-      toast.error(error.message || "Failed to submit interview data");
+      toast.error(error?.response?.data?.message || "Failed to submit interview data");
       console.error("Error ending interview:", error);
     },
   });

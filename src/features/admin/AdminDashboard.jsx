@@ -390,7 +390,7 @@ export default function AdminDashboard() {
         onError: (error) => {
           setNotification({
             type: "error",
-            message: `Error updating user: ${error.message}`,
+            message: `Error updating user: ${error.response?.data?.message}`,
           });
           setTimeout(() => setNotification(null), 5000);
         },
@@ -427,7 +427,7 @@ export default function AdminDashboard() {
           setNotification({
             type: "error",
             message: `Error deleting user: ${
-              error.message || "Invalid password or insufficient permissions"
+                error.response?.data?.message || "Invalid password or insufficient permissions"
             }`,
           });
           setTimeout(() => setNotification(null), 5000);
@@ -449,7 +449,7 @@ export default function AdminDashboard() {
       onError: (error) => {
         setNotification({
           type: "error",
-          message: `Error promoting user: ${error.message}`,
+          message: `Error promoting user: ${error.response?.data?.message}`,
         });
         setTimeout(() => setNotification(null), 5000);
       },

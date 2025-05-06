@@ -505,7 +505,7 @@ function ErrorState({ error }) {
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Alert variant="destructive">
         <AlertDescription>
-          Error loading job: {error.message || "Unknown error occurred"}
+          Error loading job: {error?.response?.data?.message || "Unknown error occurred"}
         </AlertDescription>
       </Alert>
     </div>

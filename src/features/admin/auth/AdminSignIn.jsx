@@ -1,12 +1,12 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useState, useEffect, useRef } from "react";
-import { LockIcon, UserIcon } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {useState, useEffect, useRef} from "react";
+import {LockIcon, UserIcon} from "lucide-react";
+import {Link, useNavigate} from "react-router-dom";
 import AnimatedBackground from "@/components/AnimatedBackground.jsx";
-import { ThemeToggle } from "@/components/ThemeToggle.jsx";
-import { useAuth } from "@/hooks/useAuth";
+import {ThemeToggle} from "@/components/ThemeToggle.jsx";
+import {useAuth} from "@/hooks/useAuth";
 import gsap from "gsap";
 import {LoadingIndicator} from "@/components/LoadingButton.jsx";
 
@@ -16,7 +16,7 @@ const AdminSignIn = () => {
         password: ''
     });
 
-    const { loginAdmin, isAuthenticated } = useAuth();
+    const {loginAdmin, isAuthenticated} = useAuth();
     const navigate = useNavigate();
     const formRef = useRef(null);
     const headerRef = useRef(null);
@@ -34,23 +34,23 @@ const AdminSignIn = () => {
     // GSAP animations
     useEffect(() => {
         // Create a timeline for the animations
-        const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+        const tl = gsap.timeline({defaults: {ease: "power3.out"}});
 
         // Animate the form elements
         tl.fromTo(
             headerRef.current,
-            { opacity: 0, y: -50 },
-            { opacity: 1, y: 0, duration: 0.8 }
+            {opacity: 0, y: -50},
+            {opacity: 1, y: 0, duration: 0.8}
         )
             .fromTo(
                 formRef.current,
-                { opacity: 0, y: 30 },
-                { opacity: 1, y: 0, duration: 0.6 }
+                {opacity: 0, y: 30},
+                {opacity: 1, y: 0, duration: 0.6}
             )
             .fromTo(
                 formElementsRef.current.children,
-                { opacity: 0, y: 20 },
-                { opacity: 1, y: 0, duration: 0.4, stagger: 0.15 }
+                {opacity: 0, y: 20},
+                {opacity: 1, y: 0, duration: 0.4, stagger: 0.15}
             );
 
         return () => {
@@ -78,21 +78,22 @@ const AdminSignIn = () => {
         // Error handling is now managed by the useAuth hook
     };
 
-    // Animation for error message when it appears
+    // Animation for error?.response?.data?.message when it appears
     useEffect(() => {
         if (loginAdmin.isError && errorRef.current) {
             gsap.fromTo(
                 errorRef.current,
-                { opacity: 0, y: -10 },
-                { opacity: 1, y: 0, duration: 0.3 }
+                {opacity: 0, y: -10},
+                {opacity: 1, y: 0, duration: 0.3}
             );
         }
     }, [loginAdmin.isError]);
 
+
     return (
         <main className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
             {/* Animated background */}
-            <AnimatedBackground />
+            <AnimatedBackground/>
 
             <div className="glass-card w-full max-w-md p-6 z-10">
                 <div className="gradient-border-content">
@@ -119,7 +120,7 @@ const AdminSignIn = () => {
                             <div className="space-y-2">
                                 <Label htmlFor="email">Email</Label>
                                 <div className="relative">
-                                    <UserIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                    <UserIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground"/>
                                     <Input
                                         id="email"
                                         name="email"
@@ -144,7 +145,7 @@ const AdminSignIn = () => {
                                     </Link>
                                 </div>
                                 <div className="relative">
-                                    <LockIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                    <LockIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground"/>
                                     <Input
                                         id="password"
                                         name="password"
@@ -160,29 +161,32 @@ const AdminSignIn = () => {
 
                             {loginAdmin.isError && (
                                 <div ref={errorRef} className="form-error text-sm text-red-500">
-                                    {loginAdmin.error?.message || "Invalid email or password. Please try again."}
+                                    {loginAdmin.error?.response?.data?.message}
                                 </div>
-                            )}
+                            )
+
+                            }
 
                             <Button
                                 type="submit"
                                 className="w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300"
                                 disabled={loginAdmin.isLoading}
                             >
-                                {loginAdmin.isLoading ? <> <LoadingIndicator/>  Processing </> : 'Sign In'}
+                                {loginAdmin.isLoading ? <> <LoadingIndicator/> Processing </> : 'Sign In'}
                             </Button>
                         </div>
                     </form>
 
                     <div className="mt-6 text-center">
                         <p className="text-sm text-muted-foreground">
-                            Need help? Contact <a href="mailto:support@tourvisto.com" className="text-primary hover:underline">support@tourvisto.com</a>
+                            Need help? Contact <a href="mailto:support@tourvisto.com"
+                                                  className="text-primary hover:underline">support@tourvisto.com</a>
                         </p>
                     </div>
                 </div>
             </div>
             <div className="absolute z-20 inset-x-[50%] inset-y-[85%]">
-                <ThemeToggle />
+                <ThemeToggle/>
             </div>
         </main>
     );

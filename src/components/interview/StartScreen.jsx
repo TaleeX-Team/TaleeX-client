@@ -89,7 +89,7 @@ export function StartScreen() {
         } catch (error) {
             console.error("Error starting interview:", error);
 
-            // Extract error message from API response if available
+            // Extract error?.response?.data?.message from API response if available
             let errorMessage = "Failed to start the interview. Please try again.";
 
             if (error.response?.data) {
@@ -101,15 +101,16 @@ export function StartScreen() {
                     // Also update the UI state to show as expired
                     setIsExpired(true);
                 } else if (responseData.message) {
-                    // Use the API's error message if available
+                    // Use the API's error?.response?.data?.message if available
                     errorMessage = responseData.message;
                 }
-            } else if (error.message) {
+            } else if (error.response?.data?.message) {
                 // Use the error object's message if available
-                errorMessage = error.message;
+                errorMessage = error.response?.data?.message;
+                toast.error(error.response?.data?.message)
+
             }
 
-            toast.error(errorMessage);
         } finally {
             setIsStarting(false);
         }

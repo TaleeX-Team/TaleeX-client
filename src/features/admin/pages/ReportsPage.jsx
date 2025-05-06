@@ -171,7 +171,7 @@ const ReportsPage = () => {
             }
         },
         onError: (error) => {
-            toast.error(`Failed to update status: ${error.message}`, {
+            toast.error(`${error?.response?.data?.message}`, {
                 style: { background: "#ef4444", color: "white" }
             })
         }

@@ -25,6 +25,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog.jsx";
 import { Skeleton } from "@/components/ui/skeleton.jsx";
+import {toast} from "sonner";
 
 const UserProfileDialog = ({ userId, isOpen, onClose, onEdit }) => {
   const { data: user, isLoading, error } = useUser(userId);
@@ -118,7 +119,7 @@ const UserProfileDialog = ({ userId, isOpen, onClose, onEdit }) => {
           </div>
         ) : error ? (
           <div className="py-6 text-center text-destructive">
-            <p>Error loading user profile: {error.message}</p>
+            <p>Error loading user profile: {error.response?.data?.message}</p>
           </div>
         ) : user ? (
           <div className="space-y-6">

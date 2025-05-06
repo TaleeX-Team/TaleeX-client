@@ -55,7 +55,7 @@ export default function JobApplicationPage() {
                 <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>{error instanceof Error ? error.message : "Failed to load job details"}</AlertDescription>
+                    <AlertDescription>{error instanceof Error ? error?.response?.data?.message : "Failed to load job details"}</AlertDescription>
                 </Alert>
             </div>
         )

@@ -14,7 +14,7 @@ export function useShareJob() {
             }
         },
         onError: (error) => {
-            toast.error(error.message || "Failed to share job on LinkedIn")
+            toast.error(error?.response?.data?.message || "Failed to share job on LinkedIn")
         },
     })
 

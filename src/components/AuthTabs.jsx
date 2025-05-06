@@ -35,8 +35,8 @@ export const AuthTabs = ({
     }, [login.isSuccess, register.isSuccess, navigate]);
 
     const handleError = (error, fallbackMessage) => {
-        const details = error.details;
-        const message = error.message;
+        const details = error.response?.data?.details;
+        const message = error.response?.data?.message;
 
         if (details && typeof details === "object") {
             Object.values(details).forEach((msg) => toast.error(msg));

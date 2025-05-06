@@ -13,8 +13,7 @@ const CallStatus = {
 
 const VAPI_ASSISTANT_ID = "a7939f6e-e04e-4bce-ac30-c6e7e35655a6";
 const VAPI_API_KEY = "d4ecde21-8c7d-4f5c-9996-5c2b306d9ccf";
-const ENDING_PHRASE =
-  "That concludes our interview today Thank you for your time";
+const ENDING_PHRASE = "That concludes our interview today Thank you for your time";
 const INTERVIEW_DURATION_MINUTES = 20;
 const WARNING_TIME_MINUTES = 5;
 const FINAL_WARNING_MINUTES = 1;
@@ -625,7 +624,7 @@ export function useInterviewState(questions, interviewId) {
       };
 
       const handleError = (error) => {
-        let errorMessage = error.message || "Unknown error";
+        let errorMessage = error?.response?.data?.message || "Unknown error";
         if (errorMessage.includes("microphone")) {
           errorMessage =
             "Microphone access issue. Please ensure your microphone is enabled and permissions are granted.";
@@ -649,7 +648,7 @@ export function useInterviewState(questions, interviewId) {
           clearAllTimers();
           if (debugMode)
             console.error("Detailed VAPI error:", {
-              message: error.message,
+              message: error?.response?.data?.message,
               stack: error.stack,
               callStatus,
               isAITalking,
@@ -663,7 +662,7 @@ export function useInterviewState(questions, interviewId) {
         setIsUserTalking(false);
         if (debugMode)
           console.error("Detailed VAPI error:", {
-            message: error.message,
+            message: error?.response?.data?.message,
             stack: error.stack,
             callStatus,
             isAITalking,
@@ -739,7 +738,7 @@ export function useInterviewState(questions, interviewId) {
       );
       return screenshot;
     } catch (error) {
-      setScreenshotError(`Screenshot error: ${error.message}`);
+      setScreenshotError(`Screenshot error: ${error?.response?.data?.message}`);
       return null;
     }
   };
@@ -905,7 +904,7 @@ export function useInterviewState(questions, interviewId) {
           timestamp: new Date().toISOString(),
         });
     } catch (error) {
-      setError(`Call termination error: ${error.message}`);
+      setError(`Call termination error: ${error?.response?.data?.message}`);
       setIsInterviewComplete(true);
       setCallStatus(CallStatus.FINISHED);
       if (debugMode)
@@ -1136,7 +1135,7 @@ ${formattedQuestions}
       });
     } catch (error) {
       setError(
-        `Failed to start the interview: ${error.message || "Unknown error"}`
+        `Failed to start the interview: ${error?.response?.data?.message || "Unknown error"}`
       );
       setIsAITalking(false);
       setIsUserTalking(false);
@@ -1386,7 +1385,7 @@ ${formattedQuestions}
           timestamp: new Date().toISOString(),
         });
     } catch (error) {
-      setError(`Warning: Could not toggle microphone: ${error.message}`);
+      setError(`Warning: Could not toggle microphone: ${error?.response?.data?.message}`);
       if (debugMode)
         console.error("Error toggling audio:", {
           error,
@@ -1745,7 +1744,7 @@ ${formattedQuestions}
         screenshots: screenshotData,
       };
     } catch (error) {
-      setError(`Failed to retrieve interview data: ${error.message}`);
+      setError(`Failed to retrieve interview data: ${error?.response?.data?.message}`);
       if (debugMode)
         console.error("Retrieve interview data error:", {
           error,

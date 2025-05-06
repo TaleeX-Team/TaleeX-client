@@ -479,7 +479,7 @@ const JobsPage = () => {
                                             <p className="text-lg font-medium">Error loading jobs</p>
                                             <p className="text-sm">
                                                 {error instanceof Error
-                                                    ? `Error: ${error.message}`
+                                                    ? `Error: ${error.response?.data?.message}`
                                                     : "There was a problem fetching the job data. Please try again."}
                                             </p>
                                             <Button

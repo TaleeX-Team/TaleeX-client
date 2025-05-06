@@ -74,7 +74,7 @@ export const useJobs = (initialFilters = {}) => {
       queryClient.invalidateQueries({ queryKey: ["filteredJobs"] })
     },
     onError: (error) => {
-      console.error("Create job failed:", error.message)
+      console.error("Create job failed:", error?.response?.data?.message)
     },
   })
 
@@ -87,7 +87,7 @@ export const useJobs = (initialFilters = {}) => {
       queryClient.invalidateQueries({ queryKey: ["filteredJobs"] })
     },
     onError: (error) => {
-      console.error("Delete job failed:", error.message)
+      console.error("Delete job failed:", error?.response?.data?.message)
     },
   })
 
@@ -100,7 +100,7 @@ export const useJobs = (initialFilters = {}) => {
       queryClient.invalidateQueries({ queryKey: ["filteredJobs"] })
     },
     onError: (error) => {
-      console.error("Update job failed:", error.message)
+      console.error("Update job failed:", error?.response?.data?.message)
     },
   })
 
@@ -111,7 +111,7 @@ export const useJobs = (initialFilters = {}) => {
       console.log("Job shared to LinkedIn:", res)
     },
     onError: (error) => {
-      console.error("Share to LinkedIn failed:", error.message)
+      console.error("Share to LinkedIn failed:", error?.response?.data?.message)
     },
   })
 

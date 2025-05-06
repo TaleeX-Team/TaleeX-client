@@ -240,7 +240,7 @@ export function ReportJobDialog({
                         <AlertTitle>Error</AlertTitle>
                         <AlertDescription>
                             {reportJobMutation.error instanceof Error
-                                ? reportJobMutation.error.message
+                                ? reportJobMutation.error?.response?.data?.message
                                 : "Failed to submit report. Please try again."}
                         </AlertDescription>
                     </Alert>

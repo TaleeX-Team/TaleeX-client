@@ -13,6 +13,7 @@ import { Clock, CheckCircle, Camera } from "lucide-react"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useEndInterview } from "@/hooks/useInterviewData.js"
+import {toast} from "sonner";
 
 export function InterviewCompletedDialog({
                                              interviewId,
@@ -59,10 +60,8 @@ export function InterviewCompletedDialog({
                 })
             }
         } catch (error) {
-            console.error("Failed to clear localStorage:", {
-                error: error.message,
-                timestamp: new Date().toISOString(),
-            })
+            toast.error(error.response?.data?.message)
+
         }
     }
 
@@ -109,11 +108,8 @@ export function InterviewCompletedDialog({
                 })
             }
         } catch (error) {
-            console.error("Error submitting interview data:", {
-                error: error.message,
-                interviewId,
-                timestamp: new Date().toISOString(),
-            })
+            toast.error(error.response?.data?.message)
+
             // Error is handled by the hook and displayed in UI
         }
     }

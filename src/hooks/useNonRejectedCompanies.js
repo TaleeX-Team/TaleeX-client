@@ -12,7 +12,7 @@ export const useNonRejectedCompanies = () => {
         refetchOnWindowFocus: false,
         retry: 2,
         onError: (error) => {
-            console.error("Error fetching non-rejected companies:", error.message);
+            console.error("Error fetching non-rejected companies:", error?.response?.data?.message);
         },
     });
 };

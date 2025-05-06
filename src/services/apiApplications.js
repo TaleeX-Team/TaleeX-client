@@ -10,7 +10,7 @@ export const getJobApplications = async (jobId) => {
   } catch (error) {
     console.error(
       `Failed to fetch applications for job ${jobId}:`,
-      error.response?.data || error.message
+      error.response?.data || error?.response?.data?.message
     );
     throw new Error(
       error.response?.data?.message || "Failed to fetch job applications"
@@ -35,7 +35,7 @@ export const advanceToCVReview = async (jobId, applicationIds) => {
     console.log("Applications advanced successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Failed to advance applications:", error.message);
+    console.error("Failed to advance applications:", error?.response?.data?.message);
     throw error;
   }
 };
@@ -68,7 +68,7 @@ export const scheduleInterviews = async (
     console.log("Interviews scheduled successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Failed to schedule interviews:", error.message);
+    console.error("Failed to schedule interviews:", error?.response?.data?.message);
     throw error;
   }
 };
@@ -90,7 +90,7 @@ export const changeApplicationStage = async (applicationIds, stage) => {
     console.log("Application stage changed successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Failed to change application stage:", error.message);
+    console.error("Failed to change application stage:", error?.response?.data?.message);
     throw error;
   }
 };

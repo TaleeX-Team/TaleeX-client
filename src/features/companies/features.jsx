@@ -7,6 +7,7 @@ import {
   requestVerification,
 } from "@/services/apiCompanies";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {toast}  from "sonner";
 
 export const useCompanies = () => {
   // Get QueryClient instance from the context
@@ -22,7 +23,7 @@ export const useCompanies = () => {
       console.log("Companies fetched successfully:", data);
     },
     onError: (error) => {
-      console.error("Fetching companies failed:", error.message);
+      toast.error(error.response?.data?.message)
     },
     retry: false, // Retry once on failure
   });
@@ -51,7 +52,7 @@ export const useCompanies = () => {
       console.log("Company created successfully:", newCompany);
     },
     onError: (error) => {
-      console.error("Creating company failed:", error.message);
+      toast.error(error.response?.data?.message)
     },
   });
 
@@ -79,7 +80,7 @@ export const useCompanies = () => {
       console.log("Company deleted successfully:", deletedCompany);
     },
     onError: (error) => {
-      console.error("Deleting company failed:", error.message);
+      toast.error(error.response?.data?.message)
     },
   });
 
@@ -116,10 +117,8 @@ export const useCompanies = () => {
       queryClient.invalidateQueries({ queryKey: ["companies"] });
     },
     onError: (error, variables) => {
-      console.error(
-        `Failed to request verification code for company ID: ${variables.companyId}`,
-        error.message
-      );
+      toast.error(error.response?.data?.message)
+
     },
   });
 
@@ -156,10 +155,8 @@ export const useCompanies = () => {
       queryClient.invalidateQueries({ queryKey: ["companies"] });
     },
     onError: (error, variables) => {
-      console.error(
-        `Failed to confirm domain verification for company ID: ${variables.companyId}`,
-        error.message
-      );
+      toast.error(error.response?.data?.message)
+
     },
   });
   const requestVerificationMutation = useMutation({

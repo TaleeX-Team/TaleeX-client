@@ -17,7 +17,7 @@ export const useOAuth = () => {
   const mutation = useMutation({
     mutationFn: redirectToOAuth,
     onError: (error) => {
-      toast.error(error.message || "OAuth login failed");
+      toast.error(error?.response?.data?.message || "OAuth login failed");
     },
   });
 

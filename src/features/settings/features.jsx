@@ -26,7 +26,7 @@ export const useProfile = () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
     },
     onError: (error) => {
-      console.error("User updated successfully:", error.message);
+      console.error("User updated successfully:", error?.response?.data?.message);
     },
   });
   return {

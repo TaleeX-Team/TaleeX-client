@@ -11,7 +11,7 @@ export function useChangePassword() {
             return true;
         },
         onError: (error) => {
-            toast.error(error.message || "An unexpected error occurred.");
+            toast.error(error?.response?.data?.message || "An unexpected error occurred.");
             return false;
         },
     });

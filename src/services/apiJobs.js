@@ -9,7 +9,7 @@ export const getJobs = async () => {
     console.log("Jobs fetched successfully");
     return response.data;
   } catch (error) {
-    console.error("Failed to fetch jobs:", error.response?.data || error.message);
+    console.error("Failed to fetch jobs:", error.response?.data || error?.response?.data?.message);
     throw new Error(error.response?.data?.message || "Failed to fetch jobs");
   }
 };
@@ -22,7 +22,7 @@ export const createJob = async (jobData) => {
     console.log("Job created successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Failed to create job:", error.response?.data || error.message);
+    console.error("Failed to create job:", error.response?.data || error?.response?.data?.message);
     throw new Error(error.response?.data?.message || "Failed to create job");
   }
 };
@@ -35,7 +35,7 @@ export const getJobById = async (id) => {
     console.log("Job fetched successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error(`Failed to fetch job ${id}:`, error.response?.data || error.message);
+    console.error(`Failed to fetch job ${id}:`, error.response?.data || error?.response?.data?.message);
     throw new Error(error.response?.data?.message || "Failed to fetch job");
   }
 };
@@ -48,7 +48,7 @@ export const updateJob = async ({ id, updates }) => {
     console.log("Job updated successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error(`Failed to update job ${id}:`, error.response?.data || error.message);
+    console.error(`Failed to update job ${id}:`, error.response?.data || error?.response?.data?.message);
     throw new Error(error.response?.data?.message || "Failed to update job");
   }
 };
@@ -61,7 +61,7 @@ export const deleteJob = async (id) => {
     console.log("Job deleted successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error(`Failed to delete job ${id}:`, error.response?.data || error.message);
+    console.error(`Failed to delete job ${id}:`, error.response?.data || error?.response?.data?.message);
     throw new Error(error.response?.data?.message || "Failed to delete job");
   }
 };
@@ -100,7 +100,7 @@ export const shareJobToLinkedIn = async (id) => {
     console.log("Job shared to LinkedIn successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error(`Failed to share job ${id} on LinkedIn:`, error.response?.data || error.message);
+    console.error(`Failed to share job ${id} on LinkedIn:`, error.response?.data || error?.response?.data?.message);
     throw new Error(error.response?.data?.message || "Failed to share job on LinkedIn");
   }
 };

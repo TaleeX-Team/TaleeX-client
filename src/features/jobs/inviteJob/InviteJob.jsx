@@ -27,7 +27,7 @@ export const InviteJob = () => {
                     queryClient.invalidateQueries(["job", jobData?._id]);
                 },
                 onError: (error) => {
-                    toast.error(`Failed to accept invitation: ${error.message}`);
+                    toast.error(`Failed to accept invitation: ${error?.response?.data?.message}`);
                 },
             }
         );
@@ -44,7 +44,7 @@ export const InviteJob = () => {
     if (isError) {
         return (
             <div className="text-center text-red-600">
-                Failed to load job details: {error.message}
+                Failed to load job details: {error?.response?.data?.message}
             </div>
         );
     }

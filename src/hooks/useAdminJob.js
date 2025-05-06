@@ -13,7 +13,7 @@ export const useAdminJobs = () => {
                 return response.data || INITIAL_JOBS_DATA;
             } catch (error) {
                 console.error("Error fetching jobs:", error);
-                toast.success(error.message);
+                toast.success(error?.response?.data?.message);
             }
         },
         placeholderData: INITIAL_JOBS_DATA, // Always provides initial data
@@ -44,7 +44,7 @@ export const useAdminFilteredJobs = (filterParams = {}) => {
                 return response.data || INITIAL_JOBS_DATA;
             } catch (error) {
                 console.error("Error fetching filtered jobs:", error);
-                toast.success(error.message);
+                toast.success(error?.response?.data?.message);
 
             }
         },

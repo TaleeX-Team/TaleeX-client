@@ -47,7 +47,7 @@ export function useReportJob() {
         // Enhance error handling
         const errorMessage =
           error.response?.data?.message ||
-          error.message ||
+          error?.response?.data?.message ||
           "Failed to submit report";
 
         throw new Error(errorMessage);

@@ -13,7 +13,7 @@ export function useJobApplication(jobId) {
             try {
                 return await getJobApplicationForm(jobId)
             } catch (error) {
-                toast.error(error.message || "Failed to fetch job application form")
+                toast.error(error?.response?.data?.message || "Failed to fetch job application form")
                 throw error
             }
         },
@@ -27,7 +27,7 @@ export function useJobApplication(jobId) {
             try {
                 return await submitJobApplication(jobId, formData)
             } catch (error) {
-                toast.error(error.message || "Failed to submit application")
+                toast.error(error?.response?.data?.message || "Failed to submit application")
                 throw error
             }
         },
@@ -37,7 +37,7 @@ export function useJobApplication(jobId) {
             window.scrollTo({ top: 0, behavior: "smooth" })
         },
         onError: (error) => {
-            toast.error(error.message || "An unexpected error occurred during submission")
+            toast.error(error?.response?.data?.message || "An unexpected error occurred during submission")
         }
     })
 

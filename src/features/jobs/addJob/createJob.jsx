@@ -217,7 +217,7 @@ export default function AddJob() {
             setOpen(false);
         } catch (error) {
             console.error("Job submission error:", error);
-            toast.error(`Failed to add job: ${error.message || "Unknown error"}`);
+            toast.error(` ${error?.response?.data?.message}`);
         } finally {
             setIsSubmitting(false);
         }

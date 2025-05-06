@@ -1,4 +1,5 @@
 import { advanceToCVReview } from "@/services/apiApplications";
+import {toast} from "sonner";
 
 const { useMutation, useQueryClient } = import("@tanstack/react-query");
 const useApplications = () => {
@@ -13,10 +14,7 @@ const useApplications = () => {
       queryClient.invalidateQueries({ queryKey: ["jobApplications"] });
     },
     onError: (error) => {
-      console.error(
-        "Failed to advance applications to CV review:",
-        error.message
-      );
+      toast.error(`${error?.response?.data?.message}`)
     },
   });
 

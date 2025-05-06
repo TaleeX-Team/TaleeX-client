@@ -280,13 +280,13 @@ export const registerUser = async (userData) => {
       throw new Error(message);
     }
 
-    if (error.message === "Network Error") {
+    if (error?.response?.data?.message === "Network Error") {
       throw new Error(
         "Unable to connect to the server. Please check your internet connection."
       );
     }
 
-    throw new Error(error.message || "An unexpected error occurred.");
+    throw new Error(error?.response?.data?.message || "An unexpected error occurred.");
   }
 };
 export const verifyEmail = async (verificationToken) => {
@@ -297,7 +297,7 @@ export const verifyEmail = async (verificationToken) => {
     if (error.response?.data) {
       throw error.response.data;
     }
-    throw new Error(error.message || "Verification failed");
+    throw new Error(error?.response?.data?.message || "Verification failed");
   }
 };
 
@@ -332,14 +332,14 @@ export const logoutUser = async (refreshToken) => {
       throw new Error(message);
     }
 
-    if (error.message === "Network Error") {
+    if (error?.response?.data?.message === "Network Error") {
       throw new Error(
         "Unable to connect to the server. Please check your internet connection."
       );
     }
 
     throw new Error(
-      error.message || "An unexpected error occurred during logout."
+      error?.response?.data?.message || "An unexpected error occurred during logout."
     );
   }
 };
@@ -353,7 +353,7 @@ export const forgotPassword = async (payload) => {
   } catch (error) {
     console.error(
       "Forgot‑password request failed:",
-      error.response?.data || error.message
+      error.response?.data || error?.response?.data?.message
     );
 
     if (error.response) {
@@ -366,14 +366,14 @@ export const forgotPassword = async (payload) => {
       }
     }
 
-    if (error.message === "Network Error") {
+    if (error?.response?.data?.message === "Network Error") {
       throw new Error(
         "Unable to connect to the server. Check your internet connection."
       );
     }
 
     throw new Error(
-      error.message ||
+      error?.response?.data?.message ||
         "An unexpected error occurred when requesting password reset."
     );
   }
@@ -418,7 +418,7 @@ export const sendVerificationEmail = async (email) => {
   } catch (error) {
     console.error(
       "Verification email request failed:",
-      error.response?.data || error.message
+      error.response?.data || error?.response?.data?.message
     );
 
     if (error.response) {
@@ -431,14 +431,14 @@ export const sendVerificationEmail = async (email) => {
       }
     }
 
-    if (error.message === "Network Error") {
+    if (error?.response?.data?.message === "Network Error") {
       throw new Error(
         "Unable to connect to the server. Check your internet connection."
       );
     }
 
     throw new Error(
-      error.message ||
+      error?.response?.data?.message ||
         "An unexpected error occurred when requesting email verification."
     );
   }
@@ -460,7 +460,7 @@ export const setPassword = async (newPassword) => {
   } catch (error) {
     console.error(
       "Set password request failed:",
-      error.response?.data || error.message
+      error.response?.data || error?.response?.data?.message
     );
 
     if (error.response) {
@@ -473,14 +473,14 @@ export const setPassword = async (newPassword) => {
       }
     }
 
-    if (error.message === "Network Error") {
+    if (error?.response?.data?.message === "Network Error") {
       throw new Error(
         "Unable to connect to the server. Check your internet connection."
       );
     }
 
     throw new Error(
-      error.message ||
+      error?.response?.data?.message ||
         "An unexpected error occurred when setting your password."
     );
   }
@@ -507,7 +507,7 @@ export const changePassword = async ({ oldPassword, newPassword }) => {
   } catch (error) {
     console.error(
       "Change password request failed:",
-      error.response?.data || error.message
+      error.response?.data || error?.response?.data?.message
     );
 
     if (error.response) {
@@ -520,14 +520,14 @@ export const changePassword = async ({ oldPassword, newPassword }) => {
       }
     }
 
-    if (error.message === "Network Error") {
+    if (error?.response?.data?.message === "Network Error") {
       throw new Error(
         "Unable to connect to the server. Check your internet connection."
       );
     }
 
     throw new Error(
-      error.message ||
+      error?.response?.data?.message ||
         "An unexpected error occurred when changing your password."
     );
   }
@@ -558,7 +558,7 @@ export const updateUser = async ({ userId, userData }) => {
     });
     return response.data;
   } catch (error) {
-    console.error("API Error:", error.response?.data || error.message);
+    console.error("API Error:", error.response?.data || error?.response?.data?.message);
     throw error;
   }
 };
@@ -597,7 +597,7 @@ export const getAllCompanies = async () => {
   } catch (error) {
     console.error(
       "Failed to fetch companies:",
-      error.response?.data || error.message
+      error.response?.data || error?.response?.data?.message
     );
     throw new Error(
       error.response?.data?.message || "Failed to fetch companies"
@@ -637,7 +637,7 @@ export const verifyCompany = async ({ id, status, reason }) => {
   } catch (error) {
     console.error(
       `Company verification failed for ID ${id}:`,
-      error.response?.data || error.message
+      error.response?.data || error?.response?.data?.message
     );
     throw new Error(
       error.response?.data?.message || "Failed to verify company"
@@ -699,7 +699,7 @@ export const getCompanyStatistics = async () => {
   } catch (error) {
     console.error(
       "Failed to fetch company statistics:",
-      error.response?.data || error.message
+      error.response?.data || error?.response?.data?.message
     );
     throw new Error(
       error.response?.data?.message || "Failed to fetch company statistics"
@@ -715,7 +715,7 @@ export const getJobApplicationForm = async (jobId) => {
   } catch (error) {
     console.error(
       "Failed to fetch job application details:",
-      error.response?.data || error.message
+      error.response?.data || error?.response?.data?.message
     );
 
     if (error.response) {
@@ -725,13 +725,13 @@ export const getJobApplicationForm = async (jobId) => {
       }
     }
 
-    if (error.message === "Network Error") {
+    if (error?.response?.data?.message === "Network Error") {
       throw new Error(
         "Unable to connect to the server. Please check your internet connection."
       );
     }
 
-    throw new Error(error.message || "Failed to fetch job application details");
+    throw new Error(error?.response?.data?.message || "Failed to fetch job application details");
   }
 };
 
@@ -756,7 +756,7 @@ export const submitJobApplication = async (jobId, applicationData) => {
   } catch (error) {
     console.error(
       "Application submission failed:",
-      error.response?.data || error.message
+      error.response?.data || error?.response?.data?.message
     );
 
     if (error.response) {
@@ -769,14 +769,14 @@ export const submitJobApplication = async (jobId, applicationData) => {
       }
     }
 
-    if (error.message === "Network Error") {
+    if (error?.response?.data?.message === "Network Error") {
       throw new Error(
         "Unable to connect to the server. Please check your internet connection."
       );
     }
 
     throw new Error(
-      error.message ||
+      error?.response?.data?.message ||
         "An unexpected error occurred when submitting your application."
     );
   }
@@ -789,7 +789,7 @@ export const shareJobOnLinkedIn = async (jobId) => {
   } catch (error) {
     console.error(
       "Failed to share job on LinkedIn:",
-      error.response?.data || error.message
+      error.response?.data || error?.response?.data?.message
     );
 
     if (error.response) {

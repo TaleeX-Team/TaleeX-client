@@ -136,7 +136,7 @@ const UsersPage = () => {
   // If there's an error fetching users, show a toast
   useEffect(() => {
     if (error) {
-      toast.error(`Failed :${error.message}`)
+      toast.error(`${error?.response?.data?.message}`)
     }
   }, [error])
 
@@ -213,7 +213,7 @@ const UsersPage = () => {
             // Close loading dialog
             setLoadingDialogOpen(false)
 
-            toast.error(`Failed: ${error.message}`)
+            toast.error(`${error.response?.data?.message}`)
             // Remove the action in progress on error as well
             setActionInProgressMap((prev) => {
               const updated = { ...prev }
@@ -266,7 +266,7 @@ const UsersPage = () => {
         // Close loading dialog
         setLoadingDialogOpen(false)
 
-        toast.error(`Failed: ${error.message}`)
+        toast.error(`${error.response?.data?.message}`)
         // Remove the action in progress on error
         setActionInProgressMap((prev) => {
           const updated = { ...prev }
