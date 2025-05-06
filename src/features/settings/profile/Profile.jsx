@@ -48,6 +48,11 @@ const profileSchema = z.object({
     })
     .optional()
     .or(z.literal("")),
+  email: z
+    .string()
+    .email({ message: "Please enter a valid email address." })
+    .optional()
+    .or(z.literal("")),
   imageUrl: z.any().optional(),
 });
 
@@ -68,6 +73,7 @@ export default function ProfilePage() {
       firstName: "",
       lastName: "",
       phone: "",
+      email: "",
       imageUrl: null,
     },
   });
@@ -127,12 +133,13 @@ export default function ProfilePage() {
       if (data.firstName) formData.append("firstName", data.firstName);
       if (data.lastName) formData.append("lastName", data.lastName);
       if (data.phone) formData.append("phone", data.phone);
+      if (data.email) formData.append("email", data.email);
     }
 
     // Use the mutation to update the user
     updateUserMutation.mutate(
       {
-        userId: user?._id,
+        userId: user?.id,
         userData: formData || cleanedData,
       },
       {
@@ -295,6 +302,30 @@ export default function ProfilePage() {
 
                 <div className="space-y-2">
                   <Label
+                    htmlFor="email"
+                    className={
+                      form.formState.errors.email ? "text-destructive" : ""
+                    }
+                  >
+                    Email
+                  </Label>
+                  <Input
+                    id="email"
+                    placeholder={user?.email || "john.doe@example.com"}
+                    {...form.register("email")}
+                    className={
+                      form.formState.errors.email ? "border-destructive" : ""
+                    }
+                  />
+                  {form.formState.errors.email && (
+                    <p className="text-xs text-destructive">
+                      {form.formState.errors.email.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label
                     htmlFor="phone"
                     className={
                       form.formState.errors.phone || phoneError
@@ -329,7 +360,6 @@ export default function ProfilePage() {
           </CardContent>
           <CardFooter className="flex justify-between">
             <Button className="ml-auto" type="submit" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isLoading ? (
                 <>
                   <LoadingIndicator className="mr-2" />
