@@ -11,7 +11,7 @@ const CallStatus = {
     FINISHED: "FINISHED",
 }
 
-const VAPI_ASSISTANT_ID = "a7939f6e-e04e-4bce-ac30-c6e7e35655a6"
+const VAPI_ASSISTANT_ID = "40152fdc-70d4-4300-a9b3-1f1672200982"
 const VAPI_API_KEY = "d4ecde21-8c7d-4f5c-9996-5c2b306d9ccf"
 const ENDING_PHRASE = "that concludes our interview today thank you for your time"
 const INTERVIEW_DURATION_MINUTES = 20
