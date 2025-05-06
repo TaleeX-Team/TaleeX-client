@@ -2,7 +2,7 @@ import axios from "axios";
 import TokenService from "@/lib/TokenService.js";
 
 // Base URL without the path prefix
-const BASE_URL = "https://hirex-production.up.railway.app";
+const BASE_URL = "https://taleex-development.up.railway.app";
 
 // Create a function to generate an axios instance with the right configuration
 const createApiClient = (pathPrefix = "/api/v1") => {
@@ -568,7 +568,7 @@ export const deleteUser = async ({ userId }) => {
   const response = await api.delete(`/users/${userId}`, {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
-    }
+    },
   });
   return response.data;
 };
@@ -577,7 +577,7 @@ export const deleteAdminUser = async ({ userId }) => {
   const response = await adminApiClient.delete(`/users/${userId}`, {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
-    }
+    },
   });
   return response.data;
 };
@@ -805,13 +805,13 @@ export const shareJobOnLinkedIn = async (jobId) => {
 
 export const getInterviewHeaderInfo = async (interviewId) => {
   const response = await apiClient.get(
-    `https://hirex-production.up.railway.app/api/v1/interviews/${interviewId}`
+    `https://taleex-development.up.railway.app/api/v1/interviews/${interviewId}`
   );
   return response.data;
 };
 export const getInterviewQuestions = async (interviewId) => {
   const response = await apiClient.get(
-    `https://hirex-production.up.railway.app/api/v1/interviews/${interviewId}/start`
+    `https://taleex-development.up.railway.app/api/v1/interviews/${interviewId}/start`
   );
   return response.data;
 };

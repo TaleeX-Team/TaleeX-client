@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, FolderPlus, Building2 } from "lucide-react";
+import { Search, FolderPlus, Building2, AlertTriangle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import CompanyCard from "./company-card/CompanyCard";
 import AddCompany from "./modals/add-company";
@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { useUser } from "@/hooks/useUser";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function Companies() {
   const {
