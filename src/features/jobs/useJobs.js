@@ -156,7 +156,6 @@ export const useJobs = (initialFilters = {}) => {
         if (!oldData || !oldData.jobs) {
           return { jobs: [updatedJob.job] }; // Initialize with the updated job
         }
-        console.log("Old data:", oldData);
         // Update the job in the jobs array
         return {
           ...oldData,
@@ -173,7 +172,7 @@ export const useJobs = (initialFilters = {}) => {
       console.log("Job updated:", updatedJob);
     },
     onError: (error) => {
-      toast.error(error?.response?.data?.message);
+      toast.error(error?.message);
     },
   });
   // Share to LinkedIn

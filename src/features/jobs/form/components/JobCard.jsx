@@ -12,7 +12,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Building2, Clock, ExternalLink, Edit } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import UpdateJob from "@/features/jobs/addJob/UpdateJob.jsx";
@@ -30,20 +30,7 @@ export default function JobCard({ job }) {
     tags,
     description,
   } = job;
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "open":
-        return "bg-emerald-500 text-white dark:bg-emerald-600 dark:text-white";
-      case "pending":
-        return "bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 hover:bg-amber-100/80 dark:hover:bg-amber-950/70";
-      case "closed":
-        return "bg-rose-100 text-rose-800 dark:bg-rose-950/50 dark:text-rose-300 hover:bg-rose-100/80 dark:hover:bg-rose-950/70";
-      default:
-        return "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/70";
-    }
-  };
-
+  const { id } = useParams();
   const formatOpenTime = (openTime) => {
     if (!openTime) return "Recently";
 
@@ -56,29 +43,11 @@ export default function JobCard({ job }) {
     }
   };
 
-  // // Get first two capital letters of company name for the fallback avatar
-  // const getInitials = (name) => {
-  //   if (!name) return "CO"
-  //   const words = name.split(" ")
-  //   if (words.length === 1) {
-  //     return name.substring(0, 2).toUpperCase()
-  //   }
-  //   return (words[0][0] + (words[1] ? words[1][0] : words[0][1])).toUpperCase()
-  // }
-
-  // const companyInitials = getInitials(company.name)
-
   return (
     <Card className="overflow-hidden flex flex-col relative border border-border hover:border-border/80 transition-all duration-300">
       <CardHeader className="pb-1">
         <div className="flex items-start gap-4">
           <div className="flex-1">
-            {/* <Avatar className="h-12 w-12 rounded-md border-2 border-slate-100 dark:border-slate-700 shadow-sm">
-                <AvatarImage src={company.image?.url || "/placeholder.svg"} alt={company.name} className="object-cover" />
-                <AvatarFallback className="bg-primary/10 text-primary font-bold rounded-md dark:bg-primary/20">
-                  {companyInitials}
-                </AvatarFallback>
-              </Avatar> */}
             <div className="flex items-center flex-wrap gap-2">
               <h3 className="font-semibold text-lg text-foreground">{title}</h3>
               {jobType && (
@@ -169,10 +138,17 @@ export default function JobCard({ job }) {
 
           {/* View Details Button */}
           <Button asChild variant="outline" size="sm">
-            <Link to={`${_id}`}>
-              View Details
-              <ExternalLink className="h-3.5 w-3.5 ml-1" />
-            </Link>
+            {id ? (
+              <Link to={`/app/jobs/${_id}`}>
+                View Details
+                <ExternalLink className="h-3.5 w-3.5 ml-1" />
+              </Link>
+            ) : (
+              <Link to={`${_id}`}>
+                View Details
+                <ExternalLink className="h-3.5 w-3.5 ml-1" />
+              </Link>
+            )}
           </Button>
         </div>
       </CardFooter>

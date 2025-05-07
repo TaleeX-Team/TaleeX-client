@@ -77,26 +77,6 @@ export default function Companies() {
       return matchesStatus && matchesSearch;
     }) || [];
 
-  if (isError && user?.isVerified) {
-    return (
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-destructive/5 rounded-lg border border-destructive/20 p-4 z-50">
-        <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
-          <ShieldAlert className="h-8 w-8 text-destructive" />
-        </div>
-        <h2 className="text-xl font-semibold text-destructive mb-2">
-          Error loading companies
-        </h2>
-        <p className="text-muted-foreground mb-4">
-          There was an error fetching your company data. Please try again or
-          contact support.
-        </p>
-        <Button variant="outline" className="mx-auto">
-          Retry
-        </Button>
-      </div>
-    );
-  }
-
   if (!user?.isVerified) {
     return (
       <div className="bg-background p-4 md:p-8 min-h-screen">

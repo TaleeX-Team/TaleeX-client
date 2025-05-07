@@ -286,7 +286,9 @@ export const registerUser = async (userData) => {
       );
     }
 
-    throw new Error(error?.response?.data?.message || "An unexpected error occurred.");
+    throw new Error(
+      error?.response?.data?.message || "An unexpected error occurred."
+    );
   }
 };
 export const verifyEmail = async (verificationToken) => {
@@ -339,7 +341,8 @@ export const logoutUser = async (refreshToken) => {
     }
 
     throw new Error(
-      error?.response?.data?.message || "An unexpected error occurred during logout."
+      error?.response?.data?.message ||
+        "An unexpected error occurred during logout."
     );
   }
 };
@@ -558,7 +561,10 @@ export const updateUser = async ({ userId, userData }) => {
     });
     return response.data;
   } catch (error) {
-    console.error("API Error:", error.response?.data || error?.response?.data?.message);
+    console.error(
+      "API Error:",
+      error.response?.data || error?.response?.data?.message
+    );
     throw error;
   }
 };
@@ -731,7 +737,10 @@ export const getJobApplicationForm = async (jobId) => {
       );
     }
 
-    throw new Error(error?.response?.data?.message || "Failed to fetch job application details");
+    throw new Error(
+      error?.response?.data?.message ||
+        "Failed to fetch job application details"
+    );
   }
 };
 
@@ -821,7 +830,10 @@ export const getTokenPrice = async (currency = "EGP") => {
     const response = await api.post("/tokens/token-price", { currency });
     return response.data;
   } catch (error) {
-    console.error("Failed to fetch token price:", error.response?.data || error.message);
+    console.error(
+      "Failed to fetch token price:",
+      error.response?.data || error.message
+    );
     throw new Error("Could not retrieve token price.");
   }
 };
@@ -830,7 +842,10 @@ export const getTokenFeatures = async () => {
     const response = await api.get("/tokens/features");
     return response.data;
   } catch (error) {
-    console.error("Failed to fetch token features:", error.response?.data || error.message);
+    console.error(
+      "Failed to fetch token features:",
+      error.response?.data || error.message
+    );
     throw new Error("Could not retrieve token features.");
   }
 };
@@ -840,7 +855,10 @@ export const getTokenFeatureById = async (id) => {
     const response = await api.get(`/tokens/features/${id}`);
     return response.data;
   } catch (error) {
-    console.error(`Failed to fetch token feature with ID ${id}:`, error.response?.data || error.message);
+    console.error(
+      `Failed to fetch token feature with ID ${id}:`,
+      error.response?.data || error.message
+    );
     throw new Error("Could not retrieve the token feature.");
   }
 };
@@ -851,7 +869,10 @@ export const getTokenPacks = async () => {
     const response = await api.get("/tokens/packs");
     return response.data;
   } catch (error) {
-    console.error("Failed to fetch token packs:", error.response?.data || error.message);
+    console.error(
+      "Failed to fetch token packs:",
+      error.response?.data || error.message
+    );
     throw new Error("Could not retrieve token packs.");
   }
 };
@@ -861,7 +882,10 @@ export const getTokenPackById = async (id) => {
     const response = await api.get(`/tokens/packs/${id}`);
     return response.data;
   } catch (error) {
-    console.error(`Failed to fetch token pack with ID ${id}:`, error.response?.data || error.message);
+    console.error(
+      `Failed to fetch token pack with ID ${id}:`,
+      error.response?.data || error.message
+    );
     throw new Error("Could not retrieve the token pack.");
   }
 };
@@ -869,11 +893,17 @@ export const getTokenPackById = async (id) => {
 // === Token Purchasing ===
 export const buyTokens = async ({ amountPaid, currency }) => {
   try {
-    const response = await api.patch("/users/buy-tokens", { amountPaid, currency });
+    const response = await api.patch("/users/buy-tokens", {
+      amountPaid,
+      currency,
+    });
     console.log("Tokens purchased successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Failed to buy tokens:", error.response?.data || error.message);
+    console.error(
+      "Failed to buy tokens:",
+      error.response?.data || error.message
+    );
     throw new Error("Token purchase failed.");
   }
 };
@@ -884,12 +914,13 @@ export const buyTokenPack = async (packId) => {
     console.log("Token pack purchased successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error(`Failed to buy token pack with ID ${packId}:`, error.response?.data || error.message);
+    console.error(
+      `Failed to buy token pack with ID ${packId}:`,
+      error.response?.data || error.message
+    );
     throw new Error("Token pack purchase failed.");
   }
 };
-
-
 
 // Assuming this returns questions or related data
 
