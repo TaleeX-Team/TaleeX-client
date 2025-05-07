@@ -116,13 +116,7 @@ export default function JobCard({ job }) {
               )}
             </div>
           </div>
-          <Badge
-            className={`${getStatusColor(
-              status
-            )} capitalize text-xs font-medium px-2.5 py-1`}
-          >
-            {status}
-          </Badge>
+          <JobStatusBadge initialStatus={status} jobId={_id} />
         </div>
       </CardHeader>
 
