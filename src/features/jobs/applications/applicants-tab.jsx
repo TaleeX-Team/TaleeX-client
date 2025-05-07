@@ -58,24 +58,9 @@ export default function JobApplicationManager() {
   const advanceToCVReviewMutation = useMutation({
     mutationFn: ({ jobId, applicationIds }) =>
       advanceToCVReview(jobId, applicationIds),
-    onMutate: async ({ jobId, applicationIds }) => {
-      await queryClient.cancelQueries({ queryKey: ["job/applicants", id] });
-      const previousData = queryClient.getQueryData(["job/applicants", id]);
-      queryClient.setQueryData(["job/applicants", id], (old) => {
-        if (!old || !old.applications) return old;
-        return {
-          ...old,
-          applications: old.applications.map((app) =>
-            applicationIds.includes(app._id)
-              ? {
-                  ...app,
-                  stage: "cv review",
-                  updatedAt: new Date().toISOString(),
-                }
-              : app
-          ),
-        };
-      });
+    onSuccess: (data, { jobId, applicationIds }) => {
+      queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
+
       toast(
         `${selectedApplicants.length} ${
           selectedApplicants.length === 1 ? "applicant" : "applicants"
@@ -91,44 +76,21 @@ export default function JobApplicationManager() {
         }
       );
       setSelectedApplicants([]);
-      return { previousData };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
-    },
-    onError: (err, variables, context) => {
-      queryClient.setQueryData(["job/applicants", id], context.previousData);
+    onError: (err) => {
       console.error(
         "Failed to advance applications to CV review:",
         err.message
       );
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
     },
   });
 
   const sendVideoInterviewMutation = useMutation({
     mutationFn: ({ jobId, applicationIds, interviewTypes, questionCount }) =>
       scheduleInterviews(jobId, applicationIds, interviewTypes, questionCount),
-    onMutate: async ({ jobId, applicationIds }) => {
-      await queryClient.cancelQueries({ queryKey: ["job/applicants", id] });
-      const previousData = queryClient.getQueryData(["job/applicants", id]);
-      queryClient.setQueryData(["job/applicants", id], (old) => {
-        if (!old || !old.applications) return old;
-        return {
-          ...old,
-          applications: old.applications.map((app) =>
-            applicationIds.includes(app._id)
-              ? {
-                  ...app,
-                  stage: "Sending Interview",
-                  updatedAt: new Date().toISOString(),
-                }
-              : app
-          ),
-        };
-      });
+    onSuccess: (data, { jobId, applicationIds }) => {
+      queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
+
       toast(
         `${selectedApplicants.length} ${
           selectedApplicants.length === 1 ? "applicant" : "applicants"
@@ -144,41 +106,18 @@ export default function JobApplicationManager() {
         }
       );
       setSelectedApplicants([]);
-      return { previousData };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
-    },
-    onError: (err, variables, context) => {
-      queryClient.setQueryData(["job/applicants", id], context.previousData);
+    onError: (err) => {
       console.error("Failed to send video interviews:", err.message);
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
     },
   });
 
   const rejectApplicationsMutation = useMutation({
     mutationFn: ({ applicantIds, stage }) =>
       changeApplicationStage(applicantIds, stage),
-    onMutate: async ({ applicantIds, stage }) => {
-      await queryClient.cancelQueries({ queryKey: ["job/applicants", id] });
-      const previousData = queryClient.getQueryData(["job/applicants", id]);
-      queryClient.setQueryData(["job/applicants", id], (old) => {
-        if (!old || !old.applications) return old;
-        return {
-          ...old,
-          applications: old.applications.map((app) =>
-            applicantIds.includes(app._id)
-              ? {
-                  ...app,
-                  stage: "rejected",
-                  updatedAt: new Date().toISOString(),
-                }
-              : app
-          ),
-        };
-      });
+    onSuccess: (data, { applicantIds, stage }) => {
+      queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
+
       toast(
         `${selectedApplicants.length} ${
           selectedApplicants.length === 1 ? "applicant" : "applicants"
@@ -198,23 +137,14 @@ export default function JobApplicationManager() {
         }
       );
       setSelectedApplicants([]);
-      return { previousData };
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
-    },
-    onError: (err, variables, context) => {
-      queryClient.setQueryData(["job/applicants", id], context.previousData);
+    onError: (err) => {
       console.error("Failed to reject applications:", err.message);
       toast.error("Failed to reject applications", {
         description: "Please try again later.",
       });
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
-    },
   });
-
   // Map fetched data to match component's expected structure
   const applicants =
     applicantsData?.applications?.map((app) => ({
@@ -371,7 +301,12 @@ export default function JobApplicationManager() {
   if (isError) {
     return <div>Error: {error?.response?.data?.message}</div>;
   }
+  const isLoadingMutation =
+    advanceToCVReviewMutation.isPending ||
+    rejectApplicationsMutation.isPending ||
+    sendVideoInterviewMutation.isPending;
 
+  console.log(isLoadingMutation);
   return (
     <div className="container mx-auto px-4 py-6 dark:text-gray-200">
       {isLoadingJob ? (
@@ -464,6 +399,7 @@ export default function JobApplicationManager() {
             activePhase={activePhase}
             setActivePhase={setActivePhase}
             onSendInterview={handleSendInterview}
+            isLoadingMutation={isLoadingMutation}
           />
         )}
 

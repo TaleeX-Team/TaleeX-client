@@ -35,7 +35,10 @@ export const advanceToCVReview = async (jobId, applicationIds) => {
     console.log("Applications advanced successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Failed to advance applications:", error?.response?.data?.message);
+    console.error(
+      "Failed to advance applications:",
+      error?.response?.data?.message
+    );
     throw error;
   }
 };
@@ -56,7 +59,7 @@ export const scheduleInterviews = async (
       `/jobs/${jobId}/applications/sending-interview`,
       {
         applicationIds,
-        interviewDetails,
+        type: interviewDetails,
         questionCount,
       },
       {
@@ -68,7 +71,10 @@ export const scheduleInterviews = async (
     console.log("Interviews scheduled successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Failed to schedule interviews:", error?.response?.data?.message);
+    console.error(
+      "Failed to schedule interviews:",
+      error?.response?.data?.message
+    );
     throw error;
   }
 };
@@ -90,7 +96,10 @@ export const changeApplicationStage = async (applicationIds, stage) => {
     console.log("Application stage changed successfully:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Failed to change application stage:", error?.response?.data?.message);
+    console.error(
+      "Failed to change application stage:",
+      error?.response?.data?.message
+    );
     throw error;
   }
 };

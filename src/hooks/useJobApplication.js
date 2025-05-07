@@ -30,16 +30,7 @@ export function useJobApplication(jobId) {
 
   // Submit application mutation
   const { mutateAsync, isPending: isSubmitting } = useMutation({
-    mutationFn: async (formData) => {
-      try {
-        return await submitJobApplication(jobId, formData);
-      } catch (error) {
-        toast.error(
-          error?.response?.data?.message || "Failed to submit application"
-        );
-        throw error;
-      }
-    },
+    mutationFn: async (formData) => await submitJobApplication(jobId, formData),
     onSuccess: () => {
       setIsSubmitSuccess(true);
       // Scroll to top to show success message
@@ -47,8 +38,7 @@ export function useJobApplication(jobId) {
     },
     onError: (error) => {
       toast.error(
-        error?.response?.data?.message ||
-          "An unexpected error occurred during submission"
+        error?.message || "An unexpected error occurred during submission"
       );
     },
   });

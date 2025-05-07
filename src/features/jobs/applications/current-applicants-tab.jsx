@@ -29,6 +29,7 @@ import {
   Download,
   ArrowUpDown,
   Newspaper,
+  Loader2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import CVFeedbackPage from "@/features/feedback/cv-feedback";
@@ -51,6 +52,7 @@ export function ApplicantsTab({
   setActivePhase,
   onSendInterview,
   offerApplicants,
+  isLoadingMutation,
 }) {
   const [sortOrder, setSortOrder] = useState("desc");
   const [open, setOpen] = useState(false);
@@ -184,7 +186,7 @@ export function ApplicantsTab({
               size="sm"
               className="flex items-center gap-1 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-50 dark:disabled:hover:bg-transparent"
               onClick={moveToCVReview}
-              disabled={selectedApplicants.length === 0}
+              disabled={selectedApplicants.length === 0 || isLoadingMutation}
             >
               <ArrowRight className="h-4 w-4" />
               Move to CV Review
@@ -198,10 +200,17 @@ export function ApplicantsTab({
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-1 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800"
-                disabled={selectedApplicants.length === 0}
+                disabled={selectedApplicants.length === 0 || isLoadingMutation}
               >
                 <Video className="h-4 w-4" />
-                Send Video Interview
+                {isLoadingMutation ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Moving Applicant...
+                  </>
+                ) : (
+                  "Send Video Interview"
+                )}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] dark:bg-gray-800 dark:text-gray-200">
@@ -264,7 +273,7 @@ export function ApplicantsTab({
           size="sm"
           className="flex items-center gap-1 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-50 dark:disabled:hover:bg-transparent"
           onClick={rejectApplicants}
-          disabled={selectedApplicants.length === 0}
+          disabled={selectedApplicants.length === 0 || isLoadingMutation}
         >
           Reject
         </Button>
@@ -274,7 +283,7 @@ export function ApplicantsTab({
           //success
           className="flex items-center gap-1 text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-50 dark:disabled:hover:bg-transparent"
           onClick={offerApplicants}
-          disabled={selectedApplicants.length === 0}
+          disabled={selectedApplicants.length === 0 || isLoadingMutation}
         >
           Offer
         </Button>
@@ -366,6 +375,7 @@ export function ApplicantsTab({
                               variant="outline"
                               size="sm"
                               className="h-8 px-3"
+                              disabled={!applicant?.feedback?.cv}
                             >
                               CV
                             </Button>
