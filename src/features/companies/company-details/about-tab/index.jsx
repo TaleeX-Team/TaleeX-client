@@ -4,8 +4,6 @@ import { TabsContent } from "@radix-ui/react-tabs";
 import { ExternalLink, MapPin } from "lucide-react";
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { statusBadgeStyles } from "@/utils/statusBadgeStyles";
-import { StatusIcon } from "@/components/StatusIcon";
 
 export default function AboutTab({
   description,
@@ -13,19 +11,11 @@ export default function AboutTab({
   website,
   address,
   name,
-  verification
 }) {
   return (
     <TabsContent value="about" className="space-y-8">
       <div className="bg-card rounded-lg shadow-sm border p-6 space-y-2  ">
         <h2 className="text-xl  font-semibold mb-4 flex items-center gap-2">About {name}
-        {verification?.status && (
-                                <Badge className={statusBadgeStyles[verification?.status]}>
-                                  <StatusIcon status={verification?.status} />
-                                  {verification?.status.charAt(0).toUpperCase() +
-                                    verification?.status.slice(1)}
-                                </Badge>
-                              )}
         </h2>
         
         <p className="text-muted-foreground whitespace-pre-line">

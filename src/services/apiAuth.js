@@ -815,6 +815,81 @@ export const getInterviewQuestions = async (interviewId) => {
   );
   return response.data;
 };
+// tokens
+export const getTokenPrice = async (currency = "EGP") => {
+  try {
+    const response = await api.post("/tokens/token-price", { currency });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch token price:", error.response?.data || error.message);
+    throw new Error("Could not retrieve token price.");
+  }
+};
+export const getTokenFeatures = async () => {
+  try {
+    const response = await api.get("/tokens/features");
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch token features:", error.response?.data || error.message);
+    throw new Error("Could not retrieve token features.");
+  }
+};
+
+export const getTokenFeatureById = async (id) => {
+  try {
+    const response = await api.get(`/tokens/features/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to fetch token feature with ID ${id}:`, error.response?.data || error.message);
+    throw new Error("Could not retrieve the token feature.");
+  }
+};
+
+// === Token Packs ===
+export const getTokenPacks = async () => {
+  try {
+    const response = await api.get("/tokens/packs");
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch token packs:", error.response?.data || error.message);
+    throw new Error("Could not retrieve token packs.");
+  }
+};
+
+export const getTokenPackById = async (id) => {
+  try {
+    const response = await api.get(`/tokens/packs/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to fetch token pack with ID ${id}:`, error.response?.data || error.message);
+    throw new Error("Could not retrieve the token pack.");
+  }
+};
+
+// === Token Purchasing ===
+export const buyTokens = async ({ amountPaid, currency }) => {
+  try {
+    const response = await api.patch("/users/buy-tokens", { amountPaid, currency });
+    console.log("Tokens purchased successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to buy tokens:", error.response?.data || error.message);
+    throw new Error("Token purchase failed.");
+  }
+};
+
+export const buyTokenPack = async (packId) => {
+  try {
+    const response = await api.patch("/users/buy-token-pack", { packId });
+    console.log("Token pack purchased successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to buy token pack with ID ${packId}:`, error.response?.data || error.message);
+    throw new Error("Token pack purchase failed.");
+  }
+};
+
+
 
 // Assuming this returns questions or related data
 

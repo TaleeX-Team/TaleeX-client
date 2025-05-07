@@ -66,8 +66,7 @@ export default function Companies() {
       const matchesStatus =
         selectedStatus === "all" ||
         company.verification?.status === selectedStatus;
-      const matchesSearch = company.name
-        .toLowerCase()
+      const matchesSearch = company.name?.toLowerCase()
         .includes(searchQuery.toLowerCase());
       return matchesStatus && matchesSearch;
     }) || [];
