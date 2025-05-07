@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
+  BASE_URL,
   getInterviewHeaderInfo,
   getInterviewQuestions,
 } from "@/services/apiAuth.js";
@@ -96,7 +97,7 @@ export function useEndInterview() {
       try {
         // Make the API request
         const response = await apiClient.post(
-          `https://taleex-development.up.railway.app/api/v1/interviews/${interviewId}/end`,
+          `${BASE_URL}/api/v1/interviews/${interviewId}/end`,
           formData,
           {
             headers: {
@@ -122,7 +123,9 @@ export function useEndInterview() {
     },
     onError: (error) => {
       // Handle errors
-      toast.error(error?.response?.data?.message || "Failed to submit interview data");
+      toast.error(
+        error?.response?.data?.message || "Failed to submit interview data"
+      );
       console.error("Error ending interview:", error);
     },
   });

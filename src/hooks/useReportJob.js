@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import apiClient from "@/services/apiAuth.js";
+import apiClient, { BASE_URL } from "@/services/apiAuth.js";
 
 export function useReportJob() {
   return useMutation({
@@ -33,7 +33,7 @@ export function useReportJob() {
 
       try {
         const response = await apiClient.post(
-          "https://taleex-development.up.railway.app/api/v1/reports",
+          `${BASE_URL}/api/v1/reports`,
           payload,
           {
             headers: {

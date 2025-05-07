@@ -1,8 +1,9 @@
+import { BASE_URL } from "@/services/apiAuth";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 const OAUTH_URLS = {
-  google: "https://taleex-development.up.railway.app/api/v1/auth/google",
-  linkedin: "https://taleex-development.up.railway.app/api/v1/auth/linkedin",
+  google: `${BASE_URL}/api/v1/auth/google`,
+  linkedin: `${BASE_URL}/api/v1/auth/linkedin`,
 };
 
 const redirectToOAuth = async (provider) => {
