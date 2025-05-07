@@ -54,7 +54,7 @@ const EXPERIENCE_LEVELS = [
   "Vice President",
   "C-Level",
 ];
-const JOB_STATUS = ["open", "pending", "closed"];
+const JOB_STATUS = ["open", "paused", "closed"];
 const COMMON_TAGS = [
   "JavaScript",
   "React",
@@ -581,26 +581,26 @@ export default function JobsHeaderWithFilters({
                 {filter.type === "title"
                   ? "Title"
                   : filter.type === "requirements"
-                    ? "Requirements"
-                    : filter.type === "company"
-                      ? "Company"
-                      : filter.type === "workPlaceType"
-                        ? "Workplace"
-                        : filter.type === "jobType"
-                          ? "Job Type"
-                          : filter.type === "experienceLevel"
-                            ? "Experience"
-                            : filter.type === "status"
-                              ? "Status"
-                              : filter.type === "tags"
-                                ? "Tags"
-                                : filter.type === "salaryMin"
-                                  ? "Min Salary"
-                                  : filter.type === "salaryMax"
-                                    ? "Max Salary"
-                                    : filter.type === "createdAtFrom"
-                                      ? "From Date"
-                                      : "To Date"}
+                  ? "Requirements"
+                  : filter.type === "company"
+                  ? "Company"
+                  : filter.type === "workPlaceType"
+                  ? "Workplace"
+                  : filter.type === "jobType"
+                  ? "Job Type"
+                  : filter.type === "experienceLevel"
+                  ? "Experience"
+                  : filter.type === "status"
+                  ? "Status"
+                  : filter.type === "tags"
+                  ? "Tags"
+                  : filter.type === "salaryMin"
+                  ? "Min Salary"
+                  : filter.type === "salaryMax"
+                  ? "Max Salary"
+                  : filter.type === "createdAtFrom"
+                  ? "From Date"
+                  : "To Date"}
                 : {filter.value}
                 <button
                   type="button"

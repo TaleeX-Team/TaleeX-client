@@ -17,8 +17,8 @@ const statusConfig = {
       "text-green-700 border-green-200 bg-green-50 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800",
     dotColor: "bg-green-500",
   },
-  pending: {
-    label: "Pending",
+  paused: {
+    label: "Paused",
     color:
       "text-yellow-700 border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800",
     dotColor: "bg-yellow-500",
