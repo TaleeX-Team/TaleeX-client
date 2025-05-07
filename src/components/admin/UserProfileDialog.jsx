@@ -25,7 +25,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog.jsx";
 import { Skeleton } from "@/components/ui/skeleton.jsx";
-import {toast} from "sonner";
+import { toast } from "sonner";
 
 const UserProfileDialog = ({ userId, isOpen, onClose, onEdit }) => {
   const { data: user, isLoading, error } = useUser(userId);

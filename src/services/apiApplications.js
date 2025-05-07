@@ -103,3 +103,27 @@ export const changeApplicationStage = async (applicationIds, stage) => {
     throw error;
   }
 };
+export const moveToFinalFeedback = async (applicationIds) => {
+  try {
+    console.log("Moving to final feedback stage:", {
+      applicationIds,
+    });
+    const response = await apiClient.post(
+      `/applications/final-feedback`,
+      { applicationIds },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("Application stage changed successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Failed to change application stage:",
+      error?.response?.data?.message
+    );
+    throw error;
+  }
+};

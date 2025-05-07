@@ -53,6 +53,7 @@ export function ApplicantsTab({
   onSendInterview,
   offerApplicants,
   isLoadingMutation,
+  sendToFinalFeedback,
 }) {
   const [sortOrder, setSortOrder] = useState("desc");
   const [open, setOpen] = useState(false);
@@ -192,7 +193,18 @@ export function ApplicantsTab({
               Move to CV Review
             </Button>
           )}
-
+        {activePhase === "Interview Feedback" && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-1 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-50 dark:disabled:hover:bg-transparent"
+            onClick={sendToFinalFeedback}
+            disabled={selectedApplicants.length === 0 || isLoadingMutation}
+          >
+            <ArrowRight className="h-4 w-4" />
+            Send to final feedback
+          </Button>
+        )}
         {(activePhase === "CV Review" || activePhase === "Applications") && (
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
@@ -360,11 +372,7 @@ export function ApplicantsTab({
                     {applicant.email}
                   </td>
                   <td className="py-3 px-4 dark:text-gray-300">
-                    {new Date(applicant.createdAt).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
+                    {applicant.applied}
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex gap-2">

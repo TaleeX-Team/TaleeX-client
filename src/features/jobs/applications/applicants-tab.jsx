@@ -13,10 +13,29 @@ import {
   advanceToCVReview,
   scheduleInterviews,
   changeApplicationStage,
+  moveToFinalFeedback,
 } from "@/services/apiApplications";
 import { getJobById } from "@/services/apiJobs.js";
 import { toast } from "sonner";
 import JobStatusBadge from "../ui/JobStatusBadge.jsx";
+const formatJoinDate = (dateString) => {
+  if (!dateString) return "Unknown";
+
+  try {
+    const date = new Date(dateString);
+    // Check if date is valid
+    if (isNaN(date.getTime())) return "Invalid date";
+
+    // Format the date
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }).format(date);
+  } catch (error) {
+    return "Unknown";
+  }
+};
 
 // Define the application phases
 const PHASES = [
@@ -145,13 +164,46 @@ export default function JobApplicationManager() {
       });
     },
   });
+
+  const finalFeedbackMutation = useMutation({
+    mutationFn: ({ applicationIds }) => moveToFinalFeedback(applicationIds),
+    onSuccess: (data, { applicationIds }) => {
+      queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
+
+      toast(
+        `${selectedApplicants.length} ${
+          selectedApplicants.length === 1 ? "applicant" : "applicants"
+        } moved to Final Feedback`,
+        {
+          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
+            selectedApplicants.length === 1 ? "has" : "have"
+          } been moved from ${activePhase} to Final Feedback`,
+          style: {
+            backgroundColor: "#1e88e5",
+            color: "white",
+          },
+        }
+      );
+      setSelectedApplicants([]);
+    },
+    onError: (err) => {
+      console.error(
+        "Failed to move applications to final feedback:",
+        err.message
+      );
+      toast.error("Failed to move applications to final feedback", {
+        description: "Please try again later.",
+      });
+    },
+  });
+
   // Map fetched data to match component's expected structure
   const applicants =
     applicantsData?.applications?.map((app) => ({
       id: app._id || generateId(),
       name: app.name,
       email: app.email,
-      applied: app.createdAt,
+      applied: formatJoinDate(app.createdAt),
       assignee: app.group?.[0] || null,
       cvScore: app?.feedback?.cv?.matchScore,
       phase:
@@ -163,6 +215,8 @@ export default function JobApplicationManager() {
           ? "Sending Interview"
           : app.stage === "completed interview"
           ? "Interview Feedback"
+          : app.stage === "final feedback"
+          ? "Final Feedback"
           : app.stage,
       rejected: app.stage === "rejected",
       rejectedOn: app.stage === "rejected" ? app.createdAt : null,
@@ -240,7 +294,12 @@ export default function JobApplicationManager() {
       questionCount,
     });
   };
-
+  const sendToFinalFeedback = () => {
+    if (selectedApplicants.length === 0) return;
+    finalFeedbackMutation.mutate({
+      applicationIds: selectedApplicants.map((a) => a.id),
+    });
+  };
   // Handle selecting all applicants
   const toggleSelectAll = (checked) => {
     if (checked) {
@@ -400,6 +459,7 @@ export default function JobApplicationManager() {
             setActivePhase={setActivePhase}
             onSendInterview={handleSendInterview}
             isLoadingMutation={isLoadingMutation}
+            sendToFinalFeedback={sendToFinalFeedback}
           />
         )}
 
