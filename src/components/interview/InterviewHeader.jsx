@@ -117,8 +117,8 @@ export default function InterviewHeader({
 
     // Determine timer styling based on remaining time
     const getTimerClass = () => {
-        if (timeRemaining <= 60) return "text-red-500 animate-pulse"
-        if (timeRemaining <= 300) return "text-amber-500"
+        if (timeRemaining <= 60) return "text-red-500 dark:text-red-400 animate-pulse"
+        if (timeRemaining <= 300) return "text-amber-500 dark:text-amber-400"
         return "text-muted-foreground"
     }
 
@@ -126,9 +126,9 @@ export default function InterviewHeader({
     if (!questionStates?.length || !progress?.total) {
         return (
             <div
-                className="bg-gradient-to-r from-slate-900 to-slate-800 border-b border-slate-700 shadow-md py-4 px-6 text-center text-slate-300">
+                className="bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800 border-b border-slate-300 dark:border-slate-700 shadow-md py-4 px-6 text-center text-slate-700 dark:text-slate-300">
                 <div className="flex justify-center items-center gap-2">
-                    <FileQuestion className="h-5 w-5 text-blue-400"/>
+                    <FileQuestion className="h-5 w-5 text-blue-600 dark:text-blue-400"/>
                     <span>No questions available</span>
                 </div>
             </div>
@@ -163,10 +163,10 @@ export default function InterviewHeader({
                     className={cn(
                         "absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full transition-all duration-300 z-20",
                         isCompleted
-                            ? "bg-emerald-400 scale-100"
+                            ? "bg-emerald-500 dark:bg-emerald-400 scale-100"
                             : isCurrent
-                                ? "bg-blue-500 scale-125 shadow-lg shadow-blue-500/50"
-                                : "bg-slate-400 scale-75 opacity-50",
+                                ? "bg-blue-600 dark:bg-blue-500 scale-125 shadow-lg shadow-blue-500/50"
+                                : "bg-slate-400 dark:bg-slate-500 scale-75 opacity-50",
                     )}
                     style={{left: `${(idx / (totalQuestions - 1)) * 100}%`}}
                 />
@@ -176,28 +176,28 @@ export default function InterviewHeader({
 
     return (
         <div
-            className="bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 shadow-lg backdrop-blur-lg sticky top-0 py-4 px-6 z-21">
+            className="bg-gradient-to-b from-slate-100 via-slate-50 to-white dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 border-b border-slate-300 dark:border-slate-700 shadow-lg backdrop-blur-lg sticky top-0 py-4 px-6 z-30">
 
             {/* Top section with title and controls */}
             <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-500/20 rounded-xl">
-                        <Avatar className="h-8 w-8 border border-slate-600">
+                    <div className="p-2 bg-blue-100 dark:bg-blue-500/20 rounded-xl">
+                        <Avatar className="h-8 w-8 border border-slate-200 dark:border-slate-600">
                             {userData.image ? (
                                 <AvatarImage src={userData.image || "/placeholder.svg"} alt={userData.userName}/>
                             ) : null}
-                            <AvatarFallback className="bg-blue-500/20 text-blue-400">
+                            <AvatarFallback className="bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400">
                                 {userData.userName ? userData.userName.charAt(0).toUpperCase() :
                                     <User className="h-4 w-4"/>}
                             </AvatarFallback>
                         </Avatar>
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold text-white">
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white">
                             {formattedInterviewType}
                             {userData.questionCount > 0 && (
                                 <span
-                                    className="text-slate-400 text-base font-normal ml-2">({userData.questionCount} questions)</span>
+                                    className="text-slate-500 dark:text-slate-400 text-base font-normal ml-2">({userData.questionCount} questions)</span>
                             )}
                         </h1>
                         <div className="flex items-center mt-1 gap-3">
@@ -205,16 +205,16 @@ export default function InterviewHeader({
                                 variant={getStatusVariant()}
                                 className={cn("text-xs font-medium px-2 py-0.5", callStatus === "ACTIVE" && "animate-pulse")}
                             >
-                <span
-                    className={cn(
-                        "inline-block w-2 h-2 rounded-full mr-1.5",
-                        callStatus === "ACTIVE"
-                            ? "bg-green-400"
-                            : callStatus === "CONNECTING"
-                                ? "bg-amber-400"
-                                : "bg-red-400",
-                    )}
-                ></span>
+                                <span
+                                    className={cn(
+                                        "inline-block w-2 h-2 rounded-full mr-1.5",
+                                        callStatus === "ACTIVE"
+                                            ? "bg-green-400"
+                                            : callStatus === "CONNECTING"
+                                                ? "bg-amber-400"
+                                                : "bg-red-400",
+                                    )}
+                                ></span>
                                 {callStatus === "ACTIVE"
                                     ? "Live"
                                     : callStatus === "CONNECTING"
@@ -226,8 +226,8 @@ export default function InterviewHeader({
 
                             {isInterviewStarted && (
                                 <div
-                                    className="interview-timer flex items-center text-sm text-slate-300 bg-slate-700/50 px-2 py-0.5 rounded-md">
-                                    <Clock className="h-3.5 w-3.5 mr-1.5 text-slate-400"/>
+                                    className="interview-timer flex items-center text-sm text-slate-600 dark:text-slate-300 bg-slate-200/70 dark:bg-slate-700/50 px-2 py-0.5 rounded-md">
+                                    <Clock className="h-3.5 w-3.5 mr-1.5 text-slate-500 dark:text-slate-400"/>
                                     {formatDuration(interviewDuration)}
                                 </div>
                             )}
@@ -242,7 +242,7 @@ export default function InterviewHeader({
                                 <TooltipTrigger asChild>
                                     <div
                                         className={cn(
-                                            "timer flex items-center text-sm font-medium px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700",
+                                            "timer flex items-center text-sm font-medium px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700",
                                             getTimerClass(),
                                         )}
                                     >
@@ -250,7 +250,7 @@ export default function InterviewHeader({
                                         {formatDuration(timeRemaining)}
                                     </div>
                                 </TooltipTrigger>
-                                <TooltipContent side="bottom" className="bg-slate-800 text-slate-200">
+                                <TooltipContent side="bottom" className="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200">
                                     Time remaining in the interview
                                 </TooltipContent>
                             </Tooltip>
@@ -265,14 +265,14 @@ export default function InterviewHeader({
                                     className={cn(
                                         "transition-all duration-300 rounded-full ml-2",
                                         showTranscript
-                                            ? "bg-blue-500 text-white hover:bg-blue-600"
-                                            : "hover:bg-blue-500/20 hover:text-blue-400 text-slate-300 border-slate-600",
+                                            ? "bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600"
+                                            : "hover:bg-blue-100 dark:hover:bg-blue-500/20 hover:text-blue-600 dark:hover:text-blue-400 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-600",
                                     )}
                                 >
                                     <MessageSquare className="h-4 w-4"/>
                                 </Button>
                             </TooltipTrigger>
-                            <TooltipContent side="bottom" className="bg-slate-800 text-slate-200">
+                            <TooltipContent side="bottom" className="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200">
                                 {showTranscript ? "Hide transcript" : "Show transcript"}
                             </TooltipContent>
                         </Tooltip>
@@ -287,14 +287,14 @@ export default function InterviewHeader({
                                     className={cn(
                                         "transition-all duration-300 rounded-full",
                                         isAudioOn
-                                            ? "hover:bg-blue-500/20 hover:text-blue-400 text-slate-300 border-slate-600"
-                                            : "bg-slate-700 text-red-400 hover:bg-slate-700/80",
+                                            ? "hover:bg-blue-100 dark:hover:bg-blue-500/20 hover:text-blue-600 dark:hover:text-blue-400 text-slate-600 dark:text-slate-300 border-slate-300 dark:border-slate-600"
+                                            : "bg-slate-200 dark:bg-slate-700 text-red-500 dark:text-red-400 hover:bg-slate-300 dark:hover:bg-slate-700/80",
                                     )}
                                 >
-                                    {isAudioOn ?<Mic className="h-4 w-4"/>  :<MicOff className="h-4 w-4"/> }
+                                    {isAudioOn ? <Mic className="h-4 w-4"/> : <MicOff className="h-4 w-4"/>}
                                 </Button>
                             </TooltipTrigger>
-                            <TooltipContent side="bottom" className="bg-slate-800 text-slate-200">
+                            <TooltipContent side="bottom" className="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200">
                                 {isAudioOn ? "Mute microphone" : "Unmute microphone"}
                             </TooltipContent>
                         </Tooltip>
@@ -311,7 +311,7 @@ export default function InterviewHeader({
                                     <PhoneOff className="h-4 w-4"/>
                                 </Button>
                             </TooltipTrigger>
-                            <TooltipContent side="bottom" className="bg-slate-800 text-slate-200">
+                            <TooltipContent side="bottom" className="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200">
                                 End interview
                             </TooltipContent>
                         </Tooltip>
@@ -326,17 +326,17 @@ export default function InterviewHeader({
                     onMouseEnter={() => setIsProgressHovered(true)}
                     onMouseLeave={() => setIsProgressHovered(false)}
                 >
-                    <div className="flex items-center text-xs font-medium text-slate-400">
+                    <div className="flex items-center text-xs font-medium text-slate-500 dark:text-slate-400">
                         <ChevronLeft
                             className={cn("w-4 h-4 mr-1 transition-opacity", currentQuestion === 1 ? "opacity-20" : "opacity-100")}
                         />
                         <span>Previous</span>
                     </div>
                     <div
-                        className="text-sm font-bold text-white bg-slate-800/70 px-3 py-0.5 rounded-full border border-slate-700">
+                        className="text-sm font-bold text-slate-800 dark:text-white bg-slate-100 dark:bg-slate-800/70 px-3 py-0.5 rounded-full border border-slate-300 dark:border-slate-700">
                         {currentQuestion} of {totalQuestions}
                     </div>
-                    <div className="flex items-center text-xs font-medium text-slate-400">
+                    <div className="flex items-center text-xs font-medium text-slate-500 dark:text-slate-400">
                         <span>Next</span>
                         <ChevronRight
                             className={cn(
@@ -349,7 +349,7 @@ export default function InterviewHeader({
 
                 <div
                     ref={progressRef}
-                    className="relative h-3 bg-slate-700/40 rounded-full overflow-hidden"
+                    className="relative h-3 bg-slate-200 dark:bg-slate-700/40 rounded-full overflow-hidden"
                     onMouseEnter={() => setIsProgressHovered(true)}
                     onMouseLeave={() => setIsProgressHovered(false)}
                 >
@@ -357,7 +357,7 @@ export default function InterviewHeader({
                     <div
                         ref={progressBarRef}
                         className={cn(
-                            "absolute h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full",
+                            "absolute h-full bg-gradient-to-r from-blue-500 to-blue-400 dark:from-blue-600 dark:to-blue-400 rounded-full",
                             showPulse && "pulse-animation",
                         )}
                         style={{width: `${progressPercentage}%`}}
@@ -371,7 +371,7 @@ export default function InterviewHeader({
 
                     {/* Current position highlight */}
                     <div
-                        className="absolute h-7 w-7 rounded-full border-2 border-white bg-blue-500/20 top-1/2 -translate-y-1/2 transition-all duration-300 z-10"
+                        className="absolute h-7 w-7 rounded-full border-2 border-white dark:border-slate-200 bg-blue-100 dark:bg-blue-500/20 top-1/2 -translate-y-1/2 transition-all duration-300 z-10"
                         style={{
                             left: `${progressPercentage}%`,
                             transform: "translate(-50%, -50%)",
@@ -384,13 +384,13 @@ export default function InterviewHeader({
 
             {/* Current question display */}
             {displayedQuestion && (
-                <div className="bg-slate-800/60 border border-slate-700 rounded-lg p-3 shadow-inner flex items-start">
-                    <div className="mr-3 mt-1 p-1.5 bg-blue-500/20 rounded-full flex-shrink-0">
-                        <FileQuestion className="h-4 w-4 text-blue-400"/>
+                <div className="bg-slate-100 dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 rounded-lg p-3 shadow-inner flex items-start">
+                    <div className="mr-3 mt-1 p-1.5 bg-blue-100 dark:bg-blue-500/20 rounded-full flex-shrink-0">
+                        <FileQuestion className="h-4 w-4 text-blue-600 dark:text-blue-400"/>
                     </div>
                     <div className="flex-1">
-                        <div className="text-xs text-slate-400 mb-1 font-medium">Current Question:</div>
-                        <p className="text-sm text-slate-200 leading-relaxed">{displayedQuestion}</p>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 mb-1 font-medium">Current Question:</div>
+                        <p className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed">{displayedQuestion}</p>
                     </div>
                 </div>
             )}
@@ -398,7 +398,7 @@ export default function InterviewHeader({
             {/* Error message */}
             {callStatus === "ERROR" && (
                 <div
-                    className="mt-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-md p-3 flex items-center gap-2 text-sm">
+                    className="mt-3 bg-red-100 dark:bg-red-500/10 border border-red-300 dark:border-red-500/30 text-red-600 dark:text-red-400 rounded-md p-3 flex items-center gap-2 text-sm">
                     <AlertCircle className="h-5 w-5 flex-shrink-0"/>
                     <span>Connection issues detected. Try refreshing the page or check your internet connection.</span>
                 </div>
