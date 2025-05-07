@@ -66,28 +66,16 @@ export default function Companies() {
     }
   };
 
-  // Use useMemo to filter companies only when dependencies change
-  const filteredCompanies = useMemo(() => {
-    // Safely handle potentially undefined or malformed data
-    if (!companies?.companies || !Array.isArray(companies.companies)) {
-      return [];
-    }
-
-    return companies.companies.filter((company) => {
-      // Status filter
+  const filteredCompanies =
+    companies?.companies?.filter((company) => {
       const matchesStatus =
         selectedStatus === "all" ||
         company.verification?.status === selectedStatus;
-
-      // Search filter - safely handle possible undefined name
-      const companyName = company.name || "";
-      const matchesSearch = companyName
-        .toLowerCase()
-        .includes((searchQuery || "").toLowerCase());
-
+      const matchesSearch = company.name
+        ?.toLowerCase()
+        ?.includes(searchQuery.toLowerCase());
       return matchesStatus && matchesSearch;
-    });
-  }, [companies?.companies, selectedStatus, searchQuery]);
+    }) || [];
 
   if (isError && user?.isVerified) {
     return (

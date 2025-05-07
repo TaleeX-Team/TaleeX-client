@@ -100,11 +100,10 @@ export const useAuth = () => {
       TokenService.setOAuthAuthenticated(false);
       queryClient.removeQueries({ queryKey: ["user"] });
       queryClient.removeQueries({ queryKey: ["userId"] });
-      localStorage.removeItem("userId");
 
       queryClient.invalidateQueries({ queryKey: ["auth"] });
-      Cookies.remove("hasPassword");
-      Cookies.remove("userId");
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+      queryClient.invalidateQueries({ queryKey: ["jobs"] });
       Cookies.remove("hasPassword");
       Cookies.remove("userId");
     },
@@ -122,7 +121,6 @@ export const useAuth = () => {
   const registerMutation = useMutation({
     mutationFn: registerUser,
     onSuccess: (data) => {
-      console.log(data, "Registered");
       console.log(data, "Registered");
       if (data.accessToken) {
         TokenService.setAccessToken(data.accessToken);
