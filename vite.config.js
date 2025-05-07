@@ -4,9 +4,9 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { fileURLToPath } from "url";
 
-// https://vite.dev/config/
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
@@ -18,10 +18,12 @@ export default defineConfig({
         secure: false,
       },
     },
+    historyApiFallback: true, // Add this for SPA routing in dev
   },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  base: "/", // Add this to explicitly set the base path
 });
