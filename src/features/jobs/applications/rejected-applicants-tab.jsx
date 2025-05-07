@@ -15,13 +15,13 @@ export function RejectedApplicantsTab({
   toggleSelectApplicant,
 }) {
   return (
-    <div className="mt-6">
+    <div>
       {/* Search for rejected */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
           <Input
             placeholder="Find email or name..."
-            className="pl-10 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+            className="pl-10 bg-input"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
           />
@@ -40,7 +40,7 @@ export function RejectedApplicantsTab({
             />
           </svg>
         </div>
-        <div className="flex gap-2">
+        {/* <div className="flex gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -57,7 +57,7 @@ export function RejectedApplicantsTab({
             <Save className="h-4 w-4" />
             Save Filter
           </Button>
-        </div>
+        </div> */}
       </div>
 
       {/* Rejected applicants table */}
@@ -157,11 +157,10 @@ export function RejectedApplicantsTab({
                         <svg
                           key={i}
                           xmlns="http://www.w3.org/2000/svg"
-                          className={`h-5 w-5 ${
-                            i < applicant.score
-                              ? "text-yellow-400 fill-yellow-400"
-                              : "text-gray-300 dark:text-gray-600"
-                          }`}
+                          className={`h-5 w-5 ${i < applicant.score
+                            ? "text-yellow-400 fill-yellow-400"
+                            : "text-gray-300 dark:text-gray-600"
+                            }`}
                           viewBox="0 0 20 20"
                           fill="currentColor"
                         >

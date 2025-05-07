@@ -20,6 +20,8 @@ import {
   Calendar,
   DollarSign,
   Tag,
+  Award,
+  BriefcaseBusiness,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -278,21 +280,6 @@ export default function JobsHeaderWithFilters({
           </div>
         </div>
         <div className="mt-4 md:mt-0">
-          {/* <Button
-            variant="outline"
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <Filter className="h-4 w-4 mr-2" />
-            {showFilters ? "Hide Filters" : "Show Filters"}
-          </Button>
-          {showFilters && (
-            <Button
-              variant="outline"
-              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            >
-              {showAdvancedFilters ? "Basic Filters" : "Advanced Filters"}
-            </Button>
-          )} */}
           <AddJob />
         </div>
       </div>
@@ -325,246 +312,229 @@ export default function JobsHeaderWithFilters({
           )}
           {/* <Button>Search</Button> */}
         </div>
+      </div>
 
-        {showFilters && (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="flex items-center space-x-2">
-                <Building className="h-4 w-4 text-muted-foreground" />
-                <Select value={workPlaceType} onValueChange={setWorkPlaceType}>
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Workplace Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {WORKPLACE_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
 
-              <div className="flex items-center space-x-2">
-                <Briefcase className="h-4 w-4 text-muted-foreground" />
-                <Select value={jobType} onValueChange={setJobType}>
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Job Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {JOB_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type
-                          .split("-")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                          )
-                          .join(" ")}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Briefcase className="h-4 w-4 text-muted-foreground" />
-                <Select
-                  value={experienceLevel}
-                  onValueChange={setExperienceLevel}
-                >
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Experience Level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {EXPERIENCE_LEVELS.map((level) => (
-                      <SelectItem key={level} value={level}>
-                        {level}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+      {showFilters && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="flex items-center space-x-2">
+              <Building className="h-4 w-4 text-muted-foreground" />
+              <Select value={workPlaceType} onValueChange={setWorkPlaceType}>
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Workplace Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {WORKPLACE_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            {showAdvancedFilters && (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2">
+              <BriefcaseBusiness className="h-4 w-4 text-muted-foreground" />
+              <Select value={jobType} onValueChange={setJobType}>
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Job Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {JOB_TYPES.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type
+                        .split("-")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ")}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Award className="h-4 w-4 text-muted-foreground" />
+              <Select
+                value={experienceLevel}
+                onValueChange={setExperienceLevel}
+              >
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Experience Level" />
+                </SelectTrigger>
+                <SelectContent>
+                  {EXPERIENCE_LEVELS.map((level) => (
+                    <SelectItem key={level} value={level}>
+                      {level}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Briefcase className="h-4 w-4 text-muted-foreground" />
+              <Select value={status} onValueChange={setStatus}>
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Job Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {JOB_STATUS.map((stat) => (
+                    <SelectItem key={stat} value={stat}>
+                      {stat.charAt(0).toUpperCase() + stat.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {showAdvancedFilters && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center">
+                    <Tag className="h-4 w-4 mr-2" />
+                    Tags (Skills or Keywords)
+                  </label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {selectedTags.map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="flex items-center gap-1"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => removeTag(tag)}
+                          className="ml-1 hover:bg-muted rounded-full"
+                          aria-label={`Remove ${tag} tag`}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
                     <Input
-                      placeholder="Job Requirements"
-                      value={requirements}
-                      onChange={(e) => setRequirements(e.target.value)}
+                      placeholder="Add a tag"
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={handleTagKeyDown}
                     />
                   </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Input
-                      placeholder="Company ID"
-                      value={company}
-                      onChange={(e) => setCompany(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Select value={status} onValueChange={setStatus}>
-                      <SelectTrigger className="flex-1">
-                        <SelectValue placeholder="Job Status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {JOB_STATUS.map((stat) => (
-                          <SelectItem key={stat} value={stat}>
-                            {stat.charAt(0).toUpperCase() + stat.slice(1)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {COMMON_TAGS.map((tag) => (
+                      <Badge
+                        key={tag}
+                        variant="outline"
+                        className="cursor-pointer hover:bg-accent"
+                        onClick={() => {
+                          if (!selectedTags.includes(tag)) {
+                            setSelectedTags((prev) => [...prev, tag]);
+                          }
+                        }}
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium flex items-center">
-                      <Tag className="h-4 w-4 mr-2" />
-                      Tags (Skills or Keywords)
+                <div className="space-y-4 mt-2">
+                  <div>
+                    <label className="text-sm font-medium flex items-center mb-2">
+                      <DollarSign className="h-4 w-4 mr-2" />
+                      Salary Range
                     </label>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {selectedTags.map((tag) => (
-                        <Badge
-                          key={tag}
-                          variant="secondary"
-                          className="flex items-center gap-1"
-                        >
-                          {tag}
-                          <button
-                            type="button"
-                            onClick={() => removeTag(tag)}
-                            className="ml-1 hover:bg-muted rounded-full"
-                            aria-label={`Remove ${tag} tag`}
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-2 gap-4">
                       <Input
-                        placeholder="Add a tag"
-                        value={tagInput}
-                        onChange={(e) => setTagInput(e.target.value)}
-                        onKeyDown={handleTagKeyDown}
+                        type="number"
+                        placeholder="Min Salary"
+                        value={salaryMin}
+                        onChange={(e) => setSalaryMin(e.target.value)}
+                      />
+                      <Input
+                        type="number"
+                        placeholder="Max Salary"
+                        value={salaryMax}
+                        onChange={(e) => setSalaryMax(e.target.value)}
                       />
                     </div>
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {COMMON_TAGS.map((tag) => (
-                        <Badge
-                          key={tag}
-                          variant="outline"
-                          className="cursor-pointer hover:bg-accent"
-                          onClick={() => {
-                            if (!selectedTags.includes(tag)) {
-                              setSelectedTags((prev) => [...prev, tag]);
-                            }
-                          }}
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium flex items-center mb-2">
-                        <DollarSign className="h-4 w-4 mr-2" />
-                        Salary Range
+                        <Calendar className="h-4 w-4 mr-2" />
+                        Posted After
                       </label>
-                      <div className="grid grid-cols-2 gap-4">
-                        <Input
-                          type="number"
-                          placeholder="Min Salary"
-                          value={salaryMin}
-                          onChange={(e) => setSalaryMin(e.target.value)}
-                        />
-                        <Input
-                          type="number"
-                          placeholder="Max Salary"
-                          value={salaryMax}
-                          onChange={(e) => setSalaryMax(e.target.value)}
-                        />
-                      </div>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start text-left font-normal"
+                          >
+                            {createdAtFrom ? (
+                              format(createdAtFrom, "PPP")
+                            ) : (
+                              <span className="text-muted-foreground">
+                                Pick a date
+                              </span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                          <CalendarComponent
+                            mode="single"
+                            selected={createdAtFrom}
+                            onSelect={setCreatedAtFrom}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium flex items-center mb-2">
-                          <Calendar className="h-4 w-4 mr-2" />
-                          Posted After
-                        </label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="w-full justify-start text-left font-normal"
-                            >
-                              {createdAtFrom ? (
-                                format(createdAtFrom, "PPP")
-                              ) : (
-                                <span className="text-muted-foreground">
-                                  Pick a date
-                                </span>
-                              )}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
-                            <CalendarComponent
-                              mode="single"
-                              selected={createdAtFrom}
-                              onSelect={setCreatedAtFrom}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-
-                      <div>
-                        <label className="text-sm font-medium flex items-center mb-2">
-                          <Calendar className="h-4 w-4 mr-2" />
-                          Posted Before
-                        </label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="w-full justify-start text-left font-normal"
-                            >
-                              {createdAtTo ? (
-                                format(createdAtTo, "PPP")
-                              ) : (
-                                <span className="text-muted-foreground">
-                                  Pick a date
-                                </span>
-                              )}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
-                            <CalendarComponent
-                              mode="single"
-                              selected={createdAtTo}
-                              onSelect={setCreatedAtTo}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
+                    <div>
+                      <label className="text-sm font-medium flex items-center mb-2">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        Posted Before
+                      </label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start text-left font-normal"
+                          >
+                            {createdAtTo ? (
+                              format(createdAtTo, "PPP")
+                            ) : (
+                              <span className="text-muted-foreground">
+                                Pick a date
+                              </span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                          <CalendarComponent
+                            mode="single"
+                            selected={createdAtTo}
+                            onSelect={setCreatedAtTo}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   </div>
                 </div>
-              </>
-            )}
-          </>
-        )}
-      </div>
+              </div>
+            </>
+          )}
+        </>
+      )}
 
       {activeFilters.length > 0 && (
         <div className="mt-4">

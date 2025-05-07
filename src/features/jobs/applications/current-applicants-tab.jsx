@@ -96,7 +96,7 @@ export function ApplicantsTab({
   };
 
   return (
-    <div className="mt-6">
+    <div>
       {/* Phase navigation */}
       <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
         {PHASES.map((phase, index) => (
@@ -106,7 +106,7 @@ export function ApplicantsTab({
             className={cn(
               "flex items-center gap-2 whitespace-nowrap",
               activePhase === phase
-                ? "bg-gray-900 dark:bg-gray-700 dark:text-white"
+                ? "bg-gray-900 dark:bg-primary/50 dark:text-white"
                 : "bg-white dark:bg-transparent dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800"
             )}
             onClick={() => setActivePhase(phase)}
@@ -134,7 +134,7 @@ export function ApplicantsTab({
         <div className="relative flex-1">
           <Input
             placeholder="Find email or name..."
-            className="pl-10 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+            className="pl-10 bg-input"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -153,7 +153,7 @@ export function ApplicantsTab({
             />
           </svg>
         </div>
-        <div className="flex gap-2">
+        {/* <div className="flex gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -170,7 +170,7 @@ export function ApplicantsTab({
             <Save className="h-4 w-4" />
             Save Filter
           </Button>
-        </div>
+        </div> */}
       </div>
 
       {/* Action buttons */}
@@ -186,8 +186,8 @@ export function ApplicantsTab({
               onClick={moveToCVReview}
               disabled={selectedApplicants.length === 0}
             >
-              <ArrowRight className="h-4 w-4" />
-              Move to CV Review
+              {/* <ArrowRight className="h-4 w-4" /> */}
+              Run AI CV Review
             </Button>
           )}
 
@@ -201,7 +201,7 @@ export function ApplicantsTab({
                 disabled={selectedApplicants.length === 0}
               >
                 <Video className="h-4 w-4" />
-                Send Video Interview
+                Send AI Interview
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] dark:bg-gray-800 dark:text-gray-200">
@@ -393,7 +393,7 @@ export function ApplicantsTab({
 
                             <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
                               {applicant?.feedback?.interview?.type ===
-                              "behavioral" ? (
+                                "behavioral" ? (
                                 <BehavioralFeedbackPage
                                   feedback={applicant?.feedback?.interview}
                                 />

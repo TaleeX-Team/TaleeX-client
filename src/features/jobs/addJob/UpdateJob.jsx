@@ -391,51 +391,51 @@ export default function UpdateJob({ jobId, trigger }) {
                       )}
                     />
 
-                    <FormField
-                      control={form.control}
-                      name="company"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm font-medium">
-                            Company *
-                          </FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="w-full bg-input">
-                                <SelectValue placeholder="Select a company" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {isCompaniesLoading ? (
-                                <div className="flex items-center p-2 text-sm">
-                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                  Loading companies...
-                                </div>
-                              ) : companies.length > 0 ? (
-                                companies.map((comp) => (
-                                  <SelectItem
-                                    key={comp.id || comp._id}
-                                    value={comp.id || comp._id}
-                                  >
-                                    {comp.name}
-                                  </SelectItem>
-                                ))
-                              ) : (
-                                <div className="p-2 text-sm">
-                                  No companies available
-                                </div>
-                              )}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex justify-between">
+                      <FormField
+                        control={form.control}
+                        name="company"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-sm font-medium">
+                              Company *
+                            </FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger className="w-full bg-input">
+                                  <SelectValue placeholder="Select a company" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {isCompaniesLoading ? (
+                                  <div className="flex items-center p-2 text-sm">
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Loading companies...
+                                  </div>
+                                ) : companies.length > 0 ? (
+                                  companies.map((comp) => (
+                                    <SelectItem
+                                      key={comp.id || comp._id}
+                                      value={comp.id || comp._id}
+                                    >
+                                      {comp.name}
+                                    </SelectItem>
+                                  ))
+                                ) : (
+                                  <div className="p-2 text-sm">
+                                    No companies available
+                                  </div>
+                                )}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
                       <FormField
                         control={form.control}
                         name="jobType"
@@ -479,6 +479,9 @@ export default function UpdateJob({ jobId, trigger }) {
                         )}
                       />
 
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex justify-between">
                       <FormField
                         control={form.control}
                         name="experienceLevel"
@@ -521,9 +524,6 @@ export default function UpdateJob({ jobId, trigger }) {
                           </FormItem>
                         )}
                       />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex justify-between">
                       <FormField
                         control={form.control}
                         name="workPlaceType"
@@ -552,7 +552,7 @@ export default function UpdateJob({ jobId, trigger }) {
                         )}
                       />
 
-                      <FormField
+                      {/* <FormField
                         control={form.control}
                         name="status"
                         render={({ field }) => (
@@ -578,7 +578,7 @@ export default function UpdateJob({ jobId, trigger }) {
                             <FormMessage />
                           </FormItem>
                         )}
-                      />
+                      /> */}
                     </div>
                   </TabsContent>
 
