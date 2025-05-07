@@ -129,9 +129,13 @@ export default function CompanyCard({ company, handleDelete }) {
   };
 
   // Get initials safely
-  const getInitials = () => {
-    if (!name) return "??";
-    return name.substring(0, 2).toUpperCase();
+  const getInitials = (name) => {
+    if (!name) return "CO";
+    const words = name.split(" ");
+    if (words.length === 1) {
+      return name.substring(0, 2).toUpperCase();
+    }
+    return (words[0][0] + (words[1] ? words[1][0] : words[0][1])).toUpperCase();
   };
 
   return (
@@ -168,7 +172,7 @@ export default function CompanyCard({ company, handleDelete }) {
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <span className="text-lg font-medium">{getInitials()}</span>
+                <span className="text-lg font-medium">{getInitials(name)}</span>
               )}
             </div>
             <div>

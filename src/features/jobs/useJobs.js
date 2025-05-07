@@ -99,6 +99,17 @@ export const useJobs = (initialFilters = {}) => {
   const createJobMutation = useMutation({
     mutationFn: createJob,
     onSuccess: (newJob) => {
+      queryClient.setQueryData(["jobs"], (oldData) => {
+        // Handle case where oldData might be null or undefined
+        if (!oldData || !oldData.jobs) {
+          return { jobs: [newJob.job] }; // Initialize with the new job
+        }
+        // Add the new job to the jobs array
+        return {
+          ...oldData,
+          jobs: [...oldData.jobs, newJob.job],
+        };
+      });
       console.log("Job created:", newJob);
       queryClient.invalidateQueries({ queryKey: ["jobs"] });
       queryClient.invalidateQueries({ queryKey: ["jobs", "filter"] });

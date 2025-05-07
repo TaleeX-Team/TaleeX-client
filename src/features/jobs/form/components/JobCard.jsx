@@ -85,8 +85,8 @@ export default function JobCard({ job }) {
           <div className="flex items-start gap-3 flex-1 min-w-0">
             <Avatar className="h-12 w-12 rounded-md border-2 border-slate-100 dark:border-slate-700 shadow-sm">
               <AvatarImage
-                src={company.image?.url || "/placeholder.svg"}
-                alt={company.name}
+                src={company?.image || "/placeholder.svg"}
+                alt={company?.name}
                 className="object-cover"
               />
               <AvatarFallback className="bg-primary/10 text-primary font-bold rounded-md dark:bg-primary/20">
@@ -99,8 +99,8 @@ export default function JobCard({ job }) {
               </h3>
               <div className="flex items-center text-sm text-muted-foreground mt-0.5">
                 <Building2 className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
-                <span className="line-clamp-1 truncate">{company.name}</span>
-                {company.verification.status === "verified" && (
+                <span className="line-clamp-1 truncate">{company?.name}</span>
+                {company?.verification?.status === "verified" && (
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
