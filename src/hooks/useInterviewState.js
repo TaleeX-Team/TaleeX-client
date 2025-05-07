@@ -13,7 +13,7 @@ const CallStatus = {
 
 const VAPI_ASSISTANT_ID = "40152fdc-70d4-4300-a9b3-1f1672200982"
 const VAPI_API_KEY = "d4ecde21-8c7d-4f5c-9996-5c2b306d9ccf"
-const ENDING_PHRASE = "that concludes our interview today thank you for your time"
+const ENDING_PHRASE = "That concludes our interview today. Thank you for your time."
 const INTERVIEW_DURATION_MINUTES = 20
 const WARNING_TIME_MINUTES = 5
 const FINAL_WARNING_MINUTES = 1
@@ -32,7 +32,6 @@ export function useInterviewState(questions, interviewId) {
     const [isInterviewStarted, setIsInterviewStarted] = useState(false)
     const [isAITalking, setIsAITalking] = useState(false)
     const [isUserTalking, setIsUserTalking] = useState(false)
-    const [transcript, setTranscript] = useState("")
     const [messages, setMessages] = useState([])
     const [lastMessage, setLastMessage] = useState(null)
     const [showTranscript, setShowTranscript] = useState(true)
@@ -53,7 +52,11 @@ export function useInterviewState(questions, interviewId) {
     const [timeRemaining, setTimeRemaining] = useState(INTERVIEW_DURATION_MINUTES * 60)
     const [timerWarningGiven, setTimerWarningGiven] = useState(false)
     const [finalWarningGiven, setFinalWarningGiven] = useState(false)
-
+    const [transcript, setTranscript] = useState(""); // Holds the current speaker's transcript
+    const [lastSpeakerTranscript, setLastSpeakerTranscript] = useState({
+        role: null,
+        content: "",
+    });
     // Question tracking system
     const [questionStates, setQuestionStates] = useState(
         questions.map((question, idx) => ({
@@ -339,6 +342,13 @@ export function useInterviewState(questions, interviewId) {
                 }
 
                 setMessages((prev) => [...prev, {...message, content: messageContent}])
+                if (message.role === "assistant" || message.role === "user") {
+                    setLastSpeakerTranscript({
+                        role: message.role,
+                        content: messageContent,
+                    });
+                    setTranscript(messageContent); // Set the transcript to the latest message
+                }
 
                 // End call if the ending phrase is detected from the assistant
                 if (
@@ -478,7 +488,7 @@ export function useInterviewState(questions, interviewId) {
 
             const handleSpeechEnd = () => {
                 setIsAITalking(false)
-                setLastSpeakingRole(null)
+                // setLastSpeakingRole(null)
                 if (debugMode)
                     console.log("AI speech ended, isAITalking: false", {
                         questionIndex: currentQuestionIndex,
@@ -548,7 +558,7 @@ export function useInterviewState(questions, interviewId) {
 
             const handleUserSpeechEnd = () => {
                 setIsUserTalking(false)
-                setLastSpeakingRole(null)
+                // setLastSpeakingRole(null)
                 if (debugMode)
                     console.log("User speech ended, isUserTalking: false", {
                         timestamp: new Date().toISOString(),
@@ -632,7 +642,17 @@ export function useInterviewState(questions, interviewId) {
             }
         }
     }, [vapiClientRef.current, currentQuestionIndex, questions, callStatus, debugMode])
-
+    useEffect(() => {
+        if (lastSpeakerTranscript.role && lastSpeakerTranscript.content) {
+            setTranscript(lastSpeakerTranscript.content);
+            if (debugMode)
+                console.log("Transcript updated", {
+                    role: lastSpeakerTranscript.role,
+                    content: lastSpeakerTranscript.content,
+                    timestamp: new Date().toISOString(),
+                });
+        }
+    }, [lastSpeakerTranscript, debugMode]);
     // Capture screenshot
     const captureScreenshot = () => {
         if (!videoRef.current) {
@@ -916,7 +936,7 @@ export function useInterviewState(questions, interviewId) {
 
             const formattedQuestions = questions.map((q, i) => `Question ${i + 1}: ${q}`).join("\n\n")
 
-             const interviewer = {
+            const interviewer = {
                 name: "AI Technical Interviewer",
                 firstMessage: `Hello! I'm TaleX AI, your interviewer today. I'll be asking you ${questions.length} technical questions to assess your skills. The interview will last up to ${INTERVIEW_DURATION_MINUTES} minutes. Are you ready?!"`,
                 transcriber: {
@@ -926,12 +946,7 @@ export function useInterviewState(questions, interviewId) {
                 },
                 voice: {
                     provider: "11labs",
-                    voiceId: "sarah",
-                    stability: 0.4,
-                    similarityBoost: 0.8,
-                    speed: 0.9,
-                    style: 0.5,
-                    useSpeakerBoost: true,
+                    voiceId: "MF3mGyEYCl7XYWbV9V6O",
                 },
                 model: {
                     provider: "openai",
@@ -943,11 +958,13 @@ export function useInterviewState(questions, interviewId) {
 
 Interview Guidelines:
 Follow the structured question flow:
-{{questions}}
+${{questions}}
 
+Ask the ${questions.length} predefined technical questions in order, one at a time, starting with question 1.
 Engage naturally & react appropriately:
 Listen actively to responses and acknowledge them before moving forward.
 Ask brief follow-up questions if a response is vague or requires more detail.
+Dont Explain more details about just concepts. just hints.
 Keep the conversation flowing smoothly while maintaining control.
 Be professional, yet warm and welcoming:
 
@@ -962,16 +979,19 @@ If unsure, redirect the candidate to HR for more details.
 Conclude the interview properly:
 Thank the candidate for their time.
 Inform them that the company will reach out soon with feedback.
-End the conversation on a polite and positive note.
+End the conversation on exactly this phrase: ${ENDING_PHRASE} 
 
 
 - Be sure to be professional and polite.
 - Keep all your responses short and simple. Use official language, but be kind and welcoming.
-- This is a voice conversation, so keep your responses short, like in a real conversation. Don't ramble for too long.`,
+- This is a voice conversation, so keep your responses short, like in a real conversation. Don't ramble for too long.
+**QUESTIONS**:
+${formattedQuestions}
+`,
                         },
                     ],
                 },
-
+                endCallPhrases:[ENDING_PHRASE]
             };
             if (debugMode)
                 console.log("Starting VAPI call", {
@@ -1625,6 +1645,7 @@ End the conversation on a polite and positive note.
             callStatus,
             isLoading,
             error,
+            lastSpeakerTranscript,
             conclusionDetected,
             lastUserResponseTime,
             interviewDuration,
@@ -1657,6 +1678,7 @@ End the conversation on a polite and positive note.
             setCallStatus,
             setIsLoading,
             setError,
+            setLastSpeakerTranscript,
             setConclusionDetected,
             setLastUserResponseTime,
             setInterviewDuration,

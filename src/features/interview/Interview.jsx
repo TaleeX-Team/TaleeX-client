@@ -14,6 +14,7 @@ import InterviewHeader from "@/components/interview/InterviewHeader.jsx";
 import { useStartInterview } from "@/hooks/useInterviewData.js";
 import { useInterviewState } from "@/hooks/useInterviewState.js";
 
+
 export default function Interview() {
   const { interviewId } = useParams();
   const { state: navState } = useLocation();
@@ -55,6 +56,7 @@ export default function Interview() {
       lastSpeakingRole,
       screenshots,
       lastCapturedScreenshot,
+      lastSpeakerTranscript,
     },
     actions: {
       setError,
@@ -88,9 +90,9 @@ export default function Interview() {
   // Start interview automatically if not started and questions are available
   useEffect(() => {
     if (
-      !isInterviewStarted &&
-      questionsData.length > 0 &&
-      !isStartingInterview
+        !isInterviewStarted &&
+        questionsData.length > 0 &&
+        !isStartingInterview
     ) {
       console.log("Starting interview", {
         timestamp: new Date().toISOString(),
@@ -136,119 +138,118 @@ export default function Interview() {
   // Handle case where no questions are available
   if (!questionsData.length && !isStartingInterview) {
     return (
-      <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <style jsx>{globalStyles}</style>
-        <div className="flex-1 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h2 className="text-xl font-bold text-red-500 mb-4">Error</h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">
-              No questions available for this interview. Please go back and try
-              again.
-            </p>
-            <Button
-              onClick={() => navigate(`/interviews/${interviewId}`)}
-              className="w-full"
-            >
-              Go Back
-            </Button>
+        <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+          <style jsx>{globalStyles}</style>
+          <div className="flex-1 flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full">
+              <h2 className="text-xl font-bold text-red-500 mb-4">Error</h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                No questions available for this interview. Please go back and try
+                again.
+              </p>
+              <Button
+                  onClick={() => navigate(`/interviews/${interviewId}`)}
+                  className="w-full"
+              >
+                Go Back
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <style jsx>{globalStyles}</style>
+      <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <style jsx>{globalStyles}</style>
 
-      <InterviewHeader
-        interviewId={interviewId}
-        callStatus={callStatus}
-        isInterviewStarted={isInterviewStarted}
-        interviewDuration={interviewDuration}
-        currentQuestionIndex={currentQuestionIndex}
-        totalQuestions={questionsData.length}
-        isAudioOn={isAudioOn}
-        progress={progress}
-        timeRemaining={timeRemaining}
-        isVideoOn={isVideoOn}
-        questionStates={questionStates}
-        currentQuestionSummary={currentQuestionSummary}
-        showTranscript={showTranscript}
-        isLoading={isLoading || isStartingInterview}
-        toggleAudio={toggleAudio}
-        toggleVideo={() => setIsVideoOn(!isVideoOn)}
-        toggleTranscript={toggleTranscript}
-        handleEndInterview={handleEndInterview}
-      />
-
-      {error && (
-        <Alert variant="destructive" className="mx-4 mt-4">
-          <AlertDescription className="flex justify-between items-center">
-            <span>{error}</span>
-            <Button variant="ghost" size="sm" onClick={() => setError(null)}>
-              <X className="h-4 w-4" />
-            </Button>
-          </AlertDescription>
-        </Alert>
-      )}
-
-      <main ref={mainContentRef} className="flex-1 flex flex-col">
-        <div className="flex-1 flex flex-col lg:flex-row p-4 gap-4">
-          <VideoContainer
-            isUser={true}
-            ref={userVideoContainerRef}
-            videoRef={videoRef}
-            isVideoOn={isVideoOn}
+        <InterviewHeader
+            interviewId={interviewId}
+            callStatus={callStatus}
+            isInterviewStarted={isInterviewStarted}
+            interviewDuration={interviewDuration}
+            currentQuestionIndex={currentQuestionIndex}
+            totalQuestions={questionsData.length}
             isAudioOn={isAudioOn}
-            isAITalking={isAITalking}
-            isUserTalking={isUserTalking}
-            transcript={transcript}
-            callStatus={callStatus}
-            lastCapturedScreenshot={lastCapturedScreenshot}
-            screenshotCount={screenshots.length}
-            sessionDuration={interviewDuration}
-            interviewProgress={progress.current / progress.total}
-          />
-
-          <VideoContainer
-            isUser={false}
-            ref={aiVideoContainerRef}
-            isAITalking={isAITalking}
-            isUserTalking={isUserTalking}
-            callStatus={callStatus}
-            sessionDuration={interviewDuration}
-            interviewProgress={progress.current / progress.total}
-          />
-        </div>
-
-        {showTranscript && (
-          <TranscriptPanel
-            ref={transcriptContainerRef}
-            transcriptExpanded={transcriptExpanded}
-            toggleTranscriptExpanded={toggleTranscriptExpanded}
+            progress={progress}
+            timeRemaining={timeRemaining}
+            isVideoOn={isVideoOn}
+            questionStates={questionStates}
+            currentQuestionSummary={currentQuestionSummary}
+            showTranscript={showTranscript}
+            isLoading={isLoading || isStartingInterview}
+            toggleAudio={toggleAudio}
+            toggleVideo={() => setIsVideoOn(!isVideoOn)}
             toggleTranscript={toggleTranscript}
-            callStatus={callStatus}
-            lastMessage={lastMessage}
-            isAITalking={isAITalking}
-            transcript={transcript}
-            messages={messages}
-            conclusionDetected={conclusionDetected}
-          />
-        )}
-      </main>
+            handleEndInterview={handleEndInterview}
+        />
 
-      <InterviewCompletedDialog
-        open={isInterviewComplete}
-        interviewId={interviewId}
-        onOpenChange={setIsInterviewComplete}
-        onClose={handleDialogClose}
-        interviewDuration={interviewDuration}
-        questionsAsked={progress.current}
-        totalQuestions={questionsData.length}
-        screenshots={screenshots}
-        transcript={saveAndGetTranscript(interviewId)}
-      />
-    </div>
+        {error && (
+            <Alert variant="destructive" className="mx-4 mt-4">
+              <AlertDescription className="flex justify-between items-center">
+                <span>{error}</span>
+                <Button variant="ghost" size="sm" onClick={() => setError(null)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </AlertDescription>
+            </Alert>
+        )}
+
+        <main ref={mainContentRef} className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col lg:flex-row p-4 gap-4">
+            <VideoContainer
+                isUser={true}
+                ref={userVideoContainerRef}
+                videoRef={videoRef}
+                isVideoOn={isVideoOn}
+                isAudioOn={isAudioOn}
+                isAITalking={isAITalking}
+                isUserTalking={isUserTalking}
+                transcript={transcript}
+                callStatus={callStatus}
+                lastCapturedScreenshot={lastCapturedScreenshot}
+                screenshotCount={screenshots.length}
+                sessionDuration={interviewDuration}
+                interviewProgress={progress.current / progress.total}
+            />
+
+            <VideoContainer
+                isUser={false}
+                ref={aiVideoContainerRef}
+                isAITalking={isAITalking}
+                isUserTalking={isUserTalking}
+                callStatus={callStatus}
+                sessionDuration={interviewDuration}
+                interviewProgress={progress.current / progress.total}
+            />
+          </div>
+
+          {showTranscript && (
+              <TranscriptPanel
+                  ref={transcriptContainerRef}
+                  transcriptExpanded={transcriptExpanded}
+                  toggleTranscriptExpanded={toggleTranscriptExpanded}
+                  toggleTranscript={toggleTranscript}
+                  callStatus={callStatus}
+                  lastSpeakerTranscript={lastSpeakerTranscript}
+                  isAITalking={isAITalking}
+                  isUserTalking={isUserTalking}
+                  lastSpeakingRole={lastSpeakingRole}
+              />
+          )}
+        </main>
+
+        <InterviewCompletedDialog
+            open={isInterviewComplete}
+            interviewId={interviewId}
+            onOpenChange={setIsInterviewComplete}
+            onClose={handleDialogClose}
+            interviewDuration={interviewDuration}
+            questionsAsked={progress.current}
+            totalQuestions={questionsData.length}
+            screenshots={screenshots}
+            transcript={saveAndGetTranscript(interviewId)}
+        />
+      </div>
   );
 }
