@@ -128,7 +128,7 @@ export const useJobs = (initialFilters = {}) => {
       // Update the job in the jobQuery cache
       queryClient.setQueryData(["job", updatedJob.job._id], (oldData) => {
         // Handle case where oldData might be null or undefined
-        console.log(updatedJob, "dsadsadsadjasndjasdjasiodj");
+
         if (!oldData) {
           return updatedJob.job;
         }
@@ -143,13 +143,14 @@ export const useJobs = (initialFilters = {}) => {
       queryClient.setQueryData(["jobs"], (oldData) => {
         // Handle case where oldData might be null or undefined
         if (!oldData || !oldData.jobs) {
-          return { jobs: [updatedJob] }; // Initialize with the updated job
+          return { jobs: [updatedJob.job] }; // Initialize with the updated job
         }
+        console.log("Old data:", oldData);
         // Update the job in the jobs array
         return {
           ...oldData,
           jobs: oldData.jobs.map((job) =>
-            job._id === updatedJob._id ? { ...job, ...updatedJob } : job
+            job._id === updatedJob.job._id ? { ...job, ...updatedJob.job } : job
           ),
         };
       });
@@ -157,7 +158,7 @@ export const useJobs = (initialFilters = {}) => {
       // Optionally invalidate queries to trigger a refresh in the background
       queryClient.invalidateQueries({ queryKey: ["jobs"] });
       queryClient.invalidateQueries({ queryKey: ["jobs", "filter"] });
-
+      toast.success("Job updated successfully!");
       console.log("Job updated:", updatedJob);
     },
     onError: (error) => {

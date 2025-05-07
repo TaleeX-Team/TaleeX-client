@@ -16,6 +16,7 @@ import {
 } from "@/services/apiApplications";
 import { getJobById } from "@/services/apiJobs.js";
 import { toast } from "sonner";
+import JobStatusBadge from "../ui/JobStatusBadge.jsx";
 
 // Define the application phases
 const PHASES = [
@@ -48,7 +49,7 @@ export default function JobApplicationManager() {
     queryFn: () => getJobApplications(id),
     enabled: !!id,
   });
-  const { data: job } = useQuery({
+  const { data: job, isLoading: isLoadingJob } = useQuery({
     queryKey: ["job", id],
     queryFn: () => getJobById(id),
     enabled: !!id,
@@ -339,7 +340,7 @@ export default function JobApplicationManager() {
   };
 
   // Render loading skeleton
-  if (isLoading) {
+  if (isLoading || isLoadingJob) {
     return (
       <div className="container mx-auto px-4 py-6 dark:text-gray-200">
         <div className="flex justify-between items-center mb-6">
@@ -373,26 +374,17 @@ export default function JobApplicationManager() {
 
   return (
     <div className="container mx-auto px-4 py-6 dark:text-gray-200">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold dark:text-white">{job?.title}</h1>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-1 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800"
-          >
-            <ExternalLink className="h-4 w-4" />
-            Job site
-          </Button>
-          <Badge
-            variant="outline"
-            className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800"
-          >
-            <span className="h-2 w-2 rounded-full bg-green-500"></span>
-            Open
-          </Badge>
+      {isLoadingJob ? (
+        <div className="flex justify-between items-center mb-6">
+          <div className="h-10 w-2/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+          <div className="h-9 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
         </div>
-      </div>
+      ) : (
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold dark:text-white">{job?.title}</h1>
+          <JobStatusBadge initialStatus={job?.status} jobId={job?._id} />
+        </div>
+      )}
 
       <div className="w-full">
         <div className="flex items-center border-b dark:border-gray-700 mb-4">

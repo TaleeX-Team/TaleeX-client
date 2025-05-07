@@ -289,7 +289,6 @@ export default function UpdateJob({ jobId, trigger }) {
 
       console.log("Submitting job update:", jobData);
       await updateJobMutation.mutateAsync(jobData);
-      toast.success("Job updated successfully!");
       setOpen(false);
     } catch (error) {
       console.error("Job update error:", error);
