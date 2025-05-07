@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
+import { Building2, ExternalLink, Globe, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ApplicantsTab } from "./current-applicants-tab.jsx";
 import { RejectedApplicantsTab } from "./rejected-applicants-tab.jsx";
@@ -68,22 +68,20 @@ export default function JobApplicationManager() {
           applications: old.applications.map((app) =>
             applicationIds.includes(app._id)
               ? {
-                  ...app,
-                  stage: "cv review",
-                  updatedAt: new Date().toISOString(),
-                }
+                ...app,
+                stage: "cv review",
+                updatedAt: new Date().toISOString(),
+              }
               : app
           ),
         };
       });
       toast(
-        `${selectedApplicants.length} ${
-          selectedApplicants.length === 1 ? "applicant" : "applicants"
+        `${selectedApplicants.length} ${selectedApplicants.length === 1 ? "applicant" : "applicants"
         } sent to CV Review`,
         {
-          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
-            selectedApplicants.length === 1 ? "has" : "have"
-          } been sent from ${activePhase} to CV Review`,
+          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${selectedApplicants.length === 1 ? "has" : "have"
+            } been sent from ${activePhase} to CV Review`,
           style: {
             backgroundColor: "#195f32",
             color: "white",
@@ -121,22 +119,20 @@ export default function JobApplicationManager() {
           applications: old.applications.map((app) =>
             applicationIds.includes(app._id)
               ? {
-                  ...app,
-                  stage: "Sending Interview",
-                  updatedAt: new Date().toISOString(),
-                }
+                ...app,
+                stage: "Sending Interview",
+                updatedAt: new Date().toISOString(),
+              }
               : app
           ),
         };
       });
       toast(
-        `${selectedApplicants.length} ${
-          selectedApplicants.length === 1 ? "applicant" : "applicants"
+        `${selectedApplicants.length} ${selectedApplicants.length === 1 ? "applicant" : "applicants"
         } sent to Interview`,
         {
-          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
-            selectedApplicants.length === 1 ? "has" : "have"
-          } been sent from ${activePhase} to Interview`,
+          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${selectedApplicants.length === 1 ? "has" : "have"
+            } been sent from ${activePhase} to Interview`,
           style: {
             backgroundColor: "#195f32",
             color: "white",
@@ -171,26 +167,22 @@ export default function JobApplicationManager() {
           applications: old.applications.map((app) =>
             applicantIds.includes(app._id)
               ? {
-                  ...app,
-                  stage: "rejected",
-                  updatedAt: new Date().toISOString(),
-                }
+                ...app,
+                stage: "rejected",
+                updatedAt: new Date().toISOString(),
+              }
               : app
           ),
         };
       });
       toast(
-        `${selectedApplicants.length} ${
-          selectedApplicants.length === 1 ? "applicant" : "applicants"
-        } moved to ${
-          stage === "rejected" ? "Rejected Applicants" : "Offered Applicants"
+        `${selectedApplicants.length} ${selectedApplicants.length === 1 ? "applicant" : "applicants"
+        } moved to ${stage === "rejected" ? "Rejected Applicants" : "Offered Applicants"
         }`,
         {
-          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
-            selectedApplicants.length === 1 ? "has" : "have"
-          } been moved from ${activePhase} to ${
-            stage === "rejected" ? "Rejected" : "Offered"
-          } Applicants`,
+          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${selectedApplicants.length === 1 ? "has" : "have"
+            } been moved from ${activePhase} to ${stage === "rejected" ? "Rejected" : "Offered"
+            } Applicants`,
           style: {
             backgroundColor: `${stage === "rejected" ? "darkred" : "#195f32"}`,
             color: "white",
@@ -228,12 +220,12 @@ export default function JobApplicationManager() {
         app.stage === "applied"
           ? "Applications"
           : app.stage === "cv review"
-          ? "CV Review"
-          : app.stage === "sending interview"
-          ? "Sending Interview"
-          : app.stage === "completed interview"
-          ? "Interview Feedback"
-          : app.stage,
+            ? "CV Review"
+            : app.stage === "sending interview"
+              ? "Sending Interview"
+              : app.stage === "completed interview"
+                ? "Interview Feedback"
+                : app.stage,
       rejected: app.stage === "rejected",
       rejectedOn: app.stage === "rejected" ? app.createdAt : null,
       rejectedBy: app.stage === "rejected" ? app.group?.[0] || null : null,
@@ -373,122 +365,156 @@ export default function JobApplicationManager() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 dark:text-gray-200">
-      {isLoadingJob ? (
-        <div className="flex justify-between items-center mb-6">
-          <div className="h-10 w-2/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-          <div className="h-9 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-        </div>
-      ) : (
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold dark:text-white">{job?.title}</h1>
-          <JobStatusBadge initialStatus={job?.status} jobId={job?._id} />
-        </div>
-      )}
-
-      <div className="w-full">
-        <div className="flex items-center border-b dark:border-gray-700 mb-4">
-          <button
-            onClick={() => setActiveTab("overview")}
-            className={`relative px-4 py-3 font-medium text-sm transition-colors ${
-              activeTab === "overview"
-                ? "text-black dark:text-white"
-                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-            }`}
-          >
-            Overview
-            {activeTab === "overview" && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black dark:bg-white"></span>
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab("applicants")}
-            className={`relative px-4 py-3 font-medium text-sm transition-colors ${
-              activeTab === "applicants"
-                ? "text-black dark:text-white"
-                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-            }`}
-          >
-            Applicants
-            {activeTab === "applicants" && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black dark:bg-white"></span>
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab("rejected")}
-            className={`relative px-4 py-3 font-medium text-sm transition-colors ${
-              activeTab === "rejected"
-                ? "text-black dark:text-white"
-                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-            }`}
-          >
-            Rejected Applicants
-            {activeTab === "rejected" && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black dark:bg-white"></span>
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab("all")}
-            className={`relative px-4 py-3 font-medium text-sm transition-colors ${
-              activeTab === "all"
-                ? "text-black dark:text-white"
-                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-            }`}
-          >
-            All Applicants
-            {activeTab === "all" && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black dark:bg-white"></span>
-            )}
-          </button>
-        </div>
-
-        {activeTab === "overview" && (
-          <div className="mt-6">
-            <JobDetailsPage />
+    <div className="bg-background p-4 md:p-8 min-h-screen">
+      <div className="mx-auto max-w-7xl">
+        {/* {isLoadingJob ? (
+          <div className="flex justify-between items-center mb-6">
+            <div className="h-10 w-2/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-9 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
           </div>
-        )}
+        ) : ( */}
+        <div className="mb-8 space-y-4">
+          <div className="flex flex-row flex-wrap items-center justify-between gap-2 mt-6 rounded-xl">
+            <h1 className="text-3xl font-bold dark:text-white">{job?.title}</h1>
+            <JobStatusBadge initialStatus={job?.status} jobId={job?._id} />
+          </div>
+          {job.company && (
+            <div className="hidden md:flex flex-col md:flex-row md:items-center md:gap-4 text-muted-foreground">
+              <div className="flex items-center">
+                <Building2 className="w-5 h-5 mr-2 text-primary" />
+                <span className="text-lg">
+                  {job.company.name || "Unknown Company"}
+                </span>
+              </div>
 
-        {activeTab === "applicants" && (
-          <ApplicantsTab
-            PHASES={PHASES}
-            phaseCounts={phaseCounts}
-            filteredApplicants={filteredApplicants}
-            selectedApplicants={selectedApplicants}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            toggleSelectAll={toggleSelectAll}
-            toggleSelectApplicant={toggleSelectApplicant}
-            moveToCVReview={moveToCVReview}
-            rejectApplicants={rejectApplicants}
-            offerApplicants={offerApplicants}
-            activePhase={activePhase}
-            setActivePhase={setActivePhase}
-            onSendInterview={handleSendInterview}
-          />
-        )}
+              {job.company.address && (
+                <div className="flex items-center">
+                  <MapPin className="w-4 h-4 mr-2 text-primary" />
+                  <span>{job.company.address}</span>
+                </div>
+              )}
 
-        {activeTab === "rejected" && (
-          <RejectedApplicantsTab
-            filteredApplicants={filteredApplicants}
-            selectedApplicants={selectedApplicants}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            toggleSelectAll={toggleSelectAll}
-            toggleSelectApplicant={toggleSelectApplicant}
-          />
-        )}
+              {job.company.website && (
+                <div className="flex items-center">
+                  <Globe className="w-4 h-4 mr-2 text-primary" />
+                  <a
+                    href={job.company.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-primary transition-colors"
+                  >
+                    {job.company.website.replace(/^https?:\/\//, "")}
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
-        {activeTab === "all" && (
-          <AllApplicantsTab
-            filteredApplicants={filteredApplicants}
-            selectedApplicants={selectedApplicants}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            toggleSelectAll={toggleSelectAll}
-            toggleSelectApplicant={toggleSelectApplicant}
-          />
-        )}
+
+        {/* )} */}
+
+        <div className="w-full">
+          <div className="flex items-center border-b dark:border-gray-700 mb-4">
+            <button
+              onClick={() => setActiveTab("overview")}
+              className={`relative px-4 py-3 font-medium text-sm transition-colors ${activeTab === "overview"
+                ? "text-black dark:text-white"
+                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                }`}
+            >
+              Overview
+              {activeTab === "overview" && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black dark:bg-white"></span>
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab("applicants")}
+              className={`relative px-4 py-3 font-medium text-sm transition-colors ${activeTab === "applicants"
+                ? "text-black dark:text-white"
+                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                }`}
+            >
+              Applicants
+              {activeTab === "applicants" && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black dark:bg-white"></span>
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab("rejected")}
+              className={`relative px-4 py-3 font-medium text-sm transition-colors ${activeTab === "rejected"
+                ? "text-black dark:text-white"
+                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                }`}
+            >
+              Rejected Applicants
+              {activeTab === "rejected" && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black dark:bg-white"></span>
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab("all")}
+              className={`relative px-4 py-3 font-medium text-sm transition-colors ${activeTab === "all"
+                ? "text-black dark:text-white"
+                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                }`}
+            >
+              All Applicants
+              {activeTab === "all" && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black dark:bg-white"></span>
+              )}
+            </button>
+          </div>
+
+          {activeTab === "overview" && (
+            <div>
+              <JobDetailsPage />
+            </div>
+          )}
+
+          {activeTab === "applicants" && (
+            <ApplicantsTab
+              PHASES={PHASES}
+              phaseCounts={phaseCounts}
+              filteredApplicants={filteredApplicants}
+              selectedApplicants={selectedApplicants}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              toggleSelectAll={toggleSelectAll}
+              toggleSelectApplicant={toggleSelectApplicant}
+              moveToCVReview={moveToCVReview}
+              rejectApplicants={rejectApplicants}
+              offerApplicants={offerApplicants}
+              activePhase={activePhase}
+              setActivePhase={setActivePhase}
+              onSendInterview={handleSendInterview}
+            />
+          )}
+
+          {activeTab === "rejected" && (
+            <RejectedApplicantsTab
+              filteredApplicants={filteredApplicants}
+              selectedApplicants={selectedApplicants}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              toggleSelectAll={toggleSelectAll}
+              toggleSelectApplicant={toggleSelectApplicant}
+            />
+          )}
+
+          {activeTab === "all" && (
+            <AllApplicantsTab
+              filteredApplicants={filteredApplicants}
+              selectedApplicants={selectedApplicants}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              toggleSelectAll={toggleSelectAll}
+              toggleSelectApplicant={toggleSelectApplicant}
+            />
+          )}
+        </div>
       </div>
     </div>
+
   );
 }
