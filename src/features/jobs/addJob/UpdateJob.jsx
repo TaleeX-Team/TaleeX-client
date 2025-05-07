@@ -25,7 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Edit, X, Loader2 } from "lucide-react";
+import { Edit, X, Loader2, Briefcase } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -329,11 +329,23 @@ export default function UpdateJob({ jobId, trigger }) {
         )}
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[800px] md:max-w-[900px] p-0 bg-background">
+      <DialogContent className="sm:max-w-[600px] p-0 overflow-y-auto scrollbar-none"
+        style={{
+          overscrollBehavior: "contain",
+          maxHeight: "90vh",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
         <DialogHeader className="px-6 pt-6 pb-2">
-          <DialogTitle className="text-2xl font-semibold">
-            Update Job Posting
-          </DialogTitle>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center">
+              <Briefcase className="h-5 w-5 text-primary" />
+            </div>
+            <DialogTitle className="text-2xl font-semibold">
+              Update Job Posting
+            </DialogTitle>
+          </div>
           <DialogDescription className="text-muted-foreground">
             Edit the details of this job posting.
           </DialogDescription>
@@ -345,8 +357,8 @@ export default function UpdateJob({ jobId, trigger }) {
             <span className="ml-2">Loading job details...</span>
           </div>
         ) : (
-          <Tabs defaultValue="basics" className="px-6">
-            <TabsList className="grid grid-cols-3 mb-4">
+          <Tabs defaultValue="basics" className="w-full px-6">
+            <TabsList className="grid w-full grid-cols-3 mb-4 bg-secondary/50 dark:bg-card">
               <TabsTrigger value="basics">Basic Info</TabsTrigger>
               <TabsTrigger value="details">Job Details</TabsTrigger>
               <TabsTrigger value="additional">Additional Info</TabsTrigger>
@@ -370,6 +382,7 @@ export default function UpdateJob({ jobId, trigger }) {
                           <FormControl>
                             <Input
                               placeholder="e.g. Frontend Developer"
+                              className="bg-input"
                               {...field}
                             />
                           </FormControl>
@@ -391,7 +404,7 @@ export default function UpdateJob({ jobId, trigger }) {
                             value={field.value}
                           >
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger className="w-full bg-input">
                                 <SelectValue placeholder="Select a company" />
                               </SelectTrigger>
                             </FormControl>
@@ -422,35 +435,7 @@ export default function UpdateJob({ jobId, trigger }) {
                       )}
                     />
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="workPlaceType"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-sm font-medium">
-                              Workplace Type *
-                            </FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              value={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select type" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="remote">Remote</SelectItem>
-                                <SelectItem value="hybrid">Hybrid</SelectItem>
-                                <SelectItem value="on-site">On-site</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex justify-between">
                       <FormField
                         control={form.control}
                         name="jobType"
@@ -464,7 +449,7 @@ export default function UpdateJob({ jobId, trigger }) {
                               value={field.value}
                             >
                               <FormControl>
-                                <SelectTrigger>
+                                <SelectTrigger className="w-full sm:w-[268px] bg-input">
                                   <SelectValue placeholder="Select type" />
                                 </SelectTrigger>
                               </FormControl>
@@ -507,7 +492,7 @@ export default function UpdateJob({ jobId, trigger }) {
                               value={field.value}
                             >
                               <FormControl>
-                                <SelectTrigger>
+                                <SelectTrigger className="w-full sm:w-[268px] bg-input">
                                   <SelectValue placeholder="Select level" />
                                 </SelectTrigger>
                               </FormControl>
@@ -538,33 +523,63 @@ export default function UpdateJob({ jobId, trigger }) {
                       />
                     </div>
 
-                    <FormField
-                      control={form.control}
-                      name="status"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm font-medium">
-                            Status
-                          </FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select status" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="open">Open</SelectItem>
-                              <SelectItem value="pending">Pending</SelectItem>
-                              <SelectItem value="closed">Closed</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex justify-between">
+                      <FormField
+                        control={form.control}
+                        name="workPlaceType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-sm font-medium">
+                              Workplace Type *
+                            </FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger className="w-full sm:w-[268px] bg-input">
+                                  <SelectValue placeholder="Select type" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="remote">Remote</SelectItem>
+                                <SelectItem value="hybrid">Hybrid</SelectItem>
+                                <SelectItem value="on-site">On-site</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="status"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-sm font-medium">
+                              Status
+                            </FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger className="w-full sm:w-[268px] bg-input">
+                                  <SelectValue placeholder="Select status" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="open">Open</SelectItem>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="closed">Closed</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </TabsContent>
 
                   <TabsContent value="details" className="space-y-4 py-2">
@@ -579,7 +594,7 @@ export default function UpdateJob({ jobId, trigger }) {
                           <FormControl>
                             <Textarea
                               placeholder="Describe the job responsibilities and role"
-                              className="min-h-[150px]"
+                              className="min-h-[150px] bg-input"
                               {...field}
                             />
                           </FormControl>
@@ -599,7 +614,7 @@ export default function UpdateJob({ jobId, trigger }) {
                           <FormControl>
                             <Textarea
                               placeholder="List the required skills and qualifications"
-                              className="min-h-[150px]"
+                              className="min-h-[150px] bg-input"
                               {...field}
                             />
                           </FormControl>
@@ -619,7 +634,7 @@ export default function UpdateJob({ jobId, trigger }) {
                           <Badge
                             key={tag}
                             variant="secondary"
-                            className="flex items-center gap-1"
+                            className="flex items-center gap-1 bg-secondary text-secondary-foreground"
                           >
                             {tag}
                             <button
@@ -641,6 +656,7 @@ export default function UpdateJob({ jobId, trigger }) {
                             setTimeout(() => setShowTagSuggestions(false), 200)
                           }
                           placeholder="e.g. React, Node.js"
+                          className="bg-input"
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {
                               e.preventDefault();
@@ -675,7 +691,7 @@ export default function UpdateJob({ jobId, trigger }) {
                       <h3 className="text-sm font-medium mb-3">
                         Salary Information
                       </h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-3 gap-3 flex justify-between">
                         <FormField
                           control={form.control}
                           name="salary.min"
@@ -688,6 +704,7 @@ export default function UpdateJob({ jobId, trigger }) {
                                 <Input
                                   type="number"
                                   placeholder="e.g. 50000"
+                                  className="bg-input"
                                   {...field}
                                 />
                               </FormControl>
@@ -707,6 +724,7 @@ export default function UpdateJob({ jobId, trigger }) {
                                 <Input
                                   type="number"
                                   placeholder="e.g. 100000"
+                                  className="bg-input"
                                   {...field}
                                 />
                               </FormControl>
@@ -727,7 +745,7 @@ export default function UpdateJob({ jobId, trigger }) {
                                 value={field.value}
                               >
                                 <FormControl>
-                                  <SelectTrigger>
+                                  <SelectTrigger className="bg-input">
                                     <SelectValue placeholder="Select currency" />
                                   </SelectTrigger>
                                 </FormControl>
@@ -765,6 +783,7 @@ export default function UpdateJob({ jobId, trigger }) {
                             <Input
                               type="number"
                               placeholder="e.g. 3"
+                              className="bg-input"
                               {...field}
                             />
                           </FormControl>
@@ -776,7 +795,7 @@ export default function UpdateJob({ jobId, trigger }) {
 
                   <DialogFooter className="px-6 py-4 flex justify-between sm:justify-end gap-2 border-t">
                     <DialogClose asChild>
-                      <Button type="button" variant="outline">
+                      <Button type="button" variant="outline" className="border-input hover:bg-muted">
                         Cancel
                       </Button>
                     </DialogClose>

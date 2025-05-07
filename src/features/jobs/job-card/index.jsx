@@ -126,19 +126,17 @@ export default function JobCard({ job, handleDelete }) {
               <h3 className="font-semibold text-lg text-foreground">{title}</h3>
               {jobType && (
                 <Badge
-                  className={`px-2 py-0.5 text-xs ${
-                    jobTypeColors[jobType] || "bg-muted text-muted-foreground"
-                  }`}
+                  className={`px-2 py-0.5 text-xs ${jobTypeColors[jobType] || "bg-muted text-muted-foreground"
+                    }`}
                 >
                   {jobType}
                 </Badge>
               )}
               {status && (
                 <Badge
-                  className={`px-2 py-0.5 text-xs ${
-                    statusColors[status.toLowerCase()] ||
+                  className={`px-2 py-0.5 text-xs ${statusColors[status.toLowerCase()] ||
                     "bg-muted text-muted-foreground"
-                  }`}
+                    }`}
                 >
                   {status}
                 </Badge>

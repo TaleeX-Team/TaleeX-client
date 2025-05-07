@@ -26,7 +26,7 @@ export default function JobsTab({ jobs }) {
     <TabsContent value="jobs">
       <div className="bg-card rounded-lg shadow-sm border p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Open Positions</h2>
+          <h2 className="text-xl font-semibold">Company Jobs</h2>
           <AddJob />
         </div>
 

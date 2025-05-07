@@ -36,9 +36,9 @@ export function CompanySkeleton() {
 
     // Initial card animation
     gsap.fromTo(
-        cardRef.current,
-        { y: 15, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" }
+      cardRef.current,
+      { y: 15, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" }
     );
 
     return () => {
@@ -47,105 +47,102 @@ export function CompanySkeleton() {
   }, []);
 
   return (
-      <Card
-          ref={cardRef}
-          className="overflow-hidden flex flex-col relative border border-border/60 shadow-sm bg-gradient-to-b from-background to-muted/30"
-      >
-        {/* Shimmer effect overlay */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden">
-          <div className="shimmer-effect"></div>
+    <Card
+      ref={cardRef}
+      className="overflow-hidden flex flex-col relative border border-border/60 shadow-sm bg-gradient-to-b from-background to-muted/30"
+    >
+      {/* Shimmer effect overlay */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden">
+        <div className="shimmer-effect"></div>
+      </div>
+
+      <CardHeader className="pb-1 relative">
+        <div className="flex items-start gap-4">
+          {/* Logo skeleton with shadow */}
+          <Skeleton
+            ref={addToRefs}
+            className="h-14 w-14 rounded-lg shadow-sm"
+          />
+          <div className="space-y-2 flex-1">
+            {/* Company name skeleton */}
+            <Skeleton
+              ref={addToRefs}
+              className="h-5 w-32 rounded-md"
+            />
+            {/* Website skeleton */}
+            <div className="flex items-center">
+              <Skeleton
+                ref={addToRefs}
+                className="h-4 w-4 mr-2 rounded-full"
+              />
+              <Skeleton
+                ref={addToRefs}
+                className="h-4 w-24 rounded-md"
+              />
+            </div>
+          </div>
+          {/* Action buttons skeleton */}
+          <div className="flex gap-1">
+            <Skeleton
+              ref={addToRefs}
+              className="h-6 w-6 rounded-full"
+            />
+          </div>
         </div>
+      </CardHeader>
 
-        <CardHeader className="pb-2 relative">
-          <div className="flex items-start gap-4">
-            {/* Logo skeleton with shadow */}
-            <Skeleton
-                ref={addToRefs}
-                className="h-14 w-14 rounded-lg shadow-sm"
-            />
-            <div className="space-y-2 flex-1">
-              {/* Company name skeleton */}
-              <Skeleton
-                  ref={addToRefs}
-                  className="h-5 w-32 rounded-md"
-              />
-              {/* Website skeleton */}
-              <div className="flex items-center">
-                <Skeleton
-                    ref={addToRefs}
-                    className="h-4 w-4 mr-2 rounded-full"
-                />
-                <Skeleton
-                    ref={addToRefs}
-                    className="h-4 w-24 rounded-md"
-                />
-              </div>
-            </div>
-            {/* Action buttons skeleton */}
-            <div className="flex gap-1">
-              <Skeleton
-                  ref={addToRefs}
-                  className="h-6 w-6 rounded-full"
-              />
-              <Skeleton
-                  ref={addToRefs}
-                  className="h-6 w-6 rounded-full"
-              />
-            </div>
-          </div>
-        </CardHeader>
-
-        <CardContent className="pb-2 flex-1 relative">
-          <div className="space-y-2">
-            {/* Description skeleton - 3 lines with varied width */}
-            <Skeleton
-                ref={addToRefs}
-                className="h-4 w-full rounded-md"
-            />
-            <Skeleton
-                ref={addToRefs}
-                className="h-4 w-full rounded-md"
-            />
-            <Skeleton
-                ref={addToRefs}
-                className="h-4 w-3/4 rounded-md"
-            />
-
-            {/* Badge skeleton */}
-            <div className="flex items-center mt-3">
-              <Skeleton
-                  ref={addToRefs}
-                  className="h-5 w-16 rounded-full"
-              />
-            </div>
-
-            {/* Location skeleton */}
-            <div className="flex items-center mt-4">
-              <Skeleton
-                  ref={addToRefs}
-                  className="h-4 w-4 mr-2 rounded-full"
-              />
-              <Skeleton
-                  ref={addToRefs}
-                  className="h-4 w-32 rounded-md"
-              />
-            </div>
-          </div>
-        </CardContent>
-
-        <CardFooter className="flex justify-between pt-4 mt-auto border-t border-border/40 relative bg-muted/20">
-          {/* Button skeletons */}
+      <CardContent className="flex-1 relative">
+        <div className="space-y-2">
+          {/* Description skeleton - 3 lines with varied width */}
           <Skeleton
-              ref={addToRefs}
-              className="h-9 w-24 rounded-md"
+            ref={addToRefs}
+            className="h-4 w-full rounded-md"
           />
           <Skeleton
-              ref={addToRefs}
-              className="h-9 w-24 rounded-md"
+            ref={addToRefs}
+            className="h-4 w-3/4 rounded-md"
           />
-        </CardFooter>
 
-        <style jsx>{`
+
+          {/* Location skeleton */}
+          <div className="flex items-center">
+            <Skeleton
+              ref={addToRefs}
+              className="h-4 w-4 mr-2 rounded-full"
+            />
+            <Skeleton
+              ref={addToRefs}
+              className="h-4 w-32 rounded-md"
+            />
+          </div>
+
+          {/* Badge skeleton */}
+          <div className="flex items-center mt-3">
+            <Skeleton
+              ref={addToRefs}
+              className="h-5 w-16 rounded-full"
+            />
+            <Skeleton
+              ref={addToRefs}
+              className="h-5 w-16 rounded-full mx-2"
+            />
+            <Skeleton
+              ref={addToRefs}
+              className="h-5 w-16 rounded-full"
+            />
+          </div>
+        </div>
+      </CardContent>
+
+      <CardFooter className="flex justify-end">
+        {/* Button skeletons */}
+        <Skeleton
+          ref={addToRefs}
+          className="h-9 w-20 rounded-md"
+        />
+      </CardFooter>
+
+      <style jsx>{`
         .shimmer-effect {
           position: absolute;
           top: 0;
@@ -171,6 +168,6 @@ export function CompanySkeleton() {
           }
         }
       `}</style>
-      </Card>
+    </Card>
   );
 }

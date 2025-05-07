@@ -25,7 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Plus, X, Loader2 } from "lucide-react";
+import { Plus, X, Loader2, Briefcase } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -242,7 +242,7 @@ export default function AddJob() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="mt-4 md:mt-0 ml-2 bg-primary hover:bg-primary text-primary-foreground">
+                <Button className="mt-4 md:mt-0 bg-primary hover:bg-primary text-primary-foreground">
                     <Plus className="mr-2 h-4 w-4" /> Post a Job
                 </Button>
             </DialogTrigger>
@@ -257,15 +257,20 @@ export default function AddJob() {
             >
                 <div ref={formContainerRef}>
                     <DialogHeader className="px-6 pt-6 pb-2">
-                        <DialogTitle className="text-2xl font-semibold">
-                            Create New Job
-                        </DialogTitle>
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center">
+                                <Briefcase className="h-5 w-5 text-primary" />
+                            </div>
+                            <DialogTitle className="text-2xl font-semibold">
+                                Create New Job
+                            </DialogTitle>
+                        </div>
                         <DialogDescription className="text-muted-foreground">
                             Fill in the details to track applications and candidate progress.
                         </DialogDescription>
                     </DialogHeader>
 
-                    <Tabs defaultValue="basic" className="w-full px-6">
+                    <Tabs defaultValue="basics" className="w-full px-6">
 
                         <TabsList className="grid w-full grid-cols-3 mb-4 bg-secondary/50 dark:bg-card">
                             <TabsTrigger value="basics">Basic Info</TabsTrigger>
@@ -291,7 +296,7 @@ export default function AddJob() {
                                                     <FormControl>
                                                         <Input
                                                             placeholder="e.g. Frontend Developer"
-                                                            className="border-input"
+                                                            className="bg-input"
                                                             {...field}
                                                         />
                                                     </FormControl>
@@ -314,7 +319,7 @@ export default function AddJob() {
                                                             value={field.value}
                                                         >
                                                             <FormControl>
-                                                                <SelectTrigger className="w-full sm:w-[268px] border-input">
+                                                                <SelectTrigger className="w-full sm:w-[268px] bg-input">
                                                                     <SelectValue placeholder="Select a company" />
                                                                 </SelectTrigger>
                                                             </FormControl>
@@ -363,7 +368,7 @@ export default function AddJob() {
                                                             value={field.value}
                                                         >
                                                             <FormControl>
-                                                                <SelectTrigger className="w-full sm:w-[268px] border-input">
+                                                                <SelectTrigger className="w-full sm:w-[268px] bg-input">
                                                                     <SelectValue placeholder="Select type" />
                                                                 </SelectTrigger>
                                                             </FormControl>
@@ -407,7 +412,7 @@ export default function AddJob() {
                                                             value={field.value}
                                                         >
                                                             <FormControl>
-                                                                <SelectTrigger className="w-full sm:w-[268px] border-input">
+                                                                <SelectTrigger className="w-full sm:w-[268px] bg-input">
                                                                     <SelectValue placeholder="Select type" />
                                                                 </SelectTrigger>
                                                             </FormControl>
@@ -435,7 +440,7 @@ export default function AddJob() {
                                                             value={field.value}
                                                         >
                                                             <FormControl>
-                                                                <SelectTrigger className="w-full sm:w-[268px] border-input">
+                                                                <SelectTrigger className="w-full sm:w-[268px] bg-input">
                                                                     <SelectValue placeholder="Select level" />
                                                                 </SelectTrigger>
                                                             </FormControl>
@@ -483,7 +488,7 @@ export default function AddJob() {
                                                     <FormControl>
                                                         <Textarea
                                                             placeholder="Describe the job responsibilities and role"
-                                                            className="min-h-[150px] border-input"
+                                                            className="min-h-[150px] bg-input"
                                                             {...field}
                                                         />
                                                     </FormControl>
@@ -503,7 +508,7 @@ export default function AddJob() {
                                                     <FormControl>
                                                         <Textarea
                                                             placeholder="List the required skills and qualifications"
-                                                            className="min-h-[150px] border-input"
+                                                            className="min-h-[150px] bg-input"
                                                             {...field}
                                                         />
                                                     </FormControl>
@@ -542,7 +547,7 @@ export default function AddJob() {
                                                     onChange={(e) => setCurrentTag(e.target.value)}
                                                     onFocus={() => setShowTagSuggestions(true)}
                                                     placeholder="e.g. React, Node.js"
-                                                    className="border-input"
+                                                    className="bg-input"
                                                     onKeyDown={(e) => {
                                                         if (e.key === "Enter") {
                                                             e.preventDefault();
@@ -601,7 +606,7 @@ export default function AddJob() {
                                                                 <Input
                                                                     type="number"
                                                                     placeholder="e.g. 50000"
-                                                                    className="border-input"
+                                                                    className="bg-input"
                                                                     {...field}
                                                                 />
                                                             </FormControl>
@@ -621,7 +626,7 @@ export default function AddJob() {
                                                                 <Input
                                                                     type="number"
                                                                     placeholder="e.g. 100000"
-                                                                    className="border-input"
+                                                                    className="bg-input"
                                                                     {...field}
                                                                 />
                                                             </FormControl>
@@ -643,7 +648,7 @@ export default function AddJob() {
                                                                 value={field.value}
                                                             >
                                                                 <FormControl>
-                                                                    <SelectTrigger className="border-input">
+                                                                    <SelectTrigger className="bg-input">
                                                                         <SelectValue placeholder="Select currency" />
                                                                     </SelectTrigger>
                                                                 </FormControl>
@@ -675,7 +680,7 @@ export default function AddJob() {
                                                         <Input
                                                             type="number"
                                                             placeholder="e.g. 3"
-                                                            className="border-input"
+                                                            className="bg-input"
                                                             {...field}
                                                         />
                                                     </FormControl>

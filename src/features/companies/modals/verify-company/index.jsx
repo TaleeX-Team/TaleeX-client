@@ -258,8 +258,15 @@ export default function VerifyCompany() {
           <Shield className="h-4 w-4" /> Verify Company
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
-        <DialogHeader className="p-6 pb-2">
+      <DialogContent
+        className="sm:max-w-[600px] p-0 overflow-y-auto scrollbar-none"
+        style={{
+          overscrollBehavior: "contain",
+          maxHeight: "90vh",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >        <DialogHeader className="p-6 pb-2">
           <div className="flex items-center gap-2 mb-2">
             <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center">
               <Building2 className="h-5 w-5 text-primary" />
@@ -269,9 +276,16 @@ export default function VerifyCompany() {
             </DialogTitle>
           </div>
           <DialogDescription>
-            Verify that you are part of {companyName} to manage its profile and
-            job listings.
+            Verify that you are part of {companyName} to manage its profile and job listings.
           </DialogDescription>
+
+          <Alert className="mt-1 bg-muted/40 border border-muted-200 dark:bg-muted/20 dark:border-muted">
+            <Shield className="h-4 w-4 mr-2 text-muted-foreground" />
+            <AlertDescription className="text-sm text-muted-foreground">
+              Providing accurate information and uploading valid documents helps our team verify your company faster.
+              {/* Please ensure all details are correct. Unauthorized use of company information may lead to legal consequences. */}
+            </AlertDescription>
+          </Alert>
         </DialogHeader>
 
         <Tabs defaultValue="email" className="w-full">
@@ -282,7 +296,7 @@ export default function VerifyCompany() {
             </TabsList>
           </div>
 
-          <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">
+          <div className="px-6 pt-4 max-h-[70vh] overflow-y-auto">
             {/* Email Verification Tab */}
             <TabsContent value="email" className="space-y-4">
               {company?.verification?.method === "domain" ? (
@@ -375,15 +389,14 @@ export default function VerifyCompany() {
                       <p className="text-sm text-destructive">{domainError}</p>
                     )}
                   </div>
-
+                  {/* 
                   <div className="text-sm text-muted-foreground">
                     We'll send a verification code to your company email
-                    address. The domain will be used to verify your company
-                    ownership.
-                  </div>
+                    address.
+                  </div> */}
                   <Button
                     onClick={handleSendOtp}
-                    className="w-full bg-primary text-primary-foreground"
+                    className="w-full bg-primary text-primary-foreground my-2"
                     disabled={isLoading}
                   >
                     {isLoadingRequest && (
@@ -391,6 +404,9 @@ export default function VerifyCompany() {
                     )}
                     {isLoadingRequest ? "Sending..." : "Send Verification Code"}
                   </Button>
+                  <p className="text-[0.75rem] text-destructive max-w-sm ml-1">
+                    Unauthorized use of company details may lead to legal consequences.
+                  </p>
                 </div>
               )}
             </TabsContent>
@@ -441,7 +457,7 @@ export default function VerifyCompany() {
 
                     <Button
                       type="submit"
-                      className="w-full bg-primary text-primary-foreground"
+                      className="w-full bg-primary text-primary-foreground my-1"
                       disabled={isLoadingDocument}
                     >
                       {isLoadingDocument && (
@@ -449,13 +465,16 @@ export default function VerifyCompany() {
                       )}
                       {isLoadingDocument ? "Uploading..." : "Upload Document"}
                     </Button>
+                    <p className="text-[0.75rem] text-destructive max-w-sm ml-1">
+                      Unauthorized use of company details may lead to legal consequences.
+                    </p>
                   </form>
                 </Form>
               )}
             </TabsContent>
           </div>
 
-          <DialogFooter className="p-6 pt-2">
+          <DialogFooter className="p-6 pt-0">
             <DialogClose asChild>
               <Button type="button" variant="outline">
                 Cancel

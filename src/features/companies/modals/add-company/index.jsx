@@ -266,6 +266,7 @@ export default function AddCompany() {
                           <FormControl>
                             <Input
                               placeholder="Enter company name"
+                              className="bg-input"
                               {...field}
                             />
                           </FormControl>
@@ -286,7 +287,7 @@ export default function AddCompany() {
                               <Globe className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                               <Input
                                 placeholder="e.g. https://www.example.com"
-                                className="pl-10"
+                                className="pl-10 bg-input"
                                 {...field}
                               />
                             </div>
@@ -311,7 +312,7 @@ export default function AddCompany() {
                               <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                               <Input
                                 placeholder="e.g. San Francisco, CA"
-                                className="pl-10"
+                                className="pl-10 bg-input"
                                 {...field}
                               />
                             </div>
@@ -333,7 +334,7 @@ export default function AddCompany() {
                           <FormControl>
                             <Textarea
                               placeholder="Brief description of the company"
-                              className="min-h-[120px] resize-y"
+                              className="min-h-[120px] resize-y bg-input"
                               {...field}
                             />
                           </FormControl>
@@ -374,6 +375,7 @@ export default function AddCompany() {
                           onChange={(e) => setCurrentValue(e.target.value)}
                           onKeyDown={handleKeyDown}
                           placeholder="Add a company value (e.g. Innovation, Integrity)"
+                          className="bg-input"
                         />
                         <Button
                           type="button"
