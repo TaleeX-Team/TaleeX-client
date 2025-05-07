@@ -16,7 +16,7 @@ const createApiClient = (pathPrefix = "/api/v1") => {
       "Content-Type": "application/json",
       Accept: "application/json",
     },
-    withCredentials: true, // Critical for sending cookies with cross-origin requests
+    withCredentials: true, // Critical for sending cookies with cross-origin request
   });
 
   // Setup request interceptor
