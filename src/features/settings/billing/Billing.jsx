@@ -10,6 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Check, CreditCard, Zap, Shield, Star, Award } from "lucide-react";
 import { useTokens } from "./useTokens";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SubscriptionPage() {
   // const {
@@ -32,6 +33,85 @@ export default function SubscriptionPage() {
     isBuyingTokens,
     isBuyingPack,
   } = useTokens("EGP");
+  if (isLoading) {
+    return (
+      <div className="container pt-0 pb-10 max-w-7xl mx-auto">
+        <div className="mb-12 text-center">
+          <h1 className="text-3xl font-bold tracking-tight mb-2">Token Subscription</h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Purchase tokens to use our AI-powered CV review and interview preparation services
+          </p>
+        </div>
+
+        {/* Skeleton for Token Info */}
+        <div className="mb-12">
+          <div className="flex justify-end mb-4">
+            <Button disabled>
+              <Zap className="mr-2 h-4 w-4" />
+              Buy Tokens
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xl">Token Credit</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-12 w-3/4" />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xl">Token Price</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-12 w-3/4" />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Skeleton for Token Packs */}
+        <div className="grid md:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, index) => (
+            <Card key={index}>
+              <Skeleton className="h-48 w-full" />
+              <CardHeader>
+                <Skeleton className="h-6 w-3/4" />
+                <Skeleton className="h-6 w-1/2" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-12 w-3/4" />
+                <Skeleton className="h-8 w-3/4 mt-4" />
+              </CardContent>
+              <CardFooter>
+                <Skeleton className="h-10 w-full" />
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+
+        {/* Skeleton for Features */}
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold mb-6 text-center">How Tokens Work</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, index) => (
+              <Card key={index}>
+                <CardHeader className="pb-2">
+                  <Skeleton className="h-6 w-3/4" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-10 w-2/3" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
   
 
   const icons = [Shield, Star, Award];
