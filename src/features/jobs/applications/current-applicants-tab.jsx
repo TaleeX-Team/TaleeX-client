@@ -376,7 +376,7 @@ export function ApplicantsTab({
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex gap-2">
-                      {activePhase !== "Applications" && (
+                      {applicant?.feedback?.cv && (
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button
@@ -395,53 +395,50 @@ export function ApplicantsTab({
                           </DialogContent>
                         </Dialog>
                       )}
-                      {activePhase !== "Applications" &&
-                        activePhase !== "CV Review" &&
-                        activePhase !== "Sending Interview" && (
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-8 px-3"
-                              >
-                                Feedback
-                              </Button>
-                            </DialogTrigger>
+                      {applicant?.feedback?.interview && (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 px-3"
+                            >
+                              Feedback
+                            </Button>
+                          </DialogTrigger>
 
-                            <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
-                              {applicant?.feedback?.interview?.type ===
-                              "behavioral" ? (
-                                <BehavioralFeedbackPage
-                                  feedback={applicant?.feedback?.interview}
-                                />
-                              ) : (
-                                <TechnicalFeedbackPage
-                                  feedback={applicant?.feedback?.interview}
-                                />
-                              )}
-                            </DialogContent>
-                          </Dialog>
-                        )}
-                      {activePhase !== "Applications" &&
-                        activePhase !== "CV Review" &&
-                        activePhase !== "Sending Interview" &&
-                        activePhase !== "Interview Feedback" && (
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-8 px-3"
-                              >
-                                Final Feedback
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
-                              <FinalFeedbackPage />
-                            </DialogContent>
-                          </Dialog>
-                        )}
+                          <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
+                            {applicant?.feedback?.interview?.type ===
+                            "behavioral" ? (
+                              <BehavioralFeedbackPage
+                                feedback={applicant?.feedback?.interview}
+                              />
+                            ) : (
+                              <TechnicalFeedbackPage
+                                feedback={applicant?.feedback?.interview}
+                              />
+                            )}
+                          </DialogContent>
+                        </Dialog>
+                      )}
+                      {applicant?.feedback?.final && (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 px-3"
+                            >
+                              Final Feedback
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
+                            <FinalFeedbackPage
+                              feedback={applicant?.feedback?.final}
+                            />
+                          </DialogContent>
+                        </Dialog>
+                      )}
                     </div>
                   </td>
                   <td className="py-3 px-4">
@@ -479,7 +476,26 @@ export function ApplicantsTab({
                   <td className="py-3 px-4">
                     <Badge
                       variant="outline"
-                      className="bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800"
+                      className={(() => {
+                        switch (applicant.phase) {
+                          case "Applications":
+                            return "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800";
+                          case "CV Review":
+                            return "bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-900/20 dark:text-pink-400 dark:border-pink-800";
+                          case "Sending Interview":
+                            return "bg-lime-50 text-lime-700 border-lime-200 dark:bg-lime-900/20 dark:text-lime-400 dark:border-lime-800";
+                          case "Interview Feedback":
+                            return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800";
+                          case "Final Feedback":
+                            return "bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-900/20 dark:text-sky-400 dark:border-sky-800";
+                          case "offer":
+                            return "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800";
+                          case "rejected":
+                            return "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800";
+                          default:
+                            return "bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800";
+                        }
+                      })()}
                     >
                       {applicant.phase}
                     </Badge>

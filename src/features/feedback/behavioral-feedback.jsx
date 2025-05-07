@@ -11,26 +11,7 @@ import {
   Users,
 } from "lucide-react";
 
-export default function BehavioralFeedbackPage() {
-  const feedback = {
-    type: "behavioral",
-    rating: {
-      communication: "9",
-      professionalism: "9",
-      attitude: "9",
-      culturalFit: "8",
-    },
-    overallScore: "8.75",
-    summary:
-      "Strong communicator with proactive conflict resolution and ownership of mistakes. Demonstrates maturity and team alignment but could show more emphasis on user empathy in responses.",
-    redflag: "None observed.",
-    recommendation: {
-      verdict: "Yes",
-      reasoning:
-        "The candidate shows professionalism, self-awareness, and collaborative strength, aligning well with team-oriented and ownership-driven company culture.",
-    },
-  };
-
+export default function BehavioralFeedbackPage({ feedback }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-4xl space-y-6 py-8">
@@ -63,7 +44,9 @@ export default function BehavioralFeedbackPage() {
               title="Red Flags"
               icon={<MessageSquare className="text-primary h-5 w-5" />}
             >
-              <p className="text-sm text-muted-foreground">{feedback.redflag}</p>
+              <p className="text-sm text-muted-foreground">
+                {feedback.redflag}
+              </p>
             </Section>
           </CardContent>
         </Card>
@@ -90,7 +73,9 @@ function Section({ title, icon, children }) {
 function AttributeList({ rating }) {
   const attributes = {
     communication: <MessageSquare className="h-4 w-4 text-muted-foreground" />,
-    professionalism: <HeartHandshake className="h-4 w-4 text-muted-foreground" />,
+    professionalism: (
+      <HeartHandshake className="h-4 w-4 text-muted-foreground" />
+    ),
     attitude: <Smile className="h-4 w-4 text-muted-foreground" />,
     culturalFit: <Users className="h-4 w-4 text-muted-foreground" />,
   };
@@ -126,9 +111,7 @@ function ScoreCard({ score }) {
   return (
     <div className="flex flex-col md:flex-row items-center justify-between gap-4">
       <div className="flex items-center gap-3">
-        <div className={`text-5xl font-bold text-${color}-600`}>
-          {score}
-        </div>
+        <div className={`text-5xl font-bold text-${color}-600`}>{score}</div>
         <div className="text-muted-foreground">
           <div className="text-sm uppercase font-semibold">Overall Score</div>
           <div className="text-xs">Behavioral compatibility</div>
@@ -163,7 +146,9 @@ function RecommendationCard({ recommendation }) {
       <CardHeader>
         <div className="flex items-center gap-2">
           <ThumbsUp
-            className={`h-5 w-5 ${isRecommended ? "text-green-600" : "text-red-600"}`}
+            className={`h-5 w-5 ${
+              isRecommended ? "text-green-600" : "text-red-600"
+            }`}
           />
           <CardTitle className="text-lg">Final Recommendation</CardTitle>
         </div>
@@ -195,12 +180,11 @@ function RecommendationCard({ recommendation }) {
             {recommendation.reasoning}
           </p>
         </div>
-                      
       </CardContent>
       {/* AI Note */}
       <div className="text-xs text-muted-foreground text-center mt-6">
-                TaleeX AI can make mistakes.
-              </div>
+        TaleeX AI can make mistakes.
+      </div>
     </Card>
   );
 }

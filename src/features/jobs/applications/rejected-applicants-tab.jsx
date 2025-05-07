@@ -4,7 +4,19 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Filter, Save } from "lucide-react";
+import { Filter, Newspaper, Save } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+import CVFeedbackPage from "@/features/feedback/cv-feedback";
+import BehavioralFeedbackPage from "@/features/feedback/behavioral-feedback";
+import FinalFeedbackPage from "@/features/feedback/final-feedback";
+import TechnicalFeedbackPage from "@/features/feedback/technicall-feedback";
 
 export function RejectedApplicantsTab({
   filteredApplicants,
@@ -85,13 +97,10 @@ export function RejectedApplicantsTab({
                 Applied
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Rejected on
+                Feedbacks
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Rejected by
-              </th>
-              <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Score
+                CV
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
                 Last Phase
@@ -145,35 +154,127 @@ export function RejectedApplicantsTab({
                   <td className="py-3 px-4 dark:text-gray-300">
                     {applicant.applied}
                   </td>
-                  <td className="py-3 px-4 dark:text-gray-300">
-                    {applicant.rejectedOn || "-"}
-                  </td>
-                  <td className="py-3 px-4 dark:text-gray-300">
-                    {applicant.rejectedBy || "-"}
+                  <td className="py-3 px-4">
+                    <div className="flex gap-2">
+                      {applicant?.feedback?.cv && (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 px-3"
+                              disabled={!applicant?.feedback?.cv}
+                            >
+                              CV
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
+                            <CVFeedbackPage
+                              feedback={applicant?.feedback?.cv}
+                            />
+                          </DialogContent>
+                        </Dialog>
+                      )}
+                      {applicant?.feedback?.interview && (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 px-3"
+                            >
+                              Feedback
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
+                            {applicant?.feedback?.interview?.type ===
+                            "behavioral" ? (
+                              <BehavioralFeedbackPage
+                                feedback={applicant?.feedback?.interview}
+                              />
+                            ) : (
+                              <TechnicalFeedbackPage
+                                feedback={applicant?.feedback?.interview}
+                              />
+                            )}
+                          </DialogContent>
+                        </Dialog>
+                      )}
+                      {applicant?.feedback?.final && (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 px-3"
+                            >
+                              Final Feedback
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
+                            <FinalFeedbackPage
+                              feedback={applicant?.feedback?.final}
+                            />
+                          </DialogContent>
+                        </Dialog>
+                      )}
+                    </div>
                   </td>
                   <td className="py-3 px-4">
-                    <div className="flex">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <svg
-                          key={i}
-                          xmlns="http://www.w3.org/2000/svg"
-                          className={`h-5 w-5 ${
-                            i < applicant.score
-                              ? "text-yellow-400 fill-yellow-400"
-                              : "text-gray-300 dark:text-gray-600"
-                          }`}
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                    </div>
+                    {applicant.cvUrl ? (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 p-2"
+                              asChild
+                            >
+                              <a
+                                href={applicant.cvUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <Newspaper className="h-3.5 w-3.5" />
+                                <span className="sr-only">Open CV</span>
+                              </a>
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Open CV</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ) : (
+                      <span className="text-gray-400 dark:text-gray-500">
+                        No CV
+                      </span>
+                    )}
                   </td>
                   <td className="py-3 px-4">
                     <Badge
                       variant="outline"
-                      className="bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800"
+                      className={(() => {
+                        switch (applicant.phase) {
+                          case "Applications":
+                            return "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800";
+                          case "CV Review":
+                            return "bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-900/20 dark:text-pink-400 dark:border-pink-800";
+                          case "Sending Interview":
+                            return "bg-lime-50 text-lime-700 border-lime-200 dark:bg-lime-900/20 dark:text-lime-400 dark:border-lime-800";
+                          case "Interview Feedback":
+                            return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800";
+                          case "Final Feedback":
+                            return "bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-900/20 dark:text-sky-400 dark:border-sky-800";
+                          case "offer":
+                            return "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800";
+                          case "rejected":
+                            return "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800";
+                          default:
+                            return "bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-900/20 dark:text-gray-400 dark:border-gray-800";
+                        }
+                      })()}
                     >
                       {applicant.phase}
                     </Badge>
@@ -183,7 +284,7 @@ export function RejectedApplicantsTab({
             ) : (
               <tr>
                 <td
-                  colSpan={8}
+                  colSpan={7}
                   className="py-4 text-center text-gray-500 dark:text-gray-400"
                 >
                   No rejected applicants found.
