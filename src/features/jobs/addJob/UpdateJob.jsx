@@ -95,7 +95,7 @@ const formSchema = z
       { message: "Experience level is required" }
     ),
     status: z
-      .enum(["open", "pending", "closed"], {
+      .enum(["open", "paused", "closed"], {
         message: "Status is required",
       })
       .optional(),
@@ -329,7 +329,8 @@ export default function UpdateJob({ jobId, trigger }) {
         )}
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[600px] p-0 overflow-y-auto scrollbar-none"
+      <DialogContent
+        className="sm:max-w-[600px] p-0 overflow-y-auto scrollbar-none"
         style={{
           overscrollBehavior: "contain",
           maxHeight: "90vh",
@@ -571,7 +572,7 @@ export default function UpdateJob({ jobId, trigger }) {
                               </FormControl>
                               <SelectContent>
                                 <SelectItem value="open">Open</SelectItem>
-                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="paused">Paused</SelectItem>
                                 <SelectItem value="closed">Closed</SelectItem>
                               </SelectContent>
                             </Select>
@@ -795,7 +796,11 @@ export default function UpdateJob({ jobId, trigger }) {
 
                   <DialogFooter className="px-6 py-4 flex justify-between sm:justify-end gap-2 border-t">
                     <DialogClose asChild>
-                      <Button type="button" variant="outline" className="border-input hover:bg-muted">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="border-input hover:bg-muted"
+                      >
                         Cancel
                       </Button>
                     </DialogClose>

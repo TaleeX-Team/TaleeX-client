@@ -35,7 +35,7 @@ const statusColors = {
   open: "bg-emerald-500 text-white dark:bg-emerald-600 dark:text-white",
   closed: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
   draft: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
-  pending:
+  paused:
     "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
 };
 
@@ -126,17 +126,19 @@ export default function JobCard({ job, handleDelete }) {
               <h3 className="font-semibold text-lg text-foreground">{title}</h3>
               {jobType && (
                 <Badge
-                  className={`px-2 py-0.5 text-xs ${jobTypeColors[jobType] || "bg-muted text-muted-foreground"
-                    }`}
+                  className={`px-2 py-0.5 text-xs ${
+                    jobTypeColors[jobType] || "bg-muted text-muted-foreground"
+                  }`}
                 >
                   {jobType}
                 </Badge>
               )}
               {status && (
                 <Badge
-                  className={`px-2 py-0.5 text-xs ${statusColors[status.toLowerCase()] ||
+                  className={`px-2 py-0.5 text-xs ${
+                    statusColors[status.toLowerCase()] ||
                     "bg-muted text-muted-foreground"
-                    }`}
+                  }`}
                 >
                   {status}
                 </Badge>
