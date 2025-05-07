@@ -1,5 +1,11 @@
-import React, { useState } from "react";
-import { Search, FolderPlus, Building2, AlertCircle, AlertTriangle, FileX } from "lucide-react";
+import React, { useState, useMemo } from "react";
+import {
+  Search,
+  Building2,
+  AlertCircle,
+  FileX,
+  ShieldAlert,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import CompanyCard from "./company-card/CompanyCard";
 import AddCompany from "./modals/add-company";
@@ -25,9 +31,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { useUser } from "@/hooks/useUser";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import CompaniesHeader from "./companies-header";
 import VerifyLayout from "@/components/ui/VerifyLayout";
+import CompaniesHeader from "./companies-header";
 
 export default function Companies() {
   const {
@@ -54,24 +59,37 @@ export default function Companies() {
           console.error("Error deleting company:", error);
           toast.error(
             error.response?.data?.message ||
-            "Failed to delete company. Please try again."
+              "Failed to delete company. Please try again."
           );
         },
       });
     }
   };
 
-  const filteredCompanies =
-    companies?.companies?.filter((company) => {
+  // Use useMemo to filter companies only when dependencies change
+  const filteredCompanies = useMemo(() => {
+    // Safely handle potentially undefined or malformed data
+    if (!companies?.companies || !Array.isArray(companies.companies)) {
+      return [];
+    }
+
+    return companies.companies.filter((company) => {
+      // Status filter
       const matchesStatus =
         selectedStatus === "all" ||
         company.verification?.status === selectedStatus;
-      const matchesSearch = company.name
+
+      // Search filter - safely handle possible undefined name
+      const companyName = company.name || "";
+      const matchesSearch = companyName
         .toLowerCase()
-        .includes(searchQuery.toLowerCase());
+        .includes((searchQuery || "").toLowerCase());
+
       return matchesStatus && matchesSearch;
-    }) || [];
-  if (isError && user.isVerified) {
+    });
+  }, [companies?.companies, selectedStatus, searchQuery]);
+
+  if (isError && user?.isVerified) {
     return (
       <div className="absolute inset-0 flex flex-col items-center justify-center bg-destructive/5 rounded-lg border border-destructive/20 p-4 z-50">
         <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
@@ -90,6 +108,7 @@ export default function Companies() {
       </div>
     );
   }
+
   if (!user?.isVerified) {
     return (
       <div className="bg-background p-4 md:p-8 min-h-screen">
@@ -110,7 +129,7 @@ export default function Companies() {
     <div className="bg-background p-4 md:p-8 min-h-screen">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mt-6 mb-12  rounded-xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mt-6 mb-12 rounded-xl">
           <div className="flex items-center">
             <div className="bg-primary/10 dark:bg-secondary/50 p-3 rounded-lg mr-4 hidden sm:flex">
               <Building2 className="h-8 w-8 text-primary" />
@@ -172,8 +191,8 @@ export default function Companies() {
                 Error loading companies
               </h2>
               <p className="text-muted-foreground mb-8 max-w-xs">
-                There was an error fetching your company data. Please try again or
-                contact support.
+                There was an error fetching your company data. Please try again
+                or contact support.
               </p>
               <Button variant="outline" className="mx-auto">
                 Retry

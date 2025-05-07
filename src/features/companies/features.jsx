@@ -7,7 +7,7 @@ import {
   requestVerification,
 } from "@/services/apiCompanies";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {toast}  from "sonner";
+import { toast } from "sonner";
 
 export const useCompanies = () => {
   // Get QueryClient instance from the context
@@ -23,7 +23,7 @@ export const useCompanies = () => {
       console.log("Companies fetched successfully:", data);
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message)
+      toast.error(error.response?.data?.message);
     },
     retry: false, // Retry once on failure
   });
@@ -34,44 +34,42 @@ export const useCompanies = () => {
     onSuccess: (newCompany) => {
       // Update companies data in React Query cache
       queryClient.setQueryData(["companies"], (oldData) => {
+        console.log("newCompany", newCompany);
         // Handle case where oldData might be null or undefined
         if (!oldData || !oldData.companies) {
-          return { companies: [newCompany] };
+          return { companies: [newCompany.company] };
         }
 
         // Add the new company to the existing companies array
         return {
           ...oldData,
-          companies: [...oldData.companies, newCompany],
+          companies: [...oldData.companies, newCompany.company],
         };
       });
 
       // Optionally invalidate the query to trigger a refresh in the background
       queryClient.invalidateQueries({ queryKey: ["companies"] });
-
-      console.log("Company created successfully:", newCompany);
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message)
+      toast.error(error.response?.data?.message);
     },
   });
 
   // Function to delete a company
   const deleteCompanyMutation = useMutation({
     mutationFn: deleteCompany,
-    onSuccess: (deletedCompany) => {
+    onSuccess: (deletedCompany, id) => {
       // Update companies data in React Query cache
+
       queryClient.setQueryData(["companies"], (oldData) => {
         if (!oldData || !oldData.companies) {
           return { companies: [] };
         }
-
+        console.log("deletedCompany", deletedCompany);
         // Filter out the deleted company from the existing companies array
         return {
           ...oldData,
-          companies: oldData.companies.filter(
-            (company) => company._id !== deletedCompany._id
-          ),
+          companies: oldData.companies.filter((company) => company._id !== id),
         };
       });
       // Optionally invalidate the query to trigger a refresh in the background
@@ -80,7 +78,7 @@ export const useCompanies = () => {
       console.log("Company deleted successfully:", deletedCompany);
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message)
+      toast.error(error.response?.data?.message);
     },
   });
 
@@ -117,8 +115,7 @@ export const useCompanies = () => {
       queryClient.invalidateQueries({ queryKey: ["companies"] });
     },
     onError: (error, variables) => {
-      toast.error(error.response?.data?.message)
-
+      toast.error(error.response?.data?.message);
     },
   });
 
@@ -155,8 +152,7 @@ export const useCompanies = () => {
       queryClient.invalidateQueries({ queryKey: ["companies"] });
     },
     onError: (error, variables) => {
-      toast.error(error.response?.data?.message)
-
+      toast.error(error.response?.data?.message);
     },
   });
   const requestVerificationMutation = useMutation({

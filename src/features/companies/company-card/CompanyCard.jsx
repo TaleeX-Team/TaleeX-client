@@ -143,25 +143,16 @@ export default function CompanyCard({ company, handleDelete }) {
         onMouseLeave={handleMouseLeave}
       >
         {/* Actions Menu */}
-        <div className="absolute top-7 right-2 flex gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="p-1.5 rounded-full bg-background/80 hover:bg-slate-100 dark:hover:bg-slate-800 text-muted-foreground transition-colors"
-                aria-label="Company actions"
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem
-                className="text-destructive focus:text-destructive cursor-pointer"
-                onClick={() => handleDelete(company)}
-              >
-                <Trash2 className="mr-2 h-4 w-4" /> Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <div className="absolute top-5 right-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full bg-background/80 hover:bg-slate-100 dark:hover:bg-slate-800 text-muted-foreground hover:cursor-pointer transition-colors"
+            aria-label="Delete company"
+            onClick={() => handleDelete(company)}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
 
         <CardHeader className="pb-1">
