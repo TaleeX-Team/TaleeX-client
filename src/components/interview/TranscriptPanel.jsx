@@ -82,22 +82,22 @@ export const TranscriptPanel = forwardRef(
                             ref={messageRef}
                             className={`w-full max-w-2xl rounded-xl border shadow-md transition-all duration-300 ${
                                 lastSpeakerTranscript.role === "assistant"
-                                    ? "bg-gradient-to-br from-blue-50/80 to-indigo-50/80 dark:from-blue-950/40 dark:to-indigo-950/40 border-blue-200/70 dark:border-blue-800/70"
-                                    : "bg-gradient-to-br from-emerald-50/80 to-teal-50/80 dark:from-emerald-950/40 dark:to-teal-950/40 border-emerald-200/70 dark:border-emerald-800/70"
+                                    ? "bg-blue-50/80 dark:bg-blue-950/30 border-blue-200/70 dark:border-blue-800/40"
+                                    : "bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-200/70 dark:border-emerald-800/40"
                             }`}
                         >
                             <div
                                 className={`flex items-center gap-2 p-3 border-b ${
-                                    lastSpeakerTranscript.role === "donald"
-                                        ? "border-blue-200/70 dark:border-blue-800/70 bg-blue-100/30 dark:bg-blue-900/30"
-                                        : "border-emerald-200/70 dark:border-emerald-800/70 bg-emerald-100/30 dark:bg-emerald-900/30"
+                                    lastSpeakerTranscript.role === "assistant"
+                                        ? "border-blue-200/70 dark:border-blue-800/40 bg-blue-100/30 dark:bg-blue-900/20"
+                                        : "border-emerald-200/70 dark:border-emerald-800/40 bg-emerald-100/30 dark:bg-emerald-900/20"
                                 } rounded-t-xl`}
                             >
                                 <div
                                     className={`flex items-center justify-center rounded-full w-8 h-8 ${
                                         lastSpeakerTranscript.role === "assistant"
-                                            ? "bg-gradient-to-br from-blue-500 to-indigo-600 dark:from-blue-600 dark:to-indigo-700"
-                                            : "bg-gradient-to-br from-emerald-500 to-teal-600 dark:from-emerald-600 dark:to-teal-700"
+                                            ? "bg-blue-500 dark:bg-blue-600"
+                                            : "bg-emerald-500 dark:bg-emerald-600"
                                     }`}
                                 >
                                     {lastSpeakerTranscript.role === "assistant" ? (
@@ -106,7 +106,7 @@ export const TranscriptPanel = forwardRef(
                                         <User className="h-4 w-4 text-white" />
                                     )}
                                 </div>
-                                <span className="font-medium">
+                                <span className="font-medium text-foreground">
                                     {lastSpeakerTranscript.role === "assistant" ? "Alex (Interviewer)" : "You"}
                                 </span>
 
@@ -143,15 +143,15 @@ export const TranscriptPanel = forwardRef(
                                         variant="outline"
                                         className={`text-xs ${
                                             lastSpeakerTranscript.role === "assistant"
-                                                ? "bg-blue-100/80 dark:bg-blue-900/60 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300"
-                                                : "bg-emerald-100/80 dark:bg-emerald-900/60 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300"
+                                                ? "bg-blue-100/50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-300"
+                                                : "bg-emerald-100/50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300"
                                         }`}
                                     >
                                         {lastSpeakerTranscript.role === "assistant" ? "AI" : "You"}
                                     </Badge>
                                 </div>
                             </div>
-                            <div className="p-4 text-foreground/90">
+                            <div className="p-4 text-foreground">
                                 <p className="whitespace-pre-wrap">
                                     {lastSpeakerTranscript.content}
                                 </p>
@@ -176,11 +176,11 @@ export const TranscriptPanel = forwardRef(
                             ref={messageRef}
                             className="text-center text-muted-foreground py-6 flex flex-col items-center gap-3"
                         >
-                            <div className="bg-muted/50 p-4 rounded-full">
+                            <div className="bg-muted p-4 rounded-full">
                                 <MessageSquare className="h-8 w-8 opacity-50" />
                             </div>
                             <div>
-                                <p className="font-medium">No transcript available</p>
+                                <p className="font-medium text-foreground">No transcript available</p>
                                 <p className="text-sm text-muted-foreground">The interview transcript will appear here once started</p>
                             </div>
                             <div className="text-xs flex items-center gap-1 text-muted-foreground mt-1">

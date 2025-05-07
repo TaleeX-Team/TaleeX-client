@@ -27,29 +27,50 @@ export const VideoContainer = forwardRef(
         const [showScreenshotEffect, setShowScreenshotEffect] = useState(false);
         const [audioLevel, setAudioLevel] = useState(0);
         const isDarkMode = theme === "dark";
+
         // Determine speaking state
         const isSpeaking = isUser ? isUserTalking : isAITalking;
-        // Enhanced colors based on theme
+
+        // Enhanced colors using Tailwind's color system
         const colors = {
             user: {
-                primary: isDarkMode ? "emerald-500" : "emerald-600",
-                secondary: isDarkMode ? "emerald-400" : "emerald-500",
-                background: isDarkMode ? "emerald-900/30" : "emerald-100/70",
-                glow: isDarkMode ? "emerald-500/30" : "emerald-300/50",
-                speakingRing: "emerald-500",
-                speakingGlow: isDarkMode ? "emerald-500/40" : "emerald-400/50",
+                primary: "text-emerald-500 dark:text-emerald-400",
+                secondary: "text-emerald-600 dark:text-emerald-300",
+                background: "bg-emerald-100/70 dark:bg-emerald-900/30",
+                glow: "emerald-300/50 dark:emerald-500/30",
+                speakingRing: "ring-emerald-500",
+                speakingGlow: "shadow-emerald-400/50 dark:shadow-emerald-500/40",
+                gradientFrom: "from-emerald-50 dark:from-emerald-900/40",
+                gradientTo: "to-emerald-200/50 dark:to-emerald-800/20",
+                lightBg: "bg-emerald-100",
+                darkBg: "bg-emerald-700/40",
+                lightText: "text-emerald-600",
+                darkText: "text-emerald-300",
+                avatarFallback: "bg-emerald-100 text-emerald-600 dark:bg-emerald-700/20 dark:text-emerald-400",
+                pulseColor: "bg-emerald-200 dark:bg-emerald-800",
+                highlightBg: "bg-emerald-100/90 dark:bg-emerald-500/30",
+                border: "border-emerald-300 dark:border-emerald-500/40",
             },
             ai: {
-                primary: isDarkMode ? "indigo-500" : "indigo-600",
-                secondary: isDarkMode ? "indigo-400" : "indigo-500",
-                background: isDarkMode ? "indigo-900/30" : "indigo-100/70",
-                glow: isDarkMode ? "indigo-500/30" : "indigo-300/50",
-                speakingRing: "indigo-500",
-                speakingGlow: isDarkMode ? "indigo-500/40" : "indigo-400/50",
+                primary: "text-indigo-500 dark:text-indigo-400",
+                secondary: "text-indigo-600 dark:text-indigo-300",
+                background: "bg-indigo-100/70 dark:bg-indigo-900/30",
+                glow: "indigo-300/50 dark:indigo-500/30",
+                speakingRing: "ring-indigo-500",
+                speakingGlow: "shadow-indigo-400/50 dark:shadow-indigo-500/40",
+                gradientFrom: "from-indigo-50 dark:from-indigo-900/40",
+                gradientTo: "to-indigo-200/50 dark:to-indigo-800/20",
+                lightBg: "bg-indigo-100",
+                darkBg: "bg-indigo-700/40",
+                lightText: "text-indigo-600",
+                darkText: "text-indigo-300",
+                pulseColor: "bg-indigo-200 dark:bg-indigo-800",
+                highlightBg: "bg-indigo-100/90 dark:bg-indigo-500/30",
+                border: "border-indigo-300 dark:border-indigo-500/40",
             },
-            bg: isDarkMode ? "gray-900" : "gray-50",
-            text: isDarkMode ? "white" : "gray-800",
-            subtle: isDarkMode ? "gray-400" : "gray-600",
+            bg: isDarkMode ? "bg-gray-900" : "bg-gray-50",
+            text: isDarkMode ? "text-white" : "text-gray-800",
+            subtle: isDarkMode ? "text-gray-400" : "text-gray-600",
         };
 
         // Show screenshot capture effect when a screenshot is taken
@@ -94,13 +115,13 @@ export const VideoContainer = forwardRef(
                         ? "bg-gray-900 shadow-xl"
                         : "bg-gray-100 shadow-lg",
                     isUser ? "video-container user" : "flex flex-col items-center justify-center video-container ai",
-                    isSpeaking && `ring-2 ring-${activeColors.speakingRing}`,
-                    isSpeaking && `shadow-lg shadow-${activeColors.speakingGlow}`,
+                    isSpeaking && activeColors.speakingRing,
+                    isSpeaking && "ring-2 shadow-lg",
                     isSpeaking && "z-10",
                     !isSpeaking && "opacity-90"
                 )}
                 style={{
-                    boxShadow: isSpeaking ? `0 0 20px ${activeColors.glow}` : 'none',
+                    boxShadow: isSpeaking ? `0 0 20px var(--${activeColors.glow})` : 'none',
                     transition: "all 0.3s ease-in-out"
                 }}
             >
@@ -158,14 +179,16 @@ export const VideoContainer = forwardRef(
                                 <div className="relative">
                                     <div className={cn(
                                         "absolute -inset-4 rounded-full blur-xl",
-                                        isDarkMode
-                                            ? isSpeaking ? "bg-emerald-800 opacity-60" : "bg-emerald-800 opacity-30"
-                                            : isSpeaking ? "bg-emerald-200 opacity-70" : "bg-emerald-200 opacity-40",
+                                        isSpeaking
+                                            ? isDarkMode ? "bg-emerald-800 opacity-60" : "bg-emerald-200 opacity-70"
+                                            : isDarkMode ? "bg-emerald-800 opacity-30" : "bg-emerald-200 opacity-40",
                                         isSpeaking && "animate-pulse"
                                     )}></div>
                                     <Avatar className={cn(
                                         "h-28 w-28 border-4",
-                                        isSpeaking ? "border-emerald-500 animate-float" : "border-emerald-500/20 animate-float"
+                                        isSpeaking
+                                            ? "border-emerald-500 animate-float"
+                                            : "border-emerald-500/20"
                                     )}>
                                         <AvatarImage src="/placeholder.svg?height=112&width=112" alt="You" />
                                         <AvatarFallback className={cn(
