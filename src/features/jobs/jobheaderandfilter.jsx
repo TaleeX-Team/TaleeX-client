@@ -264,15 +264,50 @@ export default function JobsHeaderWithFilters({
   };
 
   return (
-    <div className="mb-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 m-5">
-        <div>
-          <h1 className="text-3xl font-bold">Job Listings</h1>
-          <p className="text-muted-foreground mt-1">
-            Find your next career opportunity
-          </p>
+    <div className="mx-auto max-w-7xl">
+      <div className="flex flex-col md:flex-row md:items-center justify-between rounded-xl mb-12 mt-6">
+        <div className="flex items-center">
+          <div className="bg-primary/10 dark:bg-secondary/50 p-3 rounded-lg mr-4 hidden sm:flex">
+            <Briefcase className="h-8 w-8 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold flex items-center gap-2">Jobs</h1>
+            <p className="text-muted-foreground mt-1">
+              Manage your jobs directory
+            </p>
+          </div>
         </div>
-        <div className="flex gap-2 mt-3 md:mt-0">
+        <div className="mt-4 md:mt-0">
+          {/* <Button
+            variant="outline"
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            <Filter className="h-4 w-4 mr-2" />
+            {showFilters ? "Hide Filters" : "Show Filters"}
+          </Button>
+          {showFilters && (
+            <Button
+              variant="outline"
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+            >
+              {showAdvancedFilters ? "Basic Filters" : "Advanced Filters"}
+            </Button>
+          )} */}
+          <AddJob />
+        </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-4 mb-8 bg-card p-4 rounded-lg shadow-sm border border-border/50">
+        <div className="flex w-full gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search jobs by title"
+              className="pl-10"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
           <Button
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
@@ -288,22 +323,7 @@ export default function JobsHeaderWithFilters({
               {showAdvancedFilters ? "Basic Filters" : "Advanced Filters"}
             </Button>
           )}
-          <AddJob />
-        </div>
-      </div>
-
-      <div className="flex flex-col space-y-4 mx-4">
-        <div className="flex w-full gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search jobs by title"
-              className="pl-10"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
-          <Button>Search</Button>
+          {/* <Button>Search</Button> */}
         </div>
 
         {showFilters && (
@@ -561,26 +581,26 @@ export default function JobsHeaderWithFilters({
                 {filter.type === "title"
                   ? "Title"
                   : filter.type === "requirements"
-                  ? "Requirements"
-                  : filter.type === "company"
-                  ? "Company"
-                  : filter.type === "workPlaceType"
-                  ? "Workplace"
-                  : filter.type === "jobType"
-                  ? "Job Type"
-                  : filter.type === "experienceLevel"
-                  ? "Experience"
-                  : filter.type === "status"
-                  ? "Status"
-                  : filter.type === "tags"
-                  ? "Tags"
-                  : filter.type === "salaryMin"
-                  ? "Min Salary"
-                  : filter.type === "salaryMax"
-                  ? "Max Salary"
-                  : filter.type === "createdAtFrom"
-                  ? "From Date"
-                  : "To Date"}
+                    ? "Requirements"
+                    : filter.type === "company"
+                      ? "Company"
+                      : filter.type === "workPlaceType"
+                        ? "Workplace"
+                        : filter.type === "jobType"
+                          ? "Job Type"
+                          : filter.type === "experienceLevel"
+                            ? "Experience"
+                            : filter.type === "status"
+                              ? "Status"
+                              : filter.type === "tags"
+                                ? "Tags"
+                                : filter.type === "salaryMin"
+                                  ? "Min Salary"
+                                  : filter.type === "salaryMax"
+                                    ? "Max Salary"
+                                    : filter.type === "createdAtFrom"
+                                      ? "From Date"
+                                      : "To Date"}
                 : {filter.value}
                 <button
                   type="button"
