@@ -27,13 +27,13 @@ export function AllApplicantsTab({
   toggleSelectApplicant,
 }) {
   return (
-    <div className="mt-6">
+    <div>
       {/* Search for all applicants */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
           <Input
             placeholder="Find email or name..."
-            className="pl-10 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+            className="pl-10 bg-input"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
           />
@@ -51,24 +51,6 @@ export function AllApplicantsTab({
               d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
             />
           </svg>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-1 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800"
-          >
-            <Filter className="h-4 w-4" />
-            Add Filter
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-1 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800"
-          >
-            <Save className="h-4 w-4" />
-            Save Filter
-          </Button>
         </div>
       </div>
 

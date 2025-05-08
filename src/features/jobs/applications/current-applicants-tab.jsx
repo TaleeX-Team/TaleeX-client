@@ -99,7 +99,7 @@ export function ApplicantsTab({
   };
 
   return (
-    <div className="mt-6">
+    <div>
       {/* Phase navigation */}
       <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
         {PHASES.map((phase, index) => (
@@ -109,7 +109,7 @@ export function ApplicantsTab({
             className={cn(
               "flex items-center gap-2 whitespace-nowrap",
               activePhase === phase
-                ? "bg-gray-900 dark:bg-gray-700 dark:text-white"
+                ? "bg-gray-900 dark:bg-primary/50 dark:text-white"
                 : "bg-white dark:bg-transparent dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800"
             )}
             onClick={() => setActivePhase(phase)}
@@ -137,7 +137,7 @@ export function ApplicantsTab({
         <div className="relative flex-1">
           <Input
             placeholder="Find email or name..."
-            className="pl-10 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400"
+            className="pl-10 bg-input"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -156,24 +156,6 @@ export function ApplicantsTab({
             />
           </svg>
         </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-1 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800"
-          >
-            <Filter className="h-4 w-4" />
-            Add Filter
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-1 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800"
-          >
-            <Save className="h-4 w-4" />
-            Save Filter
-          </Button>
-        </div>
       </div>
 
       {/* Action buttons */}
@@ -190,7 +172,7 @@ export function ApplicantsTab({
               disabled={selectedApplicants.length === 0 || isLoadingMutation}
             >
               <ArrowRight className="h-4 w-4" />
-              Move to CV Review
+              Run AI CV Review
             </Button>
           )}
         {activePhase === "Interview Feedback" && (
@@ -221,7 +203,7 @@ export function ApplicantsTab({
                     Moving Applicant...
                   </>
                 ) : (
-                  "Send Video Interview"
+                  "Send AI Interview"
                 )}
               </Button>
             </DialogTrigger>
