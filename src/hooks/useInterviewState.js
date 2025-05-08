@@ -17,7 +17,7 @@ const ENDING_PHRASE = "That concludes our interview today. Thank you for your ti
 const INTERVIEW_DURATION_MINUTES = 20
 const WARNING_TIME_MINUTES = 5
 const FINAL_WARNING_MINUTES = 1
-const RESPONSE_TIMEOUT = 15000 // 15 seconds for response timeout
+const RESPONSE超时 = 15000 // 15 seconds for response timeout
 
 export function useInterviewState(questions, interviewId) {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -52,12 +52,12 @@ export function useInterviewState(questions, interviewId) {
     const [timeRemaining, setTimeRemaining] = useState(INTERVIEW_DURATION_MINUTES * 60)
     const [timerWarningGiven, setTimerWarningGiven] = useState(false)
     const [finalWarningGiven, setFinalWarningGiven] = useState(false)
-    const [transcript, setTranscript] = useState(""); // Holds the current speaker's transcript
+    const [transcript, setTranscript] = useState("")
     const [lastSpeakerTranscript, setLastSpeakerTranscript] = useState({
         role: null,
         content: "",
-    });
-    // Question tracking system
+    })
+
     const [questionStates, setQuestionStates] = useState(
         questions.map((question, idx) => ({
             question,
@@ -68,13 +68,12 @@ export function useInterviewState(questions, interviewId) {
             duration: 0,
             userResponses: [],
             aiResponses: [],
-        })),
+        }))
     )
 
     const maxScreenshots = 3
     const navigate = useNavigate()
 
-    // Refs
     const videoRef = useRef(null)
     const aiVideoContainerRef = useRef(null)
     const userVideoContainerRef = useRef(null)
@@ -86,7 +85,6 @@ export function useInterviewState(questions, interviewId) {
     const responseTimeoutRef = useRef(null)
     const screenshotIntervalRef = useRef(null)
 
-    // Initialize VAPI client
     useEffect(() => {
         if (!vapiClientRef.current && typeof Vapi !== "undefined") {
             vapiClientRef.current = new Vapi(VAPI_API_KEY)
@@ -95,7 +93,6 @@ export function useInterviewState(questions, interviewId) {
                     timestamp: new Date().toISOString(),
                 })
 
-            // Add WebRTC connection state listener
             vapiClientRef.current.on("call-state", (state) => {
                 if (debugMode)
                     console.log("VAPI call state changed:", {
@@ -112,7 +109,6 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [debugMode, callStatus])
 
-    // Monitor network status
     useEffect(() => {
         const handleOnline = () => {
             if (debugMode)
@@ -133,7 +129,7 @@ export function useInterviewState(questions, interviewId) {
         }
 
         window.addEventListener("online", handleOnline)
-        window.addEventListener("offline", handleOffline)
+        window.removeEventListener("offline", handleOffline)
 
         return () => {
             window.removeEventListener("online", handleOnline)
@@ -141,7 +137,6 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [callStatus, debugMode])
 
-    // Synchronize question states and progress
     useEffect(() => {
         if (questions.length > 0) {
             setQuestionStates((prevStates) => {
@@ -181,7 +176,6 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [questions, currentQuestionIndex, debugMode])
 
-    // Update messages and track responses
     useEffect(() => {
         if (messages.length > 0) {
             const newLastMessage = messages[messages.length - 1]
@@ -241,7 +235,6 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [messages, currentQuestionIndex, debugMode])
 
-    // Duration timer
     useEffect(() => {
         if (isInterviewStarted && callStatus === CallStatus.ACTIVE) {
             durationTimerRef.current = setInterval(() => {
@@ -265,7 +258,6 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [isInterviewStarted, callStatus, debugMode])
 
-    // Interview timer (for warnings and time remaining)
     useEffect(() => {
         if (isInterviewStarted && callStatus === CallStatus.ACTIVE) {
             interviewTimerRef.current = setInterval(() => {
@@ -316,7 +308,6 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [isInterviewStarted, callStatus, debugMode])
 
-    // Setup VAPI client listeners
     useEffect(() => {
         if (vapiClientRef.current) {
             const handleMessage = (message) => {
@@ -346,11 +337,10 @@ export function useInterviewState(questions, interviewId) {
                     setLastSpeakerTranscript({
                         role: message.role,
                         content: messageContent,
-                    });
-                    setTranscript(messageContent); // Set the transcript to the latest message
+                    })
+                    setTranscript(messageContent)
                 }
 
-                // End call if the ending phrase is detected from the assistant
                 if (
                     message.role === "assistant" &&
                     (normalizedMessage.includes(normalizedEndingPhrase) || messageContent.includes(ENDING_PHRASE)) &&
@@ -367,7 +357,6 @@ export function useInterviewState(questions, interviewId) {
                     return
                 }
 
-                // Question transition detection
                 if (message.role === "assistant" && messageContent) {
                     const transitionMatch = messageContent.match(
                         /Moving to question\s*(\d+)|Next question\s*(\d+)|Question\s*(\d+)|Now for question\s*(\d+)/i,
@@ -423,7 +412,6 @@ export function useInterviewState(questions, interviewId) {
             }
 
             const updateQuestionState = (newIndex) => {
-                // Only clear response timeout timer, not duration or interview timers
                 if (responseTimeoutRef.current) {
                     clearTimeout(responseTimeoutRef.current)
                     responseTimeoutRef.current = null
@@ -488,7 +476,6 @@ export function useInterviewState(questions, interviewId) {
 
             const handleSpeechEnd = () => {
                 setIsAITalking(false)
-                // setLastSpeakingRole(null)
                 if (debugMode)
                     console.log("AI speech ended, isAITalking: false", {
                         questionIndex: currentQuestionIndex,
@@ -558,7 +545,6 @@ export function useInterviewState(questions, interviewId) {
 
             const handleUserSpeechEnd = () => {
                 setIsUserTalking(false)
-                // setLastSpeakingRole(null)
                 if (debugMode)
                     console.log("User speech ended, isUserTalking: false", {
                         timestamp: new Date().toISOString(),
@@ -571,7 +557,6 @@ export function useInterviewState(questions, interviewId) {
                     errorMessage =
                         "Microphone access issue. Please ensure your microphone is enabled and permissions are granted."
                 } else if (errorMessage.includes("Meeting has ended")) {
-                    // Handle "Meeting has ended" error by ensuring interview completion
                     if (debugMode)
                         console.log("Meeting ended error detected, ensuring interview completion", {
                             timestamp: new Date().toISOString(),
@@ -642,21 +627,30 @@ export function useInterviewState(questions, interviewId) {
             }
         }
     }, [vapiClientRef.current, currentQuestionIndex, questions, callStatus, debugMode])
+
     useEffect(() => {
         if (lastSpeakerTranscript.role && lastSpeakerTranscript.content) {
-            setTranscript(lastSpeakerTranscript.content);
+            setTranscript(lastSpeakerTranscript.content)
             if (debugMode)
                 console.log("Transcript updated", {
                     role: lastSpeakerTranscript.role,
                     content: lastSpeakerTranscript.content,
                     timestamp: new Date().toISOString(),
-                });
+                })
         }
-    }, [lastSpeakerTranscript, debugMode]);
-    // Capture screenshot
+    }, [lastSpeakerTranscript, debugMode])
+
     const captureScreenshot = () => {
         if (!videoRef.current) {
             setScreenshotError("Video reference not available")
+            return null
+        }
+        if (screenshots.length >= maxScreenshots) {
+            if (debugMode)
+                console.log("Maximum screenshots reached", {
+                    screenshotCount: screenshots.length,
+                    timestamp: new Date().toISOString(),
+                })
             return null
         }
         try {
@@ -669,13 +663,17 @@ export function useInterviewState(questions, interviewId) {
             setScreenshotTimes((prev) => [...prev, new Date()])
             setLastCapturedScreenshot(screenshot)
             setTimeout(() => setLastCapturedScreenshot(null), 2000)
-            const interviewId = Date.now().toString()
             const screenshotData = {
                 interviewId,
                 screenshot,
                 timestamp: new Date().toISOString(),
             }
             localStorage.setItem(`interview_screenshot_${interviewId}_${screenshots.length}`, JSON.stringify(screenshotData))
+            if (debugMode)
+                console.log("Screenshot captured", {
+                    screenshotCount: screenshots.length + 1,
+                    timestamp: new Date().toISOString(),
+                })
             return screenshot
         } catch (error) {
             setScreenshotError(`Screenshot error: ${error?.response?.data?.message}`)
@@ -683,37 +681,35 @@ export function useInterviewState(questions, interviewId) {
         }
     }
 
-    // Manual screenshot
     const takeManualScreenshot = () => {
-        if (screenshots.length < maxScreenshots) {
-            captureScreenshot()
-        }
+        if (debugMode)
+            console.log("Manual screenshot capture is disabled to enforce 3-screenshot limit", {
+                timestamp: new Date().toISOString(),
+            })
     }
 
-    // Setup screenshot capture
     useEffect(() => {
         if (isInterviewStarted && callStatus === CallStatus.ACTIVE && videoRef.current) {
             if (screenshotIntervalRef.current) clearInterval(screenshotIntervalRef.current)
 
+            const intervalTime = 90 * 1000 // 1 minute 30 seconds
             let screenshotCount = 0
-            const intervalTime = 90000 // 1.5 minutes
+
             const intervalId = setInterval(() => {
-                if (screenshotCount < maxScreenshots) {
+                if (screenshotCount < maxScreenshots && screenshots.length < maxScreenshots) {
                     captureScreenshot()
                     screenshotCount++
-                    if (screenshotCount >= maxScreenshots) {
+                    if (screenshotCount >= maxScreenshots || screenshots.length >= maxScreenshots) {
                         clearInterval(intervalId)
                         setScreenshotInterval(null)
                         if (debugMode)
                             console.log("Screenshot interval cleared", {
+                                screenshotCount: screenshots.length,
                                 timestamp: new Date().toISOString(),
                             })
                     }
                 }
             }, intervalTime)
-
-            captureScreenshot()
-            screenshotCount++
 
             setScreenshotInterval(intervalId)
             return () => {
@@ -727,7 +723,6 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [isInterviewStarted, callStatus, debugMode])
 
-    // Monitor conclusion
     useEffect(() => {
         if (conclusionDetected && !isInterviewComplete) {
             if (screenshots.length < maxScreenshots) captureScreenshot()
@@ -735,7 +730,6 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [conclusionDetected, isInterviewComplete, screenshots.length])
 
-    // Reset isAITalking and isUserTalking when call is inactive or finished
     useEffect(() => {
         if (callStatus === CallStatus.INACTIVE || callStatus === CallStatus.FINISHED) {
             setIsAITalking(false)
@@ -747,7 +741,6 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [callStatus, debugMode])
 
-    // Stop VAPI call
     const stopVAPICall = async () => {
         try {
             if (!vapiClientRef.current) {
@@ -795,7 +788,6 @@ export function useInterviewState(questions, interviewId) {
                 captureScreenshot()
             }
 
-            // Save transcript data before completing the interview
             const transcriptData = saveAndGetTranscript(interviewId)
 
             setQuestionStates((prevStates) => {
@@ -890,7 +882,6 @@ export function useInterviewState(questions, interviewId) {
             })
     }
 
-    // Start VAPI call
     const startVAPICall = async () => {
         if (!navigator.onLine) {
             setError("No internet connection. Please check your network and try again.")
@@ -956,8 +947,8 @@ export function useInterviewState(questions, interviewId) {
                             role: "system",
                             content: `You're a professional interviewer conducting a live voice interview to evaluate a candidate's qualifications, motivation, and role fit.
 
-**Guidelines:**
-- Follow the structured question flow: ${{questions}}
+Guidelines:
+- Follow the structured question flow: ${questions}
 - Ask the ${questions.length} technical questions in order, one at a time, starting with question 1.
 - Engage naturally:
   - Listen actively, acknowledge responses, and ask brief follow-ups if needed for clarity.
@@ -971,19 +962,20 @@ export function useInterviewState(questions, interviewId) {
   - Redirect to HR if unsure.
 - Conclude:
   - Thank the candidate and say the company will follow up.
-  - End with: ${ENDING_PHRASE}
+  - You Must End with exactly this phrase:${ENDING_PHRASE}
 
-**Questions**: ${formattedQuestions}
+Questions: ${formattedQuestions}
 
-**Notes:**
+Notes:
 - Stay polite and professional.
 - Keep responses short, simple, and conversational for voice interaction.
-- Avoid long explanations.`,
+- Avoid long explanations.
+- You Must End with exactly this phrase:${ENDING_PHRASE}`,
                         },
                     ],
                 },
-                endCallPhrases:[ENDING_PHRASE]
-            };
+                endCallPhrases: [ENDING_PHRASE],
+            }
             if (debugMode)
                 console.log("Starting VAPI call", {
                     timestamp: new Date().toISOString(),
@@ -994,7 +986,6 @@ export function useInterviewState(questions, interviewId) {
                     timestamp: new Date().toISOString(),
                 })
 
-            // Wait for call to be fully active before unmuting
             await new Promise((resolve) => setTimeout(resolve, 1000))
             if (callStatus === CallStatus.ACTIVE && vapiClientRef.current) {
                 try {
@@ -1047,10 +1038,8 @@ export function useInterviewState(questions, interviewId) {
         }
     }
 
-    // Handle start interview
     const handleStartInterview = async () => {
         try {
-            // Request microphone permissions
             const stream = await navigator.mediaDevices.getUserMedia({audio: true})
             stream.getTracks().forEach((track) => track.stop())
             if (debugMode)
@@ -1092,7 +1081,6 @@ export function useInterviewState(questions, interviewId) {
         if (debugMode) console.log("Interview started", {timestamp: new Date().toISOString()})
     }
 
-    // Handle end interview
     const handleEndInterview = () => {
         stopVAPICall()
         if (videoRef.current && videoRef.current.srcObject) {
@@ -1105,11 +1093,11 @@ export function useInterviewState(questions, interviewId) {
                 timestamp: new Date().toISOString(),
             })
     }
+
     const formatTranscriptForSubmission = () => {
-        // Implement your transcript formatting logic here
-        // This is a placeholder, replace with your actual formatting
         return messages.map((msg) => `${msg.role}: ${msg.content}`).join("\n")
     }
+
     const saveTranscriptToLocalStorage = (interviewId) => {
         try {
             const transcript = formatTranscriptForSubmission()
@@ -1134,7 +1122,7 @@ export function useInterviewState(questions, interviewId) {
             return null
         }
     }
-    // Force next question
+
     const forceNextQuestion = () => {
         if (!vapiClientRef.current || callStatus !== CallStatus.ACTIVE) {
             setError("Cannot move to next question: Call is not active or VAPI client is unavailable.")
@@ -1169,7 +1157,6 @@ export function useInterviewState(questions, interviewId) {
         }
     }
 
-    // Toggle transcript visibility
     const toggleTranscript = () => {
         if (showTranscript && transcriptContainerRef.current) {
             import("gsap").then(({gsap}) => {
@@ -1184,12 +1171,10 @@ export function useInterviewState(questions, interviewId) {
         }
     }
 
-    // Toggle transcript expanded state
     const toggleTranscriptExpanded = () => {
         setTranscriptExpanded(!transcriptExpanded)
     }
 
-    // Toggle audio
     const toggleAudio = useCallback(() => {
         if (!vapiClientRef.current || callStatus !== CallStatus.ACTIVE) {
             if (debugMode)
@@ -1202,25 +1187,15 @@ export function useInterviewState(questions, interviewId) {
         }
 
         try {
-            // Get the current mute state from VAPI client
             const currentMuted = vapiClientRef.current.isMuted()
-
-            // Toggle VAPI mute state
             vapiClientRef.current.setMuted(!currentMuted)
-
-            // Get the WebRTC connection from VAPI client to access the actual audio tracks
             const peerConnection = vapiClientRef.current.getPeerConnection?.() || null
 
             if (peerConnection) {
-                // Get all senders (outgoing tracks)
                 const senders = peerConnection.getSenders() || []
-
-                // Find audio tracks and disable/enable them directly
                 senders.forEach((sender) => {
                     if (sender.track && sender.track.kind === "audio") {
-                        // This actually stops the audio from being sent
                         sender.track.enabled = currentMuted
-
                         if (debugMode)
                             console.log(`Audio track ${currentMuted ? "enabled" : "disabled"}`, {
                                 trackId: sender.track.id,
@@ -1229,16 +1204,13 @@ export function useInterviewState(questions, interviewId) {
                     }
                 })
             } else {
-                // Fallback: Try to access the user's media stream directly
                 navigator.mediaDevices
                     .getUserMedia({audio: true})
                     .then((stream) => {
                         const audioTracks = stream.getAudioTracks()
-
                         if (audioTracks && audioTracks.length > 0) {
                             audioTracks.forEach((track) => {
                                 track.enabled = currentMuted
-
                                 if (debugMode)
                                     console.log(`Audio track ${currentMuted ? "enabled" : "disabled"} (direct)`, {
                                         trackId: track.id,
@@ -1246,8 +1218,6 @@ export function useInterviewState(questions, interviewId) {
                                     })
                             })
                         }
-
-                        // If we're muting, stop the tracks to ensure microphone is fully disabled
                         if (!currentMuted) {
                             audioTracks.forEach((track) => track.stop())
                         }
@@ -1261,9 +1231,7 @@ export function useInterviewState(questions, interviewId) {
                     })
             }
 
-            // Update state to reflect new audio status
             setIsAudioOn(currentMuted)
-
             if (debugMode)
                 console.log("Audio toggled completely", {
                     newAudioState: !currentMuted,
@@ -1284,7 +1252,6 @@ export function useInterviewState(questions, interviewId) {
             (msg) => msg.content && msg.content.trim() !== "" && ["assistant", "user"].includes(msg.role),
         )
 
-        // Deduplicate messages based on role and content
         const deduplicatedMessages = []
         const seenContent = new Set()
 
@@ -1296,7 +1263,6 @@ export function useInterviewState(questions, interviewId) {
             }
         }
 
-        // Generate transcript
         const transcript = deduplicatedMessages
             .map((msg) => {
                 const speaker = msg.role === "assistant" ? "AI" : "Candidate"
@@ -1342,12 +1308,12 @@ export function useInterviewState(questions, interviewId) {
             return null
         }
     }
+
     const getCompleteTranscript = () => {
         const validMessages = messages.filter(
             (msg) => msg.content && msg.content.trim() !== "" && ["assistant", "user"].includes(msg.role),
         )
 
-        // Deduplicate messages based on role and content
         const deduplicatedMessages = []
         const seenContent = new Set()
 
@@ -1359,7 +1325,6 @@ export function useInterviewState(questions, interviewId) {
             }
         }
 
-        // Generate transcript with timestamps
         const transcript = deduplicatedMessages
             .map((msg) => {
                 const speaker = msg.role === "assistant" ? "AI" : "Candidate"
@@ -1380,13 +1345,11 @@ export function useInterviewState(questions, interviewId) {
         return transcript
     }
 
-    // 2. Function to get a structured transcript (JSON format)
     const getStructuredTranscript = () => {
         const validMessages = messages.filter(
             (msg) => msg.content && msg.content.trim() !== "" && ["assistant", "user"].includes(msg.role),
         )
 
-        // Deduplicate messages based on role and content
         const deduplicatedMessages = []
         const seenContent = new Set()
 
@@ -1398,7 +1361,6 @@ export function useInterviewState(questions, interviewId) {
             }
         }
 
-        // Return structured data
         return deduplicatedMessages.map((msg) => ({
             role: msg.role,
             speaker: msg.role === "assistant" ? "AI" : "Candidate",
@@ -1424,7 +1386,6 @@ export function useInterviewState(questions, interviewId) {
                 },
             }
 
-            // Save to localStorage
             localStorage.setItem(`interview_transcript_${interviewId}`, JSON.stringify(transcriptData))
 
             if (debugMode) {
@@ -1447,14 +1408,13 @@ export function useInterviewState(questions, interviewId) {
             return null
         }
     }
-    // Format duration
+
     const formatDuration = (seconds) => {
         const minutes = Math.floor(seconds / 60)
         const remainingSeconds = seconds % 60
         return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`
     }
 
-    // Question state management
     const getCurrentQuestionSummary = () => {
         const currentState = questionStates.find((state) => state.status === "current")
         if (!currentState) return null
@@ -1599,7 +1559,7 @@ export function useInterviewState(questions, interviewId) {
             return null
         }
     }
-    // Monitor interview completion state
+
     useEffect(() => {
         if (isInterviewComplete && conclusionDetected) {
             if (debugMode)
