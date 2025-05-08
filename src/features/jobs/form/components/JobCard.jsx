@@ -140,7 +140,7 @@ export default function JobCard({ job }) {
 
           {/* View Details Button */}
           <Button asChild variant="outline" size="sm">
-            {id ? (
+            {!id ? (
               <Link to={`/app/jobs/${_id}`}>
                 View Details
                 <ExternalLink className="h-3.5 w-3.5 ml-1" />
