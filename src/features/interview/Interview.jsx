@@ -1,23 +1,23 @@
 "use client";
 
-import {useEffect} from "react";
-import {useNavigate, useLocation, useParams} from "react-router-dom";
-import {Alert, AlertDescription} from "@/components/ui/alert";
-import {Button} from "@/components/ui/button";
-import {X} from "lucide-react";
-import {VideoContainer} from "@/components/interview/VideoContainer";
-import {TranscriptPanel} from "@/components/interview/TranscriptPanel";
-import {InterviewCompletedDialog} from "@/components/interview/InterviewCompletedDialog";
-import {globalStyles} from "@/lib/globalStyles";
-import {toast} from "sonner";
+import { useEffect } from "react";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
+import { VideoContainer } from "@/components/interview/VideoContainer";
+import { TranscriptPanel } from "@/components/interview/TranscriptPanel";
+import { InterviewCompletedDialog } from "@/components/interview/InterviewCompletedDialog";
+import { globalStyles } from "@/lib/globalStyles";
+import { toast } from "sonner";
 import InterviewHeader from "@/components/interview/InterviewHeader.jsx";
-import {useStartInterview} from "@/hooks/useInterviewData.js";
-import {useInterviewState} from "@/hooks/useInterviewState.js";
+import { useStartInterview } from "@/hooks/useInterviewData.js";
+import { useInterviewState } from "@/hooks/useInterviewState.js";
 
 
 export default function Interview() {
-    const {interviewId} = useParams();
-    const {state: navState} = useLocation();
+    const { interviewId } = useParams();
+    const { state: navState } = useLocation();
     const navigate = useNavigate();
 
     const questionsFromNav = navState?.questions || [];
@@ -165,7 +165,7 @@ export default function Interview() {
 
     return (
         <div
-            className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+            className="flex flex-col min-h-screen">
             <style jsx>{globalStyles}</style>
 
             <InterviewHeader
@@ -194,7 +194,7 @@ export default function Interview() {
                     <AlertDescription className="flex justify-between items-center">
                         <span>{error}</span>
                         <Button variant="ghost" size="sm" onClick={() => setError(null)}>
-                            <X className="h-4 w-4"/>
+                            <X className="h-4 w-4" />
                         </Button>
                     </AlertDescription>
                 </Alert>

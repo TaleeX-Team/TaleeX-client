@@ -11,7 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Building2, Clock, ExternalLink, Edit } from "lucide-react";
+import { Building2, Clock, ExternalLink, Edit, ShieldCheck } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -70,12 +70,9 @@ export default function JobCard({ job }) {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Badge
-                        variant="outline"
-                        className="ml-1.5 bg-blue-50 text-blue-700 border-blue-200 text-xs py-0 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-900"
-                      >
-                        ✓
-                      </Badge>
+                      <ShieldCheck className="text-blue-700 border-blue-200 text-xs py-0 0 dark:text-blue-300 dark:border-blue-900 h-5">
+
+                      </ShieldCheck>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p className="text-xs">Verified Company</p>
