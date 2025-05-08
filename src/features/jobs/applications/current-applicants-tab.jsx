@@ -15,10 +15,21 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 import {
   ArrowRight,
   Filter,
@@ -30,6 +41,7 @@ import {
   ArrowUpDown,
   Newspaper,
   Loader2,
+  CheckCircle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import CVFeedbackPage from "@/features/feedback/cv-feedback";
@@ -54,11 +66,14 @@ export function ApplicantsTab({
   offerApplicants,
   isLoadingMutation,
   sendToFinalFeedback,
+  setSelectedApplicants,
 }) {
   const [sortOrder, setSortOrder] = useState("desc");
   const [open, setOpen] = useState(false);
   const [interviewTypes, setInterviewTypes] = useState([]);
   const [questionCount, setQuestionCount] = useState(5);
+  const [expiryDate, setExpiryDate] = useState(null);
+  const [showError, setShowError] = useState(false);
 
   const toggleSortOrder = () => {
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -84,18 +99,40 @@ export function ApplicantsTab({
     setInterviewTypes((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     );
+    // Reset error when an interview type is selected
+    if (!interviewTypes.includes(type)) {
+      setShowError(false);
+    }
   };
 
   // Handle form submission
   const handleSubmitInterview = () => {
     if (interviewTypes.length === 0) {
-      alert("Please select at least one interview type.");
+      setShowError(true);
       return;
     }
-    onSendInterview({ interviewTypes, questionCount, selectedApplicants });
+    onSendInterview({
+      interviewTypes,
+      questionCount,
+      expiryDate,
+      selectedApplicants,
+    });
     setOpen(false);
     setInterviewTypes([]);
     setQuestionCount(5);
+    setExpiryDate(null);
+    setShowError(false);
+  };
+
+  // Reset error and form when dialog is closed
+  const handleDialogChange = (open) => {
+    setOpen(open);
+    if (!open) {
+      setShowError(false);
+      setInterviewTypes([]);
+      setQuestionCount(5);
+      setExpiryDate(null);
+    }
   };
 
   return (
@@ -188,77 +225,150 @@ export function ApplicantsTab({
           </Button>
         )}
         {(activePhase === "CV Review" || activePhase === "Applications") && (
-          <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog open={open} onOpenChange={handleDialogChange}>
             <DialogTrigger asChild>
               <Button
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-1 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-800"
+                className="flex items-center gap-2"
                 disabled={selectedApplicants.length === 0 || isLoadingMutation}
               >
-                <Video className="h-4 w-4" />
                 {isLoadingMutation ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                     Moving Applicant...
                   </>
                 ) : (
-                  "Send AI Interview"
+                  <>
+                    <Video className="h-4 w-4" />
+                    Send AI Interview
+                  </>
                 )}
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] dark:bg-gray-800 dark:text-gray-200">
+            <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Send Video Interview</DialogTitle>
+                <DialogDescription>
+                  Configure the interview settings below.
+                </DialogDescription>
               </DialogHeader>
+
               <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
+                <div className="space-y-2">
                   <Label>Interview Type</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Select one or more interview types
+                  </p>
                   <div className="flex gap-4">
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        id="technical"
-                        checked={interviewTypes.includes("technical")}
-                        onCheckedChange={() => toggleInterviewType("technical")}
-                        className="dark:border-gray-600"
-                      />
-                      <Label htmlFor="technical">Technical</Label>
+                    <div
+                      className={cn(
+                        "flex items-center gap-2 p-2 rounded-md border cursor-pointer",
+                        interviewTypes.includes("technical") &&
+                          "border-primary bg-muted"
+                      )}
+                      onClick={() => toggleInterviewType("technical")}
+                    >
+                      <Label htmlFor="technical" className="cursor-pointer">
+                        Technical
+                      </Label>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        id="behavioral"
-                        checked={interviewTypes.includes("behavioral")}
-                        onCheckedChange={() =>
-                          toggleInterviewType("behavioral")
-                        }
-                        className="dark:border-gray-600"
-                      />
-                      <Label htmlFor="behavioral">Behavioral</Label>
+                    <div
+                      className={cn(
+                        "flex items-center gap-2 p-2 rounded-md border cursor-pointer",
+                        interviewTypes.includes("behavioral") &&
+                          "border-primary bg-muted"
+                      )}
+                      onClick={() => toggleInterviewType("behavioral")}
+                    >
+                      <Label htmlFor="behavioral" className="cursor-pointer">
+                        Behavioral
+                      </Label>
                     </div>
                   </div>
+                  {showError && (
+                    <Alert variant="destructive">
+                      <AlertDescription>
+                        Please select at least one interview type
+                      </AlertDescription>
+                    </Alert>
+                  )}
                 </div>
-                <div className="grid gap-2">
-                  <Label>Number of Questions: {questionCount}</Label>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>Number of Questions</Label>
+                    <span className="text-sm font-medium bg-muted px-2 py-1 rounded">
+                      {questionCount}
+                    </span>
+                  </div>
                   <Slider
                     value={[questionCount]}
                     onValueChange={(value) => setQuestionCount(value[0])}
                     min={5}
                     max={15}
                     step={1}
-                    className="w-full"
                   />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>5</span>
+                    <span>10</span>
+                    <span>15</span>
+                  </div>
                 </div>
+
+                <div className="space-y-2">
+                  <Label>Interview Expiry Date</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !expiryDate && "text-muted-foreground"
+                        )}
+                      >
+                        {expiryDate ? (
+                          format(expiryDate, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={expiryDate}
+                        onSelect={setExpiryDate}
+                        disabled={(date) =>
+                          date < new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                {selectedApplicants.length > 0 && (
+                  <div className="p-3 rounded-md border bg-muted">
+                    <p className="text-sm font-medium">Selected Applicants</p>
+                    <p className="text-xs text-muted-foreground">
+                      {selectedApplicants.length} applicant
+                      {selectedApplicants.length !== 1 ? "s" : ""} selected
+                    </p>
+                  </div>
+                )}
               </div>
-              <div className="flex justify-end gap-2">
+
+              <DialogFooter>
                 <Button
                   variant="outline"
-                  onClick={() => setOpen(false)}
-                  className="dark:text-gray-300 dark:border-gray-700"
+                  onClick={() => handleDialogChange(false)}
                 >
                   Cancel
                 </Button>
-                <Button onClick={handleSubmitInterview}>Send</Button>
-              </div>
+                <Button onClick={handleSubmitInterview}>Send Interview</Button>
+              </DialogFooter>
             </DialogContent>
           </Dialog>
         )}
@@ -274,7 +384,6 @@ export function ApplicantsTab({
         <Button
           variant="outline"
           size="sm"
-          //success
           className="flex items-center gap-1 text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-50 dark:disabled:hover:bg-transparent"
           onClick={offerApplicants}
           disabled={selectedApplicants.length === 0 || isLoadingMutation}
@@ -388,7 +497,6 @@ export function ApplicantsTab({
                               Feedback
                             </Button>
                           </DialogTrigger>
-
                           <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
                             {applicant?.feedback?.interview?.type ===
                             "behavioral" ? (
@@ -490,7 +598,7 @@ export function ApplicantsTab({
                             <span
                               className={cn(
                                 "font-medium",
-                                getScoreColor(applicant.cvScore) // Fixed the syntax issue here
+                                getScoreColor(applicant.cvScore)
                               )}
                             >
                               {Math.round(applicant.cvScore)}%

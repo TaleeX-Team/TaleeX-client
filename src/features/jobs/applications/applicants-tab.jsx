@@ -88,8 +88,20 @@ export default function JobApplicationManager() {
   });
 
   const sendVideoInterviewMutation = useMutation({
-    mutationFn: ({ jobId, applicationIds, interviewTypes, questionCount }) =>
-      scheduleInterviews(jobId, applicationIds, interviewTypes, questionCount),
+    mutationFn: ({
+      jobId,
+      applicationIds,
+      interviewTypes,
+      questionCount,
+      expiryDate,
+    }) =>
+      scheduleInterviews(
+        jobId,
+        applicationIds,
+        interviewTypes,
+        questionCount,
+        expiryDate
+      ),
     onSuccess: (data, { jobId, applicationIds }) => {
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
 
@@ -268,12 +280,13 @@ export default function JobApplicationManager() {
     interviewTypes,
     questionCount,
     selectedApplicants: selected,
+    expiryDate,
   }) => {
-    console.log("Selected applicants for interview:", questionCount);
     sendVideoInterviewMutation.mutate({
       jobId: id,
       applicationIds: selected.map((a) => a.id),
       interviewTypes,
+      expiryDate: expiryDate?.toISOString(),
       questionCount,
     });
   };
@@ -476,6 +489,7 @@ export default function JobApplicationManager() {
               onSendInterview={handleSendInterview}
               isLoadingMutation={isLoadingMutation}
               sendToFinalFeedback={sendToFinalFeedback}
+              setSelectedApplicants={setSelectedApplicants}
             />
           )}
 
