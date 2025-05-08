@@ -60,31 +60,76 @@ const StatCard = ({title, value, description, Icon, trend = 0, color, bgColor}) 
 
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState("overview")
+    const getDateRange = () => {
+        const today = new Date();
+        const fromDate = new Date();
+        const [timePeriod, setTimePeriod] = useState("lastWeek");
 
-    // Fetch data using our custom hooks
+        switch (timePeriod) {
+            case "lastWeek":
+                fromDate.setDate(today.getDate() - 7);
+                break;
+            case "lastMonth":
+                fromDate.setDate(today.getDate() - 30);
+                break;
+            case "lastQuarter":
+                fromDate.setDate(today.getDate() - 90);
+                break;
+            case "lastYear":
+                fromDate.setDate(today.getDate() - 365);
+                break;
+            default:
+                fromDate.setDate(today.getDate() - 30);
+        }
+
+        const formatDate = (date) => {
+            const day = date.getDate().toString().padStart(2, "0");
+            const month = (date.getMonth() + 1).toString().padStart(2, "0");
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        };
+
+        return {
+            from: formatDate(fromDate),
+            to: formatDate(today),
+        };
+    };
+    const dateRangeValues = getDateRange();
+
     const {
         data: applicationsByStageResponse,
         isLoading: applicationsByStageLoading,
         refetch: refetchApplicationsByStage,
-    } = useApplicationsByStage()
+    } = useApplicationsByStage(
+         dateRangeValues.from,  dateRangeValues.to
+    )
 
     const {
         data: interviewsByStateResponse,
         isLoading: interviewsByStateLoading,
         refetch: refetchInterviewsByState,
-    } = useInterviewsByState()
+    } = useInterviewsByState(
+        dateRangeValues.from,
+       dateRangeValues.to,
+    )
 
     const {
         data: conversionFunnelResponse,
         isLoading: conversionFunnelLoading,
         refetch: refetchConversionFunnel,
-    } = useConversionFunnel()
+    } = useConversionFunnel(
+    dateRangeValues.from,
+         dateRangeValues.to,
+    )
 
     const {
         data: topAppliedJobsResponse,
         isLoading: topAppliedJobsLoading,
         refetch: refetchTopAppliedJobs,
-    } = useTopAppliedJobs()
+    } = useTopAppliedJobs(
+        dateRangeValues.from,
+       dateRangeValues.to,
+    )
 
     // Extract actual data from responses
     const applicationsByStageData = applicationsByStageResponse?.data || []
