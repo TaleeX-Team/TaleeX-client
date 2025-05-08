@@ -28,15 +28,18 @@ export default function Header({
           )}
         </div>
 
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold">{name}</h1>
-          {verification?.status && (
-                                <Badge className={statusBadgeStyles[verification?.status]}>
-                                  <StatusIcon status={verification?.status} />
-                                  {verification?.status.charAt(0).toUpperCase() +
-                                    verification?.status.slice(1)}
-                                </Badge>
-                              )}
+        <div className="flex-1 flex-row items-center ">
+          <div className="flex gap-2 items-center">
+            <h1 className="text-3xl font-bold">{name}</h1>
+            {verification?.status && (
+              <Badge className={statusBadgeStyles[verification?.status]}>
+                <StatusIcon status={verification?.status} />
+                {verification?.status.charAt(0).toUpperCase() +
+                  verification?.status.slice(1)}
+              </Badge>
+            )}
+          </div>
+
           <div className="flex flex-wrap items-center gap-3 mt-2">
             <div className="flex items-center text-muted-foreground">
               <MapPin className="mr-1 h-4 w-4" />

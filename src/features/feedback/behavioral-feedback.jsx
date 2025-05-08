@@ -1,7 +1,7 @@
-import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Progress } from "@/components/ui/progress";
 import {
   UserCheck,
   ThumbsUp,
@@ -9,49 +9,103 @@ import {
   HeartHandshake,
   Smile,
   Users,
+  Image,
+  ExternalLink,
 } from "lucide-react";
 
-export default function BehavioralFeedbackPage({ feedback }) {
+export default function BehavioralFeedbackPage({ feedback, screenshots = [] }) {
+  const [activeTab, setActiveTab] = useState("results");
+  console.log(screenshots);
+  // Mock interview screenshots data - just links
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="min-h-screen flex bg-background px-4">
       <div className="w-full max-w-4xl space-y-6 py-8">
         <h1 className="text-3xl font-bold mb-6 text-center">
           Behavioral Evaluation Results
         </h1>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Candidate Behavioral Review</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-8">
-            <ScoreCard score={feedback.overallScore} />
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="results">Evaluation Results</TabsTrigger>
+            <TabsTrigger value="screenshots">Interview Screenshots</TabsTrigger>
+          </TabsList>
 
-            <Section
-              title="Candidate Summary"
-              icon={<UserCheck className="text-primary h-5 w-5" />}
-            >
-              <p className="text-muted-foreground">{feedback.summary}</p>
-            </Section>
+          <TabsContent value="results" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Candidate Behavioral Review</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-8">
+                <ScoreCard score={feedback.overallScore} />
 
-            <Section
-              title="Attribute Ratings"
-              icon={<Users className="text-primary h-5 w-5" />}
-            >
-              <AttributeList rating={feedback.rating} />
-            </Section>
+                <Section
+                  title="Candidate Summary"
+                  icon={<UserCheck className="text-primary h-5 w-5" />}
+                >
+                  <p className="text-muted-foreground">{feedback.summary}</p>
+                </Section>
 
-            <Section
-              title="Red Flags"
-              icon={<MessageSquare className="text-primary h-5 w-5" />}
-            >
-              <p className="text-sm text-muted-foreground">
-                {feedback.redflag}
-              </p>
-            </Section>
-          </CardContent>
-        </Card>
+                <Section
+                  title="Attribute Ratings"
+                  icon={<Users className="text-primary h-5 w-5" />}
+                >
+                  <AttributeList rating={feedback.rating} />
+                </Section>
 
-        <RecommendationCard recommendation={feedback.recommendation} />
+                <Section
+                  title="Red Flags"
+                  icon={<MessageSquare className="text-primary h-5 w-5" />}
+                >
+                  <p className="text-sm text-muted-foreground">
+                    {feedback.redflag}
+                  </p>
+                </Section>
+              </CardContent>
+            </Card>
+
+            <RecommendationCard recommendation={feedback.recommendation} />
+          </TabsContent>
+
+          <TabsContent value="screenshots">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <Image className="text-primary h-5 w-5" />
+                  <CardTitle>Interview Screenshots</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-6">
+                  View screenshots taken during key moments of the interview.
+                </p>
+
+                <ul className="space-y-3">
+                  {screenshots?.map((screenshot, index) => (
+                    <li
+                      key={index}
+                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 
+               hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      <a
+                        href={screenshot?.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between text-blue-600 dark:text-blue-400 
+                 hover:underline"
+                      >
+                        <span className="truncate">
+                          View Screenshot #{index + 1}
+                        </span>
+                        <ExternalLink className="h-4 w-4 ml-2" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
@@ -101,17 +155,24 @@ function AttributeList({ rating }) {
 function ScoreCard({ score }) {
   const num = parseFloat(score);
   const getColor = (val) => {
-    if (val >= 8) return "green";
-    if (val >= 6) return "amber";
-    return "red";
+    if (val >= 8) return "text-green-600";
+    if (val >= 6) return "text-amber-600";
+    return "text-red-600";
+  };
+
+  const getProgressColor = (val) => {
+    if (val >= 8) return "bg-green-600";
+    if (val >= 6) return "bg-amber-600";
+    return "bg-red-600";
   };
 
   const color = getColor(num);
+  const progressColor = getProgressColor(num);
 
   return (
     <div className="flex flex-col md:flex-row items-center justify-between gap-4">
       <div className="flex items-center gap-3">
-        <div className={`text-5xl font-bold text-${color}-600`}>{score}</div>
+        <div className={`text-5xl font-bold ${color}`}>{score}</div>
         <div className="text-muted-foreground">
           <div className="text-sm uppercase font-semibold">Overall Score</div>
           <div className="text-xs">Behavioral compatibility</div>
@@ -125,7 +186,7 @@ function ScoreCard({ score }) {
         <Progress
           value={num * 10}
           className="h-3"
-          indicatorClassName={`bg-${color}-600`}
+          indicatorClassName={progressColor}
         />
       </div>
     </div>
@@ -186,5 +247,28 @@ function RecommendationCard({ recommendation }) {
         TaleeX AI can make mistakes.
       </div>
     </Card>
+  );
+}
+
+function Badge({ className, children }) {
+  return (
+    <div
+      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function Progress({ value, className, indicatorClassName }) {
+  return (
+    <div
+      className={`relative h-2 w-full overflow-hidden rounded-full bg-primary/10 ${className}`}
+    >
+      <div
+        className={`h-full ${indicatorClassName}`}
+        style={{ width: `${value}%` }}
+      />
+    </div>
   );
 }

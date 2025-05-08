@@ -130,8 +130,61 @@ export default function JobApplicationPage() {
         </Alert>
       )}
 
+      {/* Only show form if job status is open */}
+      {jobData.status !== "open" && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Job Not Available</AlertTitle>
+          <AlertDescription>
+            This job is not currently accepting applications.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Show warning for pending jobs */}
+      {jobData?.company?.verification?.status === "pending" && (
+        <Alert className="my-6 bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-600/30">
+          <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
+          <AlertTitle className="text-amber-800 dark:text-amber-400">
+            Company Pending Review
+          </AlertTitle>
+          <AlertDescription className="text-amber-700 dark:text-amber-300">
+            This company's profile has not yet been verified by Taleex. We recommend researching the company before submitting your application. If anything appears suspicious, please use the report feature to notify our team.
+          </AlertDescription>
+        </Alert>
+
+      )}
+
+      {/* Display detailed job info */}
+      <JobDetails job={jobData} />
+
+      {jobData.status === "open" && (
+        <>
+          <Separator className="my-8" />
+          <ApplicationForm
+            jobId={id}
+            onSubmit={submitApplication}
+            isSubmitting={isSubmitting}
+          />
+        </>
+      )}
+
+      <p className="text-xs text-muted-foreground text-center mt-6">
+        This job is posted by Taleex on behalf of an external company. Please verify the company’s legitimacy before proceeding with your application.
+      </p>
+
+      {/* Place the report dialog trigger without wrapping it in a button */}
+      {/* <div className="hidden">
+        <ReportJobDialog
+          jobId={id}
+          defaultName=""
+          defaultEmail=""
+          data-report-trigger
+        />
+      </div> */}
+
       {/* Job Header Card with Report Button */}
-      <Card className="mb-6 overflow-hidden">
+      {/* <Card className="mb-6 overflow-hidden">
         <div className="bg-slate-50 dark:bg-slate-900 p-6">
           <div className="flex justify-between items-start">
             <div>
@@ -187,7 +240,7 @@ export default function JobApplicationPage() {
             </div>
           </div>
 
-          {/* Job safety banner */}
+          Job safety banner
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-md border border-blue-200 dark:border-blue-800 mt-4">
             <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5 sm:mt-0" />
             <div>
@@ -209,54 +262,7 @@ export default function JobApplicationPage() {
             </Button>
           </div>
         </CardContent>
-      </Card>
-
-      {/* Show warning for pending jobs */}
-      {jobData?.company?.verification?.status === "pending" && (
-        <Alert className="my-6 bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800">
-          <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-          <AlertTitle className="text-amber-800 dark:text-amber-400">
-            Company Pending Review
-          </AlertTitle>
-          <AlertDescription className="text-amber-700 dark:text-amber-300">
-            This company's profile is currently pending verification. Please
-            exercise caution and research the company before applying. If
-            anything seems suspicious, please use the report feature above.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Display detailed job info */}
-      <JobDetails job={jobData} />
-
-      <Separator className="my-8" />
-
-      {/* Only show form if job status is open */}
-      {jobData.status === "open" ? (
-        <ApplicationForm
-          jobId={id}
-          onSubmit={submitApplication}
-          isSubmitting={isSubmitting}
-        />
-      ) : (
-        <Alert className="my-6">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Job Not Available</AlertTitle>
-          <AlertDescription>
-            This job is not currently accepting applications.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Place the report dialog trigger without wrapping it in a button */}
-      <div className="hidden">
-        <ReportJobDialog
-          jobId={id}
-          defaultName=""
-          defaultEmail=""
-          data-report-trigger
-        />
-      </div>
+      </Card> */}
     </div>
   );
 }

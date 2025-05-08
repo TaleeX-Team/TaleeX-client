@@ -46,7 +46,8 @@ export const scheduleInterviews = async (
   jobId,
   applicationIds,
   interviewDetails,
-  questionCount
+  questionCount,
+  expiryDate
 ) => {
   try {
     console.log("Scheduling interviews:", {
@@ -54,14 +55,19 @@ export const scheduleInterviews = async (
       applicationIds,
       interviewDetails,
       questionCount,
+      expiryDate,
     });
+    const payload = {
+      applicationIds,
+      type: interviewDetails,
+      questionCount,
+    };
+    if (expiryDate !== null) {
+      payload.expiryDate = expiryDate;
+    }
     const response = await apiClient.post(
       `/jobs/${jobId}/applications/sending-interview`,
-      {
-        applicationIds,
-        type: interviewDetails,
-        questionCount,
-      },
+      payload,
       {
         headers: {
           "Content-Type": "application/json",

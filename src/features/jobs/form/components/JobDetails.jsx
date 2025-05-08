@@ -6,10 +6,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Briefcase, Building2, Clock, Globe, MapPin, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Briefcase, Building2, CheckCircle, Clock, Globe, MapPin, ShieldCheck, User } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
+import { ReportJobDialog } from "./ReportJobDialog";
 
 export function JobDetails({ job }) {
+  const { id } = useParams();
   const getStatusColor = (status) => {
     switch (status) {
       case "open":
@@ -47,25 +50,46 @@ export function JobDetails({ job }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
+      <div className="flex flex-col gap-4 md:gap-2">
+        <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">{job.title}</h1>
-          <div className="flex items-center gap-2 mt-2 text-muted-foreground">
-            <Building2 className="h-4 w-4" />
-            <span>{job?.company?.name}</span>
-            {job?.company?.verification?.status === "verified" && (
-              <Badge
-                variant="outline"
-                className="bg-blue-50 text-blue-700 border-blue-200"
-              >
-                Verified
-              </Badge>
-            )}
+          <div className="flex items-center gap-3">
+            <Badge className={`${getStatusColor(job.status)} capitalize`}>
+              {job.status}
+            </Badge>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="relative">
+                    <ReportJobDialog
+                      jobId={id}
+                      defaultName=""
+                      defaultEmail=""
+                    />
+                    {/* <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full"></span> */}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Report this job if it seems suspicious or inappropriate</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
-        <Badge className={`${getStatusColor(job.status)} capitalize`}>
-          {job.status}
-        </Badge>
+
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <Building2 className="h-4 w-4" />
+          <span>{job?.company?.name}</span>
+          {job?.company?.verification?.status === "verified" && (
+            <Badge
+              variant="outline"
+              className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1"
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              Verified
+            </Badge>
+          )}
+        </div>
       </div>
 
       <Card>
@@ -159,6 +183,6 @@ export function JobDetails({ job }) {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </div >
   );
 }
