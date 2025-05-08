@@ -25,6 +25,7 @@ export function InterviewCompletedDialog({
                                              totalQuestions,
                                              screenshots,
                                              transcript,
+                                             callId
                                          }) {
     const [isSubmitted, setIsSubmitted] = useState(false)
     const navigate = useNavigate()
@@ -67,15 +68,6 @@ export function InterviewCompletedDialog({
 
     const handleSubmit = async () => {
         try {
-            if (debugMode) {
-                console.log("Submitting interview data:", {
-                    interviewId,
-                    transcript: transcript,
-                    screenshotCount: screenshots?.length || 0,
-                    timestamp: new Date().toISOString(),
-                })
-            }
-
             // Check if transcript is available and has the expected structure
             const transcriptText =
                 transcript && typeof transcript === "object" && transcript.plainText
@@ -84,18 +76,12 @@ export function InterviewCompletedDialog({
                         ? transcript
                         : ""
 
-            if (debugMode) {
-                console.log("Processed transcript for submission:", {
-                    transcriptLength: transcriptText.length,
-                    transcriptType: typeof transcriptText,
-                    timestamp: new Date().toISOString(),
-                })
-            }
 
             await mutateAsync({
                 interviewId,
                 transcript: transcriptText,
                 images: screenshots || [],
+                callId:callId,
             })
 
             clearLocalStorage()
@@ -110,7 +96,6 @@ export function InterviewCompletedDialog({
         } catch (error) {
             toast.error(error.response?.data?.message)
 
-            // Error is handled by the hook and displayed in UI
         }
     }
 

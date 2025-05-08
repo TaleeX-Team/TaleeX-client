@@ -17,7 +17,7 @@ const ENDING_PHRASE = "That concludes our interview today. Thank you for your ti
 const INTERVIEW_DURATION_MINUTES = 20
 const WARNING_TIME_MINUTES = 5
 const FINAL_WARNING_MINUTES = 1
-const RESPONSE超时 = 15000 // 15 seconds for response timeout
+const RESPONSE_TIMEOUT = 15000 // 15 seconds for response timeout
 
 export function useInterviewState(questions, interviewId) {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -57,6 +57,8 @@ export function useInterviewState(questions, interviewId) {
         role: null,
         content: "",
     })
+    const [callId, setCallId] = useState(null)
+    const [audioRecordingUrl, setAudioRecordingUrl] = useState(null)
 
     const [questionStates, setQuestionStates] = useState(
         questions.map((question, idx) => ({
@@ -129,7 +131,7 @@ export function useInterviewState(questions, interviewId) {
         }
 
         window.addEventListener("online", handleOnline)
-        window.removeEventListener("offline", handleOffline)
+        window.addEventListener("offline", handleOffline)
 
         return () => {
             window.removeEventListener("online", handleOnline)
@@ -552,7 +554,7 @@ export function useInterviewState(questions, interviewId) {
             }
 
             const handleError = (error) => {
-                let errorMessage = error?.response?.data?.message || "Unknown error"
+                let errorMessage = error?.response?.data?.message
                 if (errorMessage.includes("microphone")) {
                     errorMessage =
                         "Microphone access issue. Please ensure your microphone is enabled and permissions are granted."
@@ -582,6 +584,8 @@ export function useInterviewState(questions, interviewId) {
                     return
                 }
                 setError(`VAPI error: ${errorMessage}`)
+                console.log(errorMessage,"ERROR")
+                console.log(error,"VAP ERROR1")
                 setIsAITalking(false)
                 setIsUserTalking(false)
                 if (debugMode)
@@ -741,6 +745,8 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [callStatus, debugMode])
 
+
+
     const stopVAPICall = async () => {
         try {
             if (!vapiClientRef.current) {
@@ -789,6 +795,11 @@ export function useInterviewState(questions, interviewId) {
             }
 
             const transcriptData = saveAndGetTranscript(interviewId)
+
+            if (callId) {
+                await fetchRecordingUrl(callId)
+                console.log(callId,"callId")
+            }
 
             setQuestionStates((prevStates) => {
                 const newStates = [...prevStates]
@@ -948,7 +959,7 @@ export function useInterviewState(questions, interviewId) {
                             content: `You're a professional interviewer conducting a live voice interview to evaluate a candidate's qualifications, motivation, and role fit.
 
 Guidelines:
-- Follow the structured question flow: ${questions}
+- Follow the structured question flow: ${formattedQuestions}
 - Ask the ${questions.length} technical questions in order, one at a time, starting with question 1.
 - Engage naturally:
   - Listen actively, acknowledge responses, and ask brief follow-ups if needed for clarity.
@@ -962,27 +973,28 @@ Guidelines:
   - Redirect to HR if unsure.
 - Conclude:
   - Thank the candidate and say the company will follow up.
-  - You Must End with exactly this phrase:${ENDING_PHRASE}
+  - You Must End with: ${ENDING_PHRASE}
 
 Questions: ${formattedQuestions}
 
 Notes:
 - Stay polite and professional.
 - Keep responses short, simple, and conversational for voice interaction.
-- Avoid long explanations.
-- You Must End with exactly this phrase:${ENDING_PHRASE}`,
+- Avoid long explanations.`,
                         },
                     ],
                 },
                 endCallPhrases: [ENDING_PHRASE],
             }
             if (debugMode)
-                console.log("Starting VAPI call", {
+                console.log("Starting VAPI call with recording enabled", {
                     timestamp: new Date().toISOString(),
                 })
-            await vapiClientRef.current.start(VAPI_ASSISTANT_ID, interviewer)
+            const call = await vapiClientRef.current.start(VAPI_ASSISTANT_ID, interviewer)
+            setCallId(call.id)
             if (debugMode)
                 console.log("VAPI call started successfully", {
+                    callId: call.id,
                     timestamp: new Date().toISOString(),
                 })
 
@@ -1021,7 +1033,6 @@ Notes:
                 return newStates
             })
         } catch (error) {
-            setError(`Failed to start the interview: ${error?.response?.data?.message || "Unknown error"}`)
             setIsAITalking(false)
             setIsUserTalking(false)
             setCallStatus(CallStatus.INACTIVE)
@@ -1059,6 +1070,8 @@ Notes:
         setIsInterviewStarted(true)
         setScreenshots([])
         setScreenshotTimes([])
+        setAudioRecordingUrl(null)
+        setCallId(null)
         setProgress({current: 1, total: questions.length})
         setTimeRemaining(INTERVIEW_DURATION_MINUTES * 60)
         setTimerWarningGiven(false)
@@ -1460,6 +1473,8 @@ Notes:
         setCurrentQuestionIndex(0)
         setDisplayedQuestion(questions[0] || "")
         setProgress({current: 1, total: questions.length})
+        setAudioRecordingUrl(null)
+        setCallId(null)
         if (debugMode)
             console.log("Question states reset", {
                 timestamp: new Date().toISOString(),
@@ -1539,6 +1554,7 @@ Notes:
         try {
             const fullTranscriptData = JSON.parse(localStorage.getItem(`interview_transcript_${interviewId}`))
             const cleanTranscriptData = JSON.parse(localStorage.getItem(`interview_clean_transcript_${interviewId}`))
+            const audioData = JSON.parse(localStorage.getItem(`interview_audio_${interviewId}`))
             const screenshotData = []
             for (let i = 0; i < maxScreenshots; i++) {
                 const data = JSON.parse(localStorage.getItem(`interview_screenshot_${interviewId}_${i}`))
@@ -1547,6 +1563,7 @@ Notes:
             return {
                 fullTranscript: fullTranscriptData,
                 cleanTranscript: cleanTranscriptData,
+                audio: audioData,
                 screenshots: screenshotData,
             }
         } catch (error) {
@@ -1571,12 +1588,13 @@ Notes:
                 detail: {
                     transcript: getInterviewTranscript(),
                     screenshots: screenshots,
+                    audioRecordingUrl,
                     questionStates: formatQuestionStateForUI(),
                 },
             })
             window.dispatchEvent(event)
         }
-    }, [isInterviewComplete, conclusionDetected])
+    }, [isInterviewComplete, conclusionDetected, audioRecordingUrl])
 
     return {
         state: {
@@ -1611,6 +1629,8 @@ Notes:
             currentQuestionSummary: getCurrentQuestionSummary(),
             completedQuestionsSummary: getCompletedQuestionsSummary(),
             pendingQuestionsCount: getPendingQuestionsCount(),
+            audioRecordingUrl,
+            callId,
         },
         actions: {
             setCurrentQuestionIndex,
@@ -1651,7 +1671,7 @@ Notes:
             resetQuestionStates,
             saveAndGetTranscript,
             retryQuestion,
-        },
+       },
         refs: {
             videoRef,
             aiVideoContainerRef,

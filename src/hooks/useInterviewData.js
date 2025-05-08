@@ -28,13 +28,13 @@ export const useStartInterview = (interviewId) => {
 
 export function useEndInterview() {
   return useMutation({
-    mutationFn: async ({ interviewId, transcript, images }) => {
+    mutationFn: async ({ interviewId, transcript, images,callId }) => {
       // Create a new FormData instance
       const formData = new FormData();
 
       // Append transcript data
       formData.append("transcript", transcript || "");
-
+      formData.append("callId", callId);
       // Process images (limit to 3)
       if (images && images.length > 0) {
         const imagesToUpload = images.slice(0, 3);
@@ -92,6 +92,7 @@ export function useEndInterview() {
         interviewId,
         hasTranscript: !!transcript,
         imageCount: images?.length || 0,
+        callId: callId,
       });
 
       try {
