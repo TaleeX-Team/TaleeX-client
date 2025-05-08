@@ -220,6 +220,7 @@ export default function JobApplicationManager() {
       linkedIn: app.linkedIn,
       feedback: app.feedback,
       cvUrl: app.cv.file.url,
+      images: app?.interview?.images,
     })) || [];
 
   // Filter applicants based on active tab, phase, and search query
