@@ -982,8 +982,8 @@ export function useInterviewState(questions, interviewId) {
                             role: "system",
                             content: `You're a professional interviewer conducting a live voice interview to evaluate a candidate's qualifications, motivation, and role fit.
 
-**Guidelines:**
-- Follow the structured question flow: ${{questions}}
+Guidelines:
+- Follow the structured question flow that I gave you !
 - Ask the ${questions.length} technical questions in order, one at a time, starting with question 1.
 - Engage naturally:
   - Listen actively, acknowledge responses, and ask brief follow-ups if needed for clarity.
@@ -1001,7 +1001,7 @@ export function useInterviewState(questions, interviewId) {
 
 **Questions**: ${formattedQuestions}
 
-**Notes:**
+Notes:
 - Stay polite and professional.
 - Keep responses short, simple, and conversational for voice interaction.
 - Avoid long explanations.`,
