@@ -84,15 +84,22 @@ export const scheduleInterviews = async (
     throw error;
   }
 };
-export const changeApplicationStage = async (applicationIds, stage) => {
+export const changeApplicationStage = async (
+  applicationIds,
+  stage,
+  emailBody,
+  emailSubject
+) => {
   try {
     console.log("Changing application stage:", {
       applicationIds,
       stage,
+      emailBody,
+      emailSubject,
     });
     const response = await apiClient.post(
       `/applications/change-stage`,
-      { applicationIds, stage },
+      { applicationIds, stage, emailBody, emailSubject },
       {
         headers: {
           "Content-Type": "application/json",

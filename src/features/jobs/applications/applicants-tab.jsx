@@ -127,8 +127,8 @@ export default function JobApplicationManager() {
   });
 
   const rejectApplicationsMutation = useMutation({
-    mutationFn: ({ applicantIds, stage }) =>
-      changeApplicationStage(applicantIds, stage),
+    mutationFn: ({ applicantIds, stage, emailBody, emailSubject }) =>
+      changeApplicationStage(applicantIds, stage, emailBody, emailSubject),
     onSuccess: (data, { applicantIds, stage }) => {
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
 
@@ -268,11 +268,14 @@ export default function JobApplicationManager() {
     });
   };
 
-  const offerApplicants = () => {
+  const offerApplicants = ({ emailSubject, emailBody }) => {
+    console.log(emailSubject, emailBody, "asdadsadasdsad");
     if (selectedApplicants.length === 0) return;
     rejectApplicationsMutation.mutate({
       applicantIds: selectedApplicants.map((a) => a.id),
       stage: "offer",
+      emailSubject,
+      emailBody,
     });
   };
 
@@ -360,7 +363,8 @@ export default function JobApplicationManager() {
   const isLoadingMutation =
     advanceToCVReviewMutation.isPending ||
     rejectApplicationsMutation.isPending ||
-    sendVideoInterviewMutation.isPending;
+    sendVideoInterviewMutation.isPending ||
+    finalFeedbackMutation.isPending;
 
   console.log(isLoadingMutation);
   return (
@@ -489,6 +493,10 @@ export default function JobApplicationManager() {
               setActivePhase={setActivePhase}
               onSendInterview={handleSendInterview}
               isLoadingMutation={isLoadingMutation}
+              cvReviewLoading={advanceToCVReviewMutation.isPending}
+              finalFeedBackLoading={finalFeedbackMutation.isPending}
+              changeStageLoading={rejectApplicationsMutation.isPending}
+              sendVideoInterviewLoading={sendVideoInterviewMutation.isPending}
               sendToFinalFeedback={sendToFinalFeedback}
               setSelectedApplicants={setSelectedApplicants}
             />

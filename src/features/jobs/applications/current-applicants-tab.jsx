@@ -28,7 +28,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, XCircle } from "lucide-react";
 import { format } from "date-fns";
 import {
   ArrowRight,
@@ -67,13 +67,21 @@ export function ApplicantsTab({
   isLoadingMutation,
   sendToFinalFeedback,
   setSelectedApplicants,
+  cvReviewLoading,
+  finalFeedBackLoading,
+  changeStageLoading,
+  sendVideoInterviewLoading,
 }) {
   const [sortOrder, setSortOrder] = useState("desc");
-  const [open, setOpen] = useState(false);
+  const [openInterview, setOpenInterview] = useState(false);
+  const [openOffer, setOpenOffer] = useState(false);
   const [interviewTypes, setInterviewTypes] = useState([]);
   const [questionCount, setQuestionCount] = useState(5);
   const [expiryDate, setExpiryDate] = useState(null);
-  const [showError, setShowError] = useState(false);
+  const [showInterviewError, setShowInterviewError] = useState(false);
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailBody, setEmailBody] = useState("");
+  const [showOfferError, setShowOfferError] = useState(false);
 
   const toggleSortOrder = () => {
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -101,14 +109,14 @@ export function ApplicantsTab({
     );
     // Reset error when an interview type is selected
     if (!interviewTypes.includes(type)) {
-      setShowError(false);
+      setShowInterviewError(false);
     }
   };
 
-  // Handle form submission
+  // Handle interview form submission
   const handleSubmitInterview = () => {
     if (interviewTypes.length === 0) {
-      setShowError(true);
+      setShowInterviewError(true);
       return;
     }
     onSendInterview({
@@ -117,21 +125,53 @@ export function ApplicantsTab({
       expiryDate,
       selectedApplicants,
     });
-    setOpen(false);
+    setOpenInterview(false);
     setInterviewTypes([]);
     setQuestionCount(5);
     setExpiryDate(null);
-    setShowError(false);
+    setShowInterviewError(false);
   };
 
-  // Reset error and form when dialog is closed
-  const handleDialogChange = (open) => {
-    setOpen(open);
+  // Handle offer form submission
+  const handleSubmitOffer = () => {
+    if (
+      !emailSubject.trim() ||
+      !emailBody.trim() ||
+      emailSubject.length < 10 ||
+      emailBody.length < 10
+    ) {
+      setShowOfferError(true);
+      return;
+    }
+    offerApplicants({
+      emailSubject,
+      emailBody,
+      selectedApplicants,
+    });
+    setOpenOffer(false);
+    setEmailSubject("");
+    setEmailBody("");
+    setShowOfferError(false);
+  };
+
+  // Reset interview error and form when dialog is closed
+  const handleInterviewDialogChange = (open) => {
+    setOpenInterview(open);
     if (!open) {
-      setShowError(false);
+      setShowInterviewError(false);
       setInterviewTypes([]);
       setQuestionCount(5);
       setExpiryDate(null);
+    }
+  };
+
+  // Reset offer error and form when dialog is closed
+  const handleOfferDialogChange = (open) => {
+    setOpenOffer(open);
+    if (!open) {
+      setShowOfferError(false);
+      setEmailSubject("");
+      setEmailBody("");
     }
   };
 
@@ -208,8 +248,17 @@ export function ApplicantsTab({
               onClick={moveToCVReview}
               disabled={selectedApplicants.length === 0 || isLoadingMutation}
             >
-              <ArrowRight className="h-4 w-4" />
-              Run AI CV Review
+              {cvReviewLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Run AI CV Review
+                </>
+              ) : (
+                <>
+                  <ArrowRight className="h-4 w-4" />
+                  Run AI CV Review
+                </>
+              )}
             </Button>
           )}
         {activePhase === "Interview Feedback" && (
@@ -220,12 +269,24 @@ export function ApplicantsTab({
             onClick={sendToFinalFeedback}
             disabled={selectedApplicants.length === 0 || isLoadingMutation}
           >
-            <ArrowRight className="h-4 w-4" />
-            Send to final feedback
+            {finalFeedBackLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Send to final feedback
+              </>
+            ) : (
+              <>
+                <ArrowRight className="h-4 w-4" />
+                Send to final feedback
+              </>
+            )}
           </Button>
         )}
         {(activePhase === "CV Review" || activePhase === "Applications") && (
-          <Dialog open={open} onOpenChange={handleDialogChange}>
+          <Dialog
+            open={openInterview}
+            onOpenChange={handleInterviewDialogChange}
+          >
             <DialogTrigger asChild>
               <Button
                 variant="outline"
@@ -233,10 +294,10 @@ export function ApplicantsTab({
                 className="flex items-center gap-2"
                 disabled={selectedApplicants.length === 0 || isLoadingMutation}
               >
-                {isLoadingMutation ? (
+                {sendVideoInterviewLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Moving Applicant...
+                    Send AI Interview
                   </>
                 ) : (
                   <>
@@ -286,7 +347,7 @@ export function ApplicantsTab({
                       </Label>
                     </div>
                   </div>
-                  {showError && (
+                  {showInterviewError && (
                     <Alert variant="destructive">
                       <AlertDescription>
                         Please select at least one interview type
@@ -298,7 +359,7 @@ export function ApplicantsTab({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label>Number of Questions</Label>
-                    <span className="text-sm font-medium bg-muted px-2 py-1 rounded">
+                    <span className="text-sm font-medium bg-muted px-2 py-1 rounded mb-4">
                       {questionCount}
                     </span>
                   </div>
@@ -347,6 +408,9 @@ export function ApplicantsTab({
                       />
                     </PopoverContent>
                   </Popover>
+                  <p className="text-xs text-muted-foreground">
+                    The expiry date is by default two days from now
+                  </p>
                 </div>
 
                 {selectedApplicants.length > 0 && (
@@ -363,7 +427,7 @@ export function ApplicantsTab({
               <DialogFooter>
                 <Button
                   variant="outline"
-                  onClick={() => handleDialogChange(false)}
+                  onClick={() => handleInterviewDialogChange(false)}
                 >
                   Cancel
                 </Button>
@@ -379,17 +443,104 @@ export function ApplicantsTab({
           onClick={rejectApplicants}
           disabled={selectedApplicants.length === 0 || isLoadingMutation}
         >
-          Reject
+          {changeStageLoading ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Reject
+            </>
+          ) : (
+            <>
+              <XCircle className="h-4 w-4" />
+              Reject
+            </>
+          )}
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-1 text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-50 dark:disabled:hover:bg-transparent"
-          onClick={offerApplicants}
-          disabled={selectedApplicants.length === 0 || isLoadingMutation}
-        >
-          Offer
-        </Button>
+        <Dialog open={openOffer} onOpenChange={handleOfferDialogChange}>
+          <DialogTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-50 dark:disabled:hover:bg-transparent"
+              disabled={selectedApplicants.length === 0 || isLoadingMutation}
+            >
+              {changeStageLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Offer
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="h-4 w-4" />
+                  Offer
+                </>
+              )}
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Send Offer Email</DialogTitle>
+              <DialogDescription>
+                Configure the offer email details below.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="grid gap-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="emailSubject">Email Subject</Label>
+                <Input
+                  id="emailSubject"
+                  value={emailSubject}
+                  onChange={(e) => setEmailSubject(e.target.value)}
+                  placeholder="Enter email subject (minimum 10 characters)"
+                  required
+                  minLength={10}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="emailBody">Email Body</Label>
+                <textarea
+                  id="emailBody"
+                  value={emailBody}
+                  onChange={(e) => setEmailBody(e.target.value)}
+                  placeholder="Enter email body (minimum 10 characters)"
+                  className="w-full h-32 p-2 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                  required
+                  minLength={10}
+                />
+              </div>
+
+              {showOfferError && (
+                <Alert variant="destructive">
+                  <AlertDescription>
+                    Please ensure both email subject and body are filled and
+                    each has at least 10 characters.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {selectedApplicants.length > 0 && (
+                <div className="p-3 rounded-md border bg-muted">
+                  <p className="text-sm font-medium">Selected Applicants</p>
+                  <p className="text-xs text-muted-foreground">
+                    {selectedApplicants.length} applicant
+                    {selectedApplicants.length !== 1 ? "s" : ""} selected
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => handleOfferDialogChange(false)}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleSubmitOffer}>Send Offer</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Applicants table */}
