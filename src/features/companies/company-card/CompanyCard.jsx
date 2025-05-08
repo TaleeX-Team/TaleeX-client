@@ -177,16 +177,18 @@ export default function CompanyCard({ company, handleDelete }) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-lg">
-                  {name}{" "}
+                <p>
+                  <span className="text-lg font-semibold"> {name} </span>
+
                   {verification?.status && (
-                    <Badge className={statusBadgeStyles[verification?.status]}>
-                      <StatusIcon status={verification?.status} />
-                      {verification?.status.charAt(0).toUpperCase() +
-                        verification?.status.slice(1)}
+                    <Badge
+                      className={`${statusBadgeStyles[verification.status]} `}
+                    >
+                      {verification.status.charAt(0).toUpperCase() +
+                        verification.status.slice(1)}
                     </Badge>
                   )}
-                </h3>
+                </p>
               </div>
               {website && (
                 <a
