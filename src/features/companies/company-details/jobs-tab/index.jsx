@@ -21,13 +21,13 @@ const jobTypeColors = {
   Internship:
     "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
 };
-export default function JobsTab({ jobs }) {
+export default function JobsTab({ jobs, verification }) {
   return (
     <TabsContent value="jobs">
       <div className="bg-card rounded-lg shadow-sm border p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold">Company Jobs</h2>
-          <AddJob />
+          {verification.status !== "rejected" && <AddJob />}
         </div>
 
         {
