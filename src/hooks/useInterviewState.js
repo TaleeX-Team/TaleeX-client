@@ -11,13 +11,16 @@ const CallStatus = {
     FINISHED: "FINISHED",
 }
 
-const VAPI_ASSISTANT_ID = "40152fdc-70d4-4300-a9b3-1f1672200982"
-const VAPI_API_KEY = "d4ecde21-8c7d-4f5c-9996-5c2b306d9ccf"
+const VAPI_ASSISTANT_ID = import.meta.env.VITE_VAPI_ASSISTANT_ID;
+const VAPI_API_KEY = import.meta.env.VITE_VAPI_API_KEY;
+
 const ENDING_PHRASE = "That concludes our interview today. Thank you for your time."
 const INTERVIEW_DURATION_MINUTES = 20
 const WARNING_TIME_MINUTES = 5
 const FINAL_WARNING_MINUTES = 1
 const RESPONSE_TIMEOUT = 15000 // 15 seconds for response timeout
+const SCREENSHOT_INTERVAL = 90000 // 1.5 minutes (90 seconds) in milliseconds
+const MAX_SCREENSHOTS = 3
 
 export function useInterviewState(questions, interviewId) {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -46,7 +49,6 @@ export function useInterviewState(questions, interviewId) {
     const [screenshots, setScreenshots] = useState([])
     const [screenshotTimes, setScreenshotTimes] = useState([])
     const [lastCapturedScreenshot, setLastCapturedScreenshot] = useState(null)
-    const [screenshotInterval, setScreenshotInterval] = useState(null)
     const [screenshotError, setScreenshotError] = useState(null)
     const [debugMode, setDebugMode] = useState(true)
     const [timeRemaining, setTimeRemaining] = useState(INTERVIEW_DURATION_MINUTES * 60)
@@ -57,8 +59,6 @@ export function useInterviewState(questions, interviewId) {
         role: null,
         content: "",
     })
-    const [callId, setCallId] = useState(null)
-    const [audioRecordingUrl, setAudioRecordingUrl] = useState(null)
 
     const [questionStates, setQuestionStates] = useState(
         questions.map((question, idx) => ({
@@ -70,12 +70,12 @@ export function useInterviewState(questions, interviewId) {
             duration: 0,
             userResponses: [],
             aiResponses: [],
-        }))
+        })),
     )
 
-    const maxScreenshots = 3
     const navigate = useNavigate()
 
+    // Refs
     const videoRef = useRef(null)
     const aiVideoContainerRef = useRef(null)
     const userVideoContainerRef = useRef(null)
@@ -87,6 +87,7 @@ export function useInterviewState(questions, interviewId) {
     const responseTimeoutRef = useRef(null)
     const screenshotIntervalRef = useRef(null)
 
+    // Initialize VAPI client
     useEffect(() => {
         if (!vapiClientRef.current && typeof Vapi !== "undefined") {
             vapiClientRef.current = new Vapi(VAPI_API_KEY)
@@ -111,6 +112,7 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [debugMode, callStatus])
 
+    // Monitor network status
     useEffect(() => {
         const handleOnline = () => {
             if (debugMode)
@@ -139,6 +141,7 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [callStatus, debugMode])
 
+    // Synchronize question states and progress
     useEffect(() => {
         if (questions.length > 0) {
             setQuestionStates((prevStates) => {
@@ -178,6 +181,7 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [questions, currentQuestionIndex, debugMode])
 
+    // Update messages and track responses
     useEffect(() => {
         if (messages.length > 0) {
             const newLastMessage = messages[messages.length - 1]
@@ -237,6 +241,7 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [messages, currentQuestionIndex, debugMode])
 
+    // Duration timer
     useEffect(() => {
         if (isInterviewStarted && callStatus === CallStatus.ACTIVE) {
             durationTimerRef.current = setInterval(() => {
@@ -260,6 +265,7 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [isInterviewStarted, callStatus, debugMode])
 
+    // Interview timer (for warnings and time remaining)
     useEffect(() => {
         if (isInterviewStarted && callStatus === CallStatus.ACTIVE) {
             interviewTimerRef.current = setInterval(() => {
@@ -310,6 +316,7 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [isInterviewStarted, callStatus, debugMode])
 
+    // Setup VAPI client listeners
     useEffect(() => {
         if (vapiClientRef.current) {
             const handleMessage = (message) => {
@@ -336,7 +343,7 @@ export function useInterviewState(questions, interviewId) {
 
                 setMessages((prev) => [...prev, {...message, content: messageContent}])
                 if (message.role === "assistant" || message.role === "user") {
-                    setLastSpeakerTranscript({
+                    setLastSpeakericester({
                         role: message.role,
                         content: messageContent,
                     })
@@ -554,7 +561,7 @@ export function useInterviewState(questions, interviewId) {
             }
 
             const handleError = (error) => {
-                let errorMessage = error?.response?.data?.message
+                let errorMessage = error?.response?.data?.message || "Unknown error"
                 if (errorMessage.includes("microphone")) {
                     errorMessage =
                         "Microphone access issue. Please ensure your microphone is enabled and permissions are granted."
@@ -584,8 +591,6 @@ export function useInterviewState(questions, interviewId) {
                     return
                 }
                 setError(`VAPI error: ${errorMessage}`)
-                console.log(errorMessage,"ERROR")
-                console.log(error,"VAP ERROR1")
                 setIsAITalking(false)
                 setIsUserTalking(false)
                 if (debugMode)
@@ -644,17 +649,10 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [lastSpeakerTranscript, debugMode])
 
+    // Capture screenshot
     const captureScreenshot = () => {
         if (!videoRef.current) {
             setScreenshotError("Video reference not available")
-            return null
-        }
-        if (screenshots.length >= maxScreenshots) {
-            if (debugMode)
-                console.log("Maximum screenshots reached", {
-                    screenshotCount: screenshots.length,
-                    timestamp: new Date().toISOString(),
-                })
             return null
         }
         try {
@@ -674,66 +672,98 @@ export function useInterviewState(questions, interviewId) {
             }
             localStorage.setItem(`interview_screenshot_${interviewId}_${screenshots.length}`, JSON.stringify(screenshotData))
             if (debugMode)
-                console.log("Screenshot captured", {
-                    screenshotCount: screenshots.length + 1,
+                console.log("Screenshot captured and saved", {
+                    screenshotIndex: screenshots.length + 1,
                     timestamp: new Date().toISOString(),
                 })
             return screenshot
         } catch (error) {
-            setScreenshotError(`Screenshot error: ${error?.response?.data?.message}`)
+            setScreenshotError(`Screenshot error: ${error?.message || "Unknown error"}`)
+            if (debugMode)
+                console.error("Screenshot capture error:", {
+                    error,
+                    timestamp: new Date().toISOString(),
+                })
             return null
         }
     }
 
+    // Manual screenshot
     const takeManualScreenshot = () => {
-        if (debugMode)
-            console.log("Manual screenshot capture is disabled to enforce 3-screenshot limit", {
-                timestamp: new Date().toISOString(),
-            })
+        if (screenshots.length < MAX_SCREENSHOTS) {
+            captureScreenshot()
+        }
     }
 
+    // Setup screenshot capture
     useEffect(() => {
         if (isInterviewStarted && callStatus === CallStatus.ACTIVE && videoRef.current) {
-            if (screenshotIntervalRef.current) clearInterval(screenshotIntervalRef.current)
+            // Clear any existing interval
+            if (screenshotIntervalRef.current) {
+                clearInterval(screenshotIntervalRef.current)
+                screenshotIntervalRef.current = null
+                if (debugMode)
+                    console.log("Cleared previous screenshot interval", {
+                        timestamp: new Date().toISOString(),
+                    })
+            }
 
-            const intervalTime = 90 * 1000 // 1 minute 30 seconds
-            let screenshotCount = 0
+            // Take first screenshot immediately if none exist
+            if (screenshots.length === 0) {
+                captureScreenshot()
+            }
 
-            const intervalId = setInterval(() => {
-                if (screenshotCount < maxScreenshots && screenshots.length < maxScreenshots) {
-                    captureScreenshot()
-                    screenshotCount++
-                    if (screenshotCount >= maxScreenshots || screenshots.length >= maxScreenshots) {
-                        clearInterval(intervalId)
-                        setScreenshotInterval(null)
+            // Only set up interval if we haven't reached max screenshots
+            if (screenshots.length < MAX_SCREENSHOTS) {
+                const intervalId = setInterval(() => {
+                    if (screenshots.length < MAX_SCREENSHOTS) {
+                        captureScreenshot()
+                    }
+
+                    // Clear interval if max screenshots reached
+                    if (screenshots.length >= MAX_SCREENSHOTS) {
+                        clearInterval(screenshotIntervalRef.current)
+                        screenshotIntervalRef.current = null
                         if (debugMode)
-                            console.log("Screenshot interval cleared", {
-                                screenshotCount: screenshots.length,
+                            console.log("Screenshot interval cleared after reaching max screenshots", {
+                                totalScreenshots: screenshots.length,
+                                timestamp: new Date().toISOString(),
+                            })
+                    }
+                }, SCREENSHOT_INTERVAL)
+
+                screenshotIntervalRef.current = intervalId
+
+                if (debugMode)
+                    console.log("Screenshot interval set up", {
+                        interval: SCREENSHOT_INTERVAL,
+                        maxScreenshots: MAX_SCREENSHOTS,
+                        timestamp: new Date().toISOString(),
+                    })
+
+                return () => {
+                    if (screenshotIntervalRef.current) {
+                        clearInterval(screenshotIntervalRef.current)
+                        screenshotIntervalRef.current = null
+                        if (debugMode)
+                            console.log("Screenshot interval cleared on cleanup", {
                                 timestamp: new Date().toISOString(),
                             })
                     }
                 }
-            }, intervalTime)
-
-            setScreenshotInterval(intervalId)
-            return () => {
-                clearInterval(intervalId)
-                setScreenshotInterval(null)
-                if (debugMode)
-                    console.log("Screenshot interval cleared on cleanup", {
-                        timestamp: new Date().toISOString(),
-                    })
             }
         }
-    }, [isInterviewStarted, callStatus, debugMode])
+    }, [isInterviewStarted, callStatus, screenshots.length, debugMode])
 
+    // Monitor conclusion
     useEffect(() => {
         if (conclusionDetected && !isInterviewComplete) {
-            if (screenshots.length < maxScreenshots) captureScreenshot()
+            if (screenshots.length < MAX_SCREENSHOTS) captureScreenshot()
             endCallImmediately()
         }
     }, [conclusionDetected, isInterviewComplete, screenshots.length])
 
+    // Reset isAITalking and isUserTalking when call is inactive or finished
     useEffect(() => {
         if (callStatus === CallStatus.INACTIVE || callStatus === CallStatus.FINISHED) {
             setIsAITalking(false)
@@ -745,8 +775,7 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [callStatus, debugMode])
 
-
-
+    // Stop VAPI call
     const stopVAPICall = async () => {
         try {
             if (!vapiClientRef.current) {
@@ -790,16 +819,11 @@ export function useInterviewState(questions, interviewId) {
             if (vapiClientRef.current) {
                 await vapiClientRef.current.stop()
             }
-            if (screenshots.length < maxScreenshots) {
+            if (screenshots.length < MAX_SCREENSHOTS) {
                 captureScreenshot()
             }
 
             const transcriptData = saveAndGetTranscript(interviewId)
-
-            if (callId) {
-                await fetchRecordingUrl(callId)
-                console.log(callId,"callId")
-            }
 
             setQuestionStates((prevStates) => {
                 const newStates = [...prevStates]
@@ -832,7 +856,7 @@ export function useInterviewState(questions, interviewId) {
                     timestamp: new Date().toISOString(),
                 })
         } catch (error) {
-            setError(`Call termination error: ${error?.response?.data?.message}`)
+            setError(`Call termination error: ${error?.message || "Unknown error"}`)
             setIsInterviewComplete(true)
             setCallStatus(CallStatus.FINISHED)
             if (debugMode)
@@ -886,13 +910,13 @@ export function useInterviewState(questions, interviewId) {
                     timestamp: new Date().toISOString(),
                 })
         }
-        setScreenshotInterval(null)
         if (debugMode)
             console.log("All timers cleared", {
                 timestamp: new Date().toISOString(),
             })
     }
 
+    // Start VAPI call
     const startVAPICall = async () => {
         if (!navigator.onLine) {
             setError("No internet connection. Please check your network and try again.")
@@ -958,8 +982,8 @@ export function useInterviewState(questions, interviewId) {
                             role: "system",
                             content: `You're a professional interviewer conducting a live voice interview to evaluate a candidate's qualifications, motivation, and role fit.
 
-Guidelines:
-- Follow the structured question flow: ${formattedQuestions}
+**Guidelines:**
+- Follow the structured question flow: ${{questions}}
 - Ask the ${questions.length} technical questions in order, one at a time, starting with question 1.
 - Engage naturally:
   - Listen actively, acknowledge responses, and ask brief follow-ups if needed for clarity.
@@ -973,11 +997,11 @@ Guidelines:
   - Redirect to HR if unsure.
 - Conclude:
   - Thank the candidate and say the company will follow up.
-  - You Must End with: ${ENDING_PHRASE}
+  - End with: ${ENDING_PHRASE}
 
-Questions: ${formattedQuestions}
+**Questions**: ${formattedQuestions}
 
-Notes:
+**Notes:**
 - Stay polite and professional.
 - Keep responses short, simple, and conversational for voice interaction.
 - Avoid long explanations.`,
@@ -987,14 +1011,12 @@ Notes:
                 endCallPhrases: [ENDING_PHRASE],
             }
             if (debugMode)
-                console.log("Starting VAPI call with recording enabled", {
+                console.log("Starting VAPI call", {
                     timestamp: new Date().toISOString(),
                 })
-            const call = await vapiClientRef.current.start(VAPI_ASSISTANT_ID, interviewer)
-            setCallId(call.id)
+            await vapiClientRef.current.start(VAPI_ASSISTANT_ID, interviewer)
             if (debugMode)
                 console.log("VAPI call started successfully", {
-                    callId: call.id,
                     timestamp: new Date().toISOString(),
                 })
 
@@ -1033,6 +1055,7 @@ Notes:
                 return newStates
             })
         } catch (error) {
+            setError(`Failed to start the interview: ${error?.message || "Unknown error"}`)
             setIsAITalking(false)
             setIsUserTalking(false)
             setCallStatus(CallStatus.INACTIVE)
@@ -1049,6 +1072,7 @@ Notes:
         }
     }
 
+    // Handle start interview
     const handleStartInterview = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({audio: true})
@@ -1070,8 +1094,6 @@ Notes:
         setIsInterviewStarted(true)
         setScreenshots([])
         setScreenshotTimes([])
-        setAudioRecordingUrl(null)
-        setCallId(null)
         setProgress({current: 1, total: questions.length})
         setTimeRemaining(INTERVIEW_DURATION_MINUTES * 60)
         setTimerWarningGiven(false)
@@ -1094,6 +1116,7 @@ Notes:
         if (debugMode) console.log("Interview started", {timestamp: new Date().toISOString()})
     }
 
+    // Handle end interview
     const handleEndInterview = () => {
         stopVAPICall()
         if (videoRef.current && videoRef.current.srcObject) {
@@ -1136,6 +1159,7 @@ Notes:
         }
     }
 
+    // Force next question
     const forceNextQuestion = () => {
         if (!vapiClientRef.current || callStatus !== CallStatus.ACTIVE) {
             setError("Cannot move to next question: Call is not active or VAPI client is unavailable.")
@@ -1170,6 +1194,7 @@ Notes:
         }
     }
 
+    // Toggle transcript visibility
     const toggleTranscript = () => {
         if (showTranscript && transcriptContainerRef.current) {
             import("gsap").then(({gsap}) => {
@@ -1184,10 +1209,12 @@ Notes:
         }
     }
 
+    // Toggle transcript expanded state
     const toggleTranscriptExpanded = () => {
         setTranscriptExpanded(!transcriptExpanded)
     }
 
+    // Toggle audio
     const toggleAudio = useCallback(() => {
         if (!vapiClientRef.current || callStatus !== CallStatus.ACTIVE) {
             if (debugMode)
@@ -1202,6 +1229,7 @@ Notes:
         try {
             const currentMuted = vapiClientRef.current.isMuted()
             vapiClientRef.current.setMuted(!currentMuted)
+
             const peerConnection = vapiClientRef.current.getPeerConnection?.() || null
 
             if (peerConnection) {
@@ -1422,12 +1450,14 @@ Notes:
         }
     }
 
+    // Format duration
     const formatDuration = (seconds) => {
         const minutes = Math.floor(seconds / 60)
         const remainingSeconds = seconds % 60
         return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`
     }
 
+    // Question state management
     const getCurrentQuestionSummary = () => {
         const currentState = questionStates.find((state) => state.status === "current")
         if (!currentState) return null
@@ -1473,8 +1503,6 @@ Notes:
         setCurrentQuestionIndex(0)
         setDisplayedQuestion(questions[0] || "")
         setProgress({current: 1, total: questions.length})
-        setAudioRecordingUrl(null)
-        setCallId(null)
         if (debugMode)
             console.log("Question states reset", {
                 timestamp: new Date().toISOString(),
@@ -1554,20 +1582,18 @@ Notes:
         try {
             const fullTranscriptData = JSON.parse(localStorage.getItem(`interview_transcript_${interviewId}`))
             const cleanTranscriptData = JSON.parse(localStorage.getItem(`interview_clean_transcript_${interviewId}`))
-            const audioData = JSON.parse(localStorage.getItem(`interview_audio_${interviewId}`))
             const screenshotData = []
-            for (let i = 0; i < maxScreenshots; i++) {
+            for (let i = 0; i < MAX_SCREENSHOTS; i++) {
                 const data = JSON.parse(localStorage.getItem(`interview_screenshot_${interviewId}_${i}`))
                 if (data) screenshotData.push(data)
             }
             return {
                 fullTranscript: fullTranscriptData,
                 cleanTranscript: cleanTranscriptData,
-                audio: audioData,
                 screenshots: screenshotData,
             }
         } catch (error) {
-            setError(`Failed to retrieve interview data: ${error?.response?.data?.message}`)
+            setError(`Failed to retrieve interview data: ${error?.message || "Unknown error"}`)
             if (debugMode)
                 console.error("Retrieve interview data error:", {
                     error,
@@ -1577,6 +1603,7 @@ Notes:
         }
     }
 
+    // Monitor interview completion state
     useEffect(() => {
         if (isInterviewComplete && conclusionDetected) {
             if (debugMode)
@@ -1588,13 +1615,12 @@ Notes:
                 detail: {
                     transcript: getInterviewTranscript(),
                     screenshots: screenshots,
-                    audioRecordingUrl,
                     questionStates: formatQuestionStateForUI(),
                 },
             })
             window.dispatchEvent(event)
         }
-    }, [isInterviewComplete, conclusionDetected, audioRecordingUrl])
+    }, [isInterviewComplete, conclusionDetected])
 
     return {
         state: {
@@ -1629,8 +1655,6 @@ Notes:
             currentQuestionSummary: getCurrentQuestionSummary(),
             completedQuestionsSummary: getCompletedQuestionsSummary(),
             pendingQuestionsCount: getPendingQuestionsCount(),
-            audioRecordingUrl,
-            callId,
         },
         actions: {
             setCurrentQuestionIndex,
@@ -1671,7 +1695,7 @@ Notes:
             resetQuestionStates,
             saveAndGetTranscript,
             retryQuestion,
-       },
+        },
         refs: {
             videoRef,
             aiVideoContainerRef,
