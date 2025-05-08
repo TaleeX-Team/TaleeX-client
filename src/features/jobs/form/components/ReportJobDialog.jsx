@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import {
     Dialog,
     DialogContent,
@@ -8,15 +8,15 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
-import {Textarea} from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
     Card,
     CardContent,
 } from "@/components/ui/card";
-import {useReportJob} from "@/hooks/useReportJob";
+import { useReportJob } from "@/hooks/useReportJob";
 import {
     AlertCircle,
     Flag,
@@ -25,46 +25,46 @@ import {
     ShieldAlert,
     Zap
 } from "lucide-react";
-import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert";
-import {toast} from "sonner";
-import {useTheme} from "@/layouts/theme_provider/ThemeProvider.jsx";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { toast } from "sonner";
+import { useTheme } from "@/layouts/theme_provider/ThemeProvider.jsx";
 
 const REPORT_REASONS = [
     {
         value: "spam",
         label: "Spam / Promotional Content",
         description: "Job posting is primarily advertising products or services",
-        icon: <Zap className="h-5 w-5 text-amber-500"/>
+        icon: <Zap className="h-5 w-5 text-amber-500" />
     },
     {
         value: "scam",
         label: "Scam or Fraud",
         description: "Job posting appears to be fraudulent or deceptive",
-        icon: <ShieldAlert className="h-5 w-5 text-red-500"/>
+        icon: <ShieldAlert className="h-5 w-5 text-red-500" />
     },
     {
         value: "inappropriate",
         label: "Inappropriate Content",
         description: "Job contains offensive, illegal or harmful content",
-        icon: <AlertCircle className="h-5 w-5 text-orange-500"/>
+        icon: <AlertCircle className="h-5 w-5 text-orange-500" />
     },
     {
         value: "misleading",
         label: "Misleading Information",
         description: "Job details are inaccurate or misleading",
-        icon: <AlertTriangle className="h-5 w-5 text-amber-500"/>
+        icon: <AlertTriangle className="h-5 w-5 text-amber-500" />
     },
     {
         value: "discrimination",
         label: "Discrimination",
         description: "Job contains discriminatory requirements or language",
-        icon: <AlertCircle className="h-5 w-5 text-purple-500"/>
+        icon: <AlertCircle className="h-5 w-5 text-purple-500" />
     },
     {
         value: "other",
         label: "Other",
         description: "Other concerns not listed above",
-        icon: <Flag className="h-5 w-5 text-slate-500"/>
+        icon: <Flag className="h-5 w-5 text-slate-500" />
     },
 ];
 
@@ -77,11 +77,11 @@ const REPORT_REASONS = [
  * @param {Function} [props.onSuccess] - Callback after successful submission
  */
 export function ReportJobDialog({
-                                    jobId,
-                                    defaultName = "",
-                                    defaultEmail = "",
-                                    onSuccess
-                                }) {
+    jobId,
+    defaultName = "",
+    defaultEmail = "",
+    onSuccess
+}) {
     const { theme } = useTheme(); // Get current theme
     const [open, setOpen] = useState(false);
     const [step, setStep] = useState("reason"); // "reason", "details", "success"
@@ -117,7 +117,7 @@ export function ReportJobDialog({
 
     const validateReasonStep = () => {
         if (!formData.reason) {
-            setErrors({reason: "Please select a reason for reporting"});
+            setErrors({ reason: "Please select a reason for reporting" });
             return false;
         }
         return true;
@@ -145,21 +145,21 @@ export function ReportJobDialog({
     };
 
     const handleChange = (e) => {
-        const {name, value} = e.target;
-        setFormData((prev) => ({...prev, [name]: value}));
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
 
         // Clear error when field is updated
         if (errors[name]) {
-            setErrors(prev => ({...prev, [name]: null}));
+            setErrors(prev => ({ ...prev, [name]: null }));
         }
     };
 
     const handleReasonSelect = (value) => {
-        setFormData((prev) => ({...prev, reason: value}));
+        setFormData((prev) => ({ ...prev, reason: value }));
 
         // Clear reason error
         if (errors.reason) {
-            setErrors(prev => ({...prev, reason: null}));
+            setErrors(prev => ({ ...prev, reason: null }));
         }
     };
 
@@ -219,24 +219,27 @@ export function ReportJobDialog({
                         : 'border-red-200 bg-white hover:bg-red-50 text-red-700'}`}
                     data-report-trigger
                 >
-                    <Flag className="h-4 w-4"/>
+                    <Flag className="h-4 w-4" />
                     Report Job
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden">
+            <DialogContent className="sm:max-w-[500px] p-0 overflow-y-auto scrollbar-none"
+                style={{
+                    overscrollBehavior: "contain",
+                    maxHeight: "90vh",
+                    scrollbarWidth: "none",
+                    msOverflowStyle: "none",
+                }}>
                 <DialogHeader className="p-6 pb-2">
                     <DialogTitle className="flex items-center gap-2 text-lg">
-                        <Flag className={`h-5 w-5 ${theme === 'dark' ? 'text-red-400' : 'text-red-500'}`}/>
+                        {/* <Flag className={`h-5 w-5 ${theme === 'dark' ? 'text-red-400' : 'text-red-500'}`} /> */}
                         Report this job listing
                     </DialogTitle>
-                    <DialogDescription className={theme === 'dark' ? 'text-gray-400' : ''}>
-                        Help us maintain a safe platform by reporting suspicious or inappropriate job listings
-                    </DialogDescription>
                 </DialogHeader>
 
                 {reportJobMutation.isError && (
                     <Alert variant="destructive" className="mx-6">
-                        <AlertCircle className="h-4 w-4"/>
+                        <AlertCircle className="h-4 w-4" />
                         <AlertTitle>Error</AlertTitle>
                         <AlertDescription>
                             {reportJobMutation.error instanceof Error
@@ -249,11 +252,11 @@ export function ReportJobDialog({
                 {step === "reason" && (
                     <>
                         <div className="px-6 pt-2 pb-4 max-h-[400px] overflow-y-auto">
-                            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-slate-500'} mb-4`}>Select a reason for reporting this job:</p>
+                            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-slate-500'} mb-4`}>Why are you reporting this job?</p>
 
                             {errors.reason && (
-                                <Alert variant="destructive" className="mb-4">
-                                    <AlertCircle className="h-4 w-4"/>
+                                <Alert variant="destructive" className="mb-4 px-6">
+                                    <AlertCircle className="h-4 w-4" />
                                     <AlertTitle>Error</AlertTitle>
                                     <AlertDescription>{errors.reason}</AlertDescription>
                                 </Alert>
@@ -263,18 +266,17 @@ export function ReportJobDialog({
                                 {REPORT_REASONS.map((reason) => (
                                     <Card
                                         key={reason.value}
-                                        className={`cursor-pointer transition-all border ${
-                                            formData.reason === reason.value
-                                                ? theme === 'dark'
-                                                    ? 'border-blue-600 ring-2 ring-blue-900'
-                                                    : 'border-blue-500 ring-2 ring-blue-100'
-                                                : theme === 'dark'
-                                                    ? 'hover:border-blue-800 border-gray-700'
-                                                    : 'hover:border-blue-200'
-                                        } ${theme === 'dark' ? 'bg-gray-800' : ''}`}
+                                        className={`cursor-pointer transition-all border pt-4 ${formData.reason === reason.value
+                                            ? theme === 'dark'
+                                                ? 'border-secondary ring-2 ring-blue-900'
+                                                : 'border-blue-500 ring-2 ring-blue-100'
+                                            : theme === 'dark'
+                                                ? 'hover:border-primary'
+                                                : 'hover:border-blue-200'
+                                            } ${theme === 'dark' ? 'bg-card' : ''}`}
                                         onClick={() => handleReasonSelect(reason.value)}
                                     >
-                                        <CardContent className="p-4">
+                                        <CardContent>
                                             <div className="flex items-center gap-3">
                                                 <div className="flex-shrink-0">
                                                     {reason.icon}
@@ -292,7 +294,7 @@ export function ReportJobDialog({
                             </div>
                         </div>
 
-                        <DialogFooter className={`p-4 ${theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-slate-50 border-t'}`}>
+                        <DialogFooter className={`p-4 `}>
                             <Button
                                 onClick={handleNextStep}
                                 disabled={!formData.reason}
@@ -307,15 +309,13 @@ export function ReportJobDialog({
                 {step === "details" && (
                     <form onSubmit={handleSubmit}>
                         <div className="px-6 py-4 max-h-[400px] overflow-y-auto">
-                            <div className={`flex items-center gap-3 p-3 rounded-md mb-4 ${
-                                theme === 'dark' ? 'bg-blue-950' : 'bg-blue-50'
-                            }`}>
+                            <div className={`flex items-center gap-3 p-3 rounded-md mb-4 border border-dotted  border-primary/50 ${theme === 'dark' ? 'bg-primary/10' : 'bg-primary/20'
+                                }`}>
                                 {selectedReason && selectedReason.icon}
                                 <div>
                                     <p className="font-medium">{selectedReason?.label}</p>
-                                    <p className={`text-sm ${
-                                        theme === 'dark' ? 'text-gray-300' : 'text-slate-600'
-                                    }`}>{selectedReason?.description}</p>
+                                    <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-slate-600'
+                                        }`}>{selectedReason?.description}</p>
                                 </div>
                             </div>
 
@@ -327,9 +327,7 @@ export function ReportJobDialog({
                                         name="name"
                                         value={formData.name}
                                         onChange={handleChange}
-                                        className={`${errors.name ? "border-red-500" : ""} ${
-                                            theme === 'dark' ? 'bg-gray-800 border-gray-700' : ''
-                                        }`}
+                                        className={`${errors.name ? "border-red-500" : ""}bg-input border border-accent`}
                                         placeholder="Enter your name"
                                     />
                                     {errors.name && (
@@ -345,9 +343,7 @@ export function ReportJobDialog({
                                         type="email"
                                         value={formData.email}
                                         onChange={handleChange}
-                                        className={`${errors.email ? "border-red-500" : ""} ${
-                                            theme === 'dark' ? 'bg-gray-800 border-gray-700' : ''
-                                        }`}
+                                        className={`${errors.email ? "border-red-500" : ""} bg-input border border-accent`}
                                         placeholder="Enter your email address"
                                     />
                                     {errors.email && (
@@ -367,9 +363,7 @@ export function ReportJobDialog({
                                         onChange={handleChange}
                                         placeholder="Please provide any additional details about this report"
                                         rows={4}
-                                        className={`${errors.description ? "border-red-500" : ""} ${
-                                            theme === 'dark' ? 'bg-gray-800 border-gray-700' : ''
-                                        }`}
+                                        className={`${errors.description ? "border-red-500" : ""} bg-input border border-accent`}
                                     />
                                     {errors.description && (
                                         <p className="text-red-500 text-sm">{errors.description}</p>
@@ -383,9 +377,7 @@ export function ReportJobDialog({
                             </div>
                         </div>
 
-                        <DialogFooter className={`p-4 gap-2 ${
-                            theme === 'dark' ? 'bg-gray-900 border-gray-700' : 'bg-slate-50 border-t'
-                        }`}>
+                        <DialogFooter className={`p-4 gap-2`}>
                             <Button
                                 type="button"
                                 variant="outline"
@@ -408,12 +400,11 @@ export function ReportJobDialog({
                 {step === "success" && (
                     <div className="px-6 py-8 flex flex-col items-center justify-center text-center">
                         <div className={theme === 'dark' ? "bg-green-900 p-3 rounded-full mb-4" : "bg-green-100 p-3 rounded-full mb-4"}>
-                            <CheckCircle2 className={theme === 'dark' ? "h-10 w-10 text-green-400" : "h-10 w-10 text-green-600"}/>
+                            <CheckCircle2 className={theme === 'dark' ? "h-10 w-10 text-green-400" : "h-10 w-10 text-green-600"} />
                         </div>
-                        <h3 className="text-xl font-semibold mb-2">Report Submitted</h3>
-                        <p className={`mb-6 max-w-sm ${theme === 'dark' ? 'text-gray-400' : 'text-slate-600'}`}>
-                            Thank you for helping us maintain a safe platform. Our team will review your report as soon
-                            as possible.
+                        <h3 className="text-xl font-semibold mb-2">Report Received</h3>
+                        <p className={`mb-6 max-w-sm text-sm ${theme === "dark" ? "text-gray-400" : "text-slate-600"}`}>
+                            Thanks for letting us know. We’ve logged your report and will follow up if further action is needed.
                         </p>
                         <Button
                             onClick={() => setOpen(false)}

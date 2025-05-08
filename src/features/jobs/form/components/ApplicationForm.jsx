@@ -10,7 +10,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Loader2 } from "lucide-react"
-import {FileUpload} from "@/features/jobs/form/components/FileUpload.jsx";
+import { FileUpload } from "@/features/jobs/form/components/FileUpload.jsx";
 
 const applicationSchema = z.object({
     name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -151,9 +151,13 @@ export function ApplicationForm({ jobId, onSubmit, isSubmitting }) {
                                 </FormItem>
                             )}
                         />
+
                     </CardContent>
-                    <CardFooter>
-                        <Button type="submit" className="w-full md:w-auto" disabled={isSubmitting}>
+                    <CardFooter className="mt-4 flex justify-between">
+                        <p className="text-xs">
+                            By submitting this application, you consent to Taleex sharing your information with the company posting this job.
+                        </p>
+                        <Button type="submit" className="w-auto" disabled={isSubmitting}>
                             {isSubmitting ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
