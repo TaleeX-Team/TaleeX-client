@@ -52,8 +52,8 @@ export function JobDetails({ job }) {
           <h1 className="text-3xl font-bold">{job.title}</h1>
           <div className="flex items-center gap-2 mt-2 text-muted-foreground">
             <Building2 className="h-4 w-4" />
-            <span>{job.company.name}</span>
-            {job.company.verification.status === "verified" && (
+            <span>{job?.company?.name}</span>
+            {job?.company?.verification?.status === "verified" && (
               <Badge
                 variant="outline"
                 className="bg-blue-50 text-blue-700 border-blue-200"

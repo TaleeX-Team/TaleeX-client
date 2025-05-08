@@ -66,7 +66,7 @@ export default function JobCard({ job }) {
             <div className="flex items-center text-sm text-muted-foreground mt-0.5">
               <Building2 className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
               <span className="line-clamp-1 truncate">{company.name}</span>
-              {company.verification.status === "verified" && (
+              {company?.verification?.status === "verified" && (
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -123,18 +123,20 @@ export default function JobCard({ job }) {
           <Clock className="h-3.5 w-3.5 mr-1.5" />
           <span>{formatOpenTime(openTime)}</span>
         </div>
-
+        {status !== "closed"}
         <div className="flex gap-2">
           {/* Edit Job Button with UpdateJob Dialog */}
-          <UpdateJob
-            jobId={_id}
-            trigger={
-              <Button variant="outline" size="sm">
-                <Edit className="h-3.5 w-3.5 mr-1" />
-                Edit
-              </Button>
-            }
-          />
+          {status !== "closed" && (
+            <UpdateJob
+              jobId={_id}
+              trigger={
+                <Button variant="outline" size="sm">
+                  <Edit className="h-3.5 w-3.5 mr-1" />
+                  Edit
+                </Button>
+              }
+            />
+          )}
 
           {/* View Details Button */}
           <Button asChild variant="outline" size="sm">
