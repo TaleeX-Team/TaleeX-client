@@ -145,11 +145,14 @@ export default function InterviewHeader({
         image: null,
     }
 
-    // Format interview type for display (capitalize first letter + "Interview")
-    const formattedInterviewType =
-        userData.interviewType && userData.interviewType[0]
-            ? userData.interviewType[0].charAt(0).toUpperCase() + userData.interviewType[0].slice(1) + " Interview"
-            : "Interview"
+    // Format interview type for display
+    const formattedInterviewType = (() => {
+        if (!userData.interviewType?.length) return "Interview"
+        const validTypes = userData.interviewType.filter(type => ["technical", "behavioral"].includes(type))
+        if (!validTypes.length) return "Interview"
+        const formatted = validTypes.map(type => type.charAt(0).toUpperCase() + type.slice(1))
+        return formatted.length > 1 ? `${formatted.join(" & ")} Interview` : `${formatted[0]} Interview`
+    })()
 
     // Generate question markers for the progress bar
     const renderQuestionMarkers = () => {
