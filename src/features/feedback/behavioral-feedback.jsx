@@ -13,7 +13,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 
-export default function BehavioralFeedbackPage({ feedback, screenshots }) {
+export default function BehavioralFeedbackPage({ feedback, screenshots = [] }) {
   const [activeTab, setActiveTab] = useState("results");
   console.log(screenshots);
   // Mock interview screenshots data - just links

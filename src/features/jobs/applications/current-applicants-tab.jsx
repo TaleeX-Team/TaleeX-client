@@ -507,6 +507,7 @@ export function ApplicantsTab({
                             ) : (
                               <TechnicalFeedbackPage
                                 feedback={applicant?.feedback?.interview}
+                                screenshots={applicant?.images}
                               />
                             )}
                           </DialogContent>
