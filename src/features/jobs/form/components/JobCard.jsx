@@ -42,7 +42,7 @@ export default function JobCard({ job }) {
       return `${openTime.minutes} minute${openTime.minutes > 1 ? "s" : ""} ago`;
     }
   };
-
+  if (!company) return null;
   return (
     <Card className="overflow-hidden flex flex-col relative border border-border hover:border-border/80 transition-all duration-300">
       <CardHeader className="pb-1">
@@ -65,7 +65,7 @@ export default function JobCard({ job }) {
             </div>
             <div className="flex items-center text-sm text-muted-foreground mt-0.5">
               <Building2 className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
-              <span className="line-clamp-1 truncate">{company.name}</span>
+              <span className="line-clamp-1 truncate">{company?.name}</span>
               {company?.verification?.status === "verified" && (
                 <TooltipProvider>
                   <Tooltip>
