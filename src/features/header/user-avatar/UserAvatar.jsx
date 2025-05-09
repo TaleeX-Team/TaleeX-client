@@ -37,7 +37,11 @@ const UserAvatar = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className=" w-9 h-9 cursor-pointer ring-offset-background transition-opacity hover:opacity-80">
-          <AvatarImage src={user?.imageUrl} alt="@shadcn" />
+          <AvatarImage
+            className="object-cover"
+            src={user?.imageUrl}
+            alt="@shadcn"
+          />
           <AvatarFallback>{getInitials(user?.firstName)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
