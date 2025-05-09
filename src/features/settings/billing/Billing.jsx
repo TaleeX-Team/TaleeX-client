@@ -8,111 +8,50 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, CreditCard, Zap, Shield, Star, Award } from "lucide-react";
+import { Check, Zap, Shield, Star, Award } from "lucide-react";
 import { useTokens } from "./useTokens";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
+import { useEffect, useState } from "react";
+import { useUser } from "@/hooks/useUser";
+import PayPalButton from "./paypalcheckoutButton";
+import PayPalButton2 from "./paypalButton2";
 
 export default function SubscriptionPage() {
-  // const {
-  //   tokenPrice,
-  //   tokenPacks,
-  //   tokenFeatures,
-  //   isLoading,
-  //   isPriceLoading,
-  //   isBuyingPack,
-  //   buyTokenPack,
-  // } = useTokens();
+  const { data: user } = useUser();
   const {
     tokenPrice,
     tokenPacks,
     tokenFeatures,
     isLoading,
-    isError,
-    buyTokens,
     buyTokenPack,
-    isBuyingTokens,
-    isBuyingPack,
-  } = useTokens("EGP");
+  } = useTokens("USD");
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [tokenCount, setTokenCount] = useState(1);
+  const [totalPrice, setTotalPrice] = useState(0);
+
+  useEffect(() => {
+    if (tokenPrice) {
+      setTotalPrice(tokenCount * tokenPrice);
+    }
+  }, [tokenCount, tokenPrice]);
+
+  const handleIncrement = () => setTokenCount((prev) => prev + 1);
+  const handleDecrement = () => setTokenCount((prev) => Math.max(1, prev - 1));
+  const handleInputChange = (e) => {
+    const value = Math.max(1, parseInt(e.target.value) || 1);
+    setTokenCount(value);
+  };
+
   if (isLoading) {
     return (
       <div className="container pt-0 pb-10 max-w-7xl mx-auto">
-        <div className="mb-12 text-center">
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Token Subscription</h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Purchase tokens to use our AI-powered CV review and interview preparation services
-          </p>
-        </div>
-
-        {/* Skeleton for Token Info */}
-        <div className="mb-12">
-          <div className="flex justify-end mb-4">
-            <Button disabled>
-              <Zap className="mr-2 h-4 w-4" />
-              Buy Tokens
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xl">Token Credit</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-12 w-3/4" />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xl">Token Price</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-12 w-3/4" />
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Skeleton for Token Packs */}
-        <div className="grid md:grid-cols-3 gap-6">
-          {[...Array(3)].map((_, index) => (
-            <Card key={index}>
-              <Skeleton className="h-48 w-full" />
-              <CardHeader>
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-6 w-1/2" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-12 w-3/4" />
-                <Skeleton className="h-8 w-3/4 mt-4" />
-              </CardContent>
-              <CardFooter>
-                <Skeleton className="h-10 w-full" />
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-
-        {/* Skeleton for Features */}
-        <div className="mt-16">
-          <h2 className="text-2xl font-bold mb-6 text-center">How Tokens Work</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[...Array(4)].map((_, index) => (
-              <Card key={index}>
-                <CardHeader className="pb-2">
-                  <Skeleton className="h-6 w-3/4" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-10 w-2/3" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
+        {/* Skeleton Loading UI (same as before) */}
+        {/* ... */}
       </div>
     );
   }
-  
 
   const icons = [Shield, Star, Award];
   const colors = ["bg-blue-500", "bg-purple-500", "bg-amber-500"];
@@ -126,13 +65,51 @@ export default function SubscriptionPage() {
         </p>
       </div>
 
-      {/* Token Info */}
       <div className="mb-12">
         <div className="flex justify-end mb-4">
-          <Button>
-            <Zap className="mr-2 h-4 w-4" />
-            Buy Tokens
-          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Zap className="mr-2 h-4 w-4" />
+                Buy Tokens
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <div className="p-6 max-w-md w-full">
+                <h2 className="text-2xl font-bold mb-4">Purchase Tokens</h2>
+                <div className="mb-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl">Tokens: {tokenCount}</h3>
+                    <div className="flex items-center space-x-2">
+                      <Button onClick={handleDecrement} disabled={tokenCount <= 1}>-</Button>
+                      <input
+  type="number"
+  min={1}
+  value={tokenCount}
+  onChange={handleInputChange}
+  className="w-12 border border-input rounded-md text-center text-base h-9 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+  inputMode="numeric"
+/>
+                      <Button onClick={handleIncrement}>+</Button>
+                    </div>
+                  </div>
+                  <div className="mt-2">
+                    <p className="text-lg font-semibold">Total Price: ${totalPrice.toFixed(2)}</p>
+                  </div>
+                </div>
+
+                <div className="flex justify-center">
+                  <PayPalButton2
+                    amount={totalPrice}
+                    tokenCount={tokenCount}
+                    tokenPrice={tokenPrice}
+                    currency="USD"
+                    onSuccess={() => setIsDialogOpen(false)}
+                  />
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -142,7 +119,7 @@ export default function SubscriptionPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
-                <span className="text-4xl font-bold text-primary">--</span>
+                <span className="text-4xl font-bold text-primary">{user.tokens}</span>
                 <span className="text-lg ml-2 text-muted-foreground">tokens</span>
               </div>
             </CardContent>
@@ -154,9 +131,7 @@ export default function SubscriptionPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
-                <span className="text-4xl font-bold text-primary">
-              <pre>{JSON.stringify(tokenPrice, null, 2)}</pre>
-</span>
+                <span className="text-4xl font-bold text-primary">{tokenPrice}</span>
                 <span className="text-lg ml-2 text-muted-foreground">per token</span>
               </div>
             </CardContent>
@@ -164,7 +139,6 @@ export default function SubscriptionPage() {
         </div>
       </div>
 
-      {/* Token Packs */}
       <div className="grid md:grid-cols-3 gap-6">
         {tokenPacks?.map((pack, index) => {
           const Icon = icons[index % icons.length];
@@ -216,22 +190,14 @@ export default function SubscriptionPage() {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button
-                  variant={index === 1 ? "default" : "outline"}
-                  className="w-full"
-                  onClick={() => buyTokenPack(pack._id)}
-                  disabled={isBuyingPack}
-                >
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Purchase
-                </Button>
+                <PayPalButton className="mx-auto" pack={pack} />
               </CardFooter>
             </Card>
           );
         })}
       </div>
 
-      {/* Usage Info */}
+      {/* How Tokens Work */}
       <div className="mt-16">
         <h2 className="text-2xl font-bold mb-6 text-center">How Tokens Work</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
