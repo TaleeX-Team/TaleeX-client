@@ -9,21 +9,21 @@ import { Progress } from '@/components/ui/progress';
 
 export const VideoContainer = forwardRef(
     ({
-         isUser,
-         videoRef,
-         isVideoOn,
-         isAudioOn,
-         isAITalking,
-         isUserTalking,
-         transcript,
-         callStatus,
-         lastCapturedScreenshot,
-         screenshotCount,
-         theme = "dark",
-         onThemeToggle,
-         sessionDuration = 0,
-         interviewProgress = 0,
-     }, ref) => {
+        isUser,
+        videoRef,
+        isVideoOn,
+        isAudioOn,
+        isAITalking,
+        isUserTalking,
+        transcript,
+        callStatus,
+        lastCapturedScreenshot,
+        screenshotCount,
+        theme = "dark",
+        onThemeToggle,
+        sessionDuration = 0,
+        interviewProgress = 0,
+    }, ref) => {
         const [showScreenshotEffect, setShowScreenshotEffect] = useState(false);
         const [audioLevel, setAudioLevel] = useState(0);
         const isDarkMode = theme === "dark";
