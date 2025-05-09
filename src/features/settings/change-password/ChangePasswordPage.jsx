@@ -84,14 +84,19 @@ export default function ChangePasswordPage() {
     };
 
     return (
-        <div className="max-w-2xl mx-auto">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Change Password</CardTitle>
-                    <CardDescription>
+        <div className="container space-y-8">
+            <div className="flex">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">
+                        Change Password
+                    </h1>
+                    <p className="text-muted-foreground">
                         Update your password to keep your account secure
-                    </CardDescription>
-                </CardHeader>
+
+                    </p>
+                </div>
+            </div>
+            <Card className="w-full max-w-xl">
                 <CardContent>
                     <form onSubmit={handleChangePassword} className="space-y-6">
                         {/* Current Password */}
@@ -150,64 +155,64 @@ export default function ChangePasswordPage() {
                                 <p className="text-muted-foreground">Password requirements:</p>
                                 <ul className="space-y-1">
                                     <li className="flex items-center gap-2">
-                    <span className={hasMinLength ? "text-green-500" : "text-gray-400"}>
-                      {hasMinLength ? (
-                          <CheckCircle className="h-4 w-4" />
-                      ) : (
-                          <span className="inline-block h-4 w-4 rounded-full border border-gray-400" />
-                      )}
-                    </span>
+                                        <span className={hasMinLength ? "text-green-500" : "text-gray-400"}>
+                                            {hasMinLength ? (
+                                                <CheckCircle className="h-4 w-4" />
+                                            ) : (
+                                                <span className="inline-block h-4 w-4 rounded-full border border-gray-400" />
+                                            )}
+                                        </span>
                                         <span className={hasMinLength ? "text-green-500" : ""}>
-                      At least {minLength} characters
-                    </span>
+                                            At least {minLength} characters
+                                        </span>
                                     </li>
                                     <li className="flex items-center gap-2">
-                    <span className={hasUpperCase ? "text-green-500" : "text-gray-400"}>
-                      {hasUpperCase ? (
-                          <CheckCircle className="h-4 w-4" />
-                      ) : (
-                          <span className="inline-block h-4 w-4 rounded-full border border-gray-400" />
-                      )}
-                    </span>
+                                        <span className={hasUpperCase ? "text-green-500" : "text-gray-400"}>
+                                            {hasUpperCase ? (
+                                                <CheckCircle className="h-4 w-4" />
+                                            ) : (
+                                                <span className="inline-block h-4 w-4 rounded-full border border-gray-400" />
+                                            )}
+                                        </span>
                                         <span className={hasUpperCase ? "text-green-500" : ""}>
-                      At least one uppercase letter
-                    </span>
+                                            At least one uppercase letter
+                                        </span>
                                     </li>
                                     <li className="flex items-center gap-2">
-                    <span className={hasLowerCase ? "text-green-500" : "text-gray-400"}>
-                      {hasLowerCase ? (
-                          <CheckCircle className="h-4 w-4" />
-                      ) : (
-                          <span className="inline-block h-4 w-4 rounded-full border border-gray-400" />
-                      )}
-                    </span>
+                                        <span className={hasLowerCase ? "text-green-500" : "text-gray-400"}>
+                                            {hasLowerCase ? (
+                                                <CheckCircle className="h-4 w-4" />
+                                            ) : (
+                                                <span className="inline-block h-4 w-4 rounded-full border border-gray-400" />
+                                            )}
+                                        </span>
                                         <span className={hasLowerCase ? "text-green-500" : ""}>
-                      At least one lowercase letter
-                    </span>
+                                            At least one lowercase letter
+                                        </span>
                                     </li>
                                     <li className="flex items-center gap-2">
-                    <span className={hasNumber ? "text-green-500" : "text-gray-400"}>
-                      {hasNumber ? (
-                          <CheckCircle className="h-4 w-4" />
-                      ) : (
-                          <span className="inline-block h-4 w-4 rounded-full border border-gray-400" />
-                      )}
-                    </span>
+                                        <span className={hasNumber ? "text-green-500" : "text-gray-400"}>
+                                            {hasNumber ? (
+                                                <CheckCircle className="h-4 w-4" />
+                                            ) : (
+                                                <span className="inline-block h-4 w-4 rounded-full border border-gray-400" />
+                                            )}
+                                        </span>
                                         <span className={hasNumber ? "text-green-500" : ""}>
-                      At least one number
-                    </span>
+                                            At least one number
+                                        </span>
                                     </li>
                                     <li className="flex items-center gap-2">
-                    <span className={hasSpecialChar ? "text-green-500" : "text-gray-400"}>
-                      {hasSpecialChar ? (
-                          <CheckCircle className="h-4 w-4" />
-                      ) : (
-                          <span className="inline-block h-4 w-4 rounded-full border border-gray-400" />
-                      )}
-                    </span>
+                                        <span className={hasSpecialChar ? "text-green-500" : "text-gray-400"}>
+                                            {hasSpecialChar ? (
+                                                <CheckCircle className="h-4 w-4" />
+                                            ) : (
+                                                <span className="inline-block h-4 w-4 rounded-full border border-gray-400" />
+                                            )}
+                                        </span>
                                         <span className={hasSpecialChar ? "text-green-500" : ""}>
-                      At least one special character
-                    </span>
+                                            At least one special character
+                                        </span>
                                     </li>
                                 </ul>
                             </div>

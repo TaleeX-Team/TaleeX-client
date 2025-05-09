@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User, MicOff, Bot, Camera, Volume2, Sun, Moon } from 'lucide-react'
+import { User, MicOff, Bot, Camera, Volume2, Sun, Moon, BriefcaseMedical } from 'lucide-react'
 import { cn } from "@/lib/utils"
 import SplineComponent from "@/components/interview/3dLoading"
 import Webcam from "react-webcam"
@@ -110,7 +110,7 @@ export const VideoContainer = forwardRef(
             <div
                 ref={ref}
                 className={cn(
-                    "w-full lg:w-1/2 h-[40vh] lg:h-auto relative rounded-xl transition-all duration-300 overflow-hidden",
+                    "w-full lg:w-[40%] h-[40vh] lg:h-[400px] relative rounded-xl transition-all duration-300 overflow-hidden",
                     isDarkMode
                         ? "bg-gray-900 shadow-xl"
                         : "bg-gray-100 shadow-lg",
@@ -161,9 +161,7 @@ export const VideoContainer = forwardRef(
                                 />
                                 <div className={cn(
                                     "absolute inset-0 pointer-events-none",
-                                    isDarkMode
-                                        ? "bg-gradient-to-t from-black/60 to-transparent"
-                                        : "bg-gradient-to-t from-white/40 to-transparent"
+                                    "bg-gradient-to-t from-black/60 to-transparent"
                                 )}></div>
                                 {isSpeaking && (
                                     <div className="absolute inset-0 pointer-events-none border-4 border-emerald-500/50 animate-pulse rounded-lg"></div>
@@ -307,7 +305,7 @@ export const VideoContainer = forwardRef(
                             </div>
                         )}
 
-                        {isSpeaking && (
+                        {/* {isSpeaking && (
                             <div className={cn(
                                 "absolute top-0 left-0 right-0 px-4 py-3 text-sm flex items-center justify-center space-x-2 backdrop-blur-md z-20 animate-fadeIn",
                                 isDarkMode
@@ -321,16 +319,17 @@ export const VideoContainer = forwardRef(
                                 </div>
                                 <span className="font-semibold tracking-wide">YOU ARE SPEAKING</span>
                             </div>
-                        )}
+                        )} */}
                     </>
                 ) : (
                     // AI interviewer container
                     <>
                         <div className={cn(
-                            "flex flex-col items-center justify-center h-full w-full relative",
+                            "flex flex-col items-center justify-between h-full w-full relative",
                             isDarkMode
+                                // ? "bg-card border border-gradient-to-br from-gray-900 to-primary"
                                 ? "bg-gradient-to-br from-gray-900 via-gray-900 to-indigo-950/30"
-                                : "bg-gradient-to-br from-gray-50 via-gray-100 to-indigo-50"
+                                : "bg-primary/80"
                         )}>
                             <div className={cn(
                                 "absolute inset-0 overflow-hidden",
@@ -345,43 +344,45 @@ export const VideoContainer = forwardRef(
                                 )}></div>
                             </div>
 
-                            <div className="relative z-10 flex flex-col items-center justify-center space-y-6">
+                            <div className="relative z-10 flex flex-col items-center justify-center flex-grow space-y-6">
                                 <div className="relative">
                                     <div className={cn(
                                         "absolute -inset-8 rounded-full blur-xl transition-all duration-300",
                                         isDarkMode
+                                            // ? isSpeaking ? "bg-primary/15" : "bg-primary/5"
                                             ? isSpeaking ? "bg-indigo-600/30" : "bg-indigo-900/20"
-                                            : isSpeaking ? "bg-indigo-300/60" : "bg-indigo-200/30",
+                                            : isSpeaking ? "bg-gray-100/40" : "bg-gray-100/10",
                                         isSpeaking && "animate-pulse-slow"
                                     )}></div>
-                                    <div className="relative z-10">
+                                    {/* <div className="relative z-10">
                                         <SplineComponent />
-                                    </div>
+                                    </div> */}
+                                    <div className="relative z-10 my-auto">
+                                        <Bot className="h-15 w-15 text-white/90 dark:text-gray"></Bot>                                    </div>
                                 </div>
 
-                                <div className="flex flex-col items-center space-y-3">
+                                <div className="flex flex-col items-center space-y-2">
                                     <h3 className={cn(
-                                        "text-2xl font-semibold tracking-tight",
+                                        "text-2xl font-semibold tracking-tight text-white",
                                         isSpeaking && "speaking-animation",
-                                        isDarkMode ? "text-white" : "text-gray-800"
                                     )}>
                                         TaleeX
                                     </h3>
                                     <div className={cn(
                                         "text-xs uppercase tracking-wider font-medium",
                                         isDarkMode
-                                            ? isSpeaking ? "text-indigo-300" : "text-indigo-400"
-                                            : isSpeaking ? "text-indigo-600" : "text-indigo-500"
+                                            ? isSpeaking ? "text-white" : "text-secondary-foreground"
+                                            : isSpeaking ? "text-white" : "text-gray-200"
                                     )}>
                                         AI Interviewer
                                     </div>
                                 </div>
 
                                 <div className={cn(
-                                    "flex items-center space-x-2 px-4 py-2 rounded-full",
+                                    "absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 px-4 py-2 rounded-full",
                                     isDarkMode
-                                        ? "bg-gray-800/80 text-gray-200"
-                                        : "bg-white/80 text-gray-700",
+                                        ? "bg-gray-950/30 text-secondary-foreground"
+                                        : "bg-white text-gray-700",
                                     "backdrop-blur-md",
                                     isSpeaking && "ring-2 ring-indigo-500/50"
                                 )}>
@@ -389,12 +390,12 @@ export const VideoContainer = forwardRef(
                                         className={cn(
                                             "w-3 h-3 rounded-full",
                                             isSpeaking
-                                                ? "bg-indigo-500 animate-pulse"
+                                                ? "bg-primary animate-pulse"
                                                 : callStatus === "ACTIVE"
-                                                    ? "bg-blue-400"
+                                                    ? "bg-green-500"
                                                     : callStatus === "CONNECTING"
                                                         ? "bg-yellow-400"
-                                                        : "bg-gray-400",
+                                                        : "bg-green-500",
                                         )}
                                     ></div>
                                     <p className="text-sm">
@@ -408,7 +409,7 @@ export const VideoContainer = forwardRef(
                                     </p>
                                 </div>
                             </div>
-
+                            {/* 
                             <div className={cn(
                                 "absolute bottom-4 left-4 px-4 py-2 rounded-full text-sm flex items-center space-x-2",
                                 isDarkMode
@@ -430,7 +431,7 @@ export const VideoContainer = forwardRef(
                                         <span className="ml-2 text-xs font-medium text-indigo-400">SPEAKING</span>
                                     )}
                                 </div>
-                            </div>
+                            </div> */}
 
                             {isSpeaking && (
                                 <div className="absolute bottom-4 right-4 flex items-center gap-2 animate-fadeIn">
@@ -460,11 +461,11 @@ export const VideoContainer = forwardRef(
                                 </div>
                             )}
 
-                            {isSpeaking && (
+                            {/* {isSpeaking && (
                                 <div className={cn(
                                     "absolute top-0 left-0 right-0 px-4 py-3 text-sm flex items-center justify-center space-x-2 backdrop-blur-md z-20 animate-fadeIn",
                                     isDarkMode
-                                        ? "bg-indigo-500/30 text-white border-b border-indigo-500/40 shadow-lg shadow-indigo-500/30"
+                                        ? "bg-primary/20 text-white border-b border-indigo-500/40 shadow-sm shadow-indigo-500/30"
                                         : "bg-indigo-100/90 text-indigo-800 border-b border-indigo-300 shadow-lg shadow-indigo-400/20"
                                 )}>
                                     <div className="speaking-indicator mr-2">
@@ -474,7 +475,7 @@ export const VideoContainer = forwardRef(
                                     </div>
                                     <span className="font-semibold tracking-wide">AI IS SPEAKING</span>
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     </>
                 )}

@@ -2,8 +2,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Sparkles } from "lucide-react";
 const FullPageSpinner = () => {
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-white dark:bg-gray-900 transition-colors duration-300">
-            <Card className="p-6 shadow-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <div className="fixed inset-0 flex items-center justify-center z-50 transition-colors duration-300 bg-background">
+            <Card className="p-0 bg-transparent border-none shadow-none">
                 <CardContent className="flex flex-col items-center gap-6 py-6">
                     {/* Spinner animation */}
                     <div className="relative">

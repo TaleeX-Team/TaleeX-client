@@ -214,7 +214,7 @@ export default function Interview() {
             )}
 
             <main ref={mainContentRef} className="flex-1 flex flex-col">
-                <div className="flex-1 flex flex-col lg:flex-row p-4 gap-4">
+                <div className="mt-2 flex flex-col sm:flex-row p-4 gap-6 lg:justify-center">
                     <VideoContainer
                         isUser={true}
                         ref={userVideoContainerRef}

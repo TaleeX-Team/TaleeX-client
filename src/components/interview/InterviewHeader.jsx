@@ -179,7 +179,7 @@ export default function InterviewHeader({
 
     return (
         <div
-            className="bg-background border-b border-border shadow-lg backdrop-blur-lg sticky top-0 py-4 px-6 z-30">
+            className="bg-background border-b border-border shadow-lg backdrop-blur-lg sticky top-0 pt-4 px-6 z-30">
 
             {/* Top section with title and controls */}
             <div className="flex justify-between items-center mb-4">
@@ -403,7 +403,7 @@ export default function InterviewHeader({
                 <div
                     className="mt-3 bg-red-100 dark:bg-red-500/10 border border-red-300 dark:border-red-500/30 text-red-600 dark:text-red-400 rounded-md p-3 flex items-center gap-2 text-sm">
                     <AlertCircle className="h-5 w-5 flex-shrink-0" />
-                    <span>Connection issues detected. Try refreshing the page or check your internet connection.</span>
+                    <span>Connection issues detected. Check your internet connection.</span>
                 </div>
             )}
 

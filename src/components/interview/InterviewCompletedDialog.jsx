@@ -13,20 +13,20 @@ import { Clock, CheckCircle, Camera } from "lucide-react"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useEndInterview } from "@/hooks/useInterviewData.js"
-import {toast} from "sonner";
+import { toast } from "sonner";
 
 export function InterviewCompletedDialog({
-                                             interviewId,
-                                             open,
-                                             onOpenChange,
-                                             onClose,
-                                             interviewDuration,
-                                             questionsAsked,
-                                             totalQuestions,
-                                             screenshots,
-                                             transcript,
-                                             vapiCallId
-                                         }) {
+    interviewId,
+    open,
+    onOpenChange,
+    onClose,
+    interviewDuration,
+    questionsAsked,
+    totalQuestions,
+    screenshots,
+    transcript,
+    vapiCallId
+}) {
     const [isSubmitted, setIsSubmitted] = useState(false)
     const navigate = useNavigate()
     const { mutateAsync, isPending, isError, error } = useEndInterview()
@@ -80,7 +80,7 @@ export function InterviewCompletedDialog({
             await mutateAsync({
                 interviewId,
                 images: screenshots || [],
-                vapiCallId:vapiCallId,
+                vapiCallId: vapiCallId,
             })
 
             clearLocalStorage()
@@ -112,18 +112,18 @@ export function InterviewCompletedDialog({
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle className="text-xl">Interview Completed</DialogTitle>
-                    <DialogDescription>Your interview session has been completed successfully.</DialogDescription>
+                    <DialogDescription>This interview has already been completed and cannot be retaken. If you don't submit your data now, it will be permanently lost</DialogDescription>
                 </DialogHeader>
 
-                <div className="grid gap-4 py-4">
-                    <div className="flex items-center gap-4">
+                {/* <div className="grid gap-4 py-4"> */}
+                {/* <div className="flex items-center gap-4">
                         <Clock className="h-5 w-5 text-gray-500" />
                         <div>
-                            <p className="font-medium">Duration</p>
+                            <p className="font-medium">Time Spent</p>
                             <p className="text-sm text-gray-500">{formatDuration(interviewDuration)}</p>
                         </div>
-                    </div>
-
+                    </div> */}
+                {/* 
                     <div className="flex items-center gap-4">
                         <CheckCircle className="h-5 w-5 text-gray-500" />
                         <div>
@@ -132,9 +132,9 @@ export function InterviewCompletedDialog({
                                 {questionsAsked} of {totalQuestions} questions completed
                             </p>
                         </div>
-                    </div>
+                    </div> */}
 
-                    <div className="flex items-center gap-4">
+                {/* <div className="flex items-center gap-4">
                         <Camera className="h-5 w-5 text-gray-500" />
                         <div>
                             <p className="font-medium">Screenshots</p>
@@ -160,8 +160,8 @@ export function InterviewCompletedDialog({
                                 ))}
                             </div>
                         </div>
-                    )}
-                </div>
+                    )} */}
+                {/* </div> */}
 
                 <DialogFooter className="flex flex-col sm:flex-row gap-2">
                     {!isSubmitted ? (
@@ -172,7 +172,7 @@ export function InterviewCompletedDialog({
                                     Submitting...
                                 </>
                             ) : (
-                                "Submit Interview Data"
+                                "Submit"
                             )}
                         </Button>
                     ) : (

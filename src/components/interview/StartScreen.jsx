@@ -254,8 +254,8 @@ export function StartScreen() {
                                 </div>
 
                                 {/* Questions and Date */}
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
+                                {/* <div className="grid grid-cols-2 gap-4"> */}
+                                {/* <div>
                                         <h4 className="text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
                                             Questions
                                         </h4>
@@ -263,18 +263,18 @@ export function StartScreen() {
                                             <FileQuestion className="h-5 w-5 text-blue-500 dark:text-primary mr-2" />
                                             <span className="font-medium text-gray-800 dark:text-gray-200">{interviewHeaderData.questionCount}</span>
                                         </div>
-                                    </div>
+                                    </div> */}
 
-                                    <div>
-                                        <h4 className="text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
-                                            Expires
-                                        </h4>
-                                        <div className="flex items-center p-3 bg-input/50 rounded-md border border-input">
-                                            <Calendar className="h-5 w-5 text-blue-500 dark:text-primary mr-2" />
-                                            <span className="font-medium text-sm text-gray-800 dark:text-gray-200">{formattedExpiryDate}</span>
-                                        </div>
+                                <div>
+                                    <h4 className="text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
+                                        Expires
+                                    </h4>
+                                    <div className="flex items-center p-3 bg-input/50 rounded-md border border-input">
+                                        <Calendar className="h-5 w-5 text-blue-500 dark:text-primary mr-2" />
+                                        <span className="font-medium text-sm text-gray-800 dark:text-gray-200">{formattedExpiryDate}</span>
                                     </div>
                                 </div>
+                                {/* </div> */}
                             </div>
                         ) : null}
                     </Card>
@@ -356,8 +356,8 @@ export function StartScreen() {
                             </div>
                             <p className="bg-blue-500/10 dark:bg-secondary/30 border-primary border-l-10 dark:border-primary/50 w-full max-w-md">
                                 <p className="text-sm border border-dotted border-primary/50 p-2 rounded-r-sm shadow-inner dark:border-primary/30">
-
-                                    During the interview, TaleeX will capture up to 3 camera images to assist the hiring company in verifying your identity.
+                                    This interview is a one-time opportunity and cannot be retaken
+                                    {/* During the interview, TaleeX will capture up to 3 camera images to assist the hiring company in verifying your identity. */}
                                 </p>
                             </p>
                             {/* Start Button */}
@@ -389,8 +389,7 @@ export function StartScreen() {
 
                                 {!isExpired && !questionsError && (
                                     <p className="text-sm text-gray-500 dark:text-gray-300 mt-2">
-                                        Click the button above when you're ready to start your interview
-                                    </p>
+                                        By proceeding, you agree to be recorded (video and audio) for evaluation and identity verification purposes.                                    </p>
                                 )}
                             </div>
                         </div>
