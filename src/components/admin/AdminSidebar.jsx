@@ -140,12 +140,6 @@ const AdminSidebar = () => {
             href: "/admin/plans",
             active: currentPath.includes("/admin/plans")
         },
-        {
-            icon: <Settings size={collapsed ? 20 : 18} />,
-            label: "Settings",
-            href: "/admin/settings",
-            active: currentPath.includes("/admin/settings")
-        },
     ];
 
     return (
@@ -235,85 +229,6 @@ const AdminSidebar = () => {
                     </div>
                 </div>
 
-                {/* Theme toggler */}
-                {!collapsed ? (
-                    <div className="px-6 py-2">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="w-full justify-start gap-2 px-2">
-                                    {theme === 'dark' && <Moon size={16} />}
-                                    {theme === 'light' && <Sun size={16} />}
-                                    {theme === 'system' && <Laptop size={16} />}
-                                    <span className="capitalize">
-                    {theme} Theme
-                  </span>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="center" className="w-40">
-                                <DropdownMenuItem onClick={() => setTheme("light")} className="gap-2">
-                                    <Sun size={16} /> Light
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setTheme("dark")} className="gap-2">
-                                    <Moon size={16} /> Dark
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setTheme("system")} className="gap-2">
-                                    <Laptop size={16} /> System
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                ) : (
-                    <div className="px-4 py-2 flex justify-center">
-                        <TooltipProvider delayDuration={0}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-md" onClick={() => {
-                                        if (theme === 'dark') setTheme('light');
-                                        else if (theme === 'light') setTheme('system');
-                                        else setTheme('dark');
-                                    }}>
-                                        {theme === 'dark' && <Moon size={16} />}
-                                        {theme === 'light' && <Sun size={16} />}
-                                        {theme === 'system' && <Laptop size={16} />}
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent side="right">
-                                    Change Theme
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    </div>
-                )}
-
-                {/* Footer with logout */}
-                <div className="p-4 border-t border-border/30">
-                    {collapsed && !isMobileView ? (
-                        <TooltipProvider delayDuration={0}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="w-full h-10 text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                                    >
-                                        <LogOut size={18} />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent side="right">
-                                    Logout
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    ) : (
-                        <Button
-                            variant="ghost"
-                            className="w-full justify-start px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                        >
-                            <LogOut size={18} className="mr-3" />
-                            <span className="font-medium">Logout</span>
-                        </Button>
-                    )}
-                </div>
             </div>
         </>
     );

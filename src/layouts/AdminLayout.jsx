@@ -97,45 +97,7 @@ const AdminLayout = ({ children, title = "Admin Dashboard" }) => {
                             </SheetContent>
                         </Sheet>
 
-                        {/* Notifications */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="rounded-full relative">
-                                    <Bell size={18} />
-                                    {notifications > 0 && (
-                                        <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
-                                            {notifications}
-                                        </Badge>
-                                    )}
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-80">
-                                <DropdownMenuLabel className="flex items-center justify-between">
-                                    <span>Notifications</span>
-                                    <Button variant="ghost" size="sm" className="h-auto p-0 text-primary text-xs font-normal">
-                                        Mark all as read
-                                    </Button>
-                                </DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <div className="max-h-80 overflow-y-auto">
-                                    {[1, 2, 3].map((_, i) => (
-                                        <DropdownMenuItem key={i} className="p-3 cursor-pointer flex flex-col items-start">
-                                            <div className="flex justify-between w-full">
-                                                <span className="font-medium">New user registered</span>
-                                                <span className="text-xs text-muted-foreground">2m ago</span>
-                                            </div>
-                                            <span className="text-sm text-muted-foreground mt-1">
-                        Sarah Chen has joined as a recruiter
-                      </span>
-                                        </DropdownMenuItem>
-                                    ))}
-                                </div>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem className="flex justify-center text-primary font-medium">
-                                    View all notifications
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+
 
                         {/* Theme Toggle */}
                         <ThemeToggle />
