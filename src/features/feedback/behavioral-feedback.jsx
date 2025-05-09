@@ -113,7 +113,7 @@ export default function BehavioralFeedbackPage({
           </TabsContent>
           <TabsContent value="details">
             <Card className="border-0 shadow-md overflow-hidden bg-white dark:bg-[#121212]">
-              <CardHeader className="px-6 py-4">
+              <CardHeader className="px-6 ">
                 <div className="flex items-center gap-3">
                   <div className=" rounded-full ">
                     <FileText className="h-5 w-5" />
@@ -330,7 +330,9 @@ function AttributeList({ rating }) {
             {attributes[key]}
             <span className="capitalize">{key.replace(/([A-Z])/g, " $1")}</span>
           </div>
-          <Badge className="bg-primary/10 text-primary">{value}/10</Badge>
+          <Badge className="bg-primary/10 text-primary border-primary/20">
+            {value}/10
+          </Badge>
         </div>
       ))}
     </div>
@@ -340,24 +342,21 @@ function AttributeList({ rating }) {
 function ScoreCard({ score }) {
   const num = parseFloat(score);
   const getColor = (val) => {
-    if (val >= 8) return "text-green-600";
-    if (val >= 6) return "text-amber-600";
-    return "text-red-600";
-  };
-
-  const getProgressColor = (val) => {
-    if (val >= 8) return "bg-green-600";
-    if (val >= 6) return "bg-amber-600";
-    return "bg-red-600";
+    if (val >= 8) return "green";
+    if (val >= 6) return "amber";
+    return "red";
   };
 
   const color = getColor(num);
-  const progressColor = getProgressColor(num);
 
   return (
     <div className="flex flex-col md:flex-row items-center justify-between gap-4">
       <div className="flex items-center gap-3">
-        <div className={`text-5xl font-bold ${color}`}>{score}</div>
+        <div
+          className={`text-5xl font-bold text-${color}-600 dark:text-${color}-500`}
+        >
+          {score}
+        </div>
         <div className="text-muted-foreground">
           <div className="text-sm uppercase font-semibold">Overall Score</div>
           <div className="text-xs">Behavioral compatibility</div>
@@ -371,7 +370,7 @@ function ScoreCard({ score }) {
         <Progress
           value={num * 10}
           className="h-3"
-          indicatorClassName={progressColor}
+          indicatorClassName={`bg-${color}-600 dark:bg-${color}-500`}
         />
       </div>
     </div>
@@ -385,15 +384,17 @@ function RecommendationCard({ recommendation }) {
     <Card
       className={
         isRecommended
-          ? "border-green-200 bg-green-50"
-          : "border-red-200 bg-red-50"
+          ? "border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-900/20"
+          : "border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-900/20"
       }
     >
       <CardHeader>
         <div className="flex items-center gap-2">
           <ThumbsUp
             className={`h-5 w-5 ${
-              isRecommended ? "text-green-600" : "text-red-600"
+              isRecommended
+                ? "text-green-600 dark:text-green-400"
+                : "text-red-600 dark:text-red-400"
             }`}
           />
           <CardTitle className="text-lg">Final Recommendation</CardTitle>
@@ -403,7 +404,9 @@ function RecommendationCard({ recommendation }) {
         <div className="flex items-center gap-3 mb-3">
           <h3
             className={`text-xl font-semibold ${
-              isRecommended ? "text-green-700" : "text-red-700"
+              isRecommended
+                ? "text-green-700 dark:text-green-400"
+                : "text-red-700 dark:text-red-400"
             }`}
           >
             {isRecommended ? "Recommended for Hire" : "Not Recommended"}
@@ -411,20 +414,41 @@ function RecommendationCard({ recommendation }) {
           <Badge
             className={
               isRecommended
-                ? "bg-green-200 text-green-800"
-                : "bg-red-200 text-red-800"
+                ? "bg-green-200 text-green-800 dark:bg-green-800/30 dark:text-green-300"
+                : "bg-red-200 text-red-800 dark:bg-red-800/30 dark:text-red-300"
             }
           >
             {recommendation.verdict}
           </Badge>
         </div>
 
-        <Separator className={isRecommended ? "bg-green-200" : "bg-red-200"} />
+        <Separator
+          className={
+            isRecommended
+              ? "bg-green-200 dark:bg-green-700"
+              : "bg-red-200 dark:bg-red-700"
+          }
+        />
 
         <div className="mt-3">
-          <p className={isRecommended ? "text-green-800" : "text-red-800"}>
+          <p
+            className={
+              isRecommended
+                ? "text-green-800 dark:text-green-300"
+                : "text-red-800 dark:text-red-300"
+            }
+          >
             {recommendation.reasoning}
           </p>
+          {!isRecommended && (
+            <div className="mt-4 p-3 bg-white dark:bg-gray-800 rounded-md border border-red-100 dark:border-red-900/50">
+              <h4 className="text-sm font-medium mb-1">Considerations</h4>
+              <p className="text-sm text-muted-foreground">
+                Consider additional behavioral training or mentorship before
+                placement.
+              </p>
+            </div>
+          )}
         </div>
       </CardContent>
       {/* AI Note */}
