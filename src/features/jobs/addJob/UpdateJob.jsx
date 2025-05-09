@@ -95,7 +95,7 @@ const formSchema = z
       { message: "Experience level is required" }
     ),
     status: z
-      .enum(["open", "pending", "closed"], {
+      .enum(["open", "paused", "closed"], {
         message: "Status is required",
       })
       .optional(),

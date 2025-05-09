@@ -1,4 +1,6 @@
 import React, {Suspense, useState} from "react";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
+
 import {
     createBrowserRouter,
     RouterProvider,
@@ -53,6 +55,14 @@ const queryClient = new QueryClient({
         },
     },
 });
+// console.log("TESTING ENV:", import.meta.env.VITE_TEST_VAR);
+const initialOptions = {
+  "client-id": import.meta.env.VITE_PAYPAL_CLIENT_ID,
+  currency: "USD"
+};
+
+
+
 
 function App() {
     const [router] = useState(() =>
@@ -117,7 +127,9 @@ function App() {
             <ThemeProvider storageKey="app-theme">
                 <ReactQueryDevtools initialIsOpen={false}/>
                 <Suspense fallback={<FullPageSpinner/>}>
-                    <RouterProvider router={router}/>
+                <PayPalScriptProvider options={initialOptions}>
+  <RouterProvider router={router} />
+</PayPalScriptProvider>
                 </Suspense>
                 <Toaster/>
             </ThemeProvider>

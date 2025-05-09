@@ -121,7 +121,7 @@ export default function CompanyDetails() {
             verification={verification}
           />
           {/* Jobs tab */}
-          <JobsTab jobs={jobs2} />
+          <JobsTab jobs={jobs2} verification={verification} />
         </Tabs>
       </div>
     </div>

@@ -15,8 +15,6 @@ import {
 
 export default function BehavioralFeedbackPage({ feedback, screenshots = [] }) {
   const [activeTab, setActiveTab] = useState("results");
-  console.log(screenshots);
-  // Mock interview screenshots data - just links
 
   return (
     <div className="min-h-screen flex bg-background px-4">
