@@ -10,8 +10,9 @@ import {
   Smile,
   Users,
   Image,
-  ExternalLink,
   FileText,
+  Mic,
+  ChevronRight,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -19,6 +20,8 @@ export default function BehavioralFeedbackPage({
   feedback,
   screenshots = [],
   transcriptText,
+  audio,
+  summary,
 }) {
   const [activeTab, setActiveTab] = useState("results");
   const parseTranscript = (text) => {
@@ -58,16 +61,7 @@ export default function BehavioralFeedbackPage({
   };
 
   const formattedTranscript = parseTranscript(transcriptText);
-  const getSpeakerBadgeStyle = (speaker) => {
-    switch (speaker) {
-      case "AI":
-        return "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300";
-      case "User":
-        return "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300";
-      default:
-        return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
-    }
-  };
+
   return (
     <div className="min-h-screen flex bg-background px-4">
       <div className="w-full max-w-4xl space-y-6 py-8">
@@ -78,8 +72,8 @@ export default function BehavioralFeedbackPage({
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="results">Evaluation Results</TabsTrigger>
+            <TabsTrigger value="details">Interview Details</TabsTrigger>
             <TabsTrigger value="transcript">Interview Transcript</TabsTrigger>
-            <TabsTrigger value="screenshots">Interview Screenshots</TabsTrigger>
           </TabsList>
 
           <TabsContent value="results" className="space-y-6">
@@ -117,74 +111,182 @@ export default function BehavioralFeedbackPage({
 
             <RecommendationCard recommendation={feedback.recommendation} />
           </TabsContent>
-
-          <TabsContent value="transcript">
-            <Card className="border-0 shadow-sm">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-primary" />
-                  <CardTitle>Interview Transcript</CardTitle>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Complete transcript of the candidate's interview session.
-                </p>
-              </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[400px] pr-4">
-                  <div className="space-y-4">
-                    {formattedTranscript.map((entry) => (
-                      <div key={entry.key} className="group">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Badge
-                            variant="outline"
-                            className={`${getSpeakerBadgeStyle(entry.speaker)}`}
-                          >
-                            {entry.speaker}
-                          </Badge>
-                        </div>
-                        <div className="pl-1 text-sm">{entry.text}</div>
-                      </div>
-                    ))}
+          <TabsContent value="details">
+            <Card className="border-0 shadow-md overflow-hidden bg-white dark:bg-[#121212]">
+              <CardHeader className="px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className=" rounded-full ">
+                    <FileText className="h-5 w-5" />
                   </div>
-                </ScrollArea>
+                  <CardTitle className="text-xl">Interview Details</CardTitle>
+                </div>
+              </CardHeader>
+
+              <CardContent className="p-0">
+                {/* Main content area with responsive grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6">
+                  {/* Left Column: Summary & Voice Recording */}
+                  <div className="space-y-8">
+                    {/* Summary Section */}
+                    <div className="bg-white dark:bg-gray-900/30 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
+                      <div className="bg-gray-50 dark:bg-gray-800/50 px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+                        <h3 className="text-base font-medium flex items-center gap-2">
+                          <FileText className="h-4 w-4 text-indigo-500" />
+                          Interview Summary
+                        </h3>
+                      </div>
+                      <div className="p-4">
+                        <ScrollArea className="h-[200px] pr-4">
+                          <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                            {summary}
+                          </div>
+                        </ScrollArea>
+                      </div>
+                    </div>
+
+                    {/* Voice Recording Section */}
+                    <div className="bg-white dark:bg-gray-900/30 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
+                      <div className="bg-gray-50 dark:bg-gray-800/50 px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+                        <h3 className="text-base font-medium flex items-center gap-2">
+                          <Mic className="h-4 w-4 text-indigo-500" />
+                          Voice Recording
+                        </h3>
+                      </div>
+                      <div className="p-5 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/50 dark:to-gray-900/80">
+                        {/* Audio player with styled controls */}
+                        <div className="rounded-lg overflow-hidden">
+                          <audio
+                            controls
+                            className="w-full"
+                            src={audio}
+                            style={{
+                              borderRadius: "0.5rem",
+                              backgroundColor: "rgba(249, 250, 251, 0.8)",
+                              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.12)",
+                            }}
+                          >
+                            Your browser does not support the audio element.
+                          </audio>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Screenshots */}
+                  <div className="bg-white dark:bg-gray-900/30 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
+                    <div className="bg-gray-50 dark:bg-gray-800/50 px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+                      <h3 className="text-base font-medium flex items-center gap-2">
+                        <Image className="h-4 w-4 text-indigo-500" />
+                        Interview Screenshots
+                      </h3>
+                    </div>
+
+                    <ScrollArea className="h-[400px]">
+                      <div className="grid grid-cols-1 gap-4 p-4">
+                        {screenshots?.map((screenshot, index) => (
+                          <div
+                            key={index}
+                            className="group rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm transition-all duration-200 hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-800"
+                          >
+                            <div className="aspect-video bg-gray-100 dark:bg-gray-800 relative">
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <img
+                                  src={screenshot.url}
+                                  alt={`Screenshot ${index + 1}`}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            </div>
+                            <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+                              <a
+                                href={screenshot?.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-between text-indigo-600 dark:text-indigo-400 
+                                  hover:text-indigo-800 dark:hover:text-indigo-300 group-hover:underline"
+                              >
+                                <span className="flex items-center gap-2 text-sm">
+                                  <span className="truncate">
+                                    Screenshot #{index + 1}
+                                  </span>
+                                </span>
+                                <ChevronRight className="h-4 w-4 ml-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </a>
+                            </div>
+                          </div>
+                        ))}
+
+                        {screenshots.length === 0 && (
+                          <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+                            <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-full mb-3">
+                              <Image className="h-6 w-6 text-gray-400" />
+                            </div>
+                            <p className="text-gray-500 dark:text-gray-400 text-sm">
+                              No screenshots were captured during this interview
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
-          <TabsContent value="screenshots">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Image className="text-primary h-5 w-5" />
-                  <CardTitle>Interview Screenshots</CardTitle>
+          <TabsContent value="transcript">
+            <Card className="border-0 shadow-md overflow-hidden bg-white dark:bg-[#121212] font-mono">
+              <CardHeader className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-[#121212] px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-amber-100 dark:bg-amber-900/30 p-2 rounded-md">
+                      <FileText className="text-amber-600 dark:text-amber-400 h-4 w-4" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-base uppercase tracking-wider">
+                        Interview Transcript
+                      </h3>
+                    </div>
+                  </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-6">
-                  View screenshots taken during key moments of the interview.
-                </p>
-
-                <ul className="space-y-3">
-                  {screenshots?.map((screenshot, index) => (
-                    <li
-                      key={index}
-                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 
-               hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                    >
-                      <a
-                        href={screenshot?.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between text-blue-600 dark:text-blue-400 
-                 hover:underline"
-                      >
-                        <span className="truncate">
-                          View Screenshot #{index + 1}
-                        </span>
-                        <ExternalLink className="h-4 w-4 ml-2" />
-                      </a>
-                    </li>
-                  ))}
-                </ul>
+              <CardContent className="p-0">
+                <ScrollArea className="h-[450px]">
+                  <div className="py-6 px-8 bg-[#fcfcf9] dark:bg-[#121212]">
+                    <div className="max-w-3xl mx-auto space-y-5">
+                      {formattedTranscript.map((entry) => {
+                        const isAI = entry.speaker === "AI";
+                        const isUser = entry.speaker === "User";
+                        const isModerator = !isAI && !isUser;
+                        return (
+                          <div key={entry.key} className="space-y-1">
+                            {!isModerator ? (
+                              <>
+                                <div className="flex">
+                                  <div
+                                    className={`w-1/4 pr-4 uppercase font-bold text-sm ${
+                                      isAI
+                                        ? "text-blue-600 dark:text-blue-400"
+                                        : "text-green-600 dark:text-green-400"
+                                    }`}
+                                  >
+                                    {entry.speaker}
+                                  </div>
+                                  <div className="w-3/4 text-sm text-gray-800 dark:text-gray-300">
+                                    {entry.text}
+                                  </div>
+                                </div>
+                              </>
+                            ) : (
+                              <div className="w-full text-center italic text-xs text-gray-500 dark:text-gray-400 py-1 px-3 border-t border-b border-dashed border-gray-200 dark:border-gray-700">
+                                ({entry.text})
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </ScrollArea>
               </CardContent>
             </Card>
           </TabsContent>
