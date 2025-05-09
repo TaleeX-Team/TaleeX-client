@@ -14,6 +14,19 @@ import InterviewHeader from "@/components/interview/InterviewHeader.jsx";
 import {useStartInterview} from "@/hooks/useInterviewData.js";
 import {useInterviewState} from "@/hooks/useInterviewState.js";
 
+const questions = [
+
+
+    "Can you explain the difference between HTML, CSS, and JavaScript and how they work together in front-end development?",
+
+    "What are some common performance issues you might encounter in a front-end application, and how would you address them?",
+
+    "What tools and frameworks are you familiar with that can aid in front-end development, and can you describe",
+    "Can you walk me through the process of debugging a front-end application? What tools do you typically use?",
+    "Describe how you would approach making a website responsive. What techniques or frameworks would you use?",
+
+
+]
 
 export default function Interview() {
     const {interviewId} = useParams();
