@@ -14,30 +14,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-export default function TechnicalFeedbackPage({ screenshots = [] }) {
+export default function TechnicalFeedbackPage({ screenshots = [], feedback }) {
   const [activeTab, setActiveTab] = useState("results");
-
-  const feedback = {
-    type: "technical",
-    rating: {
-      technicalSkills: "2",
-      communication: "2",
-      experience: "3",
-      teamwork: "3",
-    },
-    overallScore: "2.5",
-    summary:
-      "Candidate showed minimal technical detail and avoided core questions. Communication lacked clarity and engagement.",
-    technicalSkills: {
-      keywords: ["React", "CSS", "UI", "Selenium", "Jest"],
-    },
-    redflag: "Avoided key questions, unclear responses.",
-    recommendation: {
-      verdict: "No",
-      reasoning:
-        "Insufficient demonstration of technical depth, poor engagement, and unclear communication raise concerns about job readiness.",
-    },
-  };
 
   const scoreValue = parseFloat(feedback.overallScore);
 
