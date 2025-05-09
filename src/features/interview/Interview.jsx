@@ -26,7 +26,7 @@ export default function Interview() {
         data: questionsData,
         isFetching: isStartingInterview,
         error: startError,
-    } = useStartInterview(interviewId, !questionsFromNav.length);
+    } = useStartInterview(interviewId, !questionsFromNav?.length);
 
     const {
         state: {
@@ -87,14 +87,14 @@ export default function Interview() {
             mainContentRef,
             vapiClientRef,
         },
-    } = useInterviewState(questionsData, interviewId);
+    } = useInterviewState(questionsData || [], interviewId);
 
 
     // Start interview automatically if not started and questions are available
     useEffect(() => {
         if (
             !isInterviewStarted &&
-            questionsData.length > 0 &&
+            questionsData?.length > 0 &&
             !isStartingInterview
         ) {
             console.log("Starting interview", {
@@ -104,7 +104,7 @@ export default function Interview() {
         }
     }, [
         isInterviewStarted,
-        questionsData.length,
+        questionsData?.length,
         isStartingInterview,
         handleStartInterview,
     ]);
@@ -139,13 +139,13 @@ export default function Interview() {
     };
 
     // Handle case where no questions are available
-    if (!questionsData.length && !isStartingInterview) {
+    if (!questionsData?.length && !isStartingInterview) {
         return (
             <div
-                className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+                className="flex flex-col min-h-screen">
                 <style jsx>{globalStyles}</style>
                 <div className="flex-1 flex items-center justify-center p-4">
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full">
+                    <div className="bg-card border border-border p-6 rounded-lg shadow-lg max-w-md w-full">
                         <h2 className="text-xl font-bold text-red-500 mb-4">Error</h2>
                         <p className="text-gray-600 dark:text-gray-300 mb-4">
                             No questions available for this interview. Please go back and try
@@ -174,7 +174,7 @@ export default function Interview() {
                 isInterviewStarted={isInterviewStarted}
                 interviewDuration={interviewDuration}
                 currentQuestionIndex={currentQuestionIndex}
-                totalQuestions={questionsData.length}
+                totalQuestions={questionsData?.length}
                 isAudioOn={isAudioOn}
                 progress={progress}
                 timeRemaining={timeRemaining}
@@ -251,7 +251,7 @@ export default function Interview() {
                 onClose={handleDialogClose}
                 interviewDuration={interviewDuration}
                 questionsAsked={progress.current}
-                totalQuestions={questionsData.length}
+                totalQuestions={questionsData?.length}
                 screenshots={screenshots}
                 transcript={saveAndGetTranscript(interviewId)}
                 callId={callId}

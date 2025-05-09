@@ -341,8 +341,8 @@ export function StartScreen() {
                                 </div>
 
                                 {questionsError && (
-                                    <div className="mt-2 text-red-600 dark:text-red-400 text-sm bg-red-50 dark:bg-red-900/20 p-4 rounded-md flex items-start border border-red-100 dark:border-red-800">
-                                        <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
+                                    <div className="mt-2 text-red-600 dark:text-red-100 text-sm bg-red-50 dark:bg-red-600/10 p-4 rounded-md flex items-start border border-red-100 dark:border-red-400">
+                                        <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
                                         <div>
                                             <p className="font-medium">Failed to start interview</p>
                                             <p className="mt-1">
