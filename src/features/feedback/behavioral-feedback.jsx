@@ -63,7 +63,7 @@ export default function BehavioralFeedbackPage({
   const formattedTranscript = parseTranscript(transcriptText);
 
   return (
-    <div className="min-h-screen flex bg-background px-4">
+    <div className="flex bg-background px-4">
       <div className="w-full max-w-4xl space-y-6 py-8">
         <h1 className="text-3xl font-bold mb-6 text-center">
           Behavioral Evaluation Results
@@ -113,14 +113,14 @@ export default function BehavioralFeedbackPage({
           </TabsContent>
           <TabsContent value="details">
             <Card className="border-0 shadow-md overflow-hidden bg-white dark:bg-[#121212]">
-              <CardHeader className="px-6 ">
+              {/* <CardHeader className="px-6 ">
                 <div className="flex items-center gap-3">
                   <div className=" rounded-full ">
                     <FileText className="h-5 w-5" />
                   </div>
                   <CardTitle className="text-xl">Interview Details</CardTitle>
                 </div>
-              </CardHeader>
+              </CardHeader> */}
 
               <CardContent className="p-0">
                 {/* Main content area with responsive grid */}
