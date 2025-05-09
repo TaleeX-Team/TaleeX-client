@@ -15,7 +15,7 @@ const VAPI_ASSISTANT_ID = import.meta.env.VITE_VAPI_ASSISTANT_ID;
 const VAPI_API_KEY = import.meta.env.VITE_VAPI_API_KEY;
 
 const ENDING_PHRASE = "That concludes our interview today. Thank you for your time."
-const INTERVIEW_DURATION_MINUTES = 20
+const MINUTES_PER_QUESTION = 3 // 3 minutes per question
 const WARNING_TIME_MINUTES = 5
 const FINAL_WARNING_MINUTES = 1
 const RESPONSE_TIMEOUT = 15000 // 15 seconds for response timeout
@@ -23,6 +23,8 @@ const SCREENSHOT_INTERVAL = 90000 // 1.5 minutes (90 seconds) in milliseconds
 const MAX_SCREENSHOTS = 3
 
 export function useInterviewState(questions, interviewId) {
+    const INTERVIEW_DURATION_MINUTES = questions.length * MINUTES_PER_QUESTION; // Dynamic duration based on question count
+
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
     const [displayedQuestion, setDisplayedQuestion] = useState(questions.length > 0 ? questions[0] : "")
     const [progress, setProgress] = useState({
@@ -259,7 +261,7 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [isInterviewStarted, callStatus, debugMode])
 
-    // Interview timer (for warnings and time remaining)
+    // Interview timer (for warnings, time remaining, and ending)
     useEffect(() => {
         if (isInterviewStarted && callStatus === CallStatus.ACTIVE) {
             interviewTimerRef.current = setInterval(() => {
@@ -288,6 +290,15 @@ export function useInterviewState(questions, interviewId) {
                             })
                     }
 
+                    if (newTime <= 0 && canSpeak && !conclusionDetected) {
+                        vapiClientRef.current.say(ENDING_PHRASE, true)
+                        setConclusionDetected(true)
+                        if (debugMode)
+                            console.log("Interview duration reached, ending with conclusion phrase", {
+                                timestamp: new Date().toISOString(),
+                            })
+                    }
+
                     if (debugMode)
                         console.log("Time remaining timer tick", {
                             timeRemaining: newTime,
@@ -308,7 +319,7 @@ export function useInterviewState(questions, interviewId) {
                     })
             }
         }
-    }, [isInterviewStarted, callStatus, debugMode])
+    }, [isInterviewStarted, callStatus, isAITalking, isUserTalking, lastUserResponseTime, conclusionDetected, debugMode])
 
     // Setup VAPI client listeners
     useEffect(() => {

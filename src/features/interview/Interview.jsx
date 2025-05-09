@@ -129,7 +129,7 @@ export default function Interview() {
                 count: screenshots.length,
                 timestamp: new Date().toISOString(),
             });
-            toast.success(`${screenshots.length} of 3 screenshots taken`);
+            // toast.success(`${screenshots.length} of 3 screenshots taken`);
         }
     }, [lastCapturedScreenshot, screenshots.length]);
 

@@ -40,9 +40,11 @@ import {
     ChevronDown,
     FileText,
     User,
-    Globe,
+    Globe, AlertCircle, CheckCircle, XCircle, FileX, Eye,
 } from "lucide-react"
 import { format } from "date-fns"
+import {Tooltip} from "@/components/ui/tooltip.jsx";
+import {Alert, AlertTitle} from "@/components/ui/alert.jsx";
 
 const StatusBadge = ({ status }) => {
     const getStatusConfig = () => {
@@ -123,15 +125,15 @@ export default function CompaniesManagement() {
     const [methodFilters, setMethodFilters] = useState([])
     const [selectedCompany, setSelectedCompany] = useState(null)
     const [viewMode, setViewMode] = useState("grid") // 'grid' or 'table'
-    const [showSuccessAlert, setShowSuccessAlert] = useState(false)
-    const [successMessage, setSuccessMessage] = useState("")
     const [isFilterOpen, setIsFilterOpen] = useState(false)
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm)
     const [rejectionReason, setRejectionReason] = useState("")
     const [showRejectionDialog, setShowRejectionDialog] = useState(false)
     const [companyToReject, setCompanyToReject] = useState(null)
+    const [showSuccessAlert, setShowSuccessAlert] = useState(false)
+    const [successMessage, setSuccessMessage] = useState("")
 
-    // Add this debounce effect
+// Add this debounce effect
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearchTerm(searchTerm)
@@ -140,17 +142,17 @@ export default function CompaniesManagement() {
         return () => clearTimeout(timer)
     }, [searchTerm])
 
-    // React Query hooks
+// React Query hooks
     const queryClient = useQueryClient()
 
-    // Create filters object based on UI state
+// Create filters object based on UI state
     const [filters, setFilters] = useState({
         name: searchTerm,
         verificationStatus: statusFilter !== "all" ? statusFilter : undefined,
         verificationMethod: methodFilters.length > 0 ? methodFilters : undefined,
     })
 
-    // Update filters when search, status filter, or method filters change
+// Update filters when search, status filter, or method filters change
     useEffect(() => {
         // Domain has priority over admin if both are selected
         let methodFilter = methodFilters
@@ -165,124 +167,92 @@ export default function CompaniesManagement() {
         })
     }, [debouncedSearchTerm, statusFilter, methodFilters])
 
-    // Use the filtered companies data
+// Use the filtered companies data
     const {
         data: filteredCompaniesData,
         isLoading: filteredCompaniesLoading,
         isError: isFilterError,
         error: filterError,
         refetch: refetchFilteredCompanies,
+        isFetching: isFilterFetching,
     } = useFilterCompanies(filters, {
         enabled: true,
         keepPreviousData: true,
-        staleTime: 1000 * 60 * 5, // 5 minutes
-        refetchOnWindowFocus: false,
     })
 
-    // Get all companies (used as fallback)
-    const { data: allCompaniesData, isLoading: allCompaniesLoading } = useCompanies({
+// Get all companies (used as fallback)
+    const {
+        data: allCompaniesData,
+        isLoading: allCompaniesLoading,
+        isFetching: allCompaniesFetching
+    } = useCompanies({
         enabled: !filters.name && !filters.verificationStatus && !filters.verificationMethod,
     })
 
-    // Determine which data to use
+// Company verification mutation
+    const { mutate: verifyCompanyMutation, isPending: verificationLoading } = useVerifyCompany({
+        onSuccess: (data, variables) => {
+            const actionType = variables.status === "verified" ? "verified" : "rejected"
+            setSuccessMessage(`Company successfully ${actionType}`)
+            setShowSuccessAlert(true)
+            setTimeout(() => setShowSuccessAlert(false), 3000)
+
+            // Close modal if open
+            if (selectedCompany && selectedCompany._id === variables.id) {
+                setSelectedCompany(null)
+            }
+
+            // Close rejection dialog if open
+            if (showRejectionDialog) {
+                setShowRejectionDialog(false)
+                setRejectionReason("")
+                setCompanyToReject(null)
+            }
+        },
+        onError: (error) => {
+            console.error("Verification error:", error)
+            setSuccessMessage(`Error: ${error.message || "Failed to process verification"}`)
+            setShowSuccessAlert(true)
+            setTimeout(() => setShowSuccessAlert(false), 5000)
+
+            if (showRejectionDialog) {
+                setShowRejectionDialog(false)
+            }
+        }
+    })
+
+// Determine which data to use
     const companiesData =
         filters.name || filters.verificationStatus || filters.verificationMethod ? filteredCompaniesData : allCompaniesData
-    const isLoading =
-        filters.name || filters.verificationStatus || filters.verificationMethod
-            ? filteredCompaniesLoading
-            : allCompaniesLoading
+    const isLoading = filteredCompaniesLoading || allCompaniesLoading || verificationLoading
+    const isFetching = filteredCompaniesData ? isFilterFetching : allCompaniesFetching
     const isError = isFilterError
 
-    // Company verification mutation
-    const { mutate: verifyCompanyMutation, isLoading: verificationLoading } = useVerifyCompany()
-
-    // Handle company verification
+// Handle company verification
     const handleVerifyCompany = (companyId, isApproved = true) => {
-        verifyCompanyMutation(
-            { id: companyId, status: isApproved ? "verified" : "rejected" },
-            {
-                onSuccess: () => {
-                    setSuccessMessage(isApproved ? "Company successfully verified" : "Company rejection processed")
-                    setShowSuccessAlert(true)
-                    setTimeout(() => setShowSuccessAlert(false), 3000)
-
-                    // Close modal if open
-                    if (selectedCompany && selectedCompany._id === companyId) {
-                        setSelectedCompany(null)
-                    }
-                },
-                onError: (error) => {
-                    console.error("Verification error:", error)
-                    // Handle error display
-                },
-            },
-        )
+        verifyCompanyMutation({
+            id: companyId,
+            status: isApproved ? "verified" : "rejected"
+        })
     }
 
-    // Handle rejecting a company with reason
+// Handle rejecting a company with reason
     const handleRejectCompany = (companyId, reason) => {
-        verifyCompanyMutation(
-            { id: companyId, status: "rejected", reason },
-            {
-                onSuccess: () => {
-                    setSuccessMessage("Company rejection processed")
-                    setShowSuccessAlert(true)
-                    setTimeout(() => setShowSuccessAlert(false), 3000)
-
-                    // Close modals
-                    setShowRejectionDialog(false)
-                    setRejectionReason("")
-                    setCompanyToReject(null)
-
-                    if (selectedCompany && selectedCompany._id === companyId) {
-                        setSelectedCompany(null)
-                    }
-                },
-                onError: (error) => {
-                    console.error("Rejection error:", error)
-                    setSuccessMessage(`Error: ${error.response?.data?.message || "Failed to reject company"}`)
-                    setShowSuccessAlert(true)
-                    setTimeout(() => setShowSuccessAlert(false), 5000)
-                },
-            },
-        )
+        verifyCompanyMutation({
+            id: companyId,
+            status: "rejected",
+            reason
+        })
     }
 
-    // Open rejection dialog
+// Open rejection dialog
     const openRejectionDialog = (company) => {
         setCompanyToReject(company)
         setRejectionReason("")
         setShowRejectionDialog(true)
     }
 
-    // Handle deleting a company
-    const handleDeleteCompany = async (companyId) => {
-        try {
-            const response = await fetch(`/api/companies/${companyId}`, {
-                method: "DELETE",
-            })
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}))
-                throw new Error(errorData.message || `Failed to delete company (Status: ${response.status})`)
-            }
-
-            setSuccessMessage("Company deleted successfully")
-            setShowSuccessAlert(true)
-            setTimeout(() => setShowSuccessAlert(false), 3000)
-
-            // Refetch data
-            queryClient.invalidateQueries({ queryKey: ["companies"] })
-            queryClient.invalidateQueries({ queryKey: ["filteredCompanies"] })
-        } catch (error) {
-            console.error("Error deleting company:", error)
-            setSuccessMessage(`Error: ${error.response?.data?.message || "Failed to delete company"}`)
-            setShowSuccessAlert(true)
-            setTimeout(() => setShowSuccessAlert(false), 5000)
-        }
-    }
-
-    // Format date helper
+// Format date helper
     const formatDate = (dateString) => {
         if (!dateString) return "-"
         try {
@@ -292,7 +262,7 @@ export default function CompaniesManagement() {
         }
     }
 
-    // Toggle method filter
+// Toggle method filter
     const toggleMethodFilter = (method) => {
         setMethodFilters((current) => {
             if (current.includes(method)) {
@@ -303,23 +273,507 @@ export default function CompaniesManagement() {
         })
     }
 
-    // Clear all filters
+// Clear all filters
     const clearAllFilters = () => {
         setSearchTerm("")
         setStatusFilter("all")
         setMethodFilters([])
     }
 
+    // Render loading skeleton for grid view
+    const renderGridSkeleton = () => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+                <Card key={item} className="overflow-hidden">
+                    <div className="h-36 bg-muted animate-pulse" />
+                    <CardContent className="p-4">
+                        <div className="h-6 bg-muted animate-pulse rounded w-3/4 mb-3" />
+                        <div className="h-4 bg-muted animate-pulse rounded w-full mb-2" />
+                        <div className="h-4 bg-muted animate-pulse rounded w-5/6 mb-4" />
+                        <div className="flex justify-between items-center">
+                            <div className="h-5 bg-muted animate-pulse rounded w-1/3" />
+                            <div className="h-5 bg-muted animate-pulse rounded w-1/4" />
+                        </div>
+                        <div className="mt-4 pt-3 border-t flex justify-between">
+                            <div className="h-8 bg-muted animate-pulse rounded w-1/4" />
+                            <div className="flex gap-2">
+                                <div className="h-8 bg-muted animate-pulse rounded w-16" />
+                                <div className="h-8 bg-muted animate-pulse rounded w-16" />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            ))}
+        </div>
+    )
+
+    // Render loading skeleton for table view
+    const renderTableSkeleton = () => (
+        <Table>
+            <TableHeader>
+                <TableRow>
+                    <TableHead>Company</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Method</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Website</TableHead>
+                    <TableHead>Document</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {[1, 2, 3, 4, 5].map((item) => (
+                    <TableRow key={item}>
+                        <TableCell>
+                            <div className="flex items-center">
+                                <div className="h-10 w-10 bg-muted animate-pulse rounded-full mr-3"></div>
+                                <div className="space-y-2">
+                                    <div className="h-5 bg-muted animate-pulse rounded w-32"></div>
+                                    <div className="h-4 bg-muted animate-pulse rounded w-48"></div>
+                                </div>
+                            </div>
+                        </TableCell>
+                        <TableCell><div className="h-6 bg-muted animate-pulse rounded w-20"></div></TableCell>
+                        <TableCell><div className="h-6 bg-muted animate-pulse rounded w-16"></div></TableCell>
+                        <TableCell><div className="h-5 bg-muted animate-pulse rounded w-24"></div></TableCell>
+                        <TableCell><div className="h-5 bg-muted animate-pulse rounded w-32"></div></TableCell>
+                        <TableCell><div className="h-5 bg-muted animate-pulse rounded w-16"></div></TableCell>
+                        <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                                <div className="h-8 bg-muted animate-pulse rounded w-16"></div>
+                                <div className="h-8 bg-muted animate-pulse rounded w-16"></div>
+                                <div className="h-8 bg-muted animate-pulse rounded w-8"></div>
+                            </div>
+                        </TableCell>
+                    </TableRow>
+                ))}
+            </TableBody>
+        </Table>
+    )
+
     // Render the grid view of companies
     const renderGridView = () => {
-        if (isLoading) {
-            return (
-                <div className="flex flex-col justify-center items-center py-12 gap-4">
-                    <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                    <p className="text-muted-foreground">Loading companies...</p>
-                </div>
-            )
+        if (isLoading && !isFetching) {
+            return renderGridSkeleton();
         }
+
+        if (isError) {
+            return (
+                <div className="col-span-full py-12 px-6">
+                    <ErrorBanner
+                        title="Failed to load companies"
+                        message={filterError?.message || "There was an error loading the companies data"}
+                        onRetry={() => {
+                            queryClient.invalidateQueries({ queryKey: ['filteredCompanies'] });
+                            queryClient.invalidateQueries({ queryKey: ['companies'] });
+                            refetchFilteredCompanies();
+                        }}
+                    />
+                </div>
+            );
+        }
+
+        if (companiesData?.companies?.length === 0) {
+            return (
+                <div className="col-span-full flex flex-col items-center justify-center py-16 px-4">
+                    <div className="flex items-center justify-center w-20 h-20 rounded-full bg-muted mb-5">
+                        <Search className="h-10 w-10 text-muted-foreground opacity-70" />
+                    </div>
+                    <h3 className="text-xl font-semibold mt-2">No companies found</h3>
+                    <p className="mt-2 text-muted-foreground text-center max-w-md">
+                        Try adjusting your search or filter criteria
+                    </p>
+                    <Button variant="outline" onClick={clearAllFilters} className="mt-6 px-6">
+                        Clear all filters
+                    </Button>
+                </div>
+            );
+        }
+
+        return (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-1">
+                {companiesData?.companies?.map((company) => (
+                    <Card
+                        key={company._id}
+                        className="overflow-hidden hover:shadow-lg transition-all duration-300 border-muted/80 flex flex-col"
+                    >
+                        <div className="relative h-48 bg-gradient-to-b from-muted/30 to-muted">
+                            <img
+                                src={company.image || "/TaleexLogo.png"}
+                                alt={company.name}
+                                className="w-full h-full object-cover"
+                            />
+                            <div className="absolute top-3 right-3">
+                                <StatusBadge status={company.verification.status} />
+                            </div>
+                            {company.verification.document && (
+                                <div className="absolute bottom-3 right-3">
+                                    <Tooltip content="View verification document">
+                                        <a
+                                            href={company.verification.document}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="group flex items-center gap-1 bg-white/95 dark:bg-black/90 px-3 py-2 rounded-lg shadow-md hover:shadow-lg hover:bg-white dark:hover:bg-black transition-all duration-200 border border-primary/20"
+                                        >
+                                            <FileText className="h-4 w-4 text-primary group-hover:text-primary/80" />
+                                            <span className="text-xs font-medium text-primary group-hover:text-primary/80">Document</span>
+                                        </a>
+                                    </Tooltip>
+                                </div>
+                            )}
+                        </div>
+
+                        <CardContent className="p-5 flex-1 flex flex-col">
+                            <div className="flex justify-between items-start mb-2">
+                                <h3 className="font-semibold text-lg tracking-tight truncate">{company.name}</h3>
+                            </div>
+
+                            <p className="text-muted-foreground text-sm line-clamp-2 min-h-12">
+                                {company.description || "No description available"}
+                            </p>
+
+                            <div className="mt-4 flex items-center justify-between text-sm">
+                                {company.website ? (
+                                    <a
+                                        href={company.website}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center text-primary hover:underline hover:text-primary/80 transition-colors"
+                                    >
+                                        <ExternalLink size={14} className="mr-1" />
+                                        Website
+                                    </a>
+                                ) : (
+                                    <span className="text-muted-foreground flex items-center">
+                                    <XCircle size={14} className="mr-1 opacity-70" />
+                                    No website
+                                </span>
+                                )}
+
+                                {company.verification.method && (
+                                    <MethodBadge method={company.verification.method} />
+                                )}
+                            </div>
+
+                            <div className="mt-4 flex flex-wrap gap-2">
+                                {company.values?.slice(0, 3).map((value, idx) => (
+                                    <Badge
+                                        key={idx}
+                                        variant="secondary"
+                                        className="bg-primary/10 text-primary hover:bg-primary/20 px-2 py-1"
+                                    >
+                                        {value}
+                                    </Badge>
+                                ))}
+                                {company.values?.length > 3 && (
+                                    <Badge variant="outline" className="text-muted-foreground">
+                                        +{company.values.length - 3}
+                                    </Badge>
+                                )}
+                                {(!company.values || company.values.length === 0) && (
+                                    <span className="text-xs text-muted-foreground italic">No values listed</span>
+                                )}
+                            </div>
+
+                            {company.verification.status === "rejected" && company.verification.reason && (
+                                <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-md">
+                                    <p className="text-xs text-red-700 dark:text-red-400 flex items-start">
+                                        <AlertCircle size={12} className="mr-1 mt-0.5 flex-shrink-0" />
+                                        <span>
+                                        <span className="font-medium">Rejection reason:</span> {company.verification.reason}
+                                    </span>
+                                    </p>
+                                </div>
+                            )}
+
+                            <div className="mt-auto pt-4 flex justify-between items-center border-t border-muted/60 mt-4">
+                                <Button
+                                    variant="link"
+                                    onClick={() => setSelectedCompany(company)}
+                                    className="p-0 h-auto text-primary font-medium hover:text-primary/80 transition-colors"
+                                >
+                                    View details
+                                </Button>
+                                {company.verification.status === "pending" && (
+                                    <div className="flex gap-2">
+                                        <Tooltip content="Reject company">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => openRejectionDialog(company)}
+                                                className="h-8 border-destructive text-destructive hover:bg-destructive/10 transition-colors"
+                                                disabled={verificationLoading}
+                                            >
+                                                {verificationLoading && companyToReject?._id === company._id ? (
+                                                    <Loader2 size={14} className="animate-spin mr-1" />
+                                                ) : (
+                                                    <X size={14} className="mr-1" />
+                                                )}
+                                                Reject
+                                            </Button>
+                                        </Tooltip>
+                                        <Tooltip content="Verify company">
+                                            <Button
+                                                variant="default"
+                                                size="sm"
+                                                onClick={() => handleVerifyCompany(company._id, true)}
+                                                className="h-8 bg-green-600 hover:bg-green-700 text-white transition-colors"
+                                                disabled={verificationLoading}
+                                            >
+                                                {verificationLoading && !companyToReject && selectedCompany?._id === company._id ? (
+                                                    <Loader2 size={14} className="animate-spin mr-1" />
+                                                ) : (
+                                                    <Check size={14} className="mr-1" />
+                                                )}
+                                                Verify
+                                            </Button>
+                                        </Tooltip>
+                                    </div>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+                {isFetching && !isLoading && (
+                    <div className="col-span-full flex justify-center py-8">
+                        <div className="flex flex-col items-center">
+                            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                            <span className="text-sm text-muted-foreground mt-2">Loading more companies...</span>
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    // Render the table view of companies
+    const renderTableView = () => (
+        <div className="overflow-x-auto rounded-lg border border-muted/60">
+            {isLoading && !isFetching ? (
+                renderTableSkeleton()
+            ) : (
+                <Table>
+                    <TableHeader className="bg-muted/30">
+                        <TableRow className="hover:bg-muted/40 border-b border-muted/60">
+                            <TableHead className="font-semibold">
+                                <div className="flex items-center gap-1">
+                                    Company
+                                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-muted/80">
+                                        <ArrowUpDown size={12} />
+                                    </Button>
+                                </div>
+                            </TableHead>
+                            <TableHead className="font-semibold">
+                                <div className="flex items-center gap-1">
+                                    Status
+                                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full hover:bg-muted/80">
+                                        <ArrowUpDown size={12} />
+                                    </Button>
+                                </div>
+                            </TableHead>
+                            <TableHead className="font-semibold">Method</TableHead>
+                            <TableHead className="font-semibold">Created</TableHead>
+                            <TableHead className="font-semibold">Website</TableHead>
+                            <TableHead className="font-semibold">Document</TableHead>
+                            <TableHead className="text-right font-semibold">Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {companiesData?.companies?.length > 0 ? (
+                            companiesData?.companies?.map((company) => (
+                                <TableRow
+                                    key={company._id}
+                                    className="hover:bg-muted/10 transition-colors cursor-pointer"
+                                    onClick={() => setSelectedCompany(company)}
+                                >
+                                    <TableCell className="py-4">
+                                        <div className="flex items-center">
+                                            <div className="h-12 w-12 flex-shrink-0 mr-4 rounded-md overflow-hidden border border-muted/30 bg-muted/20">
+                                                <img
+                                                    src={company.image || "/logo.svg"}
+                                                    alt={company.name}
+                                                    className="h-12 w-12 object-cover"
+                                                />
+                                            </div>
+                                            <div className="max-w-md">
+                                                <div className="font-medium text-base">{company.name}</div>
+                                                <div className="text-sm text-muted-foreground truncate max-w-xs">
+                                                    {company.description || "No description"}
+                                                </div>
+                                                {company.verification.status === "rejected" && company.verification.reason && (
+                                                    <div className="mt-1.5 text-xs flex items-start text-red-600 dark:text-red-400 max-w-xs">
+                                                        <AlertCircle size={12} className="mr-1 mt-0.5 flex-shrink-0" />
+                                                        <span className="line-clamp-2">
+                                                        <span className="font-medium">Rejected:</span> {company.verification.reason}
+                                                    </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <StatusBadge status={company.verification.status} />
+                                    </TableCell>
+                                    <TableCell>
+                                        {company.verification.method ? (
+                                            <MethodBadge method={company.verification.method} />
+                                        ) : (
+                                            <span className="text-muted-foreground text-sm">—</span>
+                                        )}
+                                    </TableCell>
+                                    <TableCell className="text-muted-foreground text-sm">
+                                        <div className="flex flex-col">
+                                            <span>{formatDate(company.createdAt)}</span>
+                                            <span className="text-xs text-muted-foreground/70">
+                                            {formatDate(company.createdAt)}
+                                        </span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="min-w-40">
+                                        {company.website ? (
+                                            <a
+                                                href={company.website}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-primary hover:text-primary/80 flex items-center group transition-colors"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                <span className="truncate w-36 inline-block">{company.website}</span>
+                                                <ExternalLink size={14} className="ml-1.5 opacity-70 group-hover:opacity-100" />
+                                            </a>
+                                        ) : (
+                                            <span className="text-muted-foreground flex items-center text-sm">
+                                            <XCircle size={14} className="mr-1.5 opacity-60" />
+                                            Not available
+                                        </span>
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        {company.verification.document ? (
+                                            <a
+                                                href={company.verification.document}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-primary hover:text-primary/80 flex items-center bg-primary/5 hover:bg-primary/10 px-2.5 py-1.5 rounded-md transition-colors inline-flex group"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                <FileText size={14} className="mr-1.5" />
+                                                <span className="font-medium text-sm">View document</span>
+                                            </a>
+                                        ) : (
+                                            <span className="text-muted-foreground flex items-center text-sm">
+                                            <FileX size={14} className="mr-1.5 opacity-60" />
+                                            No document
+                                        </span>
+                                        )}
+                                    </TableCell>
+                                    <TableCell className="text-right p-0" onClick={(e) => e.stopPropagation()}>
+                                        <div className="flex items-center justify-end pr-4 h-full">
+                                            {company.verification.status === "pending" ? (
+                                                <div className="flex items-center gap-1">
+                                                    <Tooltip content="Verify company">
+                                                        <Button
+                                                            variant="default"
+                                                            size="icon"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleVerifyCompany(company._id);
+                                                            }}
+                                                            className="h-7 w-7 bg-green-600 hover:bg-green-700 text-white rounded-md"
+                                                            disabled={verificationLoading}
+                                                        >
+                                                            {verificationLoading && !companyToReject && selectedCompany?._id === company._id ? (
+                                                                <Loader2 size={14} className="animate-spin" />
+                                                            ) : (
+                                                                <Check size={14} />
+                                                            )}
+                                                        </Button>
+                                                    </Tooltip>
+
+                                                    <Tooltip content="Reject company">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="icon"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                openRejectionDialog(company);
+                                                            }}
+                                                            className="h-7 w-7 border-destructive text-destructive hover:bg-destructive/10 rounded-md"
+                                                            disabled={verificationLoading}
+                                                        >
+                                                            {verificationLoading && companyToReject?._id === company._id ? (
+                                                                <Loader2 size={14} className="animate-spin" />
+                                                            ) : (
+                                                                <X size={14} />
+                                                            )}
+                                                        </Button>
+                                                    </Tooltip>
+                                                </div>
+                                            ) : null}
+
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedCompany(company);
+                                                }}
+                                                className="h-7 w-7 text-primary hover:text-primary/80 hover:bg-primary/5 rounded-md ml-1"
+                                            >
+                                                <Eye size={16} />
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        ) : isError ? (
+                            <TableRow>
+                                <TableCell colSpan={7} className="p-8">
+                                    <ErrorBanner
+                                        title="Failed to load companies"
+                                        message={filterError?.message || "There was an error loading the companies data"}
+                                        onRetry={() => {
+                                            queryClient.invalidateQueries({ queryKey: ['filteredCompanies'] });
+                                            queryClient.invalidateQueries({ queryKey: ['companies'] });
+                                            refetchFilteredCompanies();
+                                        }}
+                                    />
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={7} className="px-6 py-16 text-center">
+                                    <div className="inline-flex flex-col items-center justify-center">
+                                        <div className="flex items-center justify-center w-20 h-20 rounded-full bg-muted mb-5">
+                                            <Search className="h-8 w-8 text-muted-foreground opacity-70" />
+                                        </div>
+                                        <h3 className="text-xl font-semibold">No companies found</h3>
+                                        <p className="mt-2 text-muted-foreground max-w-md">
+                                            Try adjusting your search or filter criteria
+                                        </p>
+                                        <Button variant="outline" onClick={clearAllFilters} className="mt-6 px-6">
+                                            Clear all filters
+                                        </Button>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            )}
+            {isFetching && !isLoading && (
+                <div className="flex justify-center py-6 border-t border-muted/40">
+                    <div className="flex flex-col items-center">
+                        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                        <span className="text-sm text-muted-foreground mt-2">Loading more companies...</span>
+                    </div>
+                </div>
+            )}
+        </div>
+    )
+// Error handling component
+    const ErrorSection = () => {
+        const queryClient = useQueryClient();
 
         if (isError) {
             return (
@@ -327,296 +781,43 @@ export default function CompaniesManagement() {
                     <ErrorBanner
                         title="Failed to load companies"
                         message={filterError?.message || "There was an error loading the companies data"}
-                        onRetry={() => refetchFilteredCompanies()}
+                        onRetry={() => {
+                            queryClient.invalidateQueries({ queryKey: ['filteredCompanies'] });
+                            queryClient.invalidateQueries({ queryKey: ['companies'] });
+                            refetchFilteredCompanies();
+                        }}
                     />
                 </div>
-            )
+            );
         }
 
-        if (companiesData?.companies?.length === 0) {
-            return (
-                <div className="col-span-3 text-center py-12">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
-                        <Search className="h-8 w-8 text-muted-foreground" />
-                    </div>
-                    <h3 className="text-lg font-medium">No companies found</h3>
-                    <p className="mt-1 text-muted-foreground">Try adjusting your search or filter criteria</p>
-                    <Button variant="link" onClick={clearAllFilters} className="mt-4">
-                        Clear filters
-                    </Button>
-                </div>
-            )
-        }
+        return null;
+    };
+
+// Success Alert component
+    const SuccessAlert = () => {
+        if (!showSuccessAlert) return null;
 
         return (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {companiesData?.companies?.map((company) => (
-                    <Card key={company._id} className="overflow-hidden hover:shadow-md transition-shadow">
-                        <div className="relative h-36 bg-muted">
-                            <img src={company.image || "/logo.svg"} alt={company.name} className="w-full h-full object-cover" />
-                            <div className="absolute top-2 right-2">
-                                <StatusBadge status={company.verification.status} />
-                            </div>
-                            {company.verification.document && (
-                                <div className="absolute bottom-2 right-2">
-                                    <a
-                                        href={company.verification.document}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="bg-white/90 dark:bg-black/70 p-2 rounded-full shadow-sm hover:bg-white dark:hover:bg-black"
-                                    >
-                                        <FileText className="h-4 w-4 text-primary" />
-                                    </a>
-                                </div>
-                            )}
-                        </div>
-
-                        <CardContent className="p-4">
-                            <div className="flex justify-between items-start">
-                                <h3 className="font-medium text-lg">{company.name}</h3>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => handleDeleteCompany(company._id)}
-                                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                                >
-                                    <Trash2 size={16} />
-                                </Button>
-                            </div>
-
-                            <p className="text-muted-foreground text-sm mt-2 line-clamp-2">{company.description}</p>
-
-                            <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
-                                <a
-                                    href={company.website}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center text-primary hover:underline"
-                                >
-                                    <ExternalLink size={14} className="mr-1" />
-                                    Website
-                                </a>
-
-                                {company.verification.method && <MethodBadge method={company.verification.method} />}
-                            </div>
-
-                            <div className="mt-3 flex flex-wrap gap-1">
-                                {company.values?.slice(0, 3).map((value, idx) => (
-                                    <Badge key={idx} variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20">
-                                        {value}
-                                    </Badge>
-                                ))}
-                            </div>
-
-                            {company.verification.status === "rejected" && company.verification.reason && (
-                                <div className="mt-3 p-2 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-md">
-                                    <p className="text-xs text-red-700 dark:text-red-400">
-                                        <span className="font-medium">Rejection reason:</span> {company.verification.reason}
-                                    </p>
-                                </div>
-                            )}
-
-                            <div className="mt-4 flex justify-between items-center border-t pt-3">
-                                <Button variant="link" onClick={() => setSelectedCompany(company)} className="p-0 h-auto text-primary">
-                                    View details
-                                </Button>
-                                {company.verification.status === "pending" && (
-                                    <div className="flex gap-2">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => openRejectionDialog(company)}
-                                            className="h-8 border-destructive text-destructive hover:bg-destructive/10"
-                                        >
-                                            Reject
-                                        </Button>
-                                        <Button
-                                            variant="default"
-                                            size="sm"
-                                            onClick={() => handleVerifyCompany(company._id, true)}
-                                            className="h-8 bg-green-600 hover:bg-green-700 text-white"
-                                        >
-                                            Verify
-                                        </Button>
-                                    </div>
-                                )}
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
+            <div className="fixed bottom-4 right-4 z-50">
+                <Alert className={`${successMessage.includes("Error") ? "bg-destructive" : "bg-green-600"} text-white`}>
+                    <div className="flex items-center gap-2">
+                        {successMessage.includes("Error") ? (
+                            <AlertCircle className="h-4 w-4" />
+                        ) : (
+                            <CheckCircle className="h-4 w-4" />
+                        )}
+                        <AlertTitle>{successMessage}</AlertTitle>
+                    </div>
+                </Alert>
             </div>
-        )
-    }
-
-    // Render the table view of companies
-    const renderTableView = () => (
-        <div className="overflow-x-auto">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>
-                            <div className="flex items-center gap-1">
-                                Company
-                                <Button variant="ghost" size="icon" className="h-6 w-6">
-                                    <ArrowUpDown size={12} />
-                                </Button>
-                            </div>
-                        </TableHead>
-                        <TableHead>
-                            <div className="flex items-center gap-1">
-                                Status
-                                <Button variant="ghost" size="icon" className="h-6 w-6">
-                                    <ArrowUpDown size={12} />
-                                </Button>
-                            </div>
-                        </TableHead>
-                        <TableHead>Method</TableHead>
-                        <TableHead>Created</TableHead>
-                        <TableHead>Website</TableHead>
-                        <TableHead>Document</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {companiesData?.companies?.length > 0 ? (
-                        companiesData?.companies?.map((company) => (
-                            <TableRow key={company._id}>
-                                <TableCell>
-                                    <div className="flex items-center">
-                                        <div className="h-10 w-10 flex-shrink-0 mr-3">
-                                            <img src={company.image || "/logo.svg"} alt={company.name} className="h-10 w-10 rounded-full" />
-                                        </div>
-                                        <div>
-                                            <div className="font-medium">{company.name}</div>
-                                            <div className="text-sm text-muted-foreground truncate max-w-xs">{company.description}</div>
-                                            {company.verification.status === "rejected" && company.verification.reason && (
-                                                <div className="mt-1 text-xs text-red-600 dark:text-red-400">
-                                                    <span className="font-medium">Rejected:</span> {company.verification.reason}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <StatusBadge status={company.verification.status} />
-                                </TableCell>
-                                <TableCell>
-                                    {company.verification.method ? (
-                                        <MethodBadge method={company.verification.method} />
-                                    ) : (
-                                        <span className="text-muted-foreground">-</span>
-                                    )}
-                                </TableCell>
-                                <TableCell className="text-muted-foreground">{formatDate(company.createdAt)}</TableCell>
-                                <TableCell>
-                                    <a
-                                        href={company.website}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-primary hover:underline flex items-center"
-                                    >
-                                        <span className="truncate w-32 inline-block">{company.website}</span>
-                                        <ExternalLink size={14} className="ml-1" />
-                                    </a>
-                                </TableCell>
-                                <TableCell>
-                                    {company.verification.document ? (
-                                        <a
-                                            href={company.verification.document}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-primary hover:underline flex items-center"
-                                        >
-                                            <FileText size={14} className="mr-1" />
-                                            <span>View</span>
-                                        </a>
-                                    ) : (
-                                        <span className="text-muted-foreground">-</span>
-                                    )}
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2">
-                                        {company.verification.status === "pending" && (
-                                            <>
-                                                <Button
-                                                    variant="default"
-                                                    size="sm"
-                                                    onClick={() => handleVerifyCompany(company._id)}
-                                                    className="h-8 bg-green-600 hover:bg-green-700 text-white"
-                                                >
-                                                    Verify
-                                                </Button>
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => openRejectionDialog(company)}
-                                                    className="h-8 border-destructive text-destructive hover:bg-destructive/10"
-                                                >
-                                                    Reject
-                                                </Button>
-                                            </>
-                                        )}
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => setSelectedCompany(company)}
-                                            className="h-8 text-primary"
-                                        >
-                                            View
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => handleDeleteCompany(company._id)}
-                                            className="h-8 w-8 text-destructive"
-                                        >
-                                            <Trash2 size={16} />
-                                        </Button>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ))
-                    ) : isError ? (
-                        <TableRow>
-                            <TableCell colSpan={7} className="p-6">
-                                <ErrorBanner
-                                    title="Failed to load companies"
-                                    message={filterError?.message || "There was an error loading the companies data"}
-                                    onRetry={() => refetchFilteredCompanies()}
-                                />
-                            </TableCell>
-                        </TableRow>
-                    ) : (
-                        <TableRow>
-                            <TableCell colSpan={7} className="px-6 py-12 text-center">
-                                <div className="inline-flex flex-col items-center justify-center">
-                                    <Search className="h-8 w-8 text-muted-foreground mb-4" />
-                                    <h3 className="text-lg font-medium">No companies found</h3>
-                                    <p className="mt-1 text-muted-foreground">Try adjusting your search or filter criteria</p>
-                                    <Button variant="link" onClick={clearAllFilters} className="mt-4">
-                                        Clear filters
-                                    </Button>
-                                </div>
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-        </div>
-    )
+        );
+    };
 
     return (
         <div className="bg-background min-h-screen">
-            {/* Success/Error alert */}
-            {showSuccessAlert && (
-                <div className="fixed top-4 right-4 z-50 w-80 md:w-96 shadow-lg">
-                    {successMessage.includes("Error") ? (
-                        <ErrorBanner message={successMessage.replace("Error: ", "")} />
-                    ) : (
-                        <SuccessBanner message={successMessage} />
-                    )}
-                </div>
-            )}
+            {/* Success Alert */}
+            <SuccessAlert />
 
             {/* Rejection Dialog */}
             <Dialog open={showRejectionDialog} onOpenChange={(open) => !open && setShowRejectionDialog(false)}>
@@ -624,7 +825,7 @@ export default function CompaniesManagement() {
                     <DialogHeader>
                         <DialogTitle>Reject Company</DialogTitle>
                         <DialogDescription>
-                            Please provide a reason for rejecting {companyToReject?.name}. This will be sent to the company.
+                            Please provide a reason for rejecting <span className="font-medium">{companyToReject?.name}</span>. This will be sent to the company.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
@@ -750,9 +951,17 @@ export default function CompaniesManagement() {
                                                     </div>
                                                 )}
 
+                                                {selectedCompany.verification.email && (
+                                                    <div className="flex justify-between">
+                                                        <span className="text-sm font-medium text-muted-foreground">Email</span>
+                                                        <MethodBadge method={selectedCompany.verification.email} />
+                                                    </div>
+                                                )}
+
+
                                                 <div className="flex justify-between">
                                                     <span className="text-sm font-medium text-muted-foreground">Requested Date</span>
-                                                    <span className="text-sm">{formatDate(selectedCompany.verification.requestedDate)}</span>
+                                                    <span className="text-sm">{formatDate(selectedCompany.createdAt)}</span>
                                                 </div>
 
                                                 {selectedCompany.verification.reviewedDate && (
@@ -762,12 +971,6 @@ export default function CompaniesManagement() {
                                                     </div>
                                                 )}
 
-                                                {selectedCompany.verification.reviewedBy && (
-                                                    <div className="flex justify-between">
-                                                        <span className="text-sm font-medium text-muted-foreground">Reviewed By</span>
-                                                        <span className="text-sm">{selectedCompany.verification.reviewedBy}</span>
-                                                    </div>
-                                                )}
 
                                                 {selectedCompany.verification.document && (
                                                     <div className="flex justify-between items-center">
@@ -788,8 +991,8 @@ export default function CompaniesManagement() {
                                                     <div className="flex flex-col">
                                                         <span className="text-sm font-medium text-muted-foreground">Rejection Reason</span>
                                                         <span className="text-sm mt-1 p-2 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-md text-red-700 dark:text-red-400">
-                              {selectedCompany.verification.reason}
-                            </span>
+                                                        {selectedCompany.verification.reason}
+                                                    </span>
                                                     </div>
                                                 )}
                                             </div>
@@ -850,7 +1053,7 @@ export default function CompaniesManagement() {
                         <div className="flex flex-col sm:flex-row gap-4">
                             <div className="relative flex-1">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    {filteredCompaniesLoading && searchTerm ? (
+                                    {isFilterFetching && searchTerm ? (
                                         <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                                     ) : (
                                         <Search className="h-4 w-4 text-muted-foreground" />
@@ -1008,21 +1211,35 @@ export default function CompaniesManagement() {
                 {/* Content */}
                 <Card className="shadow-sm">
                     <CardContent className="p-0">
-                        <Tabs defaultValue={viewMode} value={viewMode} onValueChange={setViewMode} className="w-full">
-                            <TabsList className="hidden">
-                                <TabsTrigger value="grid">Grid</TabsTrigger>
-                                <TabsTrigger value="table">Table</TabsTrigger>
-                            </TabsList>
-                            <TabsContent value="grid" className="p-4 sm:p-6">
-                                {renderGridView()}
-                            </TabsContent>
-                            <TabsContent value="table" className="p-0">
-                                {renderTableView()}
-                            </TabsContent>
-                        </Tabs>
+                        {/* Error handling */}
+                        <ErrorSection />
+
+                        {/* Loading state */}
+                        {isLoading && !isError && (
+                            <div className="flex flex-col justify-center items-center p-12 gap-4">
+                                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                                <p className="text-muted-foreground">Loading companies...</p>
+                            </div>
+                        )}
+
+                        {/* Data view */}
+                        {!isLoading && !isError && (
+                            <Tabs defaultValue={viewMode} value={viewMode} onValueChange={setViewMode} className="w-full">
+                                <TabsList className="hidden">
+                                    <TabsTrigger value="grid">Grid</TabsTrigger>
+                                    <TabsTrigger value="table">Table</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="grid" className="p-4 sm:p-6">
+                                    {renderGridView()}
+                                </TabsContent>
+                                <TabsContent value="table" className="p-0">
+                                    {renderTableView()}
+                                </TabsContent>
+                            </Tabs>
+                        )}
                     </CardContent>
                 </Card>
             </div>
         </div>
-    )
+    );
 }
