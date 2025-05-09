@@ -3,12 +3,11 @@ import {
     getUsers,
     getUserById,
     updateUser,
-    deleteUser,
     promoteUser,
     getAllCompanies, verifyCompany, filterCompanies, getCompanyStatistics, deleteAdminUser,
 
 } from '../services/apiAuth.js';
-
+import {toast} from 'sonner'
 // Hook for fetching all users
 export const useUsers = () => {
     return useQuery({
@@ -76,28 +75,70 @@ export const usePromoteUser = () => {
 };
 
 
-export const useCompanies = () => {
+export const useCompanies = (options = {}) => {
     return useQuery({
         queryKey: ['companies'],
-        queryFn: getAllCompanies,
+        queryFn: async () => {
+            try {
+                const data = await getAllCompanies();
+                return data;
+            } catch (error) {
+                // Standardize error handling
+                console.error("Failed to fetch companies:", error);
+                throw new Error(error.response?.data?.message || "Failed to fetch companies");
+            }
+        },
+        staleTime: 1000 * 60 * 5, // 5 minutes
+        refetchOnWindowFocus: false,
+        ...options,
     });
 };
 
-// Hook for verifying/rejecting a company
-export const useVerifyCompany = () => {
+/**
+ * Hook for verifying/rejecting a company with toast notifications
+ */
+export const useVerifyCompany = (options = {}) => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: verifyCompany,
-        onSuccess: () => {
+        mutationFn: async (verificationData) => {
+            try {
+                return await verifyCompany(verificationData);
+            } catch (error) {
+                console.error("Verification error:", error);
+                throw new Error(error.response?.data?.message || "Failed to process verification");
+            }
+        },
+        onSuccess: (data, variables) => {
+            // Toast success message based on the verification action
+            const action = variables.status === "verified" ? "verified" : "rejected";
+            toast.success(`Company successfully ${action}`);
+
             // Invalidate and refetch companies data after verification
             queryClient.invalidateQueries({ queryKey: ['companies'] });
+            queryClient.invalidateQueries({ queryKey: ['filteredCompanies'] });
             queryClient.invalidateQueries({ queryKey: ['companyStatistics'] });
+
+            // Execute any custom success callback
+            if (options.onSuccess) options.onSuccess(data, variables);
+        },
+        onError: (error, variables) => {
+            // Toast error message
+            toast.error(error.message || "An error occurred during verification");
+
+            // Execute any custom error callback
+            if (options.onError) options.onError(error, variables);
+        },
+        onSettled: (...args) => {
+            // Execute any custom settled callback
+            if (options.onSettled) options.onSettled(...args);
         },
     });
 };
 
-// Hook for filtering companies
+/**
+ * Hook for filtering companies with debounce support
+ */
 export const useFilterCompanies = (filters = {}, options = {}) => {
     const {
         enabled = true,
@@ -105,30 +146,50 @@ export const useFilterCompanies = (filters = {}, options = {}) => {
         staleTime = 1000 * 60 * 5, // 5 minutes
         refetchOnWindowFocus = false,
         ...queryOptions
-    } = options
+    } = options;
 
     return useQuery({
         queryKey: ["filteredCompanies", filters],
-        queryFn: () => filterCompanies(filters),
+        queryFn: async () => {
+            try {
+                return await filterCompanies(filters);
+            } catch (error) {
+                console.error("Filter error:", error);
+                throw new Error(error.response?.data?.message);
+            }
+        },
         enabled,
         keepPreviousData,
         staleTime,
         refetchOnWindowFocus,
         ...queryOptions,
-    })
-}
+    });
+};
 
-// Hook for fetching company statistics
-export const useCompanyStatistics = () => {
+/**
+ * Hook for fetching company statistics with error handling
+ */
+export const useCompanyStatistics = (options = {}) => {
     return useQuery({
         queryKey: ["companyStatistics"],
-        queryFn: getCompanyStatistics,
+        queryFn: async () => {
+            try {
+                return await getCompanyStatistics();
+            } catch (error) {
+                console.error("Statistics error:", error);
+                throw new Error(error.response?.data?.message );
+            }
+        },
         staleTime: 1000 * 60 * 5, // 5 minutes
-    })
-}
+        refetchOnWindowFocus: false,
+        ...options,
+    });
+};
 
-// Example custom hook that combines filtering with pagination
-export const usePaginatedCompanies = (filters = {}, page = 1, pageSize = 10) => {
+/**
+ * Hook for paginated companies with better error handling
+ */
+export const usePaginatedCompanies = (filters = {}, page = 1, pageSize = 10, options = {}) => {
     // Merge pagination with other filters
     const paginatedFilters = {
         ...filters,
@@ -136,5 +197,11 @@ export const usePaginatedCompanies = (filters = {}, page = 1, pageSize = 10) => 
         pageSize,
     };
 
-    return useFilterCompanies(paginatedFilters);
+    return useFilterCompanies(paginatedFilters, {
+        onError: (error) => {
+            toast.error(`Failed to load companies: ${error.message}`);
+            if (options.onError) options.onError(error);
+        },
+        ...options,
+    });
 };
