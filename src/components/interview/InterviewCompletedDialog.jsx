@@ -9,11 +9,15 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Clock, CheckCircle, Camera } from "lucide-react"
+import {
+    CheckCircle,
+    ArrowRight
+} from "lucide-react"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useEndInterview } from "@/hooks/useInterviewData.js"
-import {toast} from "sonner";
+import { toast } from "sonner"
+import {useTheme} from "@/layouts/theme_provider/ThemeProvider.jsx";
 
 export function InterviewCompletedDialog({
                                              interviewId,
@@ -30,14 +34,9 @@ export function InterviewCompletedDialog({
     const [isSubmitted, setIsSubmitted] = useState(false)
     const navigate = useNavigate()
     const { mutateAsync, isPending, isError, error } = useEndInterview()
+    const { theme } = useTheme() // Get current theme
     const debugMode = true // Enable debug logging for verification
 
-    // Format duration from seconds to minutes:seconds
-    const formatDuration = (seconds) => {
-        const minutes = Math.floor(seconds / 60)
-        const remainingSeconds = seconds % 60
-        return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`
-    }
     // Clear localStorage entries for transcript and screenshots
     const clearLocalStorage = () => {
         try {
@@ -46,7 +45,7 @@ export function InterviewCompletedDialog({
             // Remove clean transcript
             localStorage.removeItem(`interview_clean_transcript_${interviewId}`)
             // Remove screenshots
-            for (let i = 0; i < screenshots.length; i++) {
+            for (let i = 0; i < screenshots?.length; i++) {
                 localStorage.removeItem(`interview_screenshot_${interviewId}_${i}`)
             }
             if (debugMode) {
@@ -55,14 +54,13 @@ export function InterviewCompletedDialog({
                     clearedItems: [
                         `interview_transcript_${interviewId}`,
                         `interview_clean_transcript_${interviewId}`,
-                        ...screenshots.map((_, i) => `interview_screenshot_${interviewId}_${i}`),
+                        ...screenshots?.map((_, i) => `interview_screenshot_${interviewId}_${i}`) || [],
                     ],
                     timestamp: new Date().toISOString(),
                 })
             }
         } catch (error) {
-            toast.error(error.response?.data?.message)
-
+            toast.error("Error clearing local storage")
         }
     }
 
@@ -76,15 +74,15 @@ export function InterviewCompletedDialog({
                         ? transcript
                         : ""
 
-
             await mutateAsync({
                 interviewId,
                 images: screenshots || [],
-                vapiCallId:vapiCallId,
+                vapiCallId: vapiCallId,
             })
 
             clearLocalStorage()
             setIsSubmitted(true)
+            toast.success("Interview data submitted successfully")
 
             if (debugMode) {
                 console.log("Interview data submitted successfully", {
@@ -93,8 +91,7 @@ export function InterviewCompletedDialog({
                 })
             }
         } catch (error) {
-            toast.error(error.response?.data?.message)
-
+            toast.error(error.response?.data?.message || "Failed to submit interview data")
         }
     }
 
@@ -110,69 +107,63 @@ export function InterviewCompletedDialog({
             }}
         >
             <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle className="text-xl">Interview Completed</DialogTitle>
-                    <DialogDescription>Your interview session has been completed successfully.</DialogDescription>
+                <DialogHeader className="space-y-4">
+                    <DialogTitle className="text-2xl font-semibold text-center">
+                        {isSubmitted ? "Success!" : "Interview Completed"}
+                    </DialogTitle>
+                    <DialogDescription className="text-center text-base">
+                        {isSubmitted
+                            ? "Your interview data has been processed and saved."
+                            : "Thank you for completing your interview."}
+                    </DialogDescription>
                 </DialogHeader>
 
-                <div className="grid gap-4 py-4">
-                    <div className="flex items-center gap-4">
-                        <Clock className="h-5 w-5 text-gray-500" />
-                        <div>
-                            <p className="font-medium">Duration</p>
-                            <p className="text-sm text-gray-500">{formatDuration(interviewDuration)}</p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                        <CheckCircle className="h-5 w-5 text-gray-500" />
-                        <div>
-                            <p className="font-medium">Questions</p>
-                            <p className="text-sm text-gray-500">
-                                {questionsAsked} of {totalQuestions} questions completed
+                <div className="py-8 flex justify-center">
+                    {isSubmitted ? (
+                        <div className="flex flex-col items-center justify-center space-y-4">
+                            <div className="rounded-full bg-green-100 dark:bg-green-900 p-4">
+                                <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400" />
+                            </div>
+                            <p className="text-center text-lg font-medium">
+                                Your submission was successful
                             </p>
                         </div>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                        <Camera className="h-5 w-5 text-gray-500" />
-                        <div>
-                            <p className="font-medium">Screenshots</p>
-                            <p className="text-sm text-gray-500">{screenshots?.length || 0} screenshots captured</p>
-                        </div>
-                    </div>
-
-                    {screenshots && screenshots.length > 0 && (
-                        <div className="mt-2">
-                            <p className="text-sm font-medium mb-2">Preview:</p>
-                            <div className="flex gap-2 overflow-x-auto pb-2">
-                                {screenshots.map((screenshot, index) => (
-                                    <div
-                                        key={index}
-                                        className="relative min-w-[100px] h-[75px] rounded-md overflow-hidden border border-gray-200"
-                                    >
-                                        <img
-                                            src={typeof screenshot === "string" ? screenshot : URL.createObjectURL(screenshot)}
-                                            alt={`Screenshot ${index + 1}`}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                ))}
+                    ) : (
+                        <div className="flex flex-col items-center justify-center space-y-4">
+                            <div className="rounded-full bg-blue-100 dark:bg-blue-900 p-4">
+                                <CheckCircle className="h-12 w-12 text-blue-600 dark:text-blue-400" />
                             </div>
+                            <p className="text-center text-lg font-medium">
+                                Ready to submit your interview
+                            </p>
                         </div>
                     )}
                 </div>
 
-                <DialogFooter className="flex flex-col sm:flex-row gap-2">
+                <DialogFooter className="flex-col sm:flex-row gap-3 pt-2">
+                    {isError && (
+                        <p className="text-sm text-red-500 dark:text-red-400 w-full text-center mb-2">
+                            {error?.message || "Failed to submit interview data. Please try again."}
+                        </p>
+                    )}
+
                     {!isSubmitted ? (
-                        <Button onClick={handleSubmit} className="sm:w-auto w-full" disabled={isPending}>
+                        <Button
+                            onClick={handleSubmit}
+                            className="w-full sm:w-auto"
+                            disabled={isPending}
+                            size="lg"
+                        >
                             {isPending ? (
                                 <>
                                     <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-b-transparent border-white"></span>
-                                    Submitting...
+                                    Processing...
                                 </>
                             ) : (
-                                "Submit Interview Data"
+                                <>
+                                    Submit Interview
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </>
                             )}
                         </Button>
                     ) : (
@@ -180,18 +171,14 @@ export function InterviewCompletedDialog({
                             onClick={() => {
                                 onClose()
                                 // Optionally navigate somewhere after submission
-                                // navigate("/dashboard")
+                                navigate("/")
                             }}
-                            className="sm:w-auto w-full"
+                            className="w-full sm:w-auto"
+                            size="lg"
+                            variant="default"
                         >
-                            Done
+                            Return to Dashboard
                         </Button>
-                    )}
-
-                    {isError && (
-                        <p className="text-sm text-red-500 mt-2">
-                            {error?.message || "Failed to submit interview data. Please try again."}
-                        </p>
                     )}
                 </DialogFooter>
             </DialogContent>

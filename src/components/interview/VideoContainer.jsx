@@ -231,53 +231,53 @@ export const VideoContainer = forwardRef(
                             </div>
                         </div>
 
-                        {screenshotCount > 0 && (
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <div className={cn(
-                                            "absolute top-4 left-4 px-3 py-2 rounded-lg flex items-center gap-2",
-                                            isDarkMode
-                                                ? "bg-slate-800 text-white border border-slate-700"
-                                                : "bg-white text-slate-800 border border-slate-200 shadow-sm"
-                                        )}>
-                                            <Camera className={cn(
-                                                "h-4 w-4",
-                                                screenshotCount === 3
-                                                    ? "text-amber-500"
-                                                    : "text-blue-500"
-                                            )} />
-                                            <div className="flex flex-col">
-                                                <div className="flex items-center">
-                                                    <span className="font-medium text-sm">{screenshotCount}</span>
-                                                    <span className="text-xs text-slate-500 ml-1">/ {3}</span>
-                                                </div>
-                                                <Progress
-                                                    value={(screenshotCount / 3) * 100}
-                                                    className={cn(
-                                                        "h-1 w-16 mt-1",
-                                                        screenshotCount === 3 ? "bg-amber-100" : "bg-blue-100"
-                                                    )}
-                                                    indicatorClassName={
-                                                        screenshotCount === 3 ? "bg-amber-500" : "bg-blue-500"
-                                                    }
-                                                />
-                                            </div>
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p className="text-xs">{`${screenshotCount} of ${3} screenshots taken`}</p>
-                                        {screenshotCount === 3 && (
-                                            <p className="text-xs text-amber-500">Maximum screenshots reached</p>
-                                        )}
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        )}
+                        {/*{screenshotCount > 0 && (*/}
+                        {/*    <TooltipProvider>*/}
+                        {/*        <Tooltip>*/}
+                        {/*            <TooltipTrigger asChild>*/}
+                        {/*                <div className={cn(*/}
+                        {/*                    "absolute top-4 left-4 px-3 py-2 rounded-lg flex items-center gap-2",*/}
+                        {/*                    isDarkMode*/}
+                        {/*                        ? "bg-slate-800 text-white border border-slate-700"*/}
+                        {/*                        : "bg-white text-slate-800 border border-slate-200 shadow-sm"*/}
+                        {/*                )}>*/}
+                        {/*                    <Camera className={cn(*/}
+                        {/*                        "h-4 w-4",*/}
+                        {/*                        screenshotCount === 3*/}
+                        {/*                            ? "text-amber-500"*/}
+                        {/*                            : "text-blue-500"*/}
+                        {/*                    )} />*/}
+                        {/*                    <div className="flex flex-col">*/}
+                        {/*                        <div className="flex items-center">*/}
+                        {/*                            <span className="font-medium text-sm">{screenshotCount}</span>*/}
+                        {/*                            <span className="text-xs text-slate-500 ml-1">/ {3}</span>*/}
+                        {/*                        </div>*/}
+                        {/*                        <Progress*/}
+                        {/*                            value={(screenshotCount / 3) * 100}*/}
+                        {/*                            className={cn(*/}
+                        {/*                                "h-1 w-16 mt-1",*/}
+                        {/*                                screenshotCount === 3 ? "bg-amber-100" : "bg-blue-100"*/}
+                        {/*                            )}*/}
+                        {/*                            indicatorClassName={*/}
+                        {/*                                screenshotCount === 3 ? "bg-amber-500" : "bg-blue-500"*/}
+                        {/*                            }*/}
+                        {/*                        />*/}
+                        {/*                    </div>*/}
+                        {/*                </div>*/}
+                        {/*            </TooltipTrigger>*/}
+                        {/*            <TooltipContent>*/}
+                        {/*                <p className="text-xs">{`${screenshotCount} of ${3} screenshots taken`}</p>*/}
+                        {/*                {screenshotCount === 3 && (*/}
+                        {/*                    <p className="text-xs text-amber-500">Maximum screenshots reached</p>*/}
+                        {/*                )}*/}
+                        {/*            </TooltipContent>*/}
+                        {/*        </Tooltip>*/}
+                        {/*    </TooltipProvider>*/}
+                        {/*)}*/}
 
-                        {showScreenshotEffect && (
-                            <div className="absolute inset-0 bg-white animate-flash rounded-lg z-10"></div>
-                        )}
+                        {/*{showScreenshotEffect && (*/}
+                        {/*    <div className="absolute inset-0 bg-white animate-flash rounded-lg z-10"></div>*/}
+                        {/*)}*/}
 
                         {isAudioOn && isSpeaking && audioLevel > 0 && (
                             <div className="absolute bottom-4 right-4 flex items-center gap-2 animate-fadeIn">
