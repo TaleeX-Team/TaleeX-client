@@ -267,7 +267,7 @@ export default function Interview() {
                 totalQuestions={questionsData.length}
                 screenshots={screenshots}
                 transcript={saveAndGetTranscript(interviewId)}
-                callId={callId}
+                vapiCallId={callId}
             />
         </div>
     );

@@ -59,6 +59,7 @@ export function useInterviewState(questions, interviewId) {
         role: null,
         content: "",
     })
+    const [callId, setCallId] = useState(null)
 
     const [questionStates, setQuestionStates] = useState(
         questions.map((question, idx) => ({
@@ -141,7 +142,7 @@ export function useInterviewState(questions, interviewId) {
         }
     }, [callStatus, debugMode])
 
-    // Synchronize question states and progress
+    // Synchronize question states
     useEffect(() => {
         if (questions.length > 0) {
             setQuestionStates((prevStates) => {
@@ -162,19 +163,12 @@ export function useInterviewState(questions, interviewId) {
             })
 
             setDisplayedQuestion(questions[currentQuestionIndex] || "")
-            setProgress({
-                current: currentQuestionIndex + 1,
-                total: questions.length,
-            })
 
             if (debugMode) {
                 console.log("Question state updated:", {
                     currentQuestionIndex,
                     displayedQuestion: questions[currentQuestionIndex],
-                    progress: {
-                        current: currentQuestionIndex + 1,
-                        total: questions.length,
-                    },
+                    progress,
                     timestamp: new Date().toISOString(),
                 })
             }
@@ -343,7 +337,7 @@ export function useInterviewState(questions, interviewId) {
 
                 setMessages((prev) => [...prev, {...message, content: messageContent}])
                 if (message.role === "assistant" || message.role === "user") {
-                    setLastSpeakericester({
+                    setLastSpeakerTranscript({
                         role: message.role,
                         content: messageContent,
                     })
@@ -367,15 +361,10 @@ export function useInterviewState(questions, interviewId) {
                 }
 
                 if (message.role === "assistant" && messageContent) {
-                    const transitionMatch = messageContent.match(
-                        /Moving to question\s*(\d+)|Next question\s*(\d+)|Question\s*(\d+)|Now for question\s*(\d+)/i,
-                    )
+                    const transitionMatch = messageContent.match(/Moving to question\s*(\d+)/i)
 
                     if (transitionMatch) {
-                        const questionNumber = Number.parseInt(
-                            transitionMatch[1] || transitionMatch[2] || transitionMatch[3] || transitionMatch[4],
-                            10,
-                        )
+                        const questionNumber = Number.parseInt(transitionMatch[1], 10)
                         const questionIndex = questionNumber - 1
 
                         if (questionIndex >= 0 && questionIndex < questions.length && questionIndex !== currentQuestionIndex) {
@@ -397,24 +386,6 @@ export function useInterviewState(questions, interviewId) {
                                     questionNumber,
                                     timestamp: new Date().toISOString(),
                                 })
-                        }
-                    }
-
-                    const nextIndex = currentQuestionIndex + 1
-                    if (nextIndex < questions.length) {
-                        const nextQuestion = questions[nextIndex]
-
-                        const isQuestionMatch =
-                            messageContent.toLowerCase().includes(nextQuestion.toLowerCase().slice(0, 50)) ||
-                            messageContent.toLowerCase().includes(`question ${nextIndex + 1}`)
-
-                        if (isQuestionMatch && nextIndex !== currentQuestionIndex) {
-                            if (debugMode)
-                                console.log(`Detected question content match for question ${nextIndex + 1}`, {
-                                    timestamp: new Date().toISOString(),
-                                })
-                            updateQuestionState(nextIndex)
-                            return
                         }
                     }
                 }
@@ -517,12 +488,9 @@ export function useInterviewState(questions, interviewId) {
                                 type: "add-message",
                                 message: {
                                     role: "system",
-                                    content: `The candidate has not responded after 15 seconds. Moving to question ${
-                                        nextIndex + 1
-                                    }: "${questions[nextIndex]}"`,
+                                    content: `Moving to question ${nextIndex + 1}: "${questions[nextIndex]}"`,
                                 },
                             })
-                            updateQuestionState(nextIndex)
                         } else {
                             if (debugMode)
                                 console.log("Reached last question, ending interview", {
@@ -964,7 +932,7 @@ export function useInterviewState(questions, interviewId) {
 
             const interviewer = {
                 name: "AI Technical Interviewer",
-                firstMessage: `Hello! I'm TaleX AI, your interviewer today. I'll be asking you ${questions.length} technical questions to assess your skills. The interview will last up to ${INTERVIEW_DURATION_MINUTES} minutes. Are you ready?!"`,
+                firstMessage: `Hello! I'm TaleX AI, your interviewer today. I'll be asking you ${questions.length} technical questions to assess your skills. The interview will last up to ${INTERVIEW_DURATION_MINUTES} minutes. Are you ready?!`,
                 transcriber: {
                     provider: "deepgram",
                     model: "nova-2",
@@ -983,11 +951,14 @@ export function useInterviewState(questions, interviewId) {
                             content: `You're a professional interviewer conducting a live voice interview to evaluate a candidate's qualifications, motivation, and role fit.
 
 Guidelines:
-- Follow the structured question flow that I gave you !
-- Ask the ${questions.length} technical questions in order, one at a time, starting with question 1.
+- Follow the structured question flow provided below.
+- Ask the ${questions.length} technical questions in order, starting with question 1.
+- **For question 1, start directly by reading the question.**
+- **For questions 2 through ${questions.length}, announce the transition by saying exactly: "Moving to question X"** (e.g., "Moving to question 2") before reading the question.
+- **Read each question exactly as provided** in the list, without paraphrasing.
 - Engage naturally:
-  - Listen actively, acknowledge responses, and ask brief follow-ups if needed for clarity.
-  - Provide hints, not detailed explanations.
+  - Listen actively, acknowledge responses, and ask brief follow-ups if needed for clarity (e.g., "Could you clarify that point?").
+  - Provide hints if the candidate struggles, but do not give detailed explanations.
   - Keep the conversation smooth and controlled.
 - Be professional yet friendly:
   - Use concise, official, and warm language.
@@ -997,14 +968,19 @@ Guidelines:
   - Redirect to HR if unsure.
 - Conclude:
   - Thank the candidate and say the company will follow up.
-  - End with: ${ENDING_PHRASE}
+  - End with exactly this phrase: "${ENDING_PHRASE}"
+- Timeout handling:
+  - If the candidate does not respond within 15 seconds after you finish asking a question, say "Moving to question X" (where X is the next question number) and read the next question. For the last question, say "${ENDING_PHRASE}" instead.
 
-**Questions**: ${formattedQuestions}
+**Questions**:
+${formattedQuestions}
 
 Notes:
 - Stay polite and professional.
 - Keep responses short, simple, and conversational for voice interaction.
-- Avoid long explanations.`,
+- Avoid long explanations.
+- Do not skip questions or change their order unless explicitly instructed.
+- Ensure every question transition (except the first) is announced with "Moving to question X".`,
                         },
                     ],
                 },
@@ -1014,7 +990,9 @@ Notes:
                 console.log("Starting VAPI call", {
                     timestamp: new Date().toISOString(),
                 })
-            await vapiClientRef.current.start(VAPI_ASSISTANT_ID, interviewer)
+            const call = await vapiClientRef.current.start(VAPI_ASSISTANT_ID, interviewer)
+            setCallId(call.id)
+
             if (debugMode)
                 console.log("VAPI call started successfully", {
                     timestamp: new Date().toISOString(),
@@ -1055,7 +1033,6 @@ Notes:
                 return newStates
             })
         } catch (error) {
-            setError(`Failed to start the interview: ${error?.message || "Unknown error"}`)
             setIsAITalking(false)
             setIsUserTalking(false)
             setCallStatus(CallStatus.INACTIVE)
@@ -1094,6 +1071,7 @@ Notes:
         setIsInterviewStarted(true)
         setScreenshots([])
         setScreenshotTimes([])
+        setCallId(null)
         setProgress({current: 1, total: questions.length})
         setTimeRemaining(INTERVIEW_DURATION_MINUTES * 60)
         setTimerWarningGiven(false)
@@ -1502,6 +1480,7 @@ Notes:
         )
         setCurrentQuestionIndex(0)
         setDisplayedQuestion(questions[0] || "")
+        setCallId(null)
         setProgress({current: 1, total: questions.length})
         if (debugMode)
             console.log("Question states reset", {
@@ -1655,6 +1634,7 @@ Notes:
             currentQuestionSummary: getCurrentQuestionSummary(),
             completedQuestionsSummary: getCompletedQuestionsSummary(),
             pendingQuestionsCount: getPendingQuestionsCount(),
+            callId
         },
         actions: {
             setCurrentQuestionIndex,
