@@ -6,6 +6,7 @@ import ResetPassword from "@/features/auth/password/ResetPassword";
 import OAuthCallback from "@/components/OAuthCallback";
 import FullPageSpinner from "@/components/FullPageSpinner";
 import VerifiedEmail from "@/features/auth/verified-email/VerifiedEmail.jsx";
+import AnimatedBackground from "@/components/AnimatedBackground.jsx";
 const Auth = lazy(() => import("../../features/auth/Auth"));
 const ForgetPassword = lazy(() =>
   import("../../features/auth/password/ForgetPassword.jsx")
