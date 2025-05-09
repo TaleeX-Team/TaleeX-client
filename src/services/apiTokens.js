@@ -66,6 +66,7 @@ export const getTokenPackById = async (id) => {
 // === Token Purchase ===
 export const buyTokens = async ({ amountPaid, currency }) => {
   try {
+    console.log("Attempting to purchase tokens with amountPaid:", amountPaid, "and currency:", currency);
     const response = await apiClient.patch("/users/buy-tokens", { amountPaid, currency });
     console.log(`[200] Tokens purchased:`, response.data);
     return response.data;
