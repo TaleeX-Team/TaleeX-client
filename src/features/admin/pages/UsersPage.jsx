@@ -438,10 +438,6 @@ const UsersPage = () => {
                         <SelectLabel className="text-muted-foreground">Filter by role</SelectLabel>
                         <SelectItem value="all">All Roles</SelectItem>
                         <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="recruiter">Recruiter</SelectItem>
-                        <SelectItem value="manager">Manager</SelectItem>
-                        <SelectItem value="candidate">Candidate</SelectItem>
-                        <SelectItem value="employer">Employer</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -454,7 +450,6 @@ const UsersPage = () => {
                         <SelectLabel className="text-muted-foreground">Filter by status</SelectLabel>
                         <SelectItem value="all">All Status</SelectItem>
                         <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="inactive">Inactive</SelectItem>
                         <SelectItem value="pending">Pending</SelectItem>
                       </SelectGroup>
                     </SelectContent>
@@ -560,7 +555,7 @@ const UsersPage = () => {
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-3">
                                 <Avatar className="h-10 w-10 border border-border ring-2 ring-background transition-all duration-300 hover:ring-primary/20">
-                                  <AvatarImage src={user.imageUrl || user.socialLoginAvatar} alt={getUserFullName(user)} />
+                                  <AvatarImage className="object-cover" src={user.imageUrl || user.socialLoginAvatar} alt={getUserFullName(user)} />
                                   <AvatarFallback className="bg-muted text-primary font-medium">
                                     {getUserInitials(user)}
                                   </AvatarFallback>
