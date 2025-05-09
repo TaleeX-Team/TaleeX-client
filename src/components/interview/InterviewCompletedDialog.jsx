@@ -25,7 +25,7 @@ export function InterviewCompletedDialog({
                                              totalQuestions,
                                              screenshots,
                                              transcript,
-                                             callId
+                                             vapiCallId
                                          }) {
     const [isSubmitted, setIsSubmitted] = useState(false)
     const navigate = useNavigate()
@@ -79,9 +79,8 @@ export function InterviewCompletedDialog({
 
             await mutateAsync({
                 interviewId,
-                transcript: transcriptText,
                 images: screenshots || [],
-                callId:callId,
+                vapiCallId:vapiCallId,
             })
 
             clearLocalStorage()
