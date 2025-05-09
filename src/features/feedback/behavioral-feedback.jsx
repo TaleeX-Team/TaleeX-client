@@ -11,11 +11,63 @@ import {
   Users,
   Image,
   ExternalLink,
+  FileText,
 } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-export default function BehavioralFeedbackPage({ feedback, screenshots = [] }) {
+export default function BehavioralFeedbackPage({
+  feedback,
+  screenshots = [],
+  transcriptText,
+}) {
   const [activeTab, setActiveTab] = useState("results");
+  const parseTranscript = (text) => {
+    if (!text || typeof text !== "string") {
+      return [{ speaker: "System", text: "No transcript available." }];
+    }
 
+    const lines = text.trim().split("\n");
+    const formatted = lines
+      .map((line, index) => {
+        // Skip empty lines
+        if (!line.trim()) return null;
+
+        // Split on the first colon followed by a space
+        const match = line.match(/^([^:]+):\s*(.*)$/);
+        if (!match) {
+          // Handle malformed lines
+          return {
+            speaker: "Unknown",
+            text: line.trim(),
+            key: `line-${index}`,
+          };
+        }
+
+        const [, speaker, text] = match;
+        return {
+          speaker: speaker.trim(),
+          text: text.trim(),
+          key: `line-${index}`,
+        };
+      })
+      .filter(Boolean); // Remove null entries
+
+    return formatted.length > 0
+      ? formatted
+      : [{ speaker: "System", text: "Transcript is empty.", key: "empty" }];
+  };
+
+  const formattedTranscript = parseTranscript(transcriptText);
+  const getSpeakerBadgeStyle = (speaker) => {
+    switch (speaker) {
+      case "AI":
+        return "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300";
+      case "User":
+        return "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300";
+      default:
+        return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
+    }
+  };
   return (
     <div className="min-h-screen flex bg-background px-4">
       <div className="w-full max-w-4xl space-y-6 py-8">
@@ -24,8 +76,9 @@ export default function BehavioralFeedbackPage({ feedback, screenshots = [] }) {
         </h1>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="results">Evaluation Results</TabsTrigger>
+            <TabsTrigger value="transcript">Interview Transcript</TabsTrigger>
             <TabsTrigger value="screenshots">Interview Screenshots</TabsTrigger>
           </TabsList>
 
@@ -65,6 +118,38 @@ export default function BehavioralFeedbackPage({ feedback, screenshots = [] }) {
             <RecommendationCard recommendation={feedback.recommendation} />
           </TabsContent>
 
+          <TabsContent value="transcript">
+            <Card className="border-0 shadow-sm">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-primary" />
+                  <CardTitle>Interview Transcript</CardTitle>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Complete transcript of the candidate's interview session.
+                </p>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[400px] pr-4">
+                  <div className="space-y-4">
+                    {formattedTranscript.map((entry) => (
+                      <div key={entry.key} className="group">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge
+                            variant="outline"
+                            className={`${getSpeakerBadgeStyle(entry.speaker)}`}
+                          >
+                            {entry.speaker}
+                          </Badge>
+                        </div>
+                        <div className="pl-1 text-sm">{entry.text}</div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
           <TabsContent value="screenshots">
             <Card>
               <CardHeader>

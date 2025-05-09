@@ -654,6 +654,7 @@ export function ApplicantsTab({
                               <BehavioralFeedbackPage
                                 feedback={applicant?.feedback?.interview}
                                 screenshots={applicant?.images}
+                                transcriptText={applicant?.transcript}
                               />
                             ) : (
                               <TechnicalFeedbackPage

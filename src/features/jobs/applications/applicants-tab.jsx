@@ -221,6 +221,9 @@ export default function JobApplicationManager() {
       feedback: app.feedback,
       cvUrl: app.cv.file.url,
       images: app?.interview?.images,
+      transcript: app?.interview?.transcript,
+      summary: app?.interview?.summary,
+      audio: app?.interview?.recordingUrl,
     })) || [];
 
   // Filter applicants based on active tab, phase, and search query
