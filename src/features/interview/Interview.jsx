@@ -1,18 +1,18 @@
 "use client";
 
-import {useEffect} from "react";
-import {useNavigate, useLocation, useParams} from "react-router-dom";
-import {Alert, AlertDescription} from "@/components/ui/alert";
-import {Button} from "@/components/ui/button";
-import {X} from "lucide-react";
-import {VideoContainer} from "@/components/interview/VideoContainer";
-import {TranscriptPanel} from "@/components/interview/TranscriptPanel";
-import {InterviewCompletedDialog} from "@/components/interview/InterviewCompletedDialog";
-import {globalStyles} from "@/lib/globalStyles";
-import {toast} from "sonner";
+import { useEffect } from "react";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
+import { VideoContainer } from "@/components/interview/VideoContainer";
+import { TranscriptPanel } from "@/components/interview/TranscriptPanel";
+import { InterviewCompletedDialog } from "@/components/interview/InterviewCompletedDialog";
+import { globalStyles } from "@/lib/globalStyles";
+import { toast } from "sonner";
 import InterviewHeader from "@/components/interview/InterviewHeader.jsx";
-import {useStartInterview} from "@/hooks/useInterviewData.js";
-import {useInterviewState} from "@/hooks/useInterviewState.js";
+import { useStartInterview } from "@/hooks/useInterviewData.js";
+import { useInterviewState } from "@/hooks/useInterviewState.js";
 
 const questions = [
 
@@ -29,8 +29,8 @@ const questions = [
 ]
 
 export default function Interview() {
-    const {interviewId} = useParams();
-    const {state: navState} = useLocation();
+    const { interviewId } = useParams();
+    const { state: navState } = useLocation();
     const navigate = useNavigate();
 
     const questionsFromNav = navState?.questions || [];
@@ -39,7 +39,7 @@ export default function Interview() {
         data: questionsData,
         isFetching: isStartingInterview,
         error: startError,
-    } = useStartInterview(interviewId, !questionsFromNav.length);
+    } = useStartInterview(interviewId, !questionsFromNav?.length);
 
     const {
         state: {
@@ -100,14 +100,14 @@ export default function Interview() {
             mainContentRef,
             vapiClientRef,
         },
-    } = useInterviewState(questionsData, interviewId);
+    } = useInterviewState(questionsData || [], interviewId);
 
 
     // Start interview automatically if not started and questions are available
     useEffect(() => {
         if (
             !isInterviewStarted &&
-            questionsData.length > 0 &&
+            questionsData?.length > 0 &&
             !isStartingInterview
         ) {
             console.log("Starting interview", {
@@ -117,7 +117,7 @@ export default function Interview() {
         }
     }, [
         isInterviewStarted,
-        questionsData.length,
+        questionsData?.length,
         isStartingInterview,
         handleStartInterview,
     ]);
@@ -152,13 +152,13 @@ export default function Interview() {
     };
 
     // Handle case where no questions are available
-    if (!questionsData.length && !isStartingInterview) {
+    if (!questionsData?.length && !isStartingInterview) {
         return (
             <div
-                className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+                className="flex flex-col min-h-screen">
                 <style jsx>{globalStyles}</style>
                 <div className="flex-1 flex items-center justify-center p-4">
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md w-full">
+                    <div className="bg-card border border-border p-6 rounded-lg shadow-lg max-w-md w-full">
                         <h2 className="text-xl font-bold text-red-500 mb-4">Error</h2>
                         <p className="text-gray-600 dark:text-gray-300 mb-4">
                             No questions available for this interview. Please go back and try
@@ -178,7 +178,7 @@ export default function Interview() {
 
     return (
         <div
-            className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+            className="flex flex-col min-h-screen">
             <style jsx>{globalStyles}</style>
 
             <InterviewHeader
@@ -187,7 +187,7 @@ export default function Interview() {
                 isInterviewStarted={isInterviewStarted}
                 interviewDuration={interviewDuration}
                 currentQuestionIndex={currentQuestionIndex}
-                totalQuestions={questionsData.length}
+                totalQuestions={questionsData?.length}
                 isAudioOn={isAudioOn}
                 progress={progress}
                 timeRemaining={timeRemaining}
@@ -207,14 +207,14 @@ export default function Interview() {
                     <AlertDescription className="flex justify-between items-center">
                         <span>{error}</span>
                         <Button variant="ghost" size="sm" onClick={() => setError(null)}>
-                            <X className="h-4 w-4"/>
+                            <X className="h-4 w-4" />
                         </Button>
                     </AlertDescription>
                 </Alert>
             )}
 
             <main ref={mainContentRef} className="flex-1 flex flex-col">
-                <div className="flex-1 flex flex-col lg:flex-row p-4 gap-4">
+                <div className="mt-2 flex flex-col sm:flex-row p-4 gap-6 lg:justify-center">
                     <VideoContainer
                         isUser={true}
                         ref={userVideoContainerRef}
@@ -264,7 +264,7 @@ export default function Interview() {
                 onClose={handleDialogClose}
                 interviewDuration={interviewDuration}
                 questionsAsked={progress.current}
-                totalQuestions={questionsData.length}
+                totalQuestions={questionsData?.length}
                 screenshots={screenshots}
                 transcript={saveAndGetTranscript(interviewId)}
                 vapiCallId={callId}

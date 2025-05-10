@@ -16,21 +16,21 @@ import {
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useEndInterview } from "@/hooks/useInterviewData.js"
-import { toast } from "sonner"
+import {  toast  } from "sonner"
 import {useTheme} from "@/layouts/theme_provider/ThemeProvider.jsx";
 
 export function InterviewCompletedDialog({
-                                             interviewId,
-                                             open,
-                                             onOpenChange,
-                                             onClose,
-                                             interviewDuration,
-                                             questionsAsked,
-                                             totalQuestions,
-                                             screenshots,
-                                             transcript,
-                                             vapiCallId
-                                         }) {
+    interviewId,
+    open,
+    onOpenChange,
+    onClose,
+    interviewDuration,
+    questionsAsked,
+    totalQuestions,
+    screenshots,
+    transcript,
+    vapiCallId
+}) {
     const [isSubmitted, setIsSubmitted] = useState(false)
     const navigate = useNavigate()
     const { mutateAsync, isPending, isError, error } = useEndInterview()
@@ -78,6 +78,7 @@ export function InterviewCompletedDialog({
                 interviewId,
                 images: screenshots || [],
                 vapiCallId: vapiCallId,
+                vapiCallId: vapiCallId,
             })
 
             clearLocalStorage()
@@ -114,7 +115,7 @@ export function InterviewCompletedDialog({
                     <DialogDescription className="text-center text-base">
                         {isSubmitted
                             ? "Your interview data has been processed and saved."
-                            : "Thank you for completing your interview."}
+                            : "This interview has already been completed and cannot be retaken. If you don't submit your data now, it will be permanently lost."}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -137,8 +138,8 @@ export function InterviewCompletedDialog({
                                 Ready to submit your interview
                             </p>
                         </div>
-                    )}
-                </div>
+                    )} */}
+                {/* </div> */}
 
                 <DialogFooter className="flex-col sm:flex-row gap-3 pt-2">
                     {isError && (
@@ -164,6 +165,7 @@ export function InterviewCompletedDialog({
                                     Submit Interview
                                     <ArrowRight className="ml-2 h-4 w-4" />
                                 </>
+                                "Submit"
                             )}
                         </Button>
                     ) : (
