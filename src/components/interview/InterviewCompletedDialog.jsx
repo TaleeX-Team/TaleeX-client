@@ -119,23 +119,14 @@ export function InterviewCompletedDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-8 flex justify-center">
-          {isSubmitted ? (
+        <div className="flex justify-center">
+          {isSubmitted && (
             <div className="flex flex-col items-center justify-center space-y-4">
               <div className="rounded-full bg-green-100 dark:bg-green-900 p-4">
                 <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400" />
               </div>
               <p className="text-center text-lg font-medium">
                 Your submission was successful
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <div className="rounded-full bg-blue-100 dark:bg-blue-900 p-4">
-                <CheckCircle className="h-12 w-12 text-blue-600 dark:text-blue-400" />
-              </div>
-              <p className="text-center text-lg font-medium">
-                Ready to submit your interview
               </p>
             </div>
           )}

@@ -10,14 +10,10 @@ const ProtectedLayout = () => {
   const { data: user } = useUser();
 
   return (
-    <SidebarProvider>
-      <SidebarInset>
-        <>
-              <Header user={user} />
-              <Outlet context={{ user }} />
-        </>
-      </SidebarInset>
-    </SidebarProvider>
+    <>
+      <Header user={user} />
+      <Outlet context={{ user }} />
+    </>
   );
 };
 
