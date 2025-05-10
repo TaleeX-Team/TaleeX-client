@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { useEndInterview } from "@/hooks/useInterviewData.js";
 import { toast } from "sonner";
 import { useTheme } from "@/layouts/theme_provider/ThemeProvider.jsx";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function InterviewCompletedDialog({
   interviewId,
@@ -110,27 +111,14 @@ export function InterviewCompletedDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="space-y-4">
           <DialogTitle className="text-2xl font-semibold text-center">
-            {isSubmitted ? "Success!" : "Interview Completed"}
+            {!isSubmitted ? "Success!" : "Interview Completed"}
           </DialogTitle>
           <DialogDescription className="text-center text-base">
-            {isSubmitted
+            {!isSubmitted
               ? "Your interview data has been processed and saved"
               : "This interview has already been completed and cannot be retaken. If you don't submit your data now, it will be permanently lost"}
           </DialogDescription>
         </DialogHeader>
-
-        <div className="flex justify-center">
-          {isSubmitted && (
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <div className="rounded-full bg-green-100 dark:bg-green-900 p-4">
-                <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400" />
-              </div>
-              <p className="text-center text-lg font-medium">
-                Your submission was successful
-              </p>
-            </div>
-          )}
-        </div>
 
         <DialogFooter className="flex-col sm:flex-row gap-3 pt-2">
           {isError && (
@@ -140,7 +128,7 @@ export function InterviewCompletedDialog({
             </p>
           )}
 
-          {!isSubmitted ? (
+          {isSubmitted ? (
             <Button
               onClick={handleSubmit}
               className="w-full sm:w-auto"
@@ -164,13 +152,14 @@ export function InterviewCompletedDialog({
               onClick={() => {
                 onClose();
                 // Optionally navigate somewhere after submission
+
                 navigate("/");
               }}
               className="w-full sm:w-auto"
               size="lg"
               variant="default"
             >
-              Return to Dashboard
+              Done
             </Button>
           )}
         </DialogFooter>
