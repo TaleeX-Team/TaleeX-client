@@ -654,11 +654,17 @@ export function ApplicantsTab({
                               <BehavioralFeedbackPage
                                 feedback={applicant?.feedback?.interview}
                                 screenshots={applicant?.images}
+                                transcriptText={applicant?.transcript}
+                                audio={applicant?.audio}
+                                summary={applicant?.summary}
                               />
                             ) : (
                               <TechnicalFeedbackPage
                                 feedback={applicant?.feedback?.interview}
                                 screenshots={applicant?.images}
+                                transcriptText={applicant?.transcript}
+                                audio={applicant?.audio}
+                                summary={applicant?.summary}
                               />
                             )}
                           </DialogContent>

@@ -36,15 +36,15 @@ export default function SettingsLayout() {
             Manage your account settings and preferences.
           </p>
         </div>
-        <Button variant="outline" asChild>
+        {/* <Button variant="outline" asChild>
           <Link to="/" className="gap-2 flex items-center">
             <ArrowLeft className="h-4 w-4" />
             Back to Homepage
           </Link>
-        </Button>
+        </Button> */}
       </div>
       <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
-        <aside className="lg:w-1/5">
+        <aside className="lg:w-1/5 border-r-1">
           <SidebarNav items={sidebarNavItems} />
         </aside>
         <div className="flex-1">

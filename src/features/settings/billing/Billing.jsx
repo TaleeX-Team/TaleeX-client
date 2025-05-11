@@ -58,11 +58,15 @@ export default function SubscriptionPage() {
 
   return (
     <div className="container pt-0 pb-10 max-w-7xl mx-auto">
-      <div className="mb-12 text-center">
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Token Subscription</h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Purchase tokens to use our AI-powered CV review and interview preparation services
-        </p>
+      <div className="flex">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Tokens
+          </h1>
+          <p className="text-muted-foreground">
+            Purchase tokens to use our AI-powered services
+          </p>
+        </div>
       </div>
 
       <div className="mb-12">
@@ -83,13 +87,13 @@ export default function SubscriptionPage() {
                     <div className="flex items-center space-x-2">
                       <Button onClick={handleDecrement} disabled={tokenCount <= 1}>-</Button>
                       <input
-  type="number"
-  min={1}
-  value={tokenCount}
-  onChange={handleInputChange}
-  className="w-12 border border-input rounded-md text-center text-base h-9 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-  inputMode="numeric"
-/>
+                        type="number"
+                        min={1}
+                        value={tokenCount}
+                        onChange={handleInputChange}
+                        className="w-12 border border-input rounded-md text-center text-base h-9 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                        inputMode="numeric"
+                      />
                       <Button onClick={handleIncrement}>+</Button>
                     </div>
                   </div>
@@ -99,13 +103,15 @@ export default function SubscriptionPage() {
                 </div>
 
                 <div className="flex justify-center">
-                  <PayPalButton2
-                    amount={totalPrice}
-                    tokenCount={tokenCount}
-                    tokenPrice={tokenPrice}
-                    currency="USD"
-                    onSuccess={() => setIsDialogOpen(false)}
-                  />
+                  <div className="w-[400px]">
+                    <PayPalButton2
+                      amount={totalPrice}
+                      tokenCount={tokenCount}
+                      tokenPrice={tokenPrice}
+                      currency="USD"
+                      onSuccess={() => setIsDialogOpen(false)}
+                    />
+                  </div>
                 </div>
               </div>
             </DialogContent>

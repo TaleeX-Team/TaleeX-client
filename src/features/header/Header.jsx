@@ -9,11 +9,10 @@ import { Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 import UserAvatar from "./user-avatar/UserAvatar";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useState, useEffect, useRef } from "react";
 
 export default function Header() {
   return (
-    <div className="sticky top-4 z-40 flex justify-center w-full px-4">
+    <div className="sticky top-0 z-40 flex justify-center w-full px-4">
       <header className="flex items-center justify-between backdrop-blur supports-[backdrop-filter]:bg-background/90 transition-all duration-500 h-16 w-full bg-background border-b">
         {/* Left Section with Logo and Mobile Menu */}
         <div className="flex items-center gap-4">

@@ -154,7 +154,7 @@ export default function ProfilePage() {
           console.error("Error updating profile:", error);
           toast.error(
             error.response?.data?.message ||
-              "Failed to update profile. Please try again."
+            "Failed to update profile. Please try again."
           );
         },
       }
@@ -171,7 +171,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-8">
+    <div className="container mx-auto space-y-8">
       <div className="flex">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">

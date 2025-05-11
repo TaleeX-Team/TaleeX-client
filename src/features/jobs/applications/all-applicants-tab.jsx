@@ -4,9 +4,24 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Filter, Newspaper, Save } from "lucide-react";
+import { Filter, Newspaper, Save, Users } from "lucide-react";
 
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import CVFeedbackPage from "@/features/feedback/cv-feedback";
 import BehavioralFeedbackPage from "@/features/feedback/behavioral-feedback";
@@ -18,6 +33,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useJobs } from "../useJobs";
+import { useParams } from "react-router-dom";
+import { useState } from "react";
+
 export function AllApplicantsTab({
   filteredApplicants,
   selectedApplicants,
@@ -26,10 +45,22 @@ export function AllApplicantsTab({
   toggleSelectAll,
   toggleSelectApplicant,
 }) {
+  // Static job list for the dropdown
+  const [selectedJob, setSelectedJob] = useState();
+  const jobOptions = [
+    { id: "1", title: "Software Engineer" },
+    { id: "2", title: "Product Manager" },
+    { id: "3", title: "Data Scientist" },
+    { id: "4", title: "UX Designer" },
+  ];
+  const { id } = useParams();
+  const { jobsQuery } = useJobs();
+  const jobs = jobsQuery.data.jobs.filter((job) => job._id !== id);
+  console.log(selectedJob);
   return (
     <div>
-      {/* Search for all applicants */}
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
+      {/* Search and Invite Button */}
+      <div className="flex flex-col md:flex-row gap-4 mb-6 items-center">
         <div className="relative flex-1">
           <Input
             placeholder="Find email or name..."
@@ -52,6 +83,58 @@ export function AllApplicantsTab({
             />
           </svg>
         </div>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-10 px-4"
+              disabled={selectedApplicants.length === 0}
+            >
+              <Users className="h-4 w-4 mr-2" />
+              Invite to Job
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Invite Applicants to Job</DialogTitle>
+              <DialogDescription>
+                Send job invitations to the selected applicants.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="flex items-center gap-5">
+                <label htmlFor="job" className="col-span-1 ">
+                  Job to invite to:
+                </label>
+                <Select onValueChange={setSelectedJob}>
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Select a job" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {jobs.map((job) => (
+                      <SelectItem key={job._id} value={job._id}>
+                        {job.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            {selectedApplicants.length > 0 && (
+              <div className="p-3 rounded-md border bg-muted">
+                <p className="text-sm font-medium">Selected Applicants</p>
+                <p className="text-xs text-muted-foreground">
+                  {selectedApplicants.length} applicant
+                  {selectedApplicants.length !== 1 ? "s" : ""} selected
+                </p>
+              </div>
+            )}
+            <DialogFooter>
+              <Button type="submit">Invite</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* All applicants table */}
@@ -63,7 +146,11 @@ export function AllApplicantsTab({
                 <Checkbox
                   checked={
                     selectedApplicants.length > 0 &&
-                    selectedApplicants.length === filteredApplicants.length
+                    filteredApplicants.every((applicant) =>
+                      selectedApplicants.some(
+                        (selected) => selected.id === applicant.id
+                      )
+                    )
                   }
                   onCheckedChange={(checked) => toggleSelectAll(checked)}
                   className="dark:border-gray-600"
@@ -98,7 +185,9 @@ export function AllApplicantsTab({
                 >
                   <td className="py-3 px-4">
                     <Checkbox
-                      checked={selectedApplicants.includes(applicant.id)}
+                      checked={selectedApplicants.some(
+                        (a) => a.id === applicant.id
+                      )}
                       onCheckedChange={(checked) =>
                         toggleSelectApplicant(applicant.id, checked)
                       }
@@ -175,10 +264,18 @@ export function AllApplicantsTab({
                             "behavioral" ? (
                               <BehavioralFeedbackPage
                                 feedback={applicant?.feedback?.interview}
+                                screenshots={applicant?.images}
+                                transcriptText={applicant?.transcript}
+                                audio={applicant?.audio}
+                                summary={applicant?.summary}
                               />
                             ) : (
                               <TechnicalFeedbackPage
                                 feedback={applicant?.feedback?.interview}
+                                screenshots={applicant?.images}
+                                transcriptText={applicant?.transcript}
+                                audio={applicant?.audio}
+                                summary={applicant?.summary}
                               />
                             )}
                           </DialogContent>

@@ -28,6 +28,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import FormAndInterviewHeader from "@/features/interview-appform-header/Header";
 
 export default function JobApplicationPage() {
   const { id } = useParams();
@@ -116,65 +117,71 @@ export default function JobApplicationPage() {
   };
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 px-4">
-      {isSubmitSuccess && (
-        <Alert className="mb-6 bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800">
-          <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-          <AlertTitle className="text-green-800 dark:text-green-400">
-            Application Submitted
-          </AlertTitle>
-          <AlertDescription className="text-green-700 dark:text-green-300">
-            Your application has been successfully submitted. The company will
-            contact you if they're interested.
-          </AlertDescription>
-        </Alert>
-      )}
+    <>
+      <FormAndInterviewHeader />
+      <div className="container max-w-4xl mx-auto py-8 px-4">
+        {isSubmitSuccess && (
+          <Alert className="mb-6 bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800">
+            <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+            <AlertTitle className="text-green-800 dark:text-green-400">
+              Application Submitted
+            </AlertTitle>
+            <AlertDescription className="text-green-700 dark:text-green-300">
+              Your application has been successfully submitted. The company will
+              contact you if they're interested.
+            </AlertDescription>
+          </Alert>
+        )}
 
-      {/* Only show form if job status is open */}
-      {jobData.status !== "open" && (
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Job Not Available</AlertTitle>
-          <AlertDescription>
-            This job is not currently accepting applications.
-          </AlertDescription>
-        </Alert>
-      )}
+        {/* Only show form if job status is open */}
+        {jobData.status !== "open" && (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Job Not Available</AlertTitle>
+            <AlertDescription>
+              This job is not currently accepting applications.
+            </AlertDescription>
+          </Alert>
+        )}
 
-      {/* Show warning for pending jobs */}
-      {jobData?.company?.verification?.status === "pending" && (
-        <Alert className="my-6 bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-600/30">
-          <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
-          <AlertTitle className="text-amber-800 dark:text-amber-400">
-            Company Pending Review
-          </AlertTitle>
-          <AlertDescription className="text-amber-700 dark:text-amber-300">
-            This company's profile has not yet been verified by Taleex. We recommend researching the company before submitting your application. If anything appears suspicious, please use the report feature to notify our team.
-          </AlertDescription>
-        </Alert>
+        {/* Show warning for pending jobs */}
+        {jobData?.company?.verification?.status === "pending" && (
+          <Alert className="my-6 bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-600/30">
+            <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
+            <AlertTitle className="text-amber-800 dark:text-amber-400">
+              Company Pending Review
+            </AlertTitle>
+            <AlertDescription className="text-amber-700 dark:text-amber-300">
+              This company's profile has not yet been verified by Taleex. We
+              recommend researching the company before submitting your
+              application. If anything appears suspicious, please use the report
+              feature to notify our team.
+            </AlertDescription>
+          </Alert>
+        )}
 
-      )}
+        {/* Display detailed job info */}
+        <JobDetails job={jobData} />
 
-      {/* Display detailed job info */}
-      <JobDetails job={jobData} />
+        {jobData.status === "open" && (
+          <>
+            <Separator className="my-8" />
+            <ApplicationForm
+              jobId={id}
+              onSubmit={submitApplication}
+              isSubmitting={isSubmitting}
+            />
+          </>
+        )}
 
-      {jobData.status === "open" && (
-        <>
-          <Separator className="my-8" />
-          <ApplicationForm
-            jobId={id}
-            onSubmit={submitApplication}
-            isSubmitting={isSubmitting}
-          />
-        </>
-      )}
+        <p className="text-xs text-muted-foreground text-center mt-6">
+          This job is posted by Taleex on behalf of an external company. Please
+          verify the company’s legitimacy before proceeding with your
+          application.
+        </p>
 
-      <p className="text-xs text-muted-foreground text-center mt-6">
-        This job is posted by Taleex on behalf of an external company. Please verify the company’s legitimacy before proceeding with your application.
-      </p>
-
-      {/* Place the report dialog trigger without wrapping it in a button */}
-      {/* <div className="hidden">
+        {/* Place the report dialog trigger without wrapping it in a button */}
+        {/* <div className="hidden">
         <ReportJobDialog
           jobId={id}
           defaultName=""
@@ -183,8 +190,8 @@ export default function JobApplicationPage() {
         />
       </div> */}
 
-      {/* Job Header Card with Report Button */}
-      {/* <Card className="mb-6 overflow-hidden">
+        {/* Job Header Card with Report Button */}
+        {/* <Card className="mb-6 overflow-hidden">
         <div className="bg-slate-50 dark:bg-slate-900 p-6">
           <div className="flex justify-between items-start">
             <div>
@@ -263,6 +270,7 @@ export default function JobApplicationPage() {
           </div>
         </CardContent>
       </Card> */}
-    </div>
+      </div>
+    </>
   );
 }

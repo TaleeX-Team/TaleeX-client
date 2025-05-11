@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Building2, ExternalLink, Globe, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -80,10 +80,10 @@ export default function JobApplicationManager() {
       setSelectedApplicants([]);
     },
     onError: (err) => {
-      console.error(
-        "Failed to advance applications to CV review:",
-        err.message
-      );
+      console.error("Failed to advance applicants to CV review :", err.message);
+      toast.error("Failed to advance applicants to CV review", {
+        description: "Please try again later.",
+      });
     },
   });
 
@@ -122,7 +122,10 @@ export default function JobApplicationManager() {
       setSelectedApplicants([]);
     },
     onError: (err) => {
-      console.error("Failed to send video interviews:", err.message);
+      console.error("Failed to send video interview", err.message);
+      toast.error("Failed to send to video interview", {
+        description: "Please try again later.",
+      });
     },
   });
 
@@ -221,6 +224,9 @@ export default function JobApplicationManager() {
       feedback: app.feedback,
       cvUrl: app.cv.file.url,
       images: app?.interview?.images,
+      transcript: app?.interview?.transcript,
+      summary: app?.interview?.summary,
+      audio: app?.interview?.recordingUrl,
     })) || [];
 
   // Filter applicants based on active tab, phase, and search query
@@ -327,29 +333,32 @@ export default function JobApplicationManager() {
       );
     }
   };
-
+  useEffect(() => {
+    setSelectedApplicants([]);
+  }, [activeTab, activePhase]);
   // Render loading skeleton
   if (isLoading || isLoadingJob) {
     return (
-      <div className="container mx-auto px-4 py-6 dark:text-gray-200">
-        <div className="flex justify-between items-center mb-6">
-          <div className="h-9 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-            <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+      <div className="bg-background p-4 md:p-8 min-h-screen mt-6">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex justify-between items-center mb-6">
+            <div className="h-9 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            </div>
           </div>
-        </div>
-        <div className="w-full">
-          <div className="flex items-center border-b dark:border-gray-700 mb-4">
-            <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mr-4"></div>
-            <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mr-4"></div>
-            <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mr-4"></div>
-            <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-          </div>
-          <div className="mt-6 space-y-4">
-            <div className="h-16 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-            <div className="h-16 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-            <div className="h-16 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+          <div className="w-full">
+            <div className="flex items-center border-b dark:border-gray-700 mb-4">
+              <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mr-4"></div>
+              <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mr-4"></div>
+              <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mr-4"></div>
+              <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            </div>
+            <div className="mt-6 space-y-4">
+              <div className="h-16 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              <div className="h-16 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              <div className="h-16 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            </div>
           </div>
         </div>
       </div>
