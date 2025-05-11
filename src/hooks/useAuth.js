@@ -1,4 +1,7 @@
+import TokenService from "@/lib/TokenService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Cookies from "js-cookie";
+import { useEffect } from "react";
 import {
   loginAdmin,
   loginUser,
@@ -6,9 +9,6 @@ import {
   registerUser,
   verifyEmail,
 } from "../services/apiAuth.js";
-import { useEffect } from "react";
-import TokenService from "@/lib/TokenService";
-import Cookies from "js-cookie";
 
 export const useAuth = () => {
   const queryClient = useQueryClient();
@@ -24,12 +24,13 @@ export const useAuth = () => {
     cacheTime: Infinity,
   });
 
+  // Invalidate auth/user queries when tokens change
   useEffect(() => {
     const onChange = () => {
       queryClient.invalidateQueries({ queryKey: ["auth"] });
+      queryClient.invalidateQueries({ queryKey: ["user"] });
     };
 
-    // patch TokenService to call onChange after set/clear
     const origSetAccess = TokenService.setAccessToken.bind(TokenService);
     TokenService.setAccessToken = (token) => {
       origSetAccess(token);
@@ -43,15 +44,25 @@ export const useAuth = () => {
     const origClear = TokenService.clearTokens.bind(TokenService);
     TokenService.clearTokens = () => {
       origClear();
+      TokenService.setOAuthAuthenticated(false);
       onChange();
     };
 
+    // Process any OAuth callback fragment on mount
+    const didOAuth = TokenService.processOAuthCallback();
+    if (didOAuth) {
+      onChange();
+      // navigate home once tokens are stored
+      window.location.replace("/");
+    }
+
+    // cleanup if needed
     return () => {
-      // restore if you want; skip for brevity
+      // optionally restore original methods
     };
   }, [queryClient]);
 
-  // 2) Login
+  // 2) Login user
   const loginMutation = useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
@@ -68,10 +79,11 @@ export const useAuth = () => {
       } else {
         queryClient.invalidateQueries({ queryKey: ["user"] });
       }
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
       queryClient.invalidateQueries({ queryKey: ["companies"] });
     },
   });
+
+  // 3) Login admin
   const loginAdminMutation = useMutation({
     mutationFn: loginAdmin,
     onSuccess: (data) => {
@@ -88,40 +100,33 @@ export const useAuth = () => {
       } else {
         queryClient.invalidateQueries({ queryKey: ["user"] });
       }
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
       queryClient.invalidateQueries({ queryKey: ["companies"] });
     },
   });
-  // 3) Logout
+
+  // 4) Logout
   const logoutMutation = useMutation({
     mutationFn: () => logoutUser(TokenService.getRefreshToken()),
     onSuccess: () => {
       TokenService.clearTokens();
-      TokenService.setOAuthAuthenticated(false);
       queryClient.removeQueries({ queryKey: ["user"] });
       queryClient.removeQueries({ queryKey: ["userId"] });
-
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
       queryClient.invalidateQueries({ queryKey: ["companies"] });
       queryClient.invalidateQueries({ queryKey: ["jobs"] });
       Cookies.remove("hasPassword");
       Cookies.remove("userId");
     },
     onError: () => {
-      // even on error, clear local
       TokenService.clearTokens();
-      TokenService.setOAuthAuthenticated(false);
       queryClient.removeQueries({ queryKey: ["user"] });
       localStorage.removeItem("userId");
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
     },
   });
 
-  // 4) Register
+  // 5) Register
   const registerMutation = useMutation({
     mutationFn: registerUser,
     onSuccess: (data) => {
-      console.log(data, "Registered");
       if (data.accessToken) {
         TokenService.setAccessToken(data.accessToken);
       }
@@ -135,48 +140,33 @@ export const useAuth = () => {
       } else {
         queryClient.invalidateQueries({ queryKey: ["user"] });
       }
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
       queryClient.invalidateQueries({ queryKey: ["companies"] });
     },
   });
 
-  // 5) Verify Email
+  // 6) Verify Email
   const verifyEmailMutation = useMutation({
     mutationFn: verifyEmail,
-    onSuccess: (data) => {
-      // Update user data or auth state after verification
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
     },
   });
 
-  // 6) OAuth callback helper
-  const processOAuthCallback = async () => {
-    const ok = TokenService.processOAuthTokens();
-    if (ok) {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["auth"] }),
-        queryClient.invalidateQueries({ queryKey: ["user"] }),
-      ]);
-    }
-    return ok;
-  };
-
   return {
     isAuthenticated: authQuery.data?.isAuthenticated ?? false,
-    loginAdmin: {
-      mutate: loginAdminMutation.mutate,
-      isLoading: loginAdminMutation.isPending,
-      isError: loginAdminMutation.isError,
-      error: loginAdminMutation.error,
-      isSuccess: loginAdminMutation.isSuccess,
-    },
     login: {
       mutate: loginMutation.mutate,
       isLoading: loginMutation.isPending,
       isError: loginMutation.isError,
       error: loginMutation.error,
       isSuccess: loginMutation.isSuccess,
+    },
+    loginAdmin: {
+      mutate: loginAdminMutation.mutate,
+      isLoading: loginAdminMutation.isPending,
+      isError: loginAdminMutation.isError,
+      error: loginAdminMutation.error,
+      isSuccess: loginAdminMutation.isSuccess,
     },
     logout: {
       mutate: logoutMutation.mutate,
@@ -199,6 +189,5 @@ export const useAuth = () => {
       isSuccess: verifyEmailMutation.isSuccess,
       data: verifyEmailMutation.data,
     },
-    processOAuthCallback,
   };
 };
