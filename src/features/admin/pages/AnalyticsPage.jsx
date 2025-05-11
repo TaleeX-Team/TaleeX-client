@@ -25,6 +25,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAllStatistics } from "@/hooks/useAdminStatistics";
 import { useTheme } from "@/layouts/theme_provider/ThemeProvider.jsx";
+import html2canvas from 'html2canvas';
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -66,7 +69,8 @@ const OverviewChart = ({
                            data,
                            dataKey = "value",
                            colors = {},
-                           onRefresh
+                           onRefresh,
+                           onDownloadSinglePDF
                        }) => {
     const { theme } = useTheme();
     const isDark = theme === 'dark';
@@ -245,7 +249,7 @@ const OverviewChart = ({
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-40">
-                            <DropdownMenuItem className="cursor-pointer hover:bg-primary hover:text-white">
+                            <DropdownMenuItem  onClick={onDownloadSinglePDF} className="cursor-pointer hover:bg-primary hover:text-white">
                                 <Download className="mr-2 h-4 w-4" />
                                 <span>Download</span>
                             </DropdownMenuItem>
@@ -268,13 +272,16 @@ const OverviewChart = ({
     );
 };
 
+
+
 const AnalyticsPage = () => {
     const { theme } = useTheme();
     const isDark = theme === "dark";
     const pageRef = useRef(null);
     const chartsRef = useRef([]);
     const [timePeriod, setTimePeriod] = useState("lastWeek");
-    const [isRefetching, setIsRefetching] = useState(false);
+    // const [isRefetching, setIsRefetching] = useState(false); // Removed isRefetching
+    const [showFallbackJobsMessage, setShowFallbackJobsMessage] = useState(false);
 
     // Calculate date range based on selected time period
     const getDateRange = () => {
@@ -330,21 +337,238 @@ const AnalyticsPage = () => {
     } = useAllStatistics({
         from: dateRangeValues.from,
         to: dateRangeValues.to,
-    });
-
-    // Handle refresh
+    });    // Handle refresh
     const handleRefresh = async () => {
-        setIsRefetching(true);
+        // Assuming refetch() from useAllStatistics will set isLoading to true
+        // and then to false upon completion/error.
         await refetch();
-        setIsRefetching(false);
     };
 
     // Handle time period change
-    const handleTimePeriodChange = async (newPeriod) => {
+    const handleTimePeriodChange = (newPeriod) => {
         setTimePeriod(newPeriod);
-        setIsRefetching(true);
-        await refetch();
-        setIsRefetching(false);
+        // The useAllStatistics hook will automatically refetch when `dateRangeValues` (derived from `timePeriod`) changes.
+        // The `isLoading` state from useAllStatistics should reflect the loading status.
+    };
+    // Handle PDF download
+    const handleDownloadPdf = async () => {
+        if (isLoading) {
+            console.log("Data is loading, PDF download unavailable for now.");
+            // Optionally, provide user feedback e.g., via a toast message
+            return;
+        }
+
+        const doc = new jsPDF();
+        let yPos = 15;
+
+        doc.setFontSize(18);
+        doc.text("Analytics Dashboard Report", 105, yPos, { align: "center" });
+        yPos += 10;
+
+        doc.setFontSize(12);
+        let readableTimePeriod = "Selected Period";
+        if (timePeriod === "lastWeek") readableTimePeriod = "Last 7 Days";
+        else if (timePeriod === "lastMonth") readableTimePeriod = "Last 30 Days";
+        else if (timePeriod === "lastQuarter") readableTimePeriod = "Last 90 Days";
+        else if (timePeriod === "lastYear") readableTimePeriod = "Last 12 Months";
+        doc.text(`Time Period: ${readableTimePeriod} (From: ${dateRangeValues.from} To: ${dateRangeValues.to})`, 14, yPos);
+        yPos += 10;
+
+        // KPIs - These are already calculated in the user's component scope
+        const totalApplicationsNum = totalApplications;
+        const totalInterviewsNum = totalInterviews;
+        const pendingApplicationsNum = pendingApplications;
+        const rejectedApplicationsNum = rejectedApplications;
+
+        doc.setFontSize(14);
+        doc.text("Key Performance Indicators (KPIs)", 14, yPos);
+        yPos += 7;
+        doc.setFontSize(10);
+        autoTable(doc, {
+            body: [
+                ["Total Applications", totalApplicationsNum],
+                ["Total Interviews", totalInterviewsNum],
+                ["Pending Applications", pendingApplicationsNum],
+                ["Rejected Applications", rejectedApplicationsNum],
+            ],
+            startY: yPos,
+            theme: 'plain',
+            styles: { fontSize: 10 },
+            columnStyles: { 0: { fontStyle: 'bold' } }
+        });
+        yPos = doc.lastAutoTable.finalY + 10;        for (const config of chartReportConfigs) {
+            if (yPos > 250) { // Check for page break before starting a new chart section
+                doc.addPage();
+                yPos = 15;
+            }
+
+            doc.setFontSize(14);
+            doc.text(config.title, 14, yPos);
+            yPos += 7;
+
+            const chartElement = chartsRef.current[config.refIndex];
+            let chartImageGenerated = false;
+            if (chartElement) {
+                try {
+                    const canvas = await html2canvas(chartElement, {
+                        useCORS: true,
+                        backgroundColor: isDark ? "#020817" : "#FFFFFF", // Use isDark from component state
+                        scale: 1.5, // For better resolution
+                        logging: false, // Reduce console noise
+                        onclone: (clonedDoc) => {
+                            // Minimal onclone. If oklab errors persist for individual charts, it's an html2canvas limitation.
+                        }
+                    });
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgProps = doc.getImageProperties(imgData);
+                    const pdfChartWidth = doc.internal.pageSize.getWidth() - 28; // page width minus margins
+                    let imgHeight = (imgProps.height * pdfChartWidth) / imgProps.width;
+                    const maxImgHeight = 70; // Max height for a chart image
+                    if (imgHeight > maxImgHeight) imgHeight = maxImgHeight;
+
+                    if (yPos + imgHeight > 275) { // Check for page break before image
+                        doc.addPage();
+                        yPos = 15;
+                    }
+                    doc.addImage(imgData, 'PNG', 14, yPos, pdfChartWidth, imgHeight);
+                    yPos += imgHeight + 5;
+                    chartImageGenerated = true;
+                } catch (error) {
+                    // console.error(`Error generating image for chart \"${config.title}\":`, error); // Removed console logging
+                    // Error message to PDF is already removed. The table will still be generated below.
+                }           }
+
+            let currentChartData;
+            if (config.dataFormatter) {
+                currentChartData = config.dataFormatter();
+            } else if (config.dataSource) {
+                currentChartData = config.dataSource; // Use direct data source if no formatter
+            }
+
+            if (config.fallbackFn && (!currentChartData || currentChartData.length === 0)) {
+                currentChartData = config.fallbackFn(); // This will call setShowFallbackJobsMessage from user's code
+                if (yPos > 270) { doc.addPage(); yPos = 15; }
+                doc.setFontSize(9);
+                doc.text(`(Displaying fallback data for ${config.title})`, 14, yPos);
+                yPos += 5;
+            }
+
+            if (currentChartData && currentChartData.length > 0) {
+                if (yPos > 265 && !chartImageGenerated) { // If no image and table is long, ensure space
+                    doc.addPage(); yPos = 15;
+                }
+                autoTable(doc, {
+                    head: [config.columns],
+                    body: currentChartData.map(config.bodyAccessor),
+                    startY: yPos,
+                    theme: 'grid',
+                    headStyles: { fillColor: [52, 73, 94] }, // Dark blue header
+                    styles: { fontSize: 8, cellPadding: 1.5 },
+                    columnStyles: { 0: { cellWidth: 'auto' } },
+                });
+                yPos = doc.lastAutoTable.finalY + 10;
+            } else {
+                if (yPos > 270) { doc.addPage(); yPos = 15; }
+                doc.setFontSize(10);
+                doc.text(`No data available for ${config.title}.`, 14, yPos);
+                yPos += 7;
+            }
+            yPos += 5; // Add a bit more space between sections
+        }
+        doc.save("analytics_dashboard_report.pdf");
+    };
+
+    // Handle Single Chart PDF download
+    const handleDownloadSingleChartPdf = async (chartConfig) => {
+        if (!chartConfig) {
+            console.error("Chart configuration is missing for single chart PDF download.");
+            return;
+        }
+        if (isLoading) {
+            console.log("Data is loading, PDF download unavailable for now.");
+            // Optionally, provide user feedback e.g., via a toast message
+            return;
+        }
+
+        const doc = new jsPDF();
+        let yPos = 15;
+
+        doc.setFontSize(16);
+        doc.text(chartConfig.title, 105, yPos, { align: "center" });
+        yPos += 10;
+
+        doc.setFontSize(10);
+        doc.text(`Time Period: ${timePeriod === "lastWeek" ? "Last 7 Days" : timePeriod === "lastMonth" ? "Last 30 Days" : timePeriod === "lastQuarter" ? "Last 90 Days" : timePeriod === "lastYear" ? "Last 12 Months" : "Selected Period"} (From: ${dateRangeValues.from} To: ${dateRangeValues.to})`, 14, yPos);
+        yPos += 10;
+
+        const chartElement = chartsRef.current[chartConfig.refIndex];
+        let chartImageGenerated = false;
+        if (chartElement) {
+            try {
+                const canvas = await html2canvas(chartElement, {
+                    useCORS: true,
+                    backgroundColor: isDark ? "#020817" : "#FFFFFF",
+                    scale: 1.5,
+                    logging: false,
+                    onclone: (clonedDoc) => { /* Minimal onclone */ }
+                });
+                const imgData = canvas.toDataURL('image/png');
+                const imgProps = doc.getImageProperties(imgData);
+                const pdfChartWidth = doc.internal.pageSize.getWidth() - 28;
+                let imgHeight = (imgProps.height * pdfChartWidth) / imgProps.width;
+                const maxImgHeight = 100; // Allow more height for a single chart
+                if (imgHeight > maxImgHeight) imgHeight = maxImgHeight;
+
+                if (yPos + imgHeight > 275) {
+                    doc.addPage();
+                    yPos = 15;
+                }
+                doc.addImage(imgData, 'PNG', 14, yPos, pdfChartWidth, imgHeight);
+                yPos += imgHeight + 5;
+                chartImageGenerated = true;
+            } catch (error) {
+                // Silently fail image generation, no console error, no PDF error message
+            }
+        }
+
+        let currentChartData;
+        if (chartConfig.dataFormatter) {
+            currentChartData = chartConfig.dataFormatter();
+        } else if (chartConfig.dataSource) {
+            currentChartData = chartConfig.dataSource;
+        }
+
+        if (chartConfig.fallbackFn && (!currentChartData || currentChartData.length === 0)) {
+            currentChartData = chartConfig.fallbackFn();
+            if (yPos > 270) { doc.addPage(); yPos = 15; }
+            doc.setFontSize(9);
+            doc.text(`(Displaying fallback data for ${chartConfig.title})`, 14, yPos);
+            yPos += 5;
+        }
+
+        if (currentChartData && currentChartData.length > 0) {
+            if (yPos > 265 && !chartImageGenerated) {
+                doc.addPage(); yPos = 15;
+            }
+            autoTable(doc, {
+                head: [chartConfig.columns],
+                body: currentChartData.map(chartConfig.bodyAccessor),
+                startY: yPos,
+                theme: 'grid',
+                headStyles: { fillColor: [52, 73, 94] },
+                styles: { fontSize: 10, cellPadding: 2 }, // Slightly larger font for single chart PDF
+                columnStyles: { 0: { cellWidth: 'auto' } },
+            });
+            yPos = doc.lastAutoTable.finalY + 10;
+        } else {
+            if (yPos > 270) { doc.addPage(); yPos = 15; }
+            doc.setFontSize(10);
+            doc.text(`No data available for ${chartConfig.title}.`, 14, yPos);
+            yPos += 7;
+        }
+
+        const safeTitle = chartConfig.title.replace(/[^a-z0-9]/gi, '').toLowerCase();
+        doc.save(`chart_report_${safeTitle}.pdf`);
     };
 
     // Data formatting functions
@@ -391,11 +615,13 @@ const AnalyticsPage = () => {
     const formatJobsByCompanyForChart = () => {
         if (!jobsByCompany?.length) {
             console.log("Using fallback data for jobs by company");
+            setShowFallbackJobsMessage(true); // Show message when fallback is used
             return getFallbackJobsByCompanyData().map((item) => ({
                 name: item.companyName,
                 value: item.jobCount,
             }));
         }
+        setShowFallbackJobsMessage(false); // Hide message when real data is used
         return jobsByCompany.map((item) => ({
             name: item.companyName,
             value: item.jobCount,
@@ -467,6 +693,18 @@ const AnalyticsPage = () => {
         )?.count || 0;
     const rejectedApplications = applicationsByStage?.find((item) => item.stage.toLowerCase() === "rejected")?.count || 0;
 
+
+
+
+    const chartReportConfigs = [
+        { title: "Daily Applications Trend", dataFormatter: formatDailyApplicationsForChart, refIndex: 0, columns: ["Date", "Applications"], bodyAccessor: item => [item.name, item.applications] },
+        { title: "Applications by Stage", dataFormatter: formatApplicationsByStageForChart, refIndex: 1, columns: ["Stage", "Count"], bodyAccessor: item => [item.name, item.value] },
+        { title: "Interviews by State", dataFormatter: formatInterviewsByStateForChart, refIndex: 2, columns: ["State", "Count"], bodyAccessor: item => [item.name, item.value] },
+        { title: "Application Conversion Funnel", dataFormatter: formatConversionFunnelForChart, refIndex: 3, columns: ["Stage", "Count", "Rate (%)"], bodyAccessor: item => [item.name, item.count, item.rate] },
+        { title: "Top 5 Applied Jobs", dataFormatter: formatTopAppliedJobsForChart, refIndex: 4, columns: ["Job Title", "Applications"], bodyAccessor: item => [item.name, item.applications] },
+        { title: "Reports by Reason", dataSource: reportsByReason, refIndex: 8, columns: ["Reason", "Count"], bodyAccessor: item => [item.reason, item.count] },
+    ];
+
     // GSAP animations
     useEffect(() => {
         if (typeof window !== "undefined" && pageRef.current) {
@@ -509,7 +747,7 @@ const AnalyticsPage = () => {
                         <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
                             Analytics Dashboard
                             <Badge variant="outline" className="ml-2 bg-primary/10 text-primary">
-                                {isLoading || isRefetching ? "Loading..." : "Live Data"}
+                                {isLoading ? "Loading..." : "Live Data"}
                             </Badge>
                         </h2>
                         <p className="text-muted-foreground mt-1">
@@ -528,14 +766,14 @@ const AnalyticsPage = () => {
                                 <SelectItem value="lastYear">Last 12 months</SelectItem>
                             </SelectContent>
                         </Select>
-                        <Button variant="outline" size="icon" onClick={handleRefresh} disabled={isLoading || isRefetching}>
-                            {isLoading || isRefetching ? (
+                        <Button variant="outline" size="icon" onClick={handleRefresh} disabled={isLoading}>
+                            {isLoading ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
                                 <RefreshCw className="h-4 w-4" />
                             )}
                         </Button>
-                        <Button variant="outline" size="icon">
+                        <Button variant="outline" size="icon" onClick={handleDownloadPdf} disabled={isLoading}>
                             <DownloadCloud className="h-4 w-4" />
                         </Button>
                     </div>
@@ -546,12 +784,19 @@ const AnalyticsPage = () => {
                 <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>Failed to load statistics. Please try refreshing the page.</AlertDescription>
+                    <AlertDescription>
+                        {errors?.message || (typeof errors === 'string' && errors) || 'Failed to load statistics. Please try refreshing the page.'}
+                        {errors && typeof errors === 'object' && !errors.message && (
+                            <pre className="mt-2 text-xs whitespace-pre-wrap bg-red-100 dark:bg-red-900 p-2 rounded">
+                                {JSON.stringify(errors, null, 2)}
+                            </pre>
+                        )}
+                    </AlertDescription>
                 </Alert>
             )}
 
             <div className="kpi-cards grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {isLoading || isRefetching ? (
+                {isLoading ? (
                     Array(4).fill(0).map((_, i) => (
                         <Card key={i} className="overflow-hidden border-border/40">
                             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -619,7 +864,7 @@ const AnalyticsPage = () => {
 
                 <TabsContent value="overview" className="space-y-6">
                     <div ref={(el) => (chartsRef.current[0] = el)}>
-                        {isLoading || isRefetching ? (
+                        {isLoading ? (
                             <Card className="border-border/40">
                                 <CardHeader>
                                     <Skeleton className="h-6 w-48 mb-2" />
@@ -638,6 +883,7 @@ const AnalyticsPage = () => {
                                 chartType="area"
                                 data={formatDailyApplicationsForChart()}
                                 dataKey="applications"
+                                onDownloadSinglePDF={handleDownloadSingleChartPdf(chartReportConfigs[0])}
                                 colors={{
                                     strokes: ["var(--color-primary)"],
                                     fills: ["Primary"],
@@ -650,7 +896,7 @@ const AnalyticsPage = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div ref={(el) => (chartsRef.current[1] = el)}>
-                            {isLoading || isRefetching ? (
+                            {isLoading ? (
                                 <Card className="border-border/40">
                                     <CardHeader>
                                         <Skeleton className="h-6 w-48 mb-2" />
@@ -667,6 +913,8 @@ const AnalyticsPage = () => {
                                     title="Applications by Stage"
                                     description="Current application stages"
                                     chartType="pie"
+                                    onDownloadSinglePDF={handleDownloadSingleChartPdf(chartReportConfigs[1])}
+
                                     data={formatApplicationsByStageForChart()}
                                     onRefresh={handleRefresh}
                                 />
@@ -674,7 +922,7 @@ const AnalyticsPage = () => {
                         </div>
 
                         <div ref={(el) => (chartsRef.current[2] = el)}>
-                            {isLoading || isRefetching ? (
+                            {isLoading ? (
                                 <Card className="border-border/40">
                                     <CardHeader>
                                         <Skeleton className="h-6 w-48 mb-2" />
@@ -693,6 +941,8 @@ const AnalyticsPage = () => {
                                     chartType="bar"
                                     data={formatTopAppliedJobsForChart()}
                                     dataKey="applications"
+                                    onDownloadSinglePDF={handleDownloadSingleChartPdf(chartReportConfigs[4])}
+
                                     colors={{ fills: ["var(--color-primary)"] }}
                                     onRefresh={handleRefresh}
                                 />
@@ -703,7 +953,7 @@ const AnalyticsPage = () => {
 
                 <TabsContent value="applications" className="space-y-6">
                     <div ref={(el) => (chartsRef.current[3] = el)}>
-                        {isLoading || isRefetching ? (
+                        {isLoading ? (
                             <Card className="border-border/40">
                                 <CardHeader>
                                     <Skeleton className="h-6 w-48 mb-2" />
@@ -720,6 +970,8 @@ const AnalyticsPage = () => {
                                 title="Conversion Funnel"
                                 description="Application stage conversion rates"
                                 chartType="bar"
+                                onDownloadSinglePDF={handleDownloadSingleChartPdf(chartReportConfigs[3])}
+
                                 data={formatConversionFunnelForChart()}
                                 dataKey={["count", "rate"]}
                                 colors={{ fills: ["var(--color-primary)", "#7E69AB"] }}
@@ -735,7 +987,7 @@ const AnalyticsPage = () => {
                                 <CardDescription>Detailed application metrics</CardDescription>
                             </CardHeader>
                             <CardContent className="pt-4">
-                                {isLoading || isRefetching ? (
+                                {isLoading ? (
                                     <div className="h-[300px] flex items-center justify-center">
                                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                     </div>
@@ -777,7 +1029,7 @@ const AnalyticsPage = () => {
                                 <CardDescription>Current interview statuses</CardDescription>
                             </CardHeader>
                             <CardContent className="pt-4">
-                                {isLoading || isRefetching ? (
+                                {isLoading ? (
                                     <div className="h-[300px] flex items-center justify-center">
                                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                     </div>
@@ -817,7 +1069,7 @@ const AnalyticsPage = () => {
                                 <CardDescription>Detailed interview metrics</CardDescription>
                             </CardHeader>
                             <CardContent className="pt-4">
-                                {isLoading || isRefetching ? (
+                                {isLoading ? (
                                     <div className="h-[300px] flex items-center justify-center">
                                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                     </div>
@@ -852,6 +1104,11 @@ const AnalyticsPage = () => {
                 </TabsContent>
 
                 <TabsContent value="companies" className="space-y-6">
+                    {showFallbackJobsMessage && (
+                        <p className="text-sm text-yellow-700 dark:text-yellow-300 p-3 bg-yellow-100 dark:bg-yellow-900/40 rounded-md mb-4 text-center border border-yellow-300 dark:border-yellow-700">
+                            Note: The "Jobs by Company" chart is currently displaying sample data as live data is unavailable.
+                        </p>
+                    )}
                     <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
                         <Card className="border-border/40">
                             <CardHeader>
@@ -859,7 +1116,7 @@ const AnalyticsPage = () => {
                                 <CardDescription>Reasons for reported content</CardDescription>
                             </CardHeader>
                             <CardContent className="pt-4">
-                                {isLoading || isRefetching ? (
+                                {isLoading ? (
                                     <div className="h-[300px] flex items-center justify-center">
                                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                     </div>
@@ -896,5 +1153,8 @@ const AnalyticsPage = () => {
         </div>
     );
 };
+
+
+
 
 export default AnalyticsPage;
