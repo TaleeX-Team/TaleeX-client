@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Building2, ExternalLink, Globe, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -64,11 +64,13 @@ export default function JobApplicationManager() {
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
 
       toast(
-        `${selectedApplicants.length} ${selectedApplicants.length === 1 ? "applicant" : "applicants"
+        `${selectedApplicants.length} ${
+          selectedApplicants.length === 1 ? "applicant" : "applicants"
         } sent to CV Review`,
         {
-          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${selectedApplicants.length === 1 ? "has" : "have"
-            } been sent from ${activePhase} to CV Review`,
+          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
+            selectedApplicants.length === 1 ? "has" : "have"
+          } been sent from ${activePhase} to CV Review`,
           style: {
             backgroundColor: "#195f32",
             color: "white",
@@ -78,10 +80,10 @@ export default function JobApplicationManager() {
       setSelectedApplicants([]);
     },
     onError: (err) => {
-      console.error(
-        "Failed to advance applications to CV review:",
-        err.message
-      );
+      console.error("Failed to advance applicants to CV review :", err.message);
+      toast.error("Failed to advance applicants to CV review", {
+        description: "Please try again later.",
+      });
     },
   });
 
@@ -104,11 +106,13 @@ export default function JobApplicationManager() {
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
 
       toast(
-        `${selectedApplicants.length} ${selectedApplicants.length === 1 ? "applicant" : "applicants"
+        `${selectedApplicants.length} ${
+          selectedApplicants.length === 1 ? "applicant" : "applicants"
         } sent to Interview`,
         {
-          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${selectedApplicants.length === 1 ? "has" : "have"
-            } been sent from ${activePhase} to Interview`,
+          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
+            selectedApplicants.length === 1 ? "has" : "have"
+          } been sent from ${activePhase} to Interview`,
           style: {
             backgroundColor: "#195f32",
             color: "white",
@@ -118,7 +122,10 @@ export default function JobApplicationManager() {
       setSelectedApplicants([]);
     },
     onError: (err) => {
-      console.error("Failed to send video interviews:", err.message);
+      console.error("Failed to send video interview", err.message);
+      toast.error("Failed to send to video interview", {
+        description: "Please try again later.",
+      });
     },
   });
 
@@ -129,13 +136,17 @@ export default function JobApplicationManager() {
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
 
       toast(
-        `${selectedApplicants.length} ${selectedApplicants.length === 1 ? "applicant" : "applicants"
-        } moved to ${stage === "rejected" ? "Rejected Applicants" : "Offered Applicants"
+        `${selectedApplicants.length} ${
+          selectedApplicants.length === 1 ? "applicant" : "applicants"
+        } moved to ${
+          stage === "rejected" ? "Rejected Applicants" : "Offered Applicants"
         }`,
         {
-          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${selectedApplicants.length === 1 ? "has" : "have"
-            } been moved from ${activePhase} to ${stage === "rejected" ? "Rejected" : "Offered"
-            } Applicants`,
+          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
+            selectedApplicants.length === 1 ? "has" : "have"
+          } been moved from ${activePhase} to ${
+            stage === "rejected" ? "Rejected" : "Offered"
+          } Applicants`,
           style: {
             backgroundColor: `${stage === "rejected" ? "darkred" : "#195f32"}`,
             color: "white",
@@ -158,11 +169,13 @@ export default function JobApplicationManager() {
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
 
       toast(
-        `${selectedApplicants.length} ${selectedApplicants.length === 1 ? "applicant" : "applicants"
+        `${selectedApplicants.length} ${
+          selectedApplicants.length === 1 ? "applicant" : "applicants"
         } moved to Final Feedback`,
         {
-          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${selectedApplicants.length === 1 ? "has" : "have"
-            } been moved from ${activePhase} to Final Feedback`,
+          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
+            selectedApplicants.length === 1 ? "has" : "have"
+          } been moved from ${activePhase} to Final Feedback`,
           style: {
             backgroundColor: "#1e88e5",
             color: "white",
@@ -195,14 +208,14 @@ export default function JobApplicationManager() {
         app.stage === "applied"
           ? "Applications"
           : app.stage === "cv review"
-            ? "CV Review"
-            : app.stage === "sending interview"
-              ? "Sending Interview"
-              : app.stage === "completed interview"
-                ? "Interview Feedback"
-                : app.stage === "final feedback"
-                  ? "Final Feedback"
-                  : app.stage,
+          ? "CV Review"
+          : app.stage === "sending interview"
+          ? "Sending Interview"
+          : app.stage === "completed interview"
+          ? "Interview Feedback"
+          : app.stage === "final feedback"
+          ? "Final Feedback"
+          : app.stage,
       rejected: app.stage === "rejected",
       rejectedOn: app.stage === "rejected" ? app.createdAt : null,
       rejectedBy: app.stage === "rejected" ? app.group?.[0] || null : null,
@@ -320,7 +333,9 @@ export default function JobApplicationManager() {
       );
     }
   };
-
+  useEffect(() => {
+    setSelectedApplicants([]);
+  }, [activeTab, activePhase]);
   // Render loading skeleton
   if (isLoading || isLoadingJob) {
     return (
@@ -412,10 +427,11 @@ export default function JobApplicationManager() {
           <div className="flex items-center border-b dark:border-gray-700 mb-4">
             <button
               onClick={() => setActiveTab("overview")}
-              className={`relative px-4 py-3 font-medium text-sm transition-colors ${activeTab === "overview"
-                ? "text-black dark:text-white"
-                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                }`}
+              className={`relative px-4 py-3 font-medium text-sm transition-colors ${
+                activeTab === "overview"
+                  ? "text-black dark:text-white"
+                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+              }`}
             >
               Overview
               {activeTab === "overview" && (
@@ -424,10 +440,11 @@ export default function JobApplicationManager() {
             </button>
             <button
               onClick={() => setActiveTab("applicants")}
-              className={`relative px-4 py-3 font-medium text-sm transition-colors ${activeTab === "applicants"
-                ? "text-black dark:text-white"
-                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                }`}
+              className={`relative px-4 py-3 font-medium text-sm transition-colors ${
+                activeTab === "applicants"
+                  ? "text-black dark:text-white"
+                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+              }`}
             >
               Applicants
               {activeTab === "applicants" && (
@@ -436,10 +453,11 @@ export default function JobApplicationManager() {
             </button>
             <button
               onClick={() => setActiveTab("rejected")}
-              className={`relative px-4 py-3 font-medium text-sm transition-colors ${activeTab === "rejected"
-                ? "text-black dark:text-white"
-                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                }`}
+              className={`relative px-4 py-3 font-medium text-sm transition-colors ${
+                activeTab === "rejected"
+                  ? "text-black dark:text-white"
+                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+              }`}
             >
               Rejected Applicants
               {activeTab === "rejected" && (
@@ -448,10 +466,11 @@ export default function JobApplicationManager() {
             </button>
             <button
               onClick={() => setActiveTab("all")}
-              className={`relative px-4 py-3 font-medium text-sm transition-colors ${activeTab === "all"
-                ? "text-black dark:text-white"
-                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                }`}
+              className={`relative px-4 py-3 font-medium text-sm transition-colors ${
+                activeTab === "all"
+                  ? "text-black dark:text-white"
+                  : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+              }`}
             >
               All Applicants
               {activeTab === "all" && (

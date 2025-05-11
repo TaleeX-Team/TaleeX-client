@@ -21,11 +21,12 @@ export default function CompanyDetails() {
   const { jobsQuery } = useJobs();
   // Get current company by finding it using the companyId
   const companies = queryClient.getQueryData(["companies"])?.companies || [];
-  const company = companies.find((company) => company._id === companyId);
+  const company = companies.find((company) => company?._id === companyId);
   //find the jobs that whose job.company._id is equal to companyId
 
   const jobs2 =
-    jobsQuery.data?.jobs?.filter((job) => job.company._id === companyId) || [];
+    jobsQuery.data?.jobs?.filter((job) => job?.company?._id === companyId) ||
+    [];
 
   // Loading state
   const isLoading = !queryClient.getQueryData(["companies"]);
@@ -109,7 +110,7 @@ export default function CompanyDetails() {
         >
           <TabsList className="grid w-full grid-cols-2 mb-8 dark:bg-card">
             <TabsTrigger value="about">About</TabsTrigger>
-            <TabsTrigger value="jobs">Jobs ({jobs2.length})</TabsTrigger>
+            <TabsTrigger value="jobs">Jobs ({jobs2?.length})</TabsTrigger>
           </TabsList>
 
           <AboutTab
