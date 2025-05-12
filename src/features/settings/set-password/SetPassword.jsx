@@ -16,8 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const SetPassword = () => {
-  let hasPassword = Cookies.get("hasPassword") === "true";
-  if (!hasPassword) hasPassword = localStorage.getItem("hasPassword");
+  const hasPassword = localStorage.getItem("hasPassword") === "true";
+
   const setPasswordMutation = useSetPassword();
 
   const [newPassword, setNewPassword] = useState("");

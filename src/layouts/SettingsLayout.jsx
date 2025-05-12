@@ -6,8 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import Cookies from "js-cookie";
 
 export default function SettingsLayout() {
-  const hasPassword = Cookies.get("hasPassword") === "true";
-  console.log(hasPassword, "hasPassword");
+  const hasPassword = localStorage.getItem("hasPassword") === "true";
 
   const sidebarNavItems = React.useMemo(() => {
     const baseItems = [
