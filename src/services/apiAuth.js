@@ -78,7 +78,7 @@ export const adminApiClient = createApiClient("/admin/v1");
         },
         async (error) => {
             console.log(
-                `Error response from ${error.config?.url}:`,
+                `Error response from2 ${error.config?.url}:`,
                 error.response?.status
             );
 
@@ -828,58 +828,6 @@ export const getInterviewQuestions = async (interviewId) => {
     );
     return response.data;
 };
-// tokens
-export const getTokenPrice = async (currency = "EGP") => {
-    try {
-        const response = await api.post("/tokens/token-price", {currency});
-        return response.data;
-    } catch (error) {
-        console.error(
-            "Failed to fetch token price:",
-            error.response?.data || error.message
-        );
-        throw new Error("Could not retrieve token price.");
-    }
-};
-export const getTokenFeatures = async () => {
-    try {
-        const response = await api.get("/tokens/features");
-        return response.data;
-    } catch (error) {
-        console.error(
-            "Failed to fetch token features:",
-            error.response?.data || error.message
-        );
-        throw new Error("Could not retrieve token features.");
-    }
-};
-
-export const getTokenFeatureById = async (id) => {
-    try {
-        const response = await api.get(`/tokens/features/${id}`);
-        return response.data;
-    } catch (error) {
-        console.error(
-            `Failed to fetch token feature with ID ${id}:`,
-            error.response?.data || error.message
-        );
-        throw new Error("Could not retrieve the token feature.");
-    }
-};
-
-// === Token Packs ===
-export const getTokenPacks = async () => {
-    try {
-        const response = await api.get("/tokens/packs");
-        return response.data;
-    } catch (error) {
-        console.error(
-            "Failed to fetch token packs:",
-            error.response?.data || error.message
-        );
-        throw new Error("Could not retrieve token packs.");
-    }
-};
 
 export const getTokenPackById = async (id) => {
     try {
@@ -1085,4 +1033,74 @@ export const getTopAppliedJobs = async (params) => {
     const response = await adminApiClient.get(url);
     return response.data;
 };
+// -------------
+
+// Token Features API
+export async function createTokenFeature(feature) {
+    try {
+        const response = await adminApiClient.post(`settings/tokens/features`, feature);
+        return response.data;
+    } catch (error) {
+        throw new Error("Failed to create token feature");
+    }
+}
+
+export async function updateTokenFeature(id, feature) {
+    try {
+        const response = await adminApiClient.put(`settings/tokens/features/${id}`, feature);
+        return response.data;
+    } catch (error) {
+        throw new Error("Failed to update token feature");
+    }
+}
+
+export async function deleteTokenFeature(id) {
+    try {
+        await adminApiClient.delete(`settings/tokens/features/${id}`);
+        return true;
+    } catch (error) {
+        throw new Error("Failed to delete token feature");
+    }
+}
+
+// Token Price API
+export async function updateTokenPrice(tokenPrice) {
+    try {
+        const response = await adminApiClient.put(`settings/tokens/token-price`, tokenPrice);
+        return response.data;
+    } catch (error) {
+        throw new Error("Failed to update token price");
+    }
+}
+
+// Token Packs API
+export async function createTokenPack(pack) {
+    try {
+        const response = await adminApiClient.post(`settings/tokens/packs`, pack);
+        return response.data;
+    } catch (error) {
+        throw new Error("Failed to create token pack");
+    }
+}
+
+export async function updateTokenPack(id, pack) {
+    try {
+        const response = await adminApiClient.put(`settings/tokens/packs/${id}`, pack);
+        return response.data;
+    } catch (error) {
+        throw new Error("Failed to update token pack");
+    }
+}
+
+export async function deleteTokenPack(id) {
+    try {
+        await adminApiClient.delete(`settings/tokens/packs/${id}`);
+        return true;
+    } catch (error) {
+        throw new Error("Failed to delete token pack");
+    }
+}
+
+
+
 export default apiClient;

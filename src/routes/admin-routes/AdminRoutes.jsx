@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import React, { lazy, Suspense } from "react";
 import FullPageSpinner from "@/components/FullPageSpinner";
 import ErrorPage from "@/pages/ErrorPage";
+import TokenManagementPage from "@/features/admin/pages/TokenManagementPage.jsx";
 
 // Admin Auth pages (lazy loaded)
 
@@ -28,7 +29,7 @@ const SettingsPage = lazy(() =>
   import("../../features/admin/pages/SettingsPage.jsx")
 );
 const PlansPage = lazy(() =>
-  import("../../features/admin/pages/PlansPage.jsx")
+  import("../../features/admin/pages/TokenManagementPage.jsx")
 );
 const AdminRoutes = {
   path: "/admin",
@@ -95,7 +96,7 @@ const AdminRoutes = {
       path: "plans",
       element: (
         <Suspense fallback={<FullPageSpinner />}>
-          <PlansPage />
+          <TokenManagementPage />
         </Suspense>
       ),
     },

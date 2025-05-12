@@ -24,6 +24,7 @@ import JobApplicationPage from "@/features/jobs/form/JobApplicationPage.jsx";
 import {InviteJob} from "@/features/jobs/inviteJob/InviteJob.jsx";
 import {StartScreen} from "@/components/interview/StartScreen.jsx";
 import VerifiedEmail from "@/features/auth/verified-email/VerifiedEmail.jsx";
+import LandingPage from "@/features/landing_page/LandingPage.jsx";
 
 const RootRedirect = () => {
     const {isAuthenticated, isLoading} = useAuth();
@@ -82,6 +83,10 @@ function App() {
             AdminRoutes,
             // User Auth Routes
             PublicRoutes,
+            {
+                path: "/landing-page",
+                element: <LandingPage/>,
+            },
             {
                 path: "verify-email/:verificationToken",
                 element: (

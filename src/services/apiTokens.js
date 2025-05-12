@@ -3,8 +3,15 @@ import apiClient from "./apiAuth";
 // === Token Price ===
 export const getTokenPrice = async (currency = "EGP") => {
   try {
-    const response = await apiClient.post("/tokens/token-price", { currency });
-        console.log(`[200] Token price fetched:`, response.data);
+    // Check if currency is an object (from React Query or other sources)
+    // and use default currency instead
+    const currencyValue = typeof currency === 'object' ? "EGP" : currency;
+
+    const response = await apiClient.post("/tokens/token-price", {
+      currency: currencyValue
+    });
+
+    console.log(`[200] Token price fetched:`, response.data);
     return response.data;
   } catch (error) {
     const msg = error.response?.data?.message || "Failed to fetch token price";
