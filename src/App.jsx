@@ -35,7 +35,7 @@ const RootRedirect = () => {
   if (isLoading || isUserLoading) return <FullPageSpinner />;
 
   if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/landing-page" replace />;
   }
 
   // If admin, redirect to admin dashboard
