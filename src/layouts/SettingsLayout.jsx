@@ -27,7 +27,7 @@ export default function SettingsLayout() {
   }, [hasPassword]);
 
   return (
-    <div className="container mx-auto space-y-6 p-6 pb-16 h-screen">
+    <div className="container mx-auto space-y-6 p-6 pb-16 min-h-screen ">
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
           <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
@@ -43,7 +43,7 @@ export default function SettingsLayout() {
         </Button> */}
       </div>
       <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
-        <aside className="lg:w-1/5 border-r-1">
+        <aside className="lg:w-1/5">
           <SidebarNav items={sidebarNavItems} />
         </aside>
         <div className="flex-1">
