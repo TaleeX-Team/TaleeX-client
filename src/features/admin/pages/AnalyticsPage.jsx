@@ -70,55 +70,55 @@ const COLORS = ["#9b87f5", "#7E69AB", "#FFDEE2", "#D3E4FD"];
 
 // StatCard component
 const StatCard = ({
-  title,
-  value,
-  description,
-  Icon,
-  trend = 0,
-  color,
-  bgColor,
-}) => {
+                    title,
+                    value,
+                    description,
+                    Icon,
+                    trend = 0,
+                    color,
+                    bgColor,
+                  }) => {
   const isPositive = trend >= 0;
 
   return (
-    <Card className="overflow-hidden border-border/40">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <div className={`p-2 rounded-md ${bgColor}`}>
-          <Icon className={`h-5 w-5 ${color}`} />
-        </div>
-        <div className="flex items-center">
-          {isPositive ? (
-            <ArrowUpRight className="h-4 w-4 text-green-500 mr-1" />
-          ) : (
-            <ArrowDownRight className="h-4 w-4 text-red-500 mr-1" />
-          )}
-          <span className={isPositive ? "text-green-500" : "text-red-500"}>
+      <Card className="overflow-hidden border-border/40">
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <div className={`p-2 rounded-md ${bgColor}`}>
+            <Icon className={`h-5 w-5 ${color}`} />
+          </div>
+          <div className="flex items-center">
+            {isPositive ? (
+                <ArrowUpRight className="h-4 w-4 text-green-500 mr-1" />
+            ) : (
+                <ArrowDownRight className="h-4 w-4 text-red-500 mr-1" />
+            )}
+            <span className={isPositive ? "text-green-500" : "text-red-500"}>
             {Math.abs(trend)}%
           </span>
-        </div>
-      </CardHeader>
-      <CardContent className="pb-2">
-        <div className="text-2xl font-bold">{value}</div>
-        <p className="text-xs text-muted-foreground">{title}</p>
-      </CardContent>
-      <CardFooter className="pt-1 text-xs text-muted-foreground">
-        {description}
-      </CardFooter>
-    </Card>
+          </div>
+        </CardHeader>
+        <CardContent className="pb-2">
+          <div className="text-2xl font-bold">{value}</div>
+          <p className="text-xs text-muted-foreground">{title}</p>
+        </CardContent>
+        <CardFooter className="pt-1 text-xs text-muted-foreground">
+          {description}
+        </CardFooter>
+      </Card>
   );
 };
 
 // OverviewChart component
 const OverviewChart = ({
-  title,
-  description = "Overview of activity",
-  chartType = "area",
-  data,
-  dataKey = "value",
-  colors = {},
-  onRefresh,
-  onDownloadSinglePDF,
-}) => {
+                         title,
+                         description = "Overview of activity",
+                         chartType = "area",
+                         data,
+                         dataKey = "value",
+                         colors = {},
+                         onRefresh,
+                         onDownloadSinglePDF,
+                       }) => {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
@@ -127,24 +127,24 @@ const OverviewChart = ({
     if (!active || !payload || !payload.length) return null;
 
     return (
-      <div
-        className={`p-4 ${isDark ? "bg-gray-800" : "bg-white"} border ${
-          isDark ? "border-gray-700" : "border-gray-200"
-        } rounded-md shadow-md`}
-      >
-        <p className="text-sm font-medium mb-2">{label}</p>
-        {payload.map((entry, index) => (
-          <div key={index} className="flex items-center gap-2 mb-1">
-            <div
-              className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: entry.color }}
-            />
-            <span className="text-xs">
+        <div
+            className={`p-4 ${isDark ? "bg-gray-800" : "bg-white"} border ${
+                isDark ? "border-gray-700" : "border-gray-200"
+            } rounded-md shadow-md`}
+        >
+          <p className="text-sm font-medium mb-2">{label}</p>
+          {payload.map((entry, index) => (
+              <div key={index} className="flex items-center gap-2 mb-1">
+                <div
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: entry.color }}
+                />
+                <span className="text-xs">
               {entry.name}: <strong>{entry.value}</strong>
             </span>
-          </div>
-        ))}
-      </div>
+              </div>
+          ))}
+        </div>
     );
   };
 
@@ -157,217 +157,217 @@ const OverviewChart = ({
   const renderChart = () => {
     if (chartType === "area") {
       return (
-        <AreaChart
-          data={data}
-          margin={{ top: 10, right: 10, left: 0, bottom: 10 }}
-        >
-          <defs>
-            <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={primaryColor} stopOpacity={0.2} />
-              <stop offset="95%" stopColor={primaryColor} stopOpacity={0} />
-            </linearGradient>
-            {colors.gradients?.map((gradient, index) => (
-              <linearGradient
-                key={index}
-                id={`color${gradient.id}`}
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1"
-              >
-                <stop
-                  offset="5%"
-                  stopColor={gradient.color}
-                  stopOpacity={0.2}
-                />
-                <stop offset="95%" stopColor={gradient.color} stopOpacity={0} />
+          <AreaChart
+              data={data}
+              margin={{ top: 10, right: 10, left: 0, bottom: 10 }}
+          >
+            <defs>
+              <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={primaryColor} stopOpacity={0.2} />
+                <stop offset="95%" stopColor={primaryColor} stopOpacity={0} />
               </linearGradient>
-            ))}
-          </defs>
-          <CartesianGrid
-            stroke={gridColor}
-            strokeDasharray="3 3"
-            vertical={false}
-          />
-          <XAxis
-            dataKey="name"
-            tick={{ fontSize: 11, fill: isDark ? "#e5e7eb" : "#4b5563" }}
-            axisLine={{ stroke: axisColor }}
-            tickLine={false}
-          />
-          <YAxis
-            tick={{ fontSize: 11, fill: isDark ? "#e5e7eb" : "#4b5563" }}
-            axisLine={{ stroke: axisColor }}
-            tickLine={false}
-            width={30}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          <Legend
-            iconType="circle"
-            iconSize={8}
-            wrapperStyle={{ paddingTop: 20 }}
-          />
-          {Array.isArray(dataKey) ? (
-            dataKey.map((key, index) => (
-              <Area
-                key={key}
-                type="monotone"
-                dataKey={key}
-                stroke={
-                  colors.strokes?.[index] || COLORS[index % COLORS.length]
-                }
-                strokeWidth={2}
-                fillOpacity={1}
-                fill={
-                  colors.fills?.[index]
-                    ? `url(#color${colors.fills[index]})`
-                    : index === 0
-                    ? "url(#colorValue)"
-                    : `url(#color${key})`
-                }
-              />
-            ))
-          ) : (
-            <Area
-              type="monotone"
-              dataKey={dataKey}
-              stroke={primaryColor}
-              strokeWidth={2}
-              fillOpacity={1}
-              fill="url(#colorValue)"
+              {colors.gradients?.map((gradient, index) => (
+                  <linearGradient
+                      key={index}
+                      id={`color${gradient.id}`}
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                  >
+                    <stop
+                        offset="5%"
+                        stopColor={gradient.color}
+                        stopOpacity={0.2}
+                    />
+                    <stop offset="95%" stopColor={gradient.color} stopOpacity={0} />
+                  </linearGradient>
+              ))}
+            </defs>
+            <CartesianGrid
+                stroke={gridColor}
+                strokeDasharray="3 3"
+                vertical={false}
             />
-          )}
-        </AreaChart>
+            <XAxis
+                dataKey="name"
+                tick={{ fontSize: 11, fill: isDark ? "#e5e7eb" : "#4b5563" }}
+                axisLine={{ stroke: axisColor }}
+                tickLine={false}
+            />
+            <YAxis
+                tick={{ fontSize: 11, fill: isDark ? "#e5e7eb" : "#4b5563" }}
+                axisLine={{ stroke: axisColor }}
+                tickLine={false}
+                width={30}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend
+                iconType="circle"
+                iconSize={8}
+                wrapperStyle={{ paddingTop: 20 }}
+            />
+            {Array.isArray(dataKey) ? (
+                dataKey.map((key, index) => (
+                    <Area
+                        key={key}
+                        type="monotone"
+                        dataKey={key}
+                        stroke={
+                            colors.strokes?.[index] || COLORS[index % COLORS.length]
+                        }
+                        strokeWidth={2}
+                        fillOpacity={1}
+                        fill={
+                          colors.fills?.[index]
+                              ? `url(#color${colors.fills[index]})`
+                              : index === 0
+                                  ? "url(#colorValue)"
+                                  : `url(#color${key})`
+                        }
+                    />
+                ))
+            ) : (
+                <Area
+                    type="monotone"
+                    dataKey={dataKey}
+                    stroke={primaryColor}
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorValue)"
+                />
+            )}
+          </AreaChart>
       );
     } else if (chartType === "bar") {
       return (
-        <BarChart
-          data={data}
-          margin={{ top: 10, right: 10, left: 0, bottom: 10 }}
-        >
-          <CartesianGrid
-            stroke={gridColor}
-            strokeDasharray="3 3"
-            vertical={false}
-          />
-          <XAxis
-            dataKey="name"
-            tick={{ fontSize: 11, fill: isDark ? "#e5e7eb" : "#4b5563" }}
-            axisLine={{ stroke: axisColor }}
-            tickLine={false}
-          />
-          <YAxis
-            tick={{ fontSize: 11, fill: isDark ? "#e5e7eb" : "#4b5563" }}
-            axisLine={{ stroke: axisColor }}
-            tickLine={false}
-            width={30}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          <Legend
-            iconType="circle"
-            iconSize={8}
-            wrapperStyle={{ paddingTop: 20 }}
-          />
-          {Array.isArray(dataKey) ? (
-            dataKey.map((key, index) => (
-              <Bar
-                key={key}
-                dataKey={key}
-                fill={colors.fills?.[index] || COLORS[index % COLORS.length]}
-                radius={[4, 4, 0, 0]}
-                barSize={30}
-              />
-            ))
-          ) : (
-            <Bar
-              dataKey={dataKey}
-              fill={primaryColor}
-              radius={[4, 4, 0, 0]}
-              barSize={30}
+          <BarChart
+              data={data}
+              margin={{ top: 10, right: 10, left: 0, bottom: 10 }}
+          >
+            <CartesianGrid
+                stroke={gridColor}
+                strokeDasharray="3 3"
+                vertical={false}
             />
-          )}
-        </BarChart>
+            <XAxis
+                dataKey="name"
+                tick={{ fontSize: 11, fill: isDark ? "#e5e7eb" : "#4b5563" }}
+                axisLine={{ stroke: axisColor }}
+                tickLine={false}
+            />
+            <YAxis
+                tick={{ fontSize: 11, fill: isDark ? "#e5e7eb" : "#4b5563" }}
+                axisLine={{ stroke: axisColor }}
+                tickLine={false}
+                width={30}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend
+                iconType="circle"
+                iconSize={8}
+                wrapperStyle={{ paddingTop: 20 }}
+            />
+            {Array.isArray(dataKey) ? (
+                dataKey.map((key, index) => (
+                    <Bar
+                        key={key}
+                        dataKey={key}
+                        fill={colors.fills?.[index] || COLORS[index % COLORS.length]}
+                        radius={[4, 4, 0, 0]}
+                        barSize={30}
+                    />
+                ))
+            ) : (
+                <Bar
+                    dataKey={dataKey}
+                    fill={primaryColor}
+                    radius={[4, 4, 0, 0]}
+                    barSize={30}
+                />
+            )}
+          </BarChart>
       );
     } else {
       return (
-        <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            outerRadius={90}
-            innerRadius={60}
-            fill="#8884d8"
-            dataKey="value"
-            label={({ name, percent }) =>
-              `${name}: ${(percent * 100).toFixed(0)}%`
-            }
-          >
-            {data.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
-              />
-            ))}
-          </Pie>
-          <Tooltip content={<CustomTooltip />} />
-          <Legend
-            iconType="circle"
-            iconSize={8}
-            layout="horizontal"
-            verticalAlign="bottom"
-            align="center"
-            wrapperStyle={{ paddingTop: 20 }}
-          />
-        </PieChart>
+          <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+            <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                outerRadius={90}
+                innerRadius={60}
+                fill="#8884d8"
+                dataKey="value"
+                label={({ name, percent }) =>
+                    `${name}: ${(percent * 100).toFixed(0)}%`
+                }
+            >
+              {data.map((entry, index) => (
+                  <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                  />
+              ))}
+            </Pie>
+            <Tooltip content={<CustomTooltip />} />
+            <Legend
+                iconType="circle"
+                iconSize={8}
+                layout="horizontal"
+                verticalAlign="bottom"
+                align="center"
+                wrapperStyle={{ paddingTop: 20 }}
+            />
+          </PieChart>
       );
     }
   };
 
   return (
-    <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-center">
-          <div>
-            <CardTitle className="text-lg font-semibold">{title}</CardTitle>
-            <CardDescription className="text-sm text-muted-foreground">
-              {description}
-            </CardDescription>
+      <Card className="border border-gray-200 dark:border-gray-800 shadow-sm">
+        <CardHeader className="pb-2">
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle className="text-lg font-semibold">{title}</CardTitle>
+              <CardDescription className="text-sm text-muted-foreground">
+                {description}
+              </CardDescription>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem
+                    onClick={onDownloadSinglePDF}
+                    className="cursor-pointer hover:bg-primary hover:text-white"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  <span>Download</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                    onClick={onRefresh}
+                    className="cursor-pointer hover:bg-primary hover:text-white"
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  <span>Refresh</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem
-                onClick={onDownloadSinglePDF}
-                className="cursor-pointer hover:bg-primary hover:text-white"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                <span>Download</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={onRefresh}
-                className="cursor-pointer hover:bg-primary hover:text-white"
-              >
-                <RefreshCw className="mr-2 h-4 w-4" />
-                <span>Refresh</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </CardHeader>
-      <CardContent className="pt-4 pb-4">
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            {renderChart()}
-          </ResponsiveContainer>
-        </div>
-      </CardContent>
-    </Card>
+        </CardHeader>
+        <CardContent className="pt-4 pb-4">
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              {renderChart()}
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
   );
 };
 
@@ -406,7 +406,7 @@ const AnalyticsPage = () => {
       const day = date.getDate().toString().padStart(2, "0");
       const month = (date.getMonth() + 1).toString().padStart(2, "0");
       const year = date.getFullYear();
-      return `${day}-${month}-${year}`;
+      return `${year}-${month}-${day}`; // New: YYYY-MM-DD
     };
 
     return {
@@ -469,9 +469,9 @@ const AnalyticsPage = () => {
     else if (timePeriod === "lastQuarter") readableTimePeriod = "Last 90 Days";
     else if (timePeriod === "lastYear") readableTimePeriod = "Last 12 Months";
     doc.text(
-      `Time Period: ${readableTimePeriod} (From: ${dateRangeValues.from} To: ${dateRangeValues.to})`,
-      14,
-      yPos
+        `Time Period: ${readableTimePeriod} (From: ${dateRangeValues.from} To: ${dateRangeValues.to})`,
+        14,
+        yPos
     );
     yPos += 10;
 
@@ -551,8 +551,8 @@ const AnalyticsPage = () => {
       }
 
       if (
-        config.fallbackFn &&
-        (!currentChartData || currentChartData.length === 0)
+          config.fallbackFn &&
+          (!currentChartData || currentChartData.length === 0)
       ) {
         currentChartData = config.fallbackFn(); // This will call setShowFallbackJobsMessage from user's code
         if (yPos > 270) {
@@ -598,7 +598,7 @@ const AnalyticsPage = () => {
   const handleDownloadSingleChartPdf = async (chartConfig) => {
     if (!chartConfig) {
       console.error(
-        "Chart configuration is missing for single chart PDF download."
+          "Chart configuration is missing for single chart PDF download."
       );
       return;
     }
@@ -617,19 +617,19 @@ const AnalyticsPage = () => {
 
     doc.setFontSize(10);
     doc.text(
-      `Time Period: ${
-        timePeriod === "lastWeek"
-          ? "Last 7 Days"
-          : timePeriod === "lastMonth"
-          ? "Last 30 Days"
-          : timePeriod === "lastQuarter"
-          ? "Last 90 Days"
-          : timePeriod === "lastYear"
-          ? "Last 12 Months"
-          : "Selected Period"
-      } (From: ${dateRangeValues.from} To: ${dateRangeValues.to})`,
-      14,
-      yPos
+        `Time Period: ${
+            timePeriod === "lastWeek"
+                ? "Last 7 Days"
+                : timePeriod === "lastMonth"
+                    ? "Last 30 Days"
+                    : timePeriod === "lastQuarter"
+                        ? "Last 90 Days"
+                        : timePeriod === "lastYear"
+                            ? "Last 12 Months"
+                            : "Selected Period"
+        } (From: ${dateRangeValues.from} To: ${dateRangeValues.to})`,
+        14,
+        yPos
     );
     yPos += 10;
 
@@ -673,8 +673,8 @@ const AnalyticsPage = () => {
     }
 
     if (
-      chartConfig.fallbackFn &&
-      (!currentChartData || currentChartData.length === 0)
+        chartConfig.fallbackFn &&
+        (!currentChartData || currentChartData.length === 0)
     ) {
       currentChartData = chartConfig.fallbackFn();
       if (yPos > 270) {
@@ -712,8 +712,8 @@ const AnalyticsPage = () => {
     }
 
     const safeTitle = chartConfig.title
-      .replace(/[^a-z0-9]/gi, "")
-      .toLowerCase();
+        .replace(/[^a-z0-9]/gi, "")
+        .toLowerCase();
     doc.save(`chart_report_${safeTitle}.pdf`);
   };
 
@@ -722,8 +722,8 @@ const AnalyticsPage = () => {
     if (!applicationsByStage?.length) return [];
     return applicationsByStage.map((item) => ({
       name:
-        item.stage.charAt(0).toUpperCase() +
-        item.stage.slice(1).replace(/-/g, " "),
+          item.stage.charAt(0).toUpperCase() +
+          item.stage.slice(1).replace(/-/g, " "),
       value: item.count,
     }));
   };
@@ -742,8 +742,8 @@ const AnalyticsPage = () => {
     if (!interviewsByState?.length) return [];
     return interviewsByState.map((item) => ({
       name:
-        item.state.charAt(0).toUpperCase() +
-        item.state.slice(1).replace(/-/g, " "),
+          item.state.charAt(0).toUpperCase() +
+          item.state.slice(1).replace(/-/g, " "),
       value: item.count,
     }));
   };
@@ -752,8 +752,8 @@ const AnalyticsPage = () => {
     if (!conversionFunnel?.length) return [];
     return conversionFunnel.map((item) => ({
       name:
-        item.stage.charAt(0).toUpperCase() +
-        item.stage.slice(1).replace(/-/g, " "),
+          item.stage.charAt(0).toUpperCase() +
+          item.stage.slice(1).replace(/-/g, " "),
       count: item.count,
       rate: Number.parseFloat((item.rate * 100).toFixed(1)),
     }));
@@ -870,17 +870,17 @@ const AnalyticsPage = () => {
       const dayOfWeek = date.getDay();
       const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
       const baseCount = isWeekend
-        ? 3 + Math.floor(Math.random() * 5)
-        : 8 + Math.floor(Math.random() * 12);
+          ? 3 + Math.floor(Math.random() * 5)
+          : 8 + Math.floor(Math.random() * 12);
       const trendFactor = 1 + i / 60;
       const count = Math.floor(baseCount / trendFactor);
       let growth = 0;
       if (data.length > 0) {
         const prevCount = data[data.length - 1].count;
         growth =
-          prevCount > 0
-            ? Math.round(((count - prevCount) / prevCount) * 100)
-            : 0;
+            prevCount > 0
+                ? Math.round(((count - prevCount) / prevCount) * 100)
+                : 0;
       }
       data.push({
         date: date.toISOString().split("T")[0],
@@ -893,19 +893,19 @@ const AnalyticsPage = () => {
 
   // Calculate totals
   const totalApplications =
-    applicationsByStage?.reduce((sum, item) => sum + item.count, 0) || 0;
+      applicationsByStage?.reduce((sum, item) => sum + item.count, 0) || 0;
   const totalInterviews =
-    interviewsByState?.reduce((sum, item) => sum + item.count, 0) || 0;
+      interviewsByState?.reduce((sum, item) => sum + item.count, 0) || 0;
   const pendingApplications =
-    applicationsByStage?.find(
-      (item) =>
-        item.stage.toLowerCase() === "sending-interview" ||
-        item.stage.toLowerCase() === "pending" ||
-        item.stage.toLowerCase() === "in-progress"
-    )?.count || 0;
+      applicationsByStage?.find(
+          (item) =>
+              item.stage.toLowerCase() === "sending-interview" ||
+              item.stage.toLowerCase() === "pending" ||
+              item.stage.toLowerCase() === "in-progress"
+      )?.count || 0;
   const rejectedApplications =
-    applicationsByStage?.find((item) => item.stage.toLowerCase() === "rejected")
-      ?.count || 0;
+      applicationsByStage?.find((item) => item.stage.toLowerCase() === "rejected")
+          ?.count || 0;
 
   const chartReportConfigs = [
     {
@@ -942,11 +942,13 @@ const AnalyticsPage = () => {
       refIndex: 4,
       columns: ["Job Title", "Applications"],
       bodyAccessor: (item) => [item.name, item.applications],
+      chartType: "bar",
+      dataKey: "applications"
     },
     {
       title: "Reports by Reason",
       dataSource: reportsByReason,
-      refIndex: 8,
+      refIndex: 8, // Note: refIndex jumps from 4 to 8. Ensure this is intentional and chartsRef is sized/managed accordingly.
       columns: ["Reason", "Count"],
       bodyAccessor: (item) => [item.reason, item.count],
     },
@@ -956,33 +958,37 @@ const AnalyticsPage = () => {
   useEffect(() => {
     if (typeof window !== "undefined" && pageRef.current) {
       gsap.fromTo(
-        pageRef.current.querySelector(".page-header"),
-        { opacity: 0, y: -20 },
-        { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }
+          pageRef.current.querySelector(".page-header"),
+          { opacity: 0, y: -20 },
+          { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }
       );
 
       gsap.fromTo(
-        pageRef.current.querySelector(".kpi-cards"),
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.8, delay: 0.2, ease: "power3.out" }
+          pageRef.current.querySelector(".kpi-cards"),
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.8, delay: 0.2, ease: "power3.out" }
       );
 
       chartsRef.current.forEach((chart, index) => {
+        // Ensure chart element exists before trying to animate it
+        // The index here is the actual index in chartsRef.current, which might be sparse if refIndex values have gaps.
+        // It's safer to iterate over chartReportConfigs and use config.refIndex to access chartsRef.current[config.refIndex]
         if (chart) {
           ScrollTrigger.create({
             trigger: chart,
             start: "top bottom-=100",
             onEnter: () => {
               gsap.fromTo(
-                chart,
-                { opacity: 0, y: 40 },
-                {
-                  opacity: 1,
-                  y: 0,
-                  duration: 0.7,
-                  delay: index * 0.1,
-                  ease: "power2.out",
-                }
+                  chart,
+                  { opacity: 0, y: 40 },
+                  {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.7,
+                    // delay: index * 0.1, // Delay based on loop index might not be what's intended if chartsRef is sparse.
+                    // Consider a fixed delay or delay based on config.refIndex if that's meaningful.
+                    ease: "power2.out",
+                  }
               );
             },
             once: true,
@@ -990,498 +996,198 @@ const AnalyticsPage = () => {
         }
       });
     }
-  }, []);
+  }, []); // Empty dependency array, runs once on mount.
 
+  // JSX for rendering the page
   return (
-    <div ref={pageRef} className="space-y-8 p-6 max-w-7xl mx-auto">
-      <div className="page-header space-y-2">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-              Analytics Dashboard
-              <Badge
-                variant="outline"
-                className="ml-2 bg-primary/10 text-primary"
-              >
-                {isLoading ? "Loading..." : "Live Data"}
-              </Badge>
-            </h2>
-            <p className="text-muted-foreground mt-1">
-              Track application metrics and optimize your recruitment process.
-            </p>
-          </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <Select value={timePeriod} onValueChange={handleTimePeriodChange}>
-              <SelectTrigger className="w-full sm:w-44">
-                <SelectValue placeholder="Select period" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="lastWeek">Last 7 days</SelectItem>
-                <SelectItem value="lastMonth">Last 30 days</SelectItem>
-                <SelectItem value="lastQuarter">Last 90 days</SelectItem>
-                <SelectItem value="lastYear">Last 12 months</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleRefresh}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <RefreshCw className="h-4 w-4" />
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleDownloadPdf}
-              disabled={isLoading}
-            >
-              <DownloadCloud className="h-4 w-4" />
-            </Button>
+      <div ref={pageRef} className="space-y-8 p-6 max-w-7xl mx-auto">
+        {/* Page Header */}
+        <div className="page-header space-y-2">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+                Analytics Dashboard
+                <Badge
+                    variant="outline"
+                    className="ml-2 bg-primary/10 text-primary"
+                >
+                  {isLoading ? "Loading..." : "Live Data"}
+                </Badge>
+              </h2>
+              <p className="text-muted-foreground mt-1">
+                Track application metrics and optimize your recruitment process.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Select value={timePeriod} onValueChange={handleTimePeriodChange}>
+                <SelectTrigger className="w-full sm:w-44">
+                  <SelectValue placeholder="Select period" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="lastWeek">Last 7 Days</SelectItem>
+                  <SelectItem value="lastMonth">Last 30 Days</SelectItem>
+                  <SelectItem value="lastQuarter">Last 90 Days</SelectItem>
+                  <SelectItem value="lastYear">Last 12 Months</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button onClick={handleRefresh} disabled={isLoading} className="w-full sm:w-auto">
+                <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+                Refresh Data
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {isError && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>
-            {errors?.message ||
-              (typeof errors === "string" && errors) ||
-              "Failed to load statistics. Please try refreshing the page."}
-            {errors && typeof errors === "object" && !errors.message && (
-              <pre className="mt-2 text-xs whitespace-pre-wrap bg-red-100 dark:bg-red-900 p-2 rounded">
-                {JSON.stringify(errors, null, 2)}
-              </pre>
-            )}
-          </AlertDescription>
-        </Alert>
-      )}
+        {/* Main Tabs */}
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="details">Detailed Reports</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger> {/* Assuming Settings tab exists */}
+            <TabsTrigger value="export">Export All</TabsTrigger>
+          </TabsList>
 
-      <div className="kpi-cards grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {isLoading ? (
-          Array(4)
-            .fill(0)
-            .map((_, i) => (
-              <Card key={i} className="overflow-hidden border-border/40">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <Skeleton className="h-9 w-9 rounded-md" />
-                  <Skeleton className="h-4 w-16" />
-                </CardHeader>
-                <CardContent className="pb-2">
-                  <Skeleton className="h-8 w-16 mb-1" />
-                  <Skeleton className="h-4 w-24" />
-                </CardContent>
-                <CardFooter className="pt-1">
-                  <Skeleton className="h-4 w-full" />
-                </CardFooter>
-              </Card>
-            ))
-        ) : (
-          <>
-            <StatCard
-              title="Total Applications"
-              value={totalApplications}
-              description="All applications in the system"
-              Icon={Building2}
-              trend={10}
-              color="text-blue-500"
-              bgColor="bg-blue-100 dark:bg-blue-900/30"
-            />
-            <StatCard
-              title="Interviews"
-              value={totalInterviews}
-              description="Total interviews conducted"
-              Icon={CheckCircle}
-              trend={5}
-              color="text-green-500"
-              bgColor="bg-green-100 dark:bg-green-900/30"
-            />
-            <StatCard
-              title="Pending Applications"
-              value={pendingApplications}
-              description="Applications in progress"
-              Icon={Clock}
-              trend={-2}
-              color="text-amber-500"
-              bgColor="bg-amber-100 dark:bg-amber-900/30"
-            />
-            <StatCard
-              title="Rejected Applications"
-              value={rejectedApplications}
-              description="Applications rejected"
-              Icon={XCircle}
-              trend={0}
-              color="text-red-500"
-              bgColor="bg-red-100 dark:bg-red-900/30"
-            />
-          </>
-        )}
-      </div>
-
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="bg-muted/50 p-1 rounded-lg">
-          <TabsTrigger value="overview" className="rounded-md">
-            Overview
-          </TabsTrigger>
-          <TabsTrigger value="applications" className="rounded-md">
-            Applications
-          </TabsTrigger>
-          <TabsTrigger value="interviews" className="rounded-md">
-            Interviews
-          </TabsTrigger>
-          <TabsTrigger value="companies" className="rounded-md">
-            Companies
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          <div ref={(el) => (chartsRef.current[0] = el)}>
-            {isLoading ? (
-              <Card className="border-border/40">
-                <CardHeader>
-                  <Skeleton className="h-6 w-48 mb-2" />
-                  <Skeleton className="h-4 w-64" />
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[300px] flex items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <OverviewChart
-                title="Daily Applications"
-                description="Applications received over time"
-                chartType="area"
-                data={formatDailyApplicationsForChart()}
-                dataKey="applications"
-                onDownloadSinglePDF={handleDownloadSingleChartPdf(
-                  chartReportConfigs[0]
-                )}
-                colors={{
-                  strokes: ["var(--color-primary)"],
-                  fills: ["Primary"],
-                  gradients: [{ id: "Primary", color: "var(--color-primary)" }],
-                }}
-                onRefresh={handleRefresh}
+          {/* Overview Tab Content */}
+          <TabsContent value="overview" className="mt-6">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 kpi-cards">
+              <StatCard
+                  title="Total Applications"
+                  value={isLoading ? <Skeleton className="h-6 w-20" /> : totalApplications}
+                  description="Overall applications received"
+                  Icon={CheckCircle}
+                  color="text-green-500"
+                  bgColor="bg-green-100 dark:bg-green-900/50"
+                  trend={2.5} // Example trend
               />
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div ref={(el) => (chartsRef.current[1] = el)}>
+              <StatCard
+                  title="Total Interviews"
+                  value={isLoading ? <Skeleton className="h-6 w-16" /> : totalInterviews}
+                  description="Interviews scheduled or completed"
+                  Icon={Clock}
+                  color="text-blue-500"
+                  bgColor="bg-blue-100 dark:bg-blue-900/50"
+                  trend={-1.2} // Example trend
+              />
+              <StatCard
+                  title="Pending Applications"
+                  value={isLoading ? <Skeleton className="h-6 w-14" /> : pendingApplications}
+                  description="Applications awaiting review"
+                  Icon={AlertCircle}
+                  color="text-yellow-500"
+                  bgColor="bg-yellow-100 dark:bg-yellow-900/50"
+                  trend={0}
+              />
+              <StatCard
+                  title="Rejected Applications"
+                  value={isLoading ? <Skeleton className="h-6 w-12" /> : rejectedApplications}
+                  description="Applications not moved forward"
+                  Icon={XCircle}
+                  color="text-red-500"
+                  bgColor="bg-red-100 dark:bg-red-900/50"
+                  trend={5.0}
+              />
+            </div>
+            <div className="mt-8">
               {isLoading ? (
-                <Card className="border-border/40">
-                  <CardHeader>
-                    <Skeleton className="h-6 w-48 mb-2" />
-                    <Skeleton className="h-4 w-64" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-[300px] flex items-center justify-center">
-                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    </div>
-                  </CardContent>
-                </Card>
+                  <Skeleton className="h-[350px] w-full" />
               ) : (
-                <OverviewChart
-                  title="Applications by Stage"
-                  description="Current application stages"
-                  chartType="pie"
-                  onDownloadSinglePDF={handleDownloadSingleChartPdf(
-                    chartReportConfigs[1]
-                  )}
-                  data={formatApplicationsByStageForChart()}
-                  onRefresh={handleRefresh}
-                />
+                  <OverviewChart
+                      title="Application Trends Over Time"
+                      description={`Showing data for ${timePeriod}`}
+                      chartType="area"
+                      data={formatDailyApplicationsForChart()} // Ensure this is called
+                      dataKey="applications"
+                      onRefresh={handleRefresh} // Allow refresh for this chart
+                      onDownloadSinglePDF={() => handleDownloadSingleChartPdf(chartReportConfigs.find(c => c.title === "Daily Applications Trend"))}
+                  />
               )}
             </div>
+          </TabsContent>
 
-            <div ref={(el) => (chartsRef.current[2] = el)}>
-              {isLoading ? (
-                <Card className="border-border/40">
-                  <CardHeader>
-                    <Skeleton className="h-6 w-48 mb-2" />
-                    <Skeleton className="h-4 w-64" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-[300px] flex items-center justify-center">
-                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                <OverviewChart
-                  title="Top Applied Jobs"
-                  description="Most popular job postings"
-                  chartType="bar"
-                  data={formatTopAppliedJobsForChart()}
-                  dataKey="applications"
-                  onDownloadSinglePDF={handleDownloadSingleChartPdf(
-                    chartReportConfigs[4]
-                  )}
-                  colors={{ fills: ["var(--color-primary)"] }}
-                  onRefresh={handleRefresh}
-                />
-              )}
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="applications" className="space-y-6">
-          <div ref={(el) => (chartsRef.current[3] = el)}>
-            {isLoading ? (
-              <Card className="border-border/40">
-                <CardHeader>
-                  <Skeleton className="h-6 w-48 mb-2" />
-                  <Skeleton className="h-4 w-64" />
-                </CardHeader>
-                <CardContent>
-                  <div className="h-[300px] flex items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <OverviewChart
-                title="Conversion Funnel"
-                description="Application stage conversion rates"
-                chartType="bar"
-                onDownloadSinglePDF={handleDownloadSingleChartPdf(
-                  chartReportConfigs[3]
-                )}
-                data={formatConversionFunnelForChart()}
-                dataKey={["count", "rate"]}
-                colors={{ fills: ["var(--color-primary)", "#7E69AB"] }}
-                onRefresh={handleRefresh}
-              />
+          {/* Details Tab Content */}
+          <TabsContent value="details" className="mt-6">
+            {isError && (
+                <Alert variant="destructive" className="mb-6">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Error Loading Data</AlertTitle>
+                  <AlertDescription>
+                    There was an issue fetching some of the analytics data. Please try refreshing.
+                    {errors && <pre className="mt-2 text-xs whitespace-pre-wrap">{JSON.stringify(errors, null, 2)}</pre>}
+                  </AlertDescription>
+                </Alert>
             )}
-          </div>
+            {showFallbackJobsMessage && (
+                <Alert variant="default" className="mb-6 bg-blue-50 border-blue-200 dark:bg-blue-900/30 dark:border-blue-700">
+                  <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <AlertTitle className="text-blue-700 dark:text-blue-300">Displaying Sample Data</AlertTitle>
+                  <AlertDescription className="text-blue-600 dark:text-blue-400">
+                    Some data for 'Jobs by Company' could not be loaded, so sample data is being shown for this chart.
+                  </AlertDescription>
+                </Alert>
+            )}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2"> {/* Changed lg:grid-cols-3 to lg:grid-cols-2 for better fit if many charts */}
+              {chartReportConfigs.map((config) => (
+                  <div
+                      key={config.title}
+                      ref={(el) => (chartsRef.current[config.refIndex] = el)}
+                      className={`lg:col-span-1 ${config.colSpan || ""}`} // Allow individual colSpan if needed
+                  >
+                    {isLoading && !config.dataSource ? (
+                        <Skeleton className="h-[350px] w-full" />
+                    ) : (
+                        <OverviewChart
+                            title={config.title}
+                            chartType={config.chartType || "bar"} // Default to bar for detailed reports if not specified
+                            data={
+                              config.dataFormatter
+                                  ? config.dataFormatter()
+                                  : config.dataSource || [] // Ensure data is always an array
+                            }
+                            dataKey={config.dataKey || "value"}
+                            onRefresh={() => refetch()} // Simplified refresh for individual charts
+                            onDownloadSinglePDF={() => handleDownloadSingleChartPdf(config)}
+                        />
+                    )}
+                  </div>
+              ))}
+            </div>
+          </TabsContent>
 
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-            <Card className="border-border/40">
+          {/* Settings Tab Content (Placeholder) */}
+          <TabsContent value="settings" className="mt-6">
+            <Card>
               <CardHeader>
-                <CardTitle className="text-lg">
-                  Application Statistics
-                </CardTitle>
-                <CardDescription>Detailed application metrics</CardDescription>
+                <CardTitle>Settings</CardTitle>
+                <CardDescription>Manage your analytics preferences.</CardDescription>
               </CardHeader>
-              <CardContent className="pt-4">
-                {isLoading ? (
-                  <div className="h-[300px] flex items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  </div>
-                ) : applicationsByStage?.length === 0 ? (
-                  <div className="h-[300px] flex items-center justify-center flex-col">
-                    <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground text-center">
-                      No data available
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {applicationsByStage?.map((item, index) => (
-                      <div key={index}>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm font-medium">
-                            {item.stage.charAt(0).toUpperCase() +
-                              item.stage.slice(1).replace(/-/g, " ")}
-                          </span>
-                          <span className="text-sm font-medium">
-                            {item.count}
-                          </span>
-                        </div>
-                        <div className="w-full bg-muted rounded-full h-2">
-                          <div
-                            className="bg-primary h-2 rounded-full"
-                            style={{
-                              width: `${
-                                (item.count / totalApplications) * 100
-                              }%`,
-                            }}
-                          ></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+              <CardContent>
+                <p>Settings content will go here.</p>
               </CardContent>
             </Card>
-          </div>
-        </TabsContent>
+          </TabsContent>
 
-        <TabsContent value="interviews" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="border-border/40">
+          {/* Export All Tab Content */}
+          <TabsContent value="export" className="mt-6">
+            <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Interviews by State</CardTitle>
-                <CardDescription>Current interview statuses</CardDescription>
+                <CardTitle>Export All Data</CardTitle>
+                <CardDescription>Download a comprehensive PDF report of all analytics data.</CardDescription>
               </CardHeader>
-              <CardContent className="pt-4">
-                {isLoading ? (
-                  <div className="h-[300px] flex items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  </div>
-                ) : interviewsByState?.length === 0 ? (
-                  <div className="h-[300px] flex items-center justify-center flex-col">
-                    <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground text-center">
-                      No data available
-                    </p>
-                  </div>
-                ) : (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={formatInterviewsByStateForChart()}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={100}
-                        innerRadius={60}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label={({ name, percent }) =>
-                          `${name}: ${(percent * 100).toFixed(0)}%`
-                        }
-                      >
-                        {formatInterviewsByStateForChart().map(
-                          (entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={COLORS[index % COLORS.length]}
-                            />
-                          )
-                        )}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "var(--card)",
-                          borderColor: "var(--border)",
-                          borderRadius: "8px",
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                )}
+              <CardContent className="flex flex-col items-start gap-4">
+                <p>Click the button below to generate and download the full report.</p>
+                <Button onClick={handleDownloadPdf} disabled={isLoading} size="lg">
+                  <DownloadCloud className={`mr-2 h-5 w-5 ${isLoading ? "animate-spin" : ""}`} />
+                  Download Full Report
+                </Button>
+                {isLoading && <p className="text-sm text-muted-foreground">Report generation in progress...</p>}
               </CardContent>
             </Card>
+          </TabsContent>
 
-            <Card className="border-border/40">
-              <CardHeader>
-                <CardTitle className="text-lg">Interview Statistics</CardTitle>
-                <CardDescription>Detailed interview metrics</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-4">
-                {isLoading ? (
-                  <div className="h-[300px] flex items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  </div>
-                ) : interviewsByState?.length === 0 ? (
-                  <div className="h-[300px] flex items-center justify-center flex-col">
-                    <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground text-center">
-                      No interview data available
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {interviewsByState?.map((item, index) => (
-                      <div key={index}>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm font-medium">
-                            {item.state.charAt(0).toUpperCase() +
-                              item.state.slice(1).replace(/-/g, " ")}
-                          </span>
-                          <span className="text-sm font-medium">
-                            {item.count}
-                          </span>
-                        </div>
-                        <div className="w-full bg-muted rounded-full h-2">
-                          <div
-                            className="bg-primary h-2 rounded-full"
-                            style={{
-                              width: `${(item.count / totalInterviews) * 100}%`,
-                            }}
-                          ></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="companies" className="space-y-6">
-          {showFallbackJobsMessage && (
-            <p className="text-sm text-yellow-700 dark:text-yellow-300 p-3 bg-yellow-100 dark:bg-yellow-900/40 rounded-md mb-4 text-center border border-yellow-300 dark:border-yellow-700">
-              Note: The "Jobs by Company" chart is currently displaying sample
-              data as live data is unavailable.
-            </p>
-          )}
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-            <Card className="border-border/40">
-              <CardHeader>
-                <CardTitle className="text-lg">Reports by Reason</CardTitle>
-                <CardDescription>Reasons for reported content</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-4">
-                {isLoading ? (
-                  <div className="h-[300px] flex items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  </div>
-                ) : (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={reportsByReason?.map((item) => ({
-                          name:
-                            item.reason.charAt(0).toUpperCase() +
-                            item.reason.slice(1),
-                          value: item.count,
-                        }))}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={100}
-                        innerRadius={60}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label={({ name, percent }) =>
-                          `${name}: ${(percent * 100).toFixed(0)}%`
-                        }
-                      >
-                        {reportsByReason?.map((_, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "var(--card)",
-                          borderColor: "var(--border)",
-                          borderRadius: "8px",
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
+        </Tabs>
+      </div>
   );
 };
 
 export default AnalyticsPage;
+
