@@ -63,23 +63,6 @@ export default function Header() {
             >
               Jobs
             </Link>
-            {/* <Link
-              to="landing-page"
-              className="px-3 py-1 text-sm font-medium rounded-md hover:bg-muted transition-colors"
-            >
-              landingPage            </Link> */}
-            <Link
-              to="/about-us"
-              className="px-3 py-1 text-sm font-medium rounded-md hover:bg-muted transition-colors"
-            >
-              About Us{" "}
-            </Link>
-            <Link
-              to="/contact-us"
-              className="px-3 py-1 text-sm font-medium rounded-md hover:bg-muted transition-colors"
-            >
-              Contact Us{" "}
-            </Link>
           </nav>
         </div>
 
