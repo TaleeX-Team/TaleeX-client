@@ -1,5 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { useJobs } from "@/features/jobs/useJobs.js";
+import { useTranslation } from 'react-i18next';
 import JobsHeaderWithFilters from "@/features/jobs/jobheaderandfilter.jsx";
 import {
   Card,
@@ -15,8 +16,10 @@ import { useUser } from "@/hooks/useUser.js";
 import React from "react";
 import { toast } from "sonner";
 import VerifyLayout from "@/components/ui/VerifyLayout";
+import LanguageToggle from "@/togglingButton";
 
 export default function JobsPage() {
+  const { t ,i18n } = useTranslation();
   const { jobsQuery, filteredJobsQuery, setFilter, clearFilters, hasFilters } =
     useJobs();
   const { data: user } = useUser();
@@ -48,6 +51,7 @@ export default function JobsPage() {
         </div>
       );
     }
+    // console.log(i18n.language);
 
     // Error state
     if (isError) {
@@ -57,14 +61,13 @@ export default function JobsPage() {
             <AlertCircle className="h-9 w-9 text-destructive" />
           </div>
           <h3 className="text-xl font-semibold text-destructive mb-2">
-            Error loading jobs
+          {t('jobs.error.title')}
           </h3>
           <p className="text-muted-foreground mb-8 max-w-xs">
-            There was an error fetching job listings. Please try again or
-            contact support.
+          {t('jobs.error.message')}
           </p>
           <Button variant="outline" className="mx-auto">
-            Retry
+          {t('common.retry')}
           </Button>
         </div>
       );
@@ -81,14 +84,14 @@ export default function JobsPage() {
       <div className="flex flex-col items-center justify-center py-16 px-4 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/50">
         <FileX className="h-12 w-12 text-gray-400 dark:text-gray-500 mb-4" />
         <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
-          No jobs found
+        {t('jobs.empty.title')}
         </h3>
         <p className="text-gray-500 dark:text-gray-400 text-center mb-4">
-          No jobs match your current filter criteria
+        {t('jobs.empty.message')}
         </p>
         {hasFilters && (
           <Button variant="outline" onClick={clearFilters} className="mt-2">
-            Clear all filters
+            {t('jobs.empty.clearFilters')}
           </Button>
         )}
       </div>
@@ -98,6 +101,7 @@ export default function JobsPage() {
   return (
     <div className="bg-background p-4 md:p-8 min-h-screen">
       <div className="mx-auto max-w-7xl">
+      <LanguageToggle></LanguageToggle>
 
         {/* Always show the header regardless of verification status */}
         <JobsHeaderWithFilters
@@ -188,6 +192,8 @@ function JobCardSkeleton() {
           }
         }
       `}</style>
+     
     </Card>
+    
   );
 }

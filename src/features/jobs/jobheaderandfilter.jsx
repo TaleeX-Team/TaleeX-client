@@ -1,5 +1,5 @@
 "use client";
-
+import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -99,6 +99,8 @@ export default function JobsHeaderWithFilters({
     }, 300),
     [onFilterChange]
   );
+  const { t } = useTranslation();
+
 
   useEffect(() => {
     const newActiveFilters = [];
@@ -273,9 +275,9 @@ export default function JobsHeaderWithFilters({
             <Briefcase className="h-8 w-8 text-primary" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">Jobs</h1>
+            <h1 className="text-3xl font-bold flex items-center gap-2">{t('jobs.header.title')}</h1>
             <p className="text-muted-foreground mt-1">
-              Manage your jobs directory
+            {t('jobs.header.description')}
             </p>
           </div>
         </div>
@@ -289,7 +291,7 @@ export default function JobsHeaderWithFilters({
           <div className="relative flex-1">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search jobs by title"
+              placeholder={t('jobs.filters.titlePlaceholder')}
               className="pl-10"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -300,14 +302,16 @@ export default function JobsHeaderWithFilters({
             onClick={() => setShowFilters(!showFilters)}
           >
             <Filter className="h-4 w-4 mr-2" />
-            {showFilters ? "Hide Filters" : "Show Filters"}
+            {showFilters ? t('jobs.filters.hide') : t('jobs.filters.show')}
           </Button>
           {showFilters && (
             <Button
               variant="outline"
               onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
             >
-              {showAdvancedFilters ? "Basic Filters" : "Advanced Filters"}
+             {showAdvancedFilters
+    ? t('jobs.filters.basic')
+    : t('jobs.filters.advanced')}
             </Button>
           )}
           {/* <Button>Search</Button> */}
@@ -321,7 +325,7 @@ export default function JobsHeaderWithFilters({
               <Building className="h-4 w-4 text-muted-foreground" />
               <Select value={workPlaceType} onValueChange={setWorkPlaceType}>
                 <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Workplace Type" />
+                  <SelectValue placeholder={t('jobs.filters.workplace')} />
                 </SelectTrigger>
                 <SelectContent>
                   {WORKPLACE_TYPES.map((type) => (
@@ -337,7 +341,7 @@ export default function JobsHeaderWithFilters({
               <BriefcaseBusiness className="h-4 w-4 text-muted-foreground" />
               <Select value={jobType} onValueChange={setJobType}>
                 <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Job Type" />
+                  <SelectValue placeholder={t('jobs.filters.jobType')} />
                 </SelectTrigger>
                 <SelectContent>
                   {JOB_TYPES.map((type) => (
@@ -361,7 +365,7 @@ export default function JobsHeaderWithFilters({
                 onValueChange={setExperienceLevel}
               >
                 <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Experience Level" />
+                  <SelectValue placeholder={t('jobs.filters.experience')} />
                 </SelectTrigger>
                 <SelectContent>
                   {EXPERIENCE_LEVELS.map((level) => (
@@ -376,7 +380,7 @@ export default function JobsHeaderWithFilters({
               <Briefcase className="h-4 w-4 text-muted-foreground" />
               <Select value={status} onValueChange={setStatus}>
                 <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Job Status" />
+                  <SelectValue placeholder={t('jobs.filters.status')} />
                 </SelectTrigger>
                 <SelectContent>
                   {JOB_STATUS.map((stat) => (
@@ -395,7 +399,7 @@ export default function JobsHeaderWithFilters({
                 <div className="space-y-2">
                   <label className="text-sm font-medium flex items-center">
                     <Tag className="h-4 w-4 mr-2" />
-                    Tags (Skills or Keywords)
+                    {t('jobs.filters.tags')}
                   </label>
                   <div className="flex flex-wrap gap-2 mb-2">
                     {selectedTags.map((tag) => (
@@ -418,7 +422,7 @@ export default function JobsHeaderWithFilters({
                   </div>
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Add a tag"
+                      placeholder={t('jobs.filters.addTag')}
                       value={tagInput}
                       onChange={(e) => setTagInput(e.target.value)}
                       onKeyDown={handleTagKeyDown}
@@ -446,18 +450,18 @@ export default function JobsHeaderWithFilters({
                   <div>
                     <label className="text-sm font-medium flex items-center mb-2">
                       <DollarSign className="h-4 w-4 mr-2" />
-                      Salary Range
+                      {t('jobs.filters.salaryRange')}
                     </label>
                     <div className="grid grid-cols-2 gap-4">
                       <Input
                         type="number"
-                        placeholder="Min Salary"
+                        placeholder={t('jobs.filters.minSalary')}
                         value={salaryMin}
                         onChange={(e) => setSalaryMin(e.target.value)}
                       />
                       <Input
                         type="number"
-                        placeholder="Max Salary"
+                        placeholder={t('jobs.filters.maxSalary')}
                         value={salaryMax}
                         onChange={(e) => setSalaryMax(e.target.value)}
                       />
@@ -468,7 +472,7 @@ export default function JobsHeaderWithFilters({
                     <div>
                       <label className="text-sm font-medium flex items-center mb-2">
                         <Calendar className="h-4 w-4 mr-2" />
-                        Posted After
+                       {t('jobs.filters.postedAfter')}
                       </label>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -480,7 +484,7 @@ export default function JobsHeaderWithFilters({
                               format(createdAtFrom, "PPP")
                             ) : (
                               <span className="text-muted-foreground">
-                                Pick a date
+                                {t('jobs.filters.pickDate')}
                               </span>
                             )}
                           </Button>
@@ -499,7 +503,7 @@ export default function JobsHeaderWithFilters({
                     <div>
                       <label className="text-sm font-medium flex items-center mb-2">
                         <Calendar className="h-4 w-4 mr-2" />
-                        Posted Before
+                        {t('jobs.filters.postedBefore')}
                       </label>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -511,7 +515,7 @@ export default function JobsHeaderWithFilters({
                               format(createdAtTo, "PPP")
                             ) : (
                               <span className="text-muted-foreground">
-                                Pick a date
+                                {t('jobs.filters.pickDate')}
                               </span>
                             )}
                           </Button>
@@ -538,7 +542,7 @@ export default function JobsHeaderWithFilters({
         <div className="mt-4">
           <div className="flex flex-wrap gap-2 items-center">
             <span className="text-sm text-muted-foreground">
-              Active filters:
+              {t('jobs.filters.active')}
             </span>
             {activeFilters.map((filter) => (
               <Badge
@@ -587,7 +591,7 @@ export default function JobsHeaderWithFilters({
               onClick={clearAllFilters}
               className="text-xs hover:bg-muted"
             >
-              Clear all
+              {t('jobs.common.clearAll')}
             </Button>
           </div>
         </div>
