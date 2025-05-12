@@ -24,6 +24,7 @@ import JobApplicationPage from "@/features/jobs/form/JobApplicationPage.jsx";
 import {InviteJob} from "@/features/jobs/inviteJob/InviteJob.jsx";
 import {StartScreen} from "@/components/interview/StartScreen.jsx";
 import VerifiedEmail from "@/features/auth/verified-email/VerifiedEmail.jsx";
+import LanguageSwitcher from "@/components/LanguageSwitcher.jsx";
 
 const RootRedirect = () => {
     const {isAuthenticated, isLoading} = useAuth();

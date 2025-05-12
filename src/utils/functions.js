@@ -16,3 +16,5 @@ export const formatJoinDate = (dateString) => {
     return "Unknown";
   }
 };
+
+export const getDirection = (lng) => (lng === 'ar' ? 'rtl' : 'ltr');
