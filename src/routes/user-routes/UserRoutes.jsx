@@ -21,6 +21,10 @@ import CVFeedbackPage from "@/features/feedback/cv-feedback";
 import BehavioralFeedbackPage from "@/features/feedback/behavioral-feedback";
 import TechnicalFeedbackPage from "@/features/feedback/final-feedback";
 import VerifiedEmail from "@/features/auth/verified-email/VerifiedEmail.jsx";
+import path from "path";
+import LandingPage from "@/features/landingPage/landingPage";
+import AboutPage from "@/features/aboutUs/aboutUs";
+import ContactPage from "@/features/contactUs/contactUs";
 
 const AppRedirect = () => {
   return <Navigate to="/app/companies" replace />;
@@ -61,6 +65,18 @@ const UserRoutes = {
     {
       path: "jobs/:id",
       element: <JobApplicationManager />,
+    },
+    ,{
+      path:"landing-page",
+      element:<LandingPage></LandingPage>
+    },
+    {
+      path:"about-us",
+      element:<AboutPage></AboutPage>
+    },
+    {
+      path:"contact-us",
+      element:<ContactPage></ContactPage>
     },
     //feedBack
     {
@@ -128,6 +144,7 @@ const UserRoutes = {
             </Suspense>
           ),
         },
+        
       ],
     },
   ],
