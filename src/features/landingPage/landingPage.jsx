@@ -684,7 +684,7 @@ export default function LandingPage() {
         </div>
       </section>
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <section className="py-16 bg-muted">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-6">
@@ -693,14 +693,14 @@ export default function LandingPage() {
             <div className="p-4 mb-8 inline-block">
               <div className="flex items-center justify-center">
                 <Coins className="h-6 w-6 mr-2 text-yellow-300" />
-                <span className="text-xl font-bold text-white">
+                <span className="text-xl font-bold ">
                   Join us now and get 1000 tokens for free!
                 </span>
               </div>
             </div>
             <br />
             <Link to="/">
-              <Button className="bg-muted text-foreground hover:bg-blue-50 text-lg py-6 px-8">
+              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-lg py-6 px-8">
                 Get Started Now
               </Button>
             </Link>
