@@ -28,7 +28,7 @@ export default function SubscriptionPage() {
   } = useTokens("USD");
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [tokenCount, setTokenCount] = useState(1);
+  const [tokenCount, setTokenCount] = useState(5000);
   const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
@@ -85,13 +85,13 @@ export default function SubscriptionPage() {
                   <div className="flex items-center justify-between">
                     <h3 className="text-xl">Tokens: {tokenCount}</h3>
                     <div className="flex items-center space-x-2">
-                      <Button onClick={handleDecrement} disabled={tokenCount <= 1}>-</Button>
+                      <Button onClick={handleDecrement} disabled={tokenCount <= 5000}>-</Button>
                       <input
                         type="number"
-                        min={1}
+                        min={5000}
                         value={tokenCount}
                         onChange={handleInputChange}
-                        className="w-12 border border-input rounded-md text-center text-base h-9 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                        className="w-30 border border-border bg-input rounded-md text-center text-base h-9 appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                         inputMode="numeric"
                       />
                       <Button onClick={handleIncrement}>+</Button>
@@ -137,7 +137,7 @@ export default function SubscriptionPage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
-                <span className="text-4xl font-bold text-primary">{tokenPrice}</span>
+                <span className="text-4xl font-bold text-primary">${tokenPrice}</span>
                 <span className="text-lg ml-2 text-muted-foreground">per token</span>
               </div>
             </CardContent>
@@ -206,7 +206,7 @@ export default function SubscriptionPage() {
       {/* How Tokens Work */}
       <div className="mt-16">
         <h2 className="text-2xl font-bold mb-6 text-center">How Tokens Work</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           {tokenFeatures?.map((feature) => (
             <Card key={feature._id}>
               <CardHeader className="pb-2">

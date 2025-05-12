@@ -51,9 +51,9 @@ const UserAvatar = () => {
         <Link to="settings">
           <DropdownMenuItem>Settings</DropdownMenuItem>
         </Link>
-        <Link to="/settings/billing">
+        {/* <Link to="/settings/billing">
           <DropdownMenuItem>Billing</DropdownMenuItem>
-        </Link>
+        </Link> */}
         <DropdownMenuItem
           onSelect={(e) => {
             e.preventDefault();

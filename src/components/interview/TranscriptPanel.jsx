@@ -66,30 +66,27 @@ export const TranscriptPanel = forwardRef(
     }, [isSpeaking]);
 
     return (
-      <div ref={ref} className="w-full border-t border-border h-auto mt-2">
+      <div ref={ref} className="w-full border-t border-border h-[200px] mt-2 overflow-y-auto">
         <div className="py-4 px-4 lg:px-0 flex items-center justify-center">
           {lastSpeakerTranscript.content ? (
             <div
               ref={messageRef}
-              className={`w-full lg:max-w-4/5 rounded-xl border shadow-md transition-all duration-300 ${
-                lastSpeakerTranscript.role === "assistant"
+              className={`w-full lg:max-w-4/5 rounded-xl border shadow-md transition-all duration-300 ${lastSpeakerTranscript.role === "assistant"
                   ? "bg-blue-50/80 dark:bg-blue-950/30 border-blue-200/70 dark:border-blue-800/40"
                   : "bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-200/70 dark:border-emerald-800/40"
-              }`}
+                }`}
             >
               <div
-                className={`flex items-center gap-2 p-3 border-b ${
-                  lastSpeakerTranscript.role === "assistant"
+                className={`flex items-center gap-2 p-3 border-b ${lastSpeakerTranscript.role === "assistant"
                     ? "border-blue-200/70 dark:border-blue-800/40 bg-blue-100/30 dark:bg-blue-900/20"
                     : "border-emerald-200/70 dark:border-emerald-800/40 bg-emerald-100/30 dark:bg-emerald-900/20"
-                } rounded-t-xl`}
+                  } rounded-t-xl`}
               >
                 <div
-                  className={`flex items-center justify-center rounded-full w-8 h-8 ${
-                    lastSpeakerTranscript.role === "assistant"
+                  className={`flex items-center justify-center rounded-full w-8 h-8 ${lastSpeakerTranscript.role === "assistant"
                       ? "bg-blue-500 dark:bg-blue-600"
                       : "bg-emerald-500 dark:bg-emerald-600"
-                  }`}
+                    }`}
                 >
                   {lastSpeakerTranscript.role === "assistant" ? (
                     <Bot className="h-4 w-4 text-white" />
@@ -108,25 +105,22 @@ export const TranscriptPanel = forwardRef(
                   lastSpeakingRole === lastSpeakerTranscript.role && (
                     <div className="speaking-indicator ml-2 flex gap-[3px] items-end h-3">
                       <span
-                        className={`speaking-dot block w-1 h-2 rounded-full ${
-                          lastSpeakerTranscript.role === "assistant"
+                        className={`speaking-dot block w-1 h-2 rounded-full ${lastSpeakerTranscript.role === "assistant"
                             ? "bg-blue-500 dark:bg-blue-400"
                             : "bg-emerald-500 dark:bg-emerald-400"
-                        }`}
+                          }`}
                       ></span>
                       <span
-                        className={`speaking-dot block w-1 h-3 rounded-full ${
-                          lastSpeakerTranscript.role === "assistant"
+                        className={`speaking-dot block w-1 h-3 rounded-full ${lastSpeakerTranscript.role === "assistant"
                             ? "bg-blue-500 dark:bg-blue-400"
                             : "bg-emerald-500 dark:bg-emerald-400"
-                        }`}
+                          }`}
                       ></span>
                       <span
-                        className={`speaking-dot block w-1 h-1 rounded-full ${
-                          lastSpeakerTranscript.role === "assistant"
+                        className={`speaking-dot block w-1 h-1 rounded-full ${lastSpeakerTranscript.role === "assistant"
                             ? "bg-blue-500 dark:bg-blue-400"
                             : "bg-emerald-500 dark:bg-emerald-400"
-                        }`}
+                          }`}
                       ></span>
                     </div>
                   )}
@@ -137,11 +131,10 @@ export const TranscriptPanel = forwardRef(
                   </span>
                   <Badge
                     variant="outline"
-                    className={`text-xs ${
-                      lastSpeakerTranscript.role === "assistant"
+                    className={`text-xs ${lastSpeakerTranscript.role === "assistant"
                         ? "bg-blue-100/50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-300"
                         : "bg-emerald-100/50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-300"
-                    }`}
+                      }`}
                   >
                     {lastSpeakerTranscript.role === "assistant" ? "AI" : "You"}
                   </Badge>
@@ -156,11 +149,10 @@ export const TranscriptPanel = forwardRef(
                 {isSpeaking &&
                   lastSpeakingRole === lastSpeakerTranscript.role && (
                     <div
-                      className={`mt-3 text-xs font-medium flex items-center gap-1.5 ${
-                        lastSpeakerTranscript.role === "assistant"
+                      className={`mt-3 text-xs font-medium flex items-center gap-1.5 ${lastSpeakerTranscript.role === "assistant"
                           ? "text-blue-600 dark:text-blue-400"
                           : "text-emerald-600 dark:text-emerald-400"
-                      }`}
+                        }`}
                     >
                       <Mic className="h-3 w-3 animate-pulse" />
                       Speaking...
