@@ -52,7 +52,7 @@ export default function LandingPage() {
       description:
         "Organize and manage all your companies in one place with detailed profiles and tracking.",
       icon: Building2,
-      color: "primary",
+      color: "blue",
     },
     {
       id: 1,
@@ -60,7 +60,7 @@ export default function LandingPage() {
       description:
         "Post and manage job openings with ease. Track applications and manage your hiring pipeline efficiently.",
       icon: Briefcase,
-      color: "primary",
+      color: "green",
     },
     {
       id: 2,
@@ -68,7 +68,7 @@ export default function LandingPage() {
       description:
         "Streamline your candidate management process. Organize profiles, schedule interviews, and collaborate with teams.",
       icon: Users,
-      color: "primary",
+      color: "amber",
     },
     {
       id: 3,
@@ -76,7 +76,7 @@ export default function LandingPage() {
       description:
         "Streamline your candidate management process. Organize profiles, schedule interviews, and collaborate with teams.",
       icon: Bot,
-      color: "primary",
+      color: "red",
     },
   ];
 
@@ -163,7 +163,7 @@ export default function LandingPage() {
               Pricing
             </button>
             <Link to={"/auth"}>
-              <Button>Get Started</Button>
+              <Button className=" bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700">Get Started</Button>
             </Link>
           </nav>
 
@@ -213,7 +213,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-10 md:mb-0">
-              <div className="inline-block mb-4 px-3 py-1 bg-primary/10 rounded-full">
+              <div className="inline-block mb-4 px-3 py-1  bg-blue-100 rounded-full">
                 <span className="text-sm text-primary font-medium flex items-center">
                   <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
                   Discover TaleeX
@@ -222,14 +222,14 @@ export default function LandingPage() {
 
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
                 Streamline Your{" "}
-                <span className="text-primary">Recruitment</span> Process
+                <span className=" font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Recruitment</span> Process
               </h1>
               <p className="text-xl text-muted-foreground mb-8 max-w-lg">
                 Manage companies and jobs in one powerful platform designed for
                 modern recruitment teams.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="text-lg">
+                <Button size="lg" className=" bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700">
                   Get Started
                 </Button>
                 <Button
@@ -262,7 +262,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-8">
-              <div className="inline-block mb-4 px-3 py-1 bg-primary/10 rounded-full">
+              <div className="inline-block mb-4 px-3 py-1  bg-blue-100 rounded-full">
                 <span className="text-sm text-primary font-medium">Demo</span>
               </div>
               <h2 className="text-3xl font-bold mb-4">See TaleeX in Action</h2>
@@ -303,7 +303,7 @@ export default function LandingPage() {
       <section id="products" className="py-16 bg-muted">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <div className="inline-block mb-4 px-3 py-1 bg-primary/10 rounded-full">
+            <div className="inline-block mb-4 px-3 py-1  bg-blue-100 rounded-full">
               <span className="text-sm text-primary font-medium">Products</span>
             </div>
             <h2 className="text-3xl font-bold mb-4">
@@ -330,9 +330,9 @@ export default function LandingPage() {
                   >
                     <div className="flex p-4">
                       <div
-                        className={`w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors mr-4`}
+                        className={`w-12 h-12 rounded-lg  bg-blue-100 flex items-center justify-center group-hover:bg-primary/20 transition-colors mr-4`}
                       >
-                        <card.icon className={`h-6 w-6 text-primary`} />
+                         <card.icon className={`h-6 w-6 text-${card.color}-600`} />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
@@ -471,7 +471,7 @@ export default function LandingPage() {
       <section id="how-it-works" className="py-16 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <div className="inline-block mb-4 px-3 py-1 bg-primary/10 rounded-full">
+            <div className="inline-block mb-4 px-3 py-1  bg-blue-100 rounded-full">
               <span className="text-sm text-primary font-medium">
                 How It Works
               </span>
@@ -486,7 +486,7 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="bg-card p-6 rounded-xl shadow-md text-center border border-border hover:shadow-lg transition-shadow">
-              <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+              <div className="w-16 h-16 rounded-full  bg-blue-100 text-primary flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                 1
               </div>
               <h3 className="text-xl font-semibold mb-2">
@@ -498,7 +498,7 @@ export default function LandingPage() {
             </div>
 
             <div className="bg-card p-6 rounded-xl shadow-md text-center border border-border hover:shadow-lg transition-shadow">
-              <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+              <div className="w-16 h-16 rounded-full  bg-blue-100 text-primary flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                 2
               </div>
               <h3 className="text-xl font-semibold mb-2">Add Companies</h3>
@@ -508,7 +508,7 @@ export default function LandingPage() {
             </div>
 
             <div className="bg-card p-6 rounded-xl shadow-md text-center border border-border hover:shadow-lg transition-shadow">
-              <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+              <div className="w-16 h-16 rounded-full  bg-blue-100 text-primary flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                 3
               </div>
               <h3 className="text-xl font-semibold mb-2">Post Jobs</h3>
@@ -524,7 +524,7 @@ export default function LandingPage() {
       <section id="pricing" className="py-16 bg-muted">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <div className="inline-block mb-4 px-3 py-1 bg-primary/10 rounded-full">
+            <div className="inline-block mb-4 px-3 py-1  bg-blue-100 rounded-full">
               <span className="text-sm text-primary font-medium">Pricing</span>
             </div>
             <h2 className="text-3xl font-bold mb-4">
@@ -541,7 +541,7 @@ export default function LandingPage() {
               <div className="mt-4 mb-2">
                 <span className="text-3xl font-bold">$9.99</span>
               </div>
-              <div className="bg-primary/10 p-3 rounded-md text-center mx-4 my-5">
+              <div className=" bg-blue-100 p-3 rounded-md text-center mx-4 my-5">
                 <div className="flex items-center justify-center">
                   <span className="text-2xl font-bold text-primary">10000</span>
                   <Coins className="h-5 w-5 ml-2 text-primary" />
@@ -575,7 +575,7 @@ export default function LandingPage() {
               <div className="mt-4 mb-2">
                 <span className="text-3xl font-bold">$19.99</span>
               </div>
-              <div className="bg-primary/10 p-3 rounded-md text-center mx-4 my-5">
+              <div className=" bg-blue-100 p-3 rounded-md text-center mx-4 my-5">
                 <div className="flex items-center justify-center">
                   <span className="text-2xl font-bold text-primary">25000</span>
                   <Coins className="h-5 w-5 ml-2 text-primary" />
@@ -603,7 +603,7 @@ export default function LandingPage() {
               <div className="mt-4 mb-2">
                 <span className="text-3xl font-bold">$29.99</span>
               </div>
-              <div className="bg-primary/10 p-3 rounded-md text-center mx-4 my-5">
+              <div className=" bg-blue-100 p-3 rounded-md text-center mx-4 my-5">
                 <div className="flex items-center justify-center">
                   <span className="text-2xl font-bold text-primary">40000</span>
                   <Coins className="h-5 w-5 ml-2 text-primary" />
@@ -644,7 +644,7 @@ export default function LandingPage() {
               <div className="bg-card p-4 rounded-xl border border-border shadow-md">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-semibold">CV Review</h3>
-                  <div className="bg-primary/10 text-primary px-2 py-1 rounded flex items-center">
+                  <div className=" bg-blue-100 text-primary px-2 py-1 rounded flex items-center">
                     <span className="text-sm font-medium mr-1">40</span>
                     <Coins className="h-4 w-4" />
                   </div>
@@ -657,7 +657,7 @@ export default function LandingPage() {
               <div className="bg-card p-4 rounded-xl border border-border shadow-md">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-semibold">Final Evaluation</h3>
-                  <div className="bg-primary/10 text-primary px-2 py-1 rounded flex items-center">
+                  <div className=" bg-blue-100 text-primary px-2 py-1 rounded flex items-center">
                     <span className="text-sm font-medium mr-1">60</span>
                     <Coins className="h-4 w-4" />
                   </div>
@@ -670,7 +670,7 @@ export default function LandingPage() {
               <div className="bg-card p-4 rounded-xl border border-border shadow-md">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-semibold">AI Interview</h3>
-                  <div className="bg-primary/10 text-primary px-2 py-1 rounded flex items-center">
+                  <div className=" bg-blue-100 text-primary px-2 py-1 rounded flex items-center">
                     <span className="text-sm font-medium mr-1">100</span>
                     <Coins className="h-4 w-4" />
                   </div>
@@ -700,7 +700,7 @@ export default function LandingPage() {
             </div>
             <br />
             <Link to="/">
-              <Button className="bg-white text-blue-600 hover:bg-blue-50 text-lg py-6 px-8">
+              <Button className="bg-muted text-foreground hover:bg-blue-50 text-lg py-6 px-8">
                 Get Started Now
               </Button>
             </Link>
@@ -709,7 +709,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-white py-12 border-t border-gray-100">
+      <footer className="bg-background py-12 ">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center mb-8">
             <div className="flex items-center mb-4 md:mb-0">
@@ -767,7 +767,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-gray-100 text-center text-sm text-gray-500">
+          <div className="mt-8 pt-8  text-center text-sm text-gray-500">
             © {new Date().getFullYear()} TaleeX. All rights reserved.
           </div>
         </div>
