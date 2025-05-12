@@ -1,7 +1,7 @@
 "use client"
 
-import {useState, useEffect, useRef, useCallback} from "react"
-import {useNavigate} from "react-router-dom"
+import { useState, useEffect, useRef, useCallback } from "react"
+import { useNavigate } from "react-router-dom"
 import Vapi from "@vapi-ai/web"
 
 const CallStatus = {
@@ -346,7 +346,7 @@ export function useInterviewState(questions, interviewId) {
                     })
                 }
 
-                setMessages((prev) => [...prev, {...message, content: messageContent}])
+                setMessages((prev) => [...prev, { ...message, content: messageContent }])
                 if (message.role === "assistant" || message.role === "user") {
                     setLastSpeakerTranscript({
                         role: message.role,
@@ -440,7 +440,7 @@ export function useInterviewState(questions, interviewId) {
                     console.log("Question state updated:", {
                         newQuestionIndex: newIndex,
                         question: questions[newIndex],
-                        progress: {current: newIndex + 1, total: questions.length},
+                        progress: { current: newIndex + 1, total: questions.length },
                         timestamp: new Date().toISOString(),
                     })
                 }
@@ -943,7 +943,7 @@ export function useInterviewState(questions, interviewId) {
 
             const interviewer = {
                 name: "AI Technical Interviewer",
-                firstMessage: `Hello! I'm TaleX AI, your interviewer today. I'll be asking you ${questions.length} technical questions to assess your skills. The interview will last up to ${INTERVIEW_DURATION_MINUTES} minutes. Are you ready?!`,
+                firstMessage: `Hello! I'm TaleeX AI, your interviewer today. I'll be asking you some questions to assess your skills. The interview will last up to ${INTERVIEW_DURATION_MINUTES} minutes. Are you ready?!`,
                 transcriber: {
                     provider: "deepgram",
                     model: "nova-2",
@@ -1063,7 +1063,7 @@ Notes:
     // Handle start interview
     const handleStartInterview = async () => {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({audio: true})
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
             stream.getTracks().forEach((track) => track.stop())
             if (debugMode)
                 console.log("Microphone permission granted", {
@@ -1083,7 +1083,7 @@ Notes:
         setScreenshots([])
         setScreenshotTimes([])
         setCallId(null)
-        setProgress({current: 1, total: questions.length})
+        setProgress({ current: 1, total: questions.length })
         setTimeRemaining(INTERVIEW_DURATION_MINUTES * 60)
         setTimerWarningGiven(false)
         setFinalWarningGiven(false)
@@ -1102,7 +1102,7 @@ Notes:
         )
 
         await startVAPICall()
-        if (debugMode) console.log("Interview started", {timestamp: new Date().toISOString()})
+        if (debugMode) console.log("Interview started", { timestamp: new Date().toISOString() })
     }
 
     // Handle end interview
@@ -1186,7 +1186,7 @@ Notes:
     // Toggle transcript visibility
     const toggleTranscript = () => {
         if (showTranscript && transcriptContainerRef.current) {
-            import("gsap").then(({gsap}) => {
+            import("gsap").then(({ gsap }) => {
                 gsap.to(transcriptContainerRef.current, {
                     opacity: 0,
                     duration: 0.3,
@@ -1235,7 +1235,7 @@ Notes:
                 })
             } else {
                 navigator.mediaDevices
-                    .getUserMedia({audio: true})
+                    .getUserMedia({ audio: true })
                     .then((stream) => {
                         const audioTracks = stream.getAudioTracks()
                         if (audioTracks && audioTracks.length > 0) {
@@ -1492,7 +1492,7 @@ Notes:
         setCurrentQuestionIndex(0)
         setDisplayedQuestion(questions[0] || "")
         setCallId(null)
-        setProgress({current: 1, total: questions.length})
+        setProgress({ current: 1, total: questions.length })
         if (debugMode)
             console.log("Question states reset", {
                 timestamp: new Date().toISOString(),
@@ -1528,7 +1528,7 @@ Notes:
             })
             setCurrentQuestionIndex(questionIndex)
             setDisplayedQuestion(questions[questionIndex])
-            setProgress({current: questionIndex + 1, total: questions.length})
+            setProgress({ current: questionIndex + 1, total: questions.length })
 
             if (vapiClientRef.current) {
                 vapiClientRef.current.send({

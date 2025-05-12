@@ -70,8 +70,8 @@ export function InterviewCompletedDialog({
         transcript && typeof transcript === "object" && transcript.plainText
           ? transcript.plainText
           : typeof transcript === "string"
-          ? transcript
-          : "";
+            ? transcript
+            : "";
 
       await mutateAsync({
         interviewId,
@@ -114,13 +114,13 @@ export function InterviewCompletedDialog({
           </DialogTitle>
           <DialogDescription className="text-center text-base">
             {isSubmitted
-              ? "Your interview data has been processed and saved."
-              : "Thank you for completing your interview."}
+              ? ""
+              : "This interview has already been completed and cannot be retaken. If you don't submit your data now, it will be permanently lost"}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-8 flex justify-center">
-          {isSubmitted ? (
+        {isSubmitted && (
+          <div className="py-8 flex justify-center">
             <div className="flex flex-col items-center justify-center space-y-4">
               <div className="rounded-full bg-green-100 dark:bg-green-900 p-4">
                 <CheckCircle className="h-12 w-12 text-green-600 dark:text-green-400" />
@@ -129,17 +129,17 @@ export function InterviewCompletedDialog({
                 Your submission was successful
               </p>
             </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <div className="rounded-full bg-blue-100 dark:bg-blue-900 p-4">
-                <CheckCircle className="h-12 w-12 text-blue-600 dark:text-blue-400" />
-              </div>
-              <p className="text-center text-lg font-medium">
-                Ready to submit your interview
-              </p>
-            </div>
-          )}
-        </div>
+          </div>
+          // ) : (
+          //   <div className="flex flex-col items-center justify-center space-y-4">
+          //     <div className="rounded-full bg-blue-100 dark:bg-blue-900 p-4">
+          //       <CheckCircle className="h-12 w-12 text-blue-600 dark:text-blue-400" />
+          //     </div>
+          //     <p className="text-center text-lg font-medium">
+          //       Ready to submit your interview
+          //     </p>
+          //   </div>
+        )}
 
         <DialogFooter className="flex-col sm:flex-row gap-3 pt-2">
           {isError && (
@@ -179,7 +179,7 @@ export function InterviewCompletedDialog({
               size="lg"
               variant="default"
             >
-              Return to Dashboard
+              Done
             </Button>
           )}
         </DialogFooter>

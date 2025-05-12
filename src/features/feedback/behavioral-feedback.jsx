@@ -271,11 +271,10 @@ export default function BehavioralFeedbackPage({
                               <>
                                 <div className="flex">
                                   <div
-                                    className={`w-1/4 pr-4 uppercase font-bold text-sm ${
-                                      isAI
-                                        ? "text-blue-600 dark:text-blue-400"
-                                        : "text-green-600 dark:text-green-400"
-                                    }`}
+                                    className={`w-1/4 pr-4 uppercase font-bold text-sm ${isAI
+                                      ? "text-blue-600 dark:text-blue-400"
+                                      : "text-green-600 dark:text-green-400"
+                                      }`}
                                   >
                                     {entry.speaker}
                                   </div>
@@ -408,11 +407,10 @@ function RecommendationCard({ recommendation }) {
       <CardContent>
         <div className="flex items-center gap-3 mb-3">
           <h3
-            className={`text-xl ${
-              isRecommended
-                ? "text-green-700 dark:text-gray-200 font-semibold"
-                : "text-red-700 dark:text-gray-200"
-            }`}
+            className={`text-xl ${isRecommended
+              ? "text-green-700 dark:text-gray-200 font-semibold"
+              : "text-red-700 dark:text-gray-200"
+              }`}
           >
             {isRecommended ? "" : "Verdict"}
             {isRecommended ? "Recommended for Hire" : ""}
@@ -448,7 +446,7 @@ function RecommendationCard({ recommendation }) {
             {recommendation.reasoning}
           </p>
           {!isRecommended && (
-            <div className="mt-4 p-3 bg-white dark:bg-gray-800 rounded-md border border-red-100 dark:border-red-900/50">
+            <div className="mt-4 p-3 bg-white dark:bg-input/10 rounded-md border border-red-100 dark:border-red-900/50">
               <h4 className="text-sm font-medium mb-1">Considerations</h4>
               <p className="text-sm text-muted-foreground">
                 Consider additional behavioral training or mentorship before

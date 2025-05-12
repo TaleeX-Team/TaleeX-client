@@ -89,9 +89,8 @@ export function StartScreen() {
         } else if (diffHours > 0) {
           timeLeftStr += `${diffHours} hour${diffHours > 1 ? "s" : ""}`;
           if (diffMinutes > 0) {
-            timeLeftStr += ` ${diffMinutes} minute${
-              diffMinutes > 1 ? "s" : ""
-            }`;
+            timeLeftStr += ` ${diffMinutes} minute${diffMinutes > 1 ? "s" : ""
+              }`;
           }
         } else {
           timeLeftStr += `${diffMinutes} minute${diffMinutes !== 1 ? "s" : ""}`;
@@ -203,11 +202,10 @@ export function StartScreen() {
               <div className="space-y-6">
                 {/* Status */}
                 <div
-                  className={`rounded-md p-3 border  ${
-                    isExpired
+                  className={`rounded-md p-3 border  ${isExpired
                       ? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700/30"
                       : "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700/30"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center">
                     {isExpired ? (
@@ -351,11 +349,10 @@ export function StartScreen() {
                     variant={isAudioOn ? "default" : "outline"}
                     size="sm"
                     onClick={() => setIsAudioOn(!isAudioOn)}
-                    className={`transition-all duration-200 ${
-                      isAudioOn
+                    className={`transition-all duration-200 ${isAudioOn
                         ? "bg-blue-500 hover:bg-blue-600 dark:bg-primary/50 dark:hover:bg-primary/30 text-white"
                         : "text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600"
-                    }`}
+                      }`}
                   >
                     {isAudioOn ? "Enabled" : "Disabled"}
                   </Button>
@@ -369,7 +366,7 @@ export function StartScreen() {
                   <span className="text-sm font-medium bg-blue-100 dark:bg-primary/50 text-blue-800 dark:text-white px-3 py-1 rounded-full">
                     ~
                     {interviewHeaderData
-                      ? Math.round(interviewHeaderData.questionCount * 2.5)
+                      ? Math.round(interviewHeaderData.questionCount * 3)
                       : 30}{" "}
                     mins
                   </span>
