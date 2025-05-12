@@ -66,31 +66,7 @@ const UserRoutes = {
       path: "jobs/:id",
       element: <JobApplicationManager />,
     },
-    ,{
-      path:"landing-page",
-      element:<LandingPage></LandingPage>
-    },
-    {
-      path:"about-us",
-      element:<AboutPage></AboutPage>
-    },
-    {
-      path:"contact-us",
-      element:<ContactPage></ContactPage>
-    },
-    //feedBack
-    {
-      path: "cv-feedback",
-      element: <CVFeedbackPage />,
-    },
-    {
-      path: "behavioral-feedback",
-      element: <BehavioralFeedbackPage />,
-    },
-    {
-      path: "Final-feedback",
-      element: <TechnicalFeedbackPage />,
-    },
+
     {
       path: "verify-email/:verificationToken",
       element: (
@@ -144,7 +120,6 @@ const UserRoutes = {
             </Suspense>
           ),
         },
-        
       ],
     },
   ],
