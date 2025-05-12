@@ -163,7 +163,9 @@ export default function LandingPage() {
               Pricing
             </button>
             <Link to={"/auth"}>
-              <Button className=" bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700">Get Started</Button>
+              <Button className=" bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700">
+                Get Started
+              </Button>
             </Link>
           </nav>
 
@@ -202,7 +204,9 @@ export default function LandingPage() {
               >
                 Pricing
               </button>
-              <Button className="w-full">Get Started</Button>
+              <Link to={"/auth"}>
+                <Button className="w-full">Get Started</Button>
+              </Link>
             </nav>
           </div>
         )}
@@ -222,14 +226,20 @@ export default function LandingPage() {
 
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
                 Streamline Your{" "}
-                <span className=" font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Recruitment</span> Process
+                <span className=" font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  Recruitment
+                </span>{" "}
+                Process
               </h1>
               <p className="text-xl text-muted-foreground mb-8 max-w-lg">
                 Manage companies and jobs in one powerful platform designed for
                 modern recruitment teams.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className=" bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700">
+                <Button
+                  size="lg"
+                  className=" bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700"
+                >
                   Get Started
                 </Button>
                 <Button
@@ -332,7 +342,9 @@ export default function LandingPage() {
                       <div
                         className={`w-12 h-12 rounded-lg  bg-blue-100 flex items-center justify-center group-hover:bg-primary/20 transition-colors mr-4`}
                       >
-                         <card.icon className={`h-6 w-6 text-${card.color}-600`} />
+                        <card.icon
+                          className={`h-6 w-6 text-${card.color}-600`}
+                        />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
