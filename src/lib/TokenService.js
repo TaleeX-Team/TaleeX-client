@@ -84,9 +84,9 @@ const TokenService = {
       if (rt) TokenService.setRefreshToken(rt);
 
       // optional user info
-      if (hp !== null)
-        Cookies.set("hasPassword", hp, { sameSite: "none", secure: true });
-      if (uid) Cookies.set("userId", uid, { sameSite: "none", secure: true });
+      if (hp !== null) localStorage.setItem("hasPassword", hp);
+
+      if (uid) localStorage.setItem("userId", uid);
 
       // clear the URL fragment so tokens aren’t visible
       window.history.replaceState(null, "", window.location.pathname);

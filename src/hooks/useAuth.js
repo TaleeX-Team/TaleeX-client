@@ -74,6 +74,9 @@ export const useAuth = () => {
       }
       if (data.user) {
         queryClient.setQueryData(["user"], data.user);
+        localStorage.setItem("userId", data.user.id);
+        localStorage.setItem("hasPassword", data.user.hasPassword);
+
         Cookies.set("userId", data.user.id);
         Cookies.set("hasPassword", data.user.hasPassword);
       } else {
@@ -95,6 +98,8 @@ export const useAuth = () => {
       }
       if (data.user) {
         queryClient.setQueryData(["user"], data.user);
+        localStorage.setItem("userId", data.user.id);
+        localStorage.setItem("hasPassword", data.user.hasPassword);
         Cookies.set("userId", data.user.id);
         Cookies.set("hasPassword", data.user.hasPassword);
       } else {
@@ -113,6 +118,8 @@ export const useAuth = () => {
       queryClient.removeQueries({ queryKey: ["userId"] });
       queryClient.invalidateQueries({ queryKey: ["companies"] });
       queryClient.invalidateQueries({ queryKey: ["jobs"] });
+      localStorage.setItem("userId");
+      localStorage.setItem("hasPassword");
       Cookies.remove("hasPassword");
       Cookies.remove("userId");
     },
@@ -120,6 +127,7 @@ export const useAuth = () => {
       TokenService.clearTokens();
       queryClient.removeQueries({ queryKey: ["user"] });
       localStorage.removeItem("userId");
+      localStorage.removeItem("hasPassword");
     },
   });
 
@@ -135,6 +143,8 @@ export const useAuth = () => {
       }
       if (data.user) {
         queryClient.setQueryData(["user"], data.user);
+        localStorage.setItem("userId", data.user.id);
+        localStorage.setItem("hasPassword", data.user.hasPassword);
         Cookies.set("userId", data.user.id);
         Cookies.set("hasPassword", data.user.hasPassword);
       } else {

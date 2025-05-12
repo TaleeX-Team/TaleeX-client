@@ -15,12 +15,12 @@ export const useUser = () => {
       if (cached) return cached;
 
       // Get userId from localStorage
-      const userId = Cookies.get("userId")
+      let userId = Cookies.get("userId");
 
       if (!userId) {
-        throw new Error("No user ID found");
+        userId = localStorage.getItem("userId");
       }
-      console.log(userId);
+
       // Fetch user data from API
       const userData = await getUserById(userId);
       return userData;
