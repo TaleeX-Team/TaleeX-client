@@ -530,6 +530,7 @@ export default function JobApplicationManager() {
               onSearchChange={setSearchQuery}
               toggleSelectAll={toggleSelectAll}
               toggleSelectApplicant={toggleSelectApplicant}
+              setSelectedApplicants={setSelectedApplicants}
             />
           )}
         </div>

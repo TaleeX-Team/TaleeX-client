@@ -140,3 +140,29 @@ export const moveToFinalFeedback = async (applicationIds) => {
     throw error;
   }
 };
+export const inviteToJob = async (jobId, applicationIds, newJobId) => {
+  try {
+    console.log("Inviting applciants to new job ", {
+      jobId,
+      applicationIds,
+      newJobId,
+    });
+    const response = await apiClient.post(
+      `/jobs/${jobId}/applications/invite`,
+      { applicationIds, newJobId },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("Applications Invited successfully:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Failed to advance applications:",
+      error?.response?.data?.message
+    );
+    throw error;
+  }
+};

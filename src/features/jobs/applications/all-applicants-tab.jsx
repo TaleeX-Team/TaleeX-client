@@ -36,6 +36,9 @@ import {
 import { useJobs } from "../useJobs";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { inviteToJob } from "@/services/apiApplications";
 
 export function AllApplicantsTab({
   filteredApplicants,
@@ -44,19 +47,55 @@ export function AllApplicantsTab({
   onSearchChange,
   toggleSelectAll,
   toggleSelectApplicant,
+  setSelectedApplicants,
 }) {
   // Static job list for the dropdown
   const [selectedJob, setSelectedJob] = useState();
-  const jobOptions = [
-    { id: "1", title: "Software Engineer" },
-    { id: "2", title: "Product Manager" },
-    { id: "3", title: "Data Scientist" },
-    { id: "4", title: "UX Designer" },
-  ];
+  const queryClient = useQueryClient();
   const { id } = useParams();
   const { jobsQuery } = useJobs();
-  const jobs = jobsQuery.data.jobs.filter((job) => job._id !== id);
-  console.log(selectedJob);
+
+  const jobs = jobsQuery.data.jobs
+    .filter((job) => job._id !== id)
+    .filter((job) => job.status === "open" && job?.company);
+  const inviteToJobMutation = useMutation({
+    mutationFn: ({ jobId, applicationIds, newJobId }) =>
+      inviteToJob(jobId, applicationIds, newJobId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
+
+      toast(
+        `${selectedApplicants.length} ${
+          selectedApplicants.length === 1 ? "applicant" : "applicants"
+        } sent to CV Review`,
+        {
+          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
+            selectedApplicants.length === 1 ? "has" : "have"
+          } been sent a job invitation `,
+          style: {
+            backgroundColor: "#195f32",
+            color: "white",
+          },
+        }
+      );
+      setSelectedApplicants([]);
+    },
+    onError: (err) => {
+      console.error("Failed to invite applicants to the job :", err.message);
+      toast.error("Failed to invite applicants to the job", {
+        description: "Please try again later.",
+      });
+    },
+  });
+  const inviteToJobFunction = () => {
+    if (selectedApplicants.length === 0) return;
+    inviteToJobMutation.mutate({
+      jobId: id,
+      applicationIds: selectedApplicants.map((a) => a.id),
+      newJobId: selectedJob,
+    });
+  };
+
   return (
     <div>
       {/* Search and Invite Button */}
@@ -131,7 +170,9 @@ export function AllApplicantsTab({
               </div>
             )}
             <DialogFooter>
-              <Button type="submit">Invite</Button>
+              <Button onClick={inviteToJobFunction} type="submit">
+                Invite
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
