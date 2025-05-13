@@ -101,7 +101,6 @@ export default function JobsPage() {
   return (
     <div className="bg-background p-4 md:p-8 min-h-screen">
       <div className="mx-auto max-w-7xl">
-      <LanguageToggle></LanguageToggle>
 
         {/* Always show the header regardless of verification status */}
         <JobsHeaderWithFilters

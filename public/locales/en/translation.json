@@ -25,6 +25,18 @@
       "active": "Active filters:",
       "salaryRange": "Salary Range"
     },
+    
+    "time": {
+      "recently": "Recently",
+      "days": "{{count}} day(s) ago",
+      "hours": "{{count}} hour(s) ago",
+      "minutes": "{{count}} minute(s) ago"
+    },
+    
+
+    "verifiedCompany": "Verified Company",
+    "viewDetails": "View Details",
+
     "error": {
       "title": "Error loading jobs",
       "message": "There was an error fetching job listings. Please try again or contact support."
@@ -35,7 +47,9 @@
       "clearFilters": "Clear all filters"
     },
     "common": {
-    "clearAll": "Clear all"
+    "clearAll": "Clear all",
+    "edit": "Edit"
+
   }
   }
     
