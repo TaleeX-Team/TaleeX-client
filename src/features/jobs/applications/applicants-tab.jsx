@@ -82,7 +82,7 @@ export default function JobApplicationManager() {
     onError: (err) => {
       console.error("Failed to advance applicants to CV review :", err.message);
       toast.error("Failed to advance applicants to CV review", {
-        description: "Please try again later.",
+        description: `${err?.response?.data?.message}`,
       });
     },
   });
@@ -124,7 +124,7 @@ export default function JobApplicationManager() {
     onError: (err) => {
       console.error("Failed to send video interview", err.message);
       toast.error("Failed to send to video interview", {
-        description: "Please try again later.",
+        description: `${err?.response?.data?.message}`,
       });
     },
   });
@@ -158,7 +158,7 @@ export default function JobApplicationManager() {
     onError: (err) => {
       console.error("Failed to reject applications:", err.message);
       toast.error("Failed to reject applications", {
-        description: "Please try again later.",
+        description: `${err?.response?.data?.message}`,
       });
     },
   });
@@ -190,7 +190,7 @@ export default function JobApplicationManager() {
         err.message
       );
       toast.error("Failed to move applications to final feedback", {
-        description: "Please try again later.",
+        description: `${err?.response?.data?.message}`,
       });
     },
   });
