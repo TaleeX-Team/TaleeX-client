@@ -134,7 +134,7 @@ export function RejectedApplicantsTab({
                     </div>
                   </td>
                   <td className="py-3 px-4 dark:text-gray-300">
-                    {applicant.applied}
+                    {applicant?.applied}
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex gap-2">

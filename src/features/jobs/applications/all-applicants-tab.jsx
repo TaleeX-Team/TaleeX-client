@@ -85,7 +85,7 @@ export function AllApplicantsTab({
     onError: (err) => {
       console.error("Failed to invite applicants to the job:", err.message);
       toast.error("Failed to invite applicants to the job", {
-        description: "Please try again later.",
+        description: `${err?.response?.data?.message}`,
       });
     },
   });
