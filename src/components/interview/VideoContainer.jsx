@@ -1,571 +1,534 @@
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef, useEffect, useState, ForwardedRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  User,
+  UserRound,
   MicOff,
   Bot,
-  Camera,
   Volume2,
   Sun,
   Moon,
-  BriefcaseMedical,
+  Video,
+  VideoOff,
+  MessageCircle,
+  Clock,
+  Activity,
+  CheckCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import SplineComponent from "@/components/interview/3dLoading";
 import Webcam from "react-webcam";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Progress } from "@/components/ui/progress";
 import { useTheme } from "@/layouts/theme_provider/ThemeProvider";
 
+
 export const VideoContainer = forwardRef(
-  (
-    {
-      isUser,
-      videoRef,
-      isVideoOn,
-      isAudioOn,
-      isAITalking,
-      isUserTalking,
-      transcript,
-      callStatus,
-      lastCapturedScreenshot,
-      screenshotCount,
-      onThemeToggle,
-      sessionDuration = 0,
-      interviewProgress = 0,
-    },
-    ref
-  ) => {
-    const [showScreenshotEffect, setShowScreenshotEffect] = useState(false);
-    const [audioLevel, setAudioLevel] = useState(0);
-    const { theme } = useTheme();
-    const isDarkMode = theme === "dark";
+    (
+        {
+          isUser,
+          videoRef,
+          isVideoOn,
+          isAudioOn,
+          isAITalking,
+          isUserTalking,
+          transcript,
+          callStatus,
+          lastCapturedScreenshot,
+          screenshotCount,
+          onThemeToggle,
+          sessionDuration = 0,
+          interviewProgress = 0,
+        },
+        ref
+    ) => {
+      const [showScreenshotEffect, setShowScreenshotEffect] = useState(false);
+      const [audioLevel, setAudioLevel] = useState(0);
+      const { theme } = useTheme();
+      const isDarkMode = theme === "dark";
 
-    // Determine speaking state
-    const isSpeaking = isUser ? isUserTalking : isAITalking;
+      // Determine speaking state
+      const isSpeaking = isUser ? isUserTalking : isAITalking;
 
-    // Enhanced colors using Tailwind's color system
-    const colors = {
-      user: {
-        primary: "text-emerald-500 dark:text-emerald-400",
-        secondary: "text-emerald-600 dark:text-emerald-300",
-        background: "bg-emerald-100/70 dark:bg-emerald-900/30",
-        glow: "emerald-300/50 dark:emerald-500/30",
-        speakingRing: "ring-emerald-500",
-        speakingGlow: "shadow-emerald-400/50 dark:shadow-emerald-500/40",
-        gradientFrom: "from-emerald-50 dark:from-emerald-900/40",
-        gradientTo: "to-emerald-200/50 dark:to-emerald-800/20",
-        lightBg: "bg-emerald-100",
-        darkBg: "bg-emerald-700/40",
-        lightText: "text-emerald-600",
-        darkText: "text-emerald-300",
-        avatarFallback:
-          "bg-emerald-100 text-emerald-600 dark:bg-emerald-700/20 dark:text-emerald-400",
-        pulseColor: "bg-emerald-200 dark:bg-emerald-800",
-        highlightBg: "bg-emerald-100/90 dark:bg-emerald-500/30",
-        border: "border-emerald-300 dark:border-emerald-500/40",
-      },
-      ai: {
-        primary: "text-indigo-500 dark:text-indigo-400",
-        secondary: "text-indigo-600 dark:text-indigo-300",
-        background: "bg-indigo-100/70 dark:bg-indigo-900/30",
-        glow: "indigo-300/50 dark:indigo-500/30",
-        speakingRing: "ring-indigo-500",
-        speakingGlow: "shadow-indigo-400/50 dark:shadow-indigo-500/40",
-        gradientFrom: "from-indigo-50 dark:from-indigo-900/40",
-        gradientTo: "to-indigo-200/50 dark:to-indigo-800/20",
-        lightBg: "bg-indigo-100",
-        darkBg: "bg-indigo-700/40",
-        lightText: "text-indigo-600",
-        darkText: "text-indigo-300",
-        pulseColor: "bg-indigo-200 dark:bg-indigo-800",
-        highlightBg: "bg-indigo-100/90 dark:bg-indigo-500/30",
-        border: "border-indigo-300 dark:border-indigo-500/40",
-      },
-      bg: isDarkMode ? "bg-gray-900" : "bg-gray-50",
-      text: isDarkMode ? "text-white" : "text-gray-800",
-      subtle: isDarkMode ? "text-gray-400" : "text-gray-600",
-    };
+      // Enhanced colors using Tailwind's color system
+      const colors = {
+        user: {
+          primary: "text-emerald-500 dark:text-emerald-400",
+          secondary: "text-emerald-600 dark:text-emerald-300",
+          background: "bg-emerald-50/90 dark:bg-emerald-900/30",
+          backgroundActive: "bg-emerald-100/90 dark:bg-emerald-800/50",
+          glow: "emerald-300/50 dark:emerald-500/30",
+          speakingRing: "ring-emerald-500/70",
+          speakingGlow: "shadow-emerald-400/50 dark:shadow-emerald-500/40",
+          gradientFrom: "from-emerald-50 dark:from-emerald-900/40",
+          gradientTo: "to-emerald-200/50 dark:to-emerald-800/20",
+          lightBg: "bg-emerald-100",
+          darkBg: "bg-emerald-700/40",
+          lightText: "text-emerald-600",
+          darkText: "text-emerald-300",
+          avatarFallback:
+              "bg-emerald-100 text-emerald-700 dark:bg-emerald-700/60 dark:text-emerald-200",
+          pulseColor: "bg-emerald-200 dark:bg-emerald-700",
+          highlightBg: "bg-emerald-100/90 dark:bg-emerald-500/30",
+          border: "border-emerald-300 dark:border-emerald-500/40",
+          statusBg: "bg-emerald-50/80 dark:bg-emerald-900/50",
+          statusText: "text-emerald-700 dark:text-emerald-300",
+        },
+        ai: {
+          primary: "text-primary dark:text-primary-foreground",
+          secondary: "text-primary-foreground dark:text-primary",
+          background: "bg-primary/10 dark:bg-primary/30",
+          backgroundActive: "bg-primary/20 dark:bg-primary/40",
+          glow: "primary/50 dark:primary/30",
+          speakingRing: "ring-primary/70",
+          speakingGlow: "shadow-primary/50 dark:shadow-primary/40",
+          gradientFrom: "from-primary/5 dark:from-primary/40",
+          gradientTo: "to-primary/10 dark:to-primary/20",
+          lightBg: "bg-primary/10",
+          darkBg: "bg-primary/40",
+          lightText: "text-primary",
+          darkText: "text-primary-foreground",
+          avatarFallback:
+              "bg-primary/10 text-primary dark:bg-primary/60 dark:text-primary-foreground",
+          pulseColor: "bg-primary/20 dark:bg-primary/70",
+          highlightBg: "bg-primary/10 dark:bg-primary/30",
+          border: "border-primary/30 dark:border-primary/40",
+          statusBg: "bg-primary/5 dark:bg-primary/50",
+          statusText: "text-primary dark:text-primary-foreground",
+        },
+        bg: isDarkMode ? "bg-gray-950" : "bg-gray-50",
+        text: isDarkMode ? "text-gray-100" : "text-gray-800",
+        subtle: isDarkMode ? "text-gray-400" : "text-gray-600",
+        statuses: {
+          active: "text-green-500",
+          connecting: "text-amber-500",
+          waiting: "text-blue-500",
+        },
+      };
 
-    // Show screenshot capture effect when a screenshot is taken
-    useEffect(() => {
-      if (lastCapturedScreenshot) {
-        setShowScreenshotEffect(true);
-        const timer = setTimeout(() => {
-          setShowScreenshotEffect(false);
-        }, 1500);
-        return () => clearTimeout(timer);
-      }
-    }, [lastCapturedScreenshot]);
+      // Show screenshot capture effect when a screenshot is taken
+      useEffect(() => {
+        if (lastCapturedScreenshot) {
+          setShowScreenshotEffect(true);
+          const timer = setTimeout(() => {
+            setShowScreenshotEffect(false);
+          }, 1500);
+          return () => clearTimeout(timer);
+        }
+      }, [lastCapturedScreenshot]);
 
-    // Simulate audio level detection
-    useEffect(() => {
-      if (isAudioOn && isSpeaking) {
-        const interval = setInterval(() => {
-          setAudioLevel(Math.random() * 0.7 + 0.3); // Random value between 0.3 and 1
-        }, 100);
-        return () => clearInterval(interval);
-      } else {
-        setAudioLevel(0);
-      }
-    }, [isAudioOn, isSpeaking]);
+      // Simulate audio level detection
+      useEffect(() => {
+        if (isAudioOn && isSpeaking) {
+          const interval = setInterval(() => {
+            setAudioLevel(Math.random() * 0.7 + 0.3); // Random value between 0.3 and 1
+          }, 100);
+          return () => clearInterval(interval);
+        } else {
+          setAudioLevel(0);
+        }
+      }, [isAudioOn, isSpeaking]);
 
-    // Format session time
-    const formatTime = (seconds) => {
-      const mins = Math.floor(seconds / 60);
-      const secs = seconds % 60;
-      return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
-    };
+      // Format session time
+      const formatTime = (seconds) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+      };
 
-    // Get the appropriate color set
-    const activeColors = isUser ? colors.user : colors.ai;
+      // Get the appropriate color set
+      const activeColors = isUser ? colors.user : colors.ai;
 
-    return (
-      <div
-        ref={ref}
-        className={cn(
-          "w-full lg:w-[40%] h-[40vh] lg:h-[400px] relative rounded-xl transition-all duration-300 overflow-hidden",
-          isDarkMode ? "bg-gray-900 shadow-xl" : "bg-gray-100 shadow-lg",
-          isUser
-            ? "video-container user"
-            : "flex flex-col items-center justify-center video-container ai",
-          isSpeaking && activeColors.speakingRing,
-          isSpeaking && "ring-2 shadow-lg",
-          isSpeaking && "z-10",
-          !isSpeaking && "opacity-90"
-        )}
-        style={{
-          boxShadow: isSpeaking
-            ? `0 0 20px var(--${activeColors.glow})`
-            : "none",
-          transition: "all 0.3s ease-in-out",
-        }}
-      >
-        {/* Theme toggle button */}
-        {onThemeToggle && (
-          <button
-            onClick={onThemeToggle}
-            className={cn(
-              "absolute top-4 right-4 z-20 p-2 rounded-full transition-all duration-300",
-              isDarkMode
-                ? "bg-gray-800 text-yellow-400 hover:bg-gray-700"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            )}
-          >
-            {isDarkMode ? (
-              <Sun className="h-4 w-4" />
+      // Status indicators
+      const getStatusIndicator = () => {
+        if (callStatus === "ACTIVE") {
+          return {
+            color: "bg-green-500",
+            text: isSpeaking ? "Speaking" : "Listening",
+            icon: isSpeaking ? (
+                <Volume2 className="h-3.5 w-3.5" aria-hidden="true" />
             ) : (
-              <Moon className="h-4 w-4" />
-            )}
-          </button>
-        )}
+                <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
+            ),
+          };
+        } else if (callStatus === "CONNECTING") {
+          return {
+            color: "bg-amber-500",
+            text: "Connecting",
+            icon: <Activity className="h-3.5 w-3.5" aria-hidden="true" />,
+          };
+        } else {
+          return {
+            color: "bg-blue-500",
+            text: "Ready",
+            icon: <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />,
+          };
+        }
+      };
 
-        {isUser ? (
-          // User video container
-          <>
-            {isVideoOn ? (
-              <div className="relative w-full h-full">
-                <Webcam
-                  ref={videoRef}
-                  audio={isAudioOn}
-                  muted={true}
-                  mirrored={true}
-                  screenshotFormat="image/jpeg"
-                  screenshotQuality={0.85}
-                  videoConstraints={{
-                    width: 1280,
-                    height: 720,
-                    facingMode: "user",
-                  }}
-                  className="w-full h-full object-cover"
-                />
-                <div
-                  className={cn(
-                    "absolute inset-0 pointer-events-none",
-                    "bg-gradient-to-t from-black/60 to-transparent"
-                  )}
-                ></div>
-                {isSpeaking && (
-                  <div className="absolute inset-0 pointer-events-none border-4 border-emerald-500/50 animate-pulse rounded-lg"></div>
-                )}
-              </div>
-            ) : (
-              <div
-                className={cn(
-                  "w-full h-full flex items-center justify-center",
+      const status = getStatusIndicator();
+
+      return (
+          <div
+              ref={ref}
+              className={cn(
+                  "w-full lg:w-[40%] h-[40vh] lg:h-[400px] relative rounded-xl overflow-hidden transition-all duration-300",
                   isDarkMode
-                    ? "bg-gradient-to-br from-gray-800 to-gray-900"
-                    : "bg-gradient-to-br from-gray-50 to-gray-200"
-                )}
-              >
-                <div className="relative">
-                  <div
+                      ? "bg-gray-900 shadow-xl border border-gray-800"
+                      : "bg-white shadow-lg border border-gray-200",
+                  isUser ? "video-container-user" : "video-container-ai",
+                  isSpeaking && activeColors.speakingRing,
+                  isSpeaking && "ring-2 shadow-lg",
+                  isSpeaking ? "z-10 scale-[1.02]" : "z-0",
+                  !isSpeaking && "opacity-95"
+              )}
+              style={{
+                boxShadow: isSpeaking
+                    ? `0 0 20px var(--${activeColors.glow})`
+                    : "none",
+                transition: "all 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
+              }}
+          >
+
+            {/* Theme toggle button */}
+            {onThemeToggle && (
+                <button
+                    onClick={onThemeToggle}
                     className={cn(
-                      "absolute -inset-4 rounded-full blur-xl",
-                      isSpeaking
-                        ? isDarkMode
-                          ? "bg-emerald-800 opacity-60"
-                          : "bg-emerald-200 opacity-70"
-                        : isDarkMode
-                        ? "bg-emerald-800 opacity-30"
-                        : "bg-emerald-200 opacity-40",
-                      isSpeaking && "animate-pulse"
-                    )}
-                  ></div>
-                  <Avatar
-                    className={cn(
-                      "h-28 w-28 border-4",
-                      isSpeaking
-                        ? "border-emerald-500 animate-float"
-                        : "border-emerald-500/20"
-                    )}
-                  >
-                    <AvatarImage
-                      src="/placeholder.svg?height=112&width=112"
-                      alt="You"
-                    />
-                    <AvatarFallback
-                      className={cn(
-                        "text-2xl",
+                        "absolute top-3 right-3 z-20 p-2 rounded-full transition-all duration-300",
                         isDarkMode
-                          ? "bg-emerald-700/20 text-emerald-400"
-                          : "bg-emerald-100 text-emerald-600"
-                      )}
-                    >
-                      You
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-              </div>
+                            ? "bg-gray-800/80 text-amber-400 hover:bg-gray-700 hover:text-amber-300"
+                            : "bg-gray-100/80 text-gray-600 hover:bg-gray-200 hover:text-gray-700",
+                        "backdrop-blur-sm"
+                    )}
+                    aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+                >
+                  {isDarkMode ? (
+                      <Sun className="h-4 w-4" />
+                  ) : (
+                      <Moon className="h-4 w-4" />
+                  )}
+                </button>
             )}
 
-            <div
-              className={cn(
-                "absolute bottom-4 left-4 px-4 py-2 rounded-full text-sm flex items-center space-x-2 backdrop-blur-md",
-                isDarkMode
-                  ? "bg-gray-800/80 text-white"
-                  : "bg-white/80 text-gray-800",
-                isSpeaking && "ring-2 ring-emerald-500/50"
-              )}
-            >
-              <div
-                className={cn(
-                  "h-8 w-8 rounded-full flex items-center justify-center",
-                  isDarkMode ? "bg-emerald-700/40" : "bg-emerald-100",
-                  isSpeaking && "ring-1 ring-emerald-400"
-                )}
-              >
-                <User
-                  className={cn(
-                    "h-4 w-4",
-                    isDarkMode ? "text-emerald-300" : "text-emerald-600"
-                  )}
-                />
-              </div>
-              <div>
-                <span className="font-medium">You</span>
-                {!isAudioOn && (
-                  <span className="ml-2">
-                    <MicOff className="h-3 w-3 text-red-400 inline-block" />
-                  </span>
-                )}
-                {isSpeaking && (
-                  <span className="ml-2 text-xs font-medium text-emerald-400">
-                    SPEAKING
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/*{screenshotCount > 0 && (*/}
-            {/*    <TooltipProvider>*/}
-            {/*        <Tooltip>*/}
-            {/*            <TooltipTrigger asChild>*/}
-            {/*                <div className={cn(*/}
-            {/*                    "absolute top-4 left-4 px-3 py-2 rounded-lg flex items-center gap-2",*/}
-            {/*                    isDarkMode*/}
-            {/*                        ? "bg-slate-800 text-white border border-slate-700"*/}
-            {/*                        : "bg-white text-slate-800 border border-slate-200 shadow-sm"*/}
-            {/*                )}>*/}
-            {/*                    <Camera className={cn(*/}
-            {/*                        "h-4 w-4",*/}
-            {/*                        screenshotCount === 3*/}
-            {/*                            ? "text-amber-500"*/}
-            {/*                            : "text-blue-500"*/}
-            {/*                    )} />*/}
-            {/*                    <div className="flex flex-col">*/}
-            {/*                        <div className="flex items-center">*/}
-            {/*                            <span className="font-medium text-sm">{screenshotCount}</span>*/}
-            {/*                            <span className="text-xs text-slate-500 ml-1">/ {3}</span>*/}
-            {/*                        </div>*/}
-            {/*                        <Progress*/}
-            {/*                            value={(screenshotCount / 3) * 100}*/}
-            {/*                            className={cn(*/}
-            {/*                                "h-1 w-16 mt-1",*/}
-            {/*                                screenshotCount === 3 ? "bg-amber-100" : "bg-blue-100"*/}
-            {/*                            )}*/}
-            {/*                            indicatorClassName={*/}
-            {/*                                screenshotCount === 3 ? "bg-amber-500" : "bg-blue-500"*/}
-            {/*                            }*/}
-            {/*                        />*/}
-            {/*                    </div>*/}
-            {/*                </div>*/}
-            {/*            </TooltipTrigger>*/}
-            {/*            <TooltipContent>*/}
-            {/*                <p className="text-xs">{`${screenshotCount} of ${3} screenshots taken`}</p>*/}
-            {/*                {screenshotCount === 3 && (*/}
-            {/*                    <p className="text-xs text-amber-500">Maximum screenshots reached</p>*/}
-            {/*                )}*/}
-            {/*            </TooltipContent>*/}
-            {/*        </Tooltip>*/}
-            {/*    </TooltipProvider>*/}
-            {/*)}*/}
-
-            {/*{showScreenshotEffect && (*/}
-            {/*    <div className="absolute inset-0 bg-white animate-flash rounded-lg z-10"></div>*/}
-            {/*)}*/}
-
-            {isAudioOn && isSpeaking && audioLevel > 0 && (
-              <div className="absolute bottom-4 right-4 flex items-center gap-2 animate-fadeIn">
-                <div
-                  className={cn(
-                    "audio-wave",
-                    isDarkMode ? "text-emerald-400" : "text-emerald-600"
-                  )}
-                >
-                  {[...Array(5)].map((_, i) => (
-                    <span
-                      key={i}
-                      style={{
-                        height: `${Math.min(8 + i * 3, 20) * audioLevel}px`,
-                        animationDelay: `${i * 0.1}s`,
-                      }}
-                    />
-                  ))}
-                </div>
-                <div
-                  className={cn(
-                    "p-2 rounded-full",
-                    isDarkMode
-                      ? "bg-gray-800/80 text-emerald-400"
-                      : "bg-white/80 text-emerald-600",
-                    "ring-1 ring-emerald-500"
-                  )}
-                >
-                  <Volume2 className="h-4 w-4" />
-                </div>
-              </div>
+            {/* Screenshot effect overlay */}
+            {showScreenshotEffect && (
+                <div className="absolute inset-0 bg-white z-50 animate-flash opacity-0 pointer-events-none"></div>
             )}
 
-            {/* {isSpeaking && (
+            {isUser ? (
+                // User video container
+                <>
+                  {isVideoOn ? (
+                      <div className="relative w-full h-full">
+                        <Webcam
+                            ref={videoRef}
+                            audio={isAudioOn}
+                            muted={true}
+                            mirrored={true}
+                            screenshotFormat="image/jpeg"
+                            screenshotQuality={0.85}
+                            videoConstraints={{
+                              width: 1280,
+                              height: 720,
+                              facingMode: "user",
+                            }}
+                            className="w-full h-full object-cover"
+                        />
+
+                        {/* Gradient overlay */}
+                        <div className={cn(
+                            "absolute inset-0 pointer-events-none",
+                            "bg-gradient-to-t from-black/60 via-transparent to-black/30"
+                        )}></div>
+
+                        {/* Speaking indicator */}
+                        {isSpeaking && (
+                            <div className="absolute inset-0 pointer-events-none border-4 border-emerald-500/40 animate-pulse rounded-lg"></div>
+                        )}
+
+                        {/* Screenshot count indicator */}
+                        {screenshotCount > 0 && (
                             <div className={cn(
-                                "absolute top-0 left-0 right-0 px-4 py-3 text-sm flex items-center justify-center space-x-2 backdrop-blur-md z-20 animate-fadeIn",
+                                "absolute top-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-full text-xs font-medium",
                                 isDarkMode
-                                    ? "bg-emerald-500/30 text-white border-b border-emerald-500/40 shadow-lg shadow-emerald-500/30"
-                                    : "bg-emerald-100/90 text-emerald-800 border-b border-emerald-300 shadow-lg shadow-emerald-400/20"
+                                    ? "bg-gray-800/70 text-white"
+                                    : "bg-white/70 text-gray-700",
+                                "backdrop-blur-sm flex items-center gap-1.5"
                             )}>
-                                <div className="speaking-indicator mr-2">
-                                    <span className="bg-emerald-400"></span>
-                                    <span className="bg-emerald-400"></span>
-                                    <span className="bg-emerald-400"></span>
-                                </div>
-                                <span className="font-semibold tracking-wide">YOU ARE SPEAKING</span>
+                              <span className="block h-2 w-2 rounded-full bg-emerald-500"></span>
+                              <span>{screenshotCount} captures</span>
                             </div>
-                        )} */}
-          </>
-        ) : (
-          // AI interviewer container
-          <>
-            <div
-              className={cn(
-                "flex flex-col items-center justify-between h-full w-full relative",
-                isDarkMode
-                  ? // ? "bg-card border border-gradient-to-br from-gray-900 to-primary"
-                    "bg-gradient-to-br from-gray-900 via-gray-900 to-indigo-950/30"
-                  : "bg-primary/80"
-              )}
-            >
-              <div
-                className={cn(
-                  "absolute inset-0 overflow-hidden",
-                  isDarkMode ? "opacity-20" : "opacity-10"
-                )}
-              >
-                <div
-                  className={cn(
-                    "absolute -inset-[100%]",
-                    isSpeaking
-                      ? "bg-[radial-gradient(40%_40%_at_50%_50%,#6366f150_0%,transparent_75%)]"
-                      : "bg-[radial-gradient(40%_40%_at_50%_50%,#4f46e550_0%,transparent_75%)]",
-                    isSpeaking && "animate-pulse-slow"
-                  )}
-                ></div>
-              </div>
+                        )}
+                      </div>
+                  ) : (
+                      // Avatar fallback when video is off
+                      <div className={cn(
+                          "w-full h-full flex items-center justify-center",
+                          isDarkMode
+                              ? "bg-gradient-to-br from-gray-800 to-gray-900"
+                              : "bg-gradient-to-br from-gray-50 to-gray-100"
+                      )}>
+                        <div className="relative">
+                          {/* Avatar glow effect */}
+                          <div className={cn(
+                              "absolute -inset-8 rounded-full blur-xl opacity-70 transition-opacity duration-700",
+                              isDarkMode
+                                  ? isSpeaking ? "bg-emerald-700/50" : "bg-emerald-900/30"
+                                  : isSpeaking ? "bg-emerald-200" : "bg-emerald-100/60",
+                              isSpeaking && "animate-pulse-slow"
+                          )}></div>
 
-              <div className="relative z-10 flex flex-col items-center justify-center flex-grow space-y-6">
-                <div className="relative">
-                  <div
-                    className={cn(
-                      "absolute -inset-8 rounded-full blur-xl transition-all duration-300",
-                      isDarkMode
-                        ? // ? isSpeaking ? "bg-primary/15" : "bg-primary/5"
-                          isSpeaking
-                          ? "bg-indigo-600/30"
-                          : "bg-indigo-900/20"
-                        : isSpeaking
-                        ? "bg-gray-100/40"
-                        : "bg-gray-100/10",
-                      isSpeaking && "animate-pulse-slow"
-                    )}
-                  ></div>
-                  {/* <div className="relative z-10">
-                                        <SplineComponent />
-                                    </div> */}
-                  <div className="relative z-10 my-auto">
-                    <Bot className="h-15 w-15 text-white/90 dark:text-gray"></Bot>{" "}
-                  </div>
-                </div>
-
-                <div className="flex flex-col items-center space-y-2">
-                  <h3
-                    className={cn(
-                      "text-2xl font-semibold tracking-tight text-white",
-                      isSpeaking && "speaking-animation"
-                    )}
-                  >
-                    TaleeX
-                  </h3>
-                  <div
-                    className={cn(
-                      "text-xs uppercase tracking-wider font-medium",
-                      isDarkMode
-                        ? isSpeaking
-                          ? "text-white"
-                          : "text-secondary-foreground"
-                        : isSpeaking
-                        ? "text-white"
-                        : "text-gray-200"
-                    )}
-                  >
-                    AI Interviewer
-                  </div>
-                </div>
-
-                <div
-                  className={cn(
-                    "absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 px-4 py-2 rounded-full",
-                    isDarkMode
-                      ? "bg-gray-950/30 text-secondary-foreground"
-                      : "bg-white text-gray-700",
-                    "backdrop-blur-md",
-                    isSpeaking && "ring-2 ring-indigo-500/50"
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "w-3 h-3 rounded-full",
-                      isSpeaking
-                        ? "bg-primary animate-pulse"
-                        : callStatus === "ACTIVE"
-                        ? "bg-green-500"
-                        : callStatus === "CONNECTING"
-                        ? "bg-yellow-400"
-                        : "bg-green-500"
-                    )}
-                  ></div>
-                  <p className="text-sm">
-                    {isSpeaking
-                      ? "Speaking..."
-                      : callStatus === "ACTIVE"
-                      ? "Listening..."
-                      : callStatus === "CONNECTING"
-                      ? "Connecting..."
-                      : "Waiting..."}
-                  </p>
-                </div>
-              </div>
-              {/* 
-                            <div className={cn(
-                                "absolute bottom-4 left-4 px-4 py-2 rounded-full text-sm flex items-center space-x-2",
-                                isDarkMode
-                                    ? "bg-gray-800/80 text-white"
-                                    : "bg-white/80 text-gray-800",
-                                "backdrop-blur-md",
-                                isSpeaking && "ring-2 ring-indigo-500/50"
+                          <div className="relative flex flex-col items-center gap-4">
+                            <Avatar className={cn(
+                                "h-28 w-28 border-4 transition-all duration-300",
+                                isSpeaking
+                                    ? "border-emerald-500 shadow-lg shadow-emerald-500/20"
+                                    : "border-emerald-400/30"
                             )}>
-                                <div className={cn(
-                                    "h-8 w-8 rounded-full flex items-center justify-center",
-                                    isDarkMode ? "bg-indigo-700/40" : "bg-indigo-100",
-                                    isSpeaking && "ring-1 ring-indigo-400"
-                                )}>
-                                    <Bot className={cn("h-4 w-4", isDarkMode ? "text-indigo-300" : "text-indigo-600")} />
-                                </div>
-                                <div>
-                                    <span className="font-medium">Interviewer</span>
-                                    {isSpeaking && (
-                                        <span className="ml-2 text-xs font-medium text-indigo-400">SPEAKING</span>
-                                    )}
-                                </div>
-                            </div> */}
+                              <AvatarImage
+                                  src="/placeholder.svg?height=112&width=112"
+                                  alt="You"
+                              />
+                              <AvatarFallback
+                                  className={cn(
+                                      "text-2xl font-medium",
+                                      activeColors.avatarFallback
+                                  )}
+                              >
+                                You
+                              </AvatarFallback>
+                            </Avatar>
 
-              {isSpeaking && (
-                <div className="absolute bottom-4 right-4 flex items-center gap-2 animate-fadeIn">
-                  <div
-                    className={cn(
-                      "audio-wave",
-                      isDarkMode ? "text-indigo-400" : "text-indigo-600"
-                    )}
-                  >
-                    {[...Array(5)].map((_, i) => (
-                      <span
-                        key={i}
-                        style={{
-                          height: `${Math.min(8 + i * 3, 20)}px`,
-                          animationDelay: `${i * 0.1}s`,
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <div
-                    className={cn(
-                      "p-2 rounded-full",
+                            <div className={cn(
+                                "px-4 py-2 rounded-full backdrop-blur-md",
+                                isDarkMode
+                                    ? "bg-gray-800/80 text-gray-200"
+                                    : "bg-white/80 text-gray-700",
+                                "flex items-center gap-2"
+                            )}>
+                              <VideoOff className="h-4 w-4 text-red-400" />
+                              <span className="text-sm font-medium">Camera Off</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                  )}
+
+                  {/* User status badge */}
+                  <div className={cn(
+                      "absolute bottom-4 left-4 px-3 py-1.5 rounded-full backdrop-blur-md flex items-center gap-2.5 transition-all",
                       isDarkMode
-                        ? "bg-gray-800/80 text-indigo-400"
-                        : "bg-white/80 text-indigo-600",
-                      "ring-1 ring-indigo-500"
-                    )}
-                  >
-                    <Volume2 className="h-4 w-4" />
+                          ? "bg-gray-800/90 text-white"
+                          : "bg-white/90 text-gray-800",
+                      isSpeaking && "ring-1 ring-emerald-500"
+                  )}>
+                    <div className={cn(
+                        "h-8 w-8 rounded-full flex items-center justify-center",
+                        isDarkMode
+                            ? isSpeaking ? "bg-emerald-600/40" : "bg-emerald-700/20"
+                            : isSpeaking ? "bg-emerald-100" : "bg-gray-100",
+                        "transition-colors duration-300"
+                    )}>
+                      <UserRound
+                          className={cn(
+                              "h-4.5 w-4.5",
+                              isDarkMode ? "text-emerald-200" : "text-emerald-700"
+                          )}
+                      />
+                    </div>
+                    <div>
+                      <span className="font-medium text-sm">You</span>
+                      {!isAudioOn && (
+                          <span className="ml-1.5">
+                    <MicOff className="h-3.5 w-3.5 text-red-400 inline-block" />
+                  </span>
+                      )}
+                      {isSpeaking && (
+                          <span className={cn(
+                              "ml-1.5 text-xs font-medium",
+                              "text-emerald-500 dark:text-emerald-400"
+                          )}>
+                    • Speaking
+                  </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
 
-              {/* {isSpeaking && (
-                                <div className={cn(
-                                    "absolute top-0 left-0 right-0 px-4 py-3 text-sm flex items-center justify-center space-x-2 backdrop-blur-md z-20 animate-fadeIn",
-                                    isDarkMode
-                                        ? "bg-primary/20 text-white border-b border-indigo-500/40 shadow-sm shadow-indigo-500/30"
-                                        : "bg-indigo-100/90 text-indigo-800 border-b border-indigo-300 shadow-lg shadow-indigo-400/20"
-                                )}>
-                                    <div className="speaking-indicator mr-2">
-                                        <span className="bg-indigo-400"></span>
-                                        <span className="bg-indigo-400"></span>
-                                        <span className="bg-indigo-400"></span>
-                                    </div>
-                                    <span className="font-semibold tracking-wide">AI IS SPEAKING</span>
-                                </div>
-                            )} */}
-            </div>
-          </>
-        )}
-      </div>
-    );
-  }
+                  {/* Audio visualization */}
+                  {isAudioOn && isSpeaking && audioLevel > 0 && (
+                      <div className="absolute bottom-4 right-4 flex items-center gap-2.5 animate-fadeIn">
+                        <div className={cn(
+                            "audio-wave",
+                            isDarkMode ? "text-emerald-400" : "text-emerald-600"
+                        )}>
+                          {[...Array(5)].map((_, i) => (
+                              <span
+                                  key={i}
+                                  style={{
+                                    height: `${Math.min(8 + i * 3, 20) * audioLevel}px`,
+                                    animationDelay: `${i * 0.1}s`,
+                                  }}
+                                  className="bg-current"
+                              />
+                          ))}
+                        </div>
+                        <div className={cn(
+                            "p-2 rounded-full transition-all",
+                            isDarkMode
+                                ? "bg-gray-800/90 text-emerald-400 ring-1 ring-emerald-500/50"
+                                : "bg-white/90 text-emerald-600 ring-1 ring-emerald-400/50",
+                            "backdrop-blur-sm"
+                        )}>
+                          <Volume2 className="h-4 w-4" />
+                        </div>
+                      </div>
+                  )}
+                </>
+            ) : (
+                // AI interviewer container
+                <>
+                  <div className={cn(
+                      "flex flex-col items-center justify-center h-full w-full relative",
+                      isDarkMode
+                          ? "bg-gradient-to-br from-gray-900 via-gray-900 to-primary/40"
+                          : "bg-gradient-to-br from-gray-50 via-gray-100 to-primary/10"
+                  )}>
+                    {/* Background effects */}
+                    <div className={cn(
+                        "absolute inset-0 overflow-hidden",
+                        isDarkMode ? "opacity-30" : "opacity-15"
+                    )}>
+                      <div className={cn(
+                          "absolute -inset-[100%]",
+                          isSpeaking
+                              ? "bg-[radial-gradient(40%_40%_at_50%_50%,var(--primary)50_0%,transparent_75%)]"
+                              : "bg-[radial-gradient(40%_40%_at_50%_50%,var(--primary)50_0%,transparent_75%)]",
+                          isSpeaking && "animate-pulse-slow"
+                      )}></div>
+                    </div>
+
+                    {/* AI Content */}
+                    <div className="relative z-10 flex flex-col items-center justify-center flex-grow space-y-7 w-full px-4">
+                      <div className="relative">
+                        {/* Glow effect */}
+                        <div className={cn(
+                            "absolute -inset-8 rounded-full blur-xl transition-all duration-500",
+                            isDarkMode
+                                ? isSpeaking ? "bg-primary/40" : "bg-primary/20"
+                                : isSpeaking ? "bg-primary/30" : "bg-primary/10",
+                            isSpeaking && "animate-pulse-slow"
+                        )}></div>
+
+                        {/* AI Avatar */}
+                        <div className={cn(
+                            "relative z-10 flex items-center justify-center rounded-full p-6",
+                            isDarkMode
+                                ? isSpeaking ? "bg-primary/50" : "bg-primary/30"
+                                : isSpeaking ? "bg-primary/20" : "bg-primary/10",
+                            "transition-colors duration-300 border-2",
+                            isDarkMode
+                                ? isSpeaking ? "border-primary/70" : "border-primary/30"
+                                : isSpeaking ? "border-primary/30" : "border-primary/20"
+                        )}>
+                          <Bot className={cn(
+                              "h-12 w-12 transition-colors duration-300",
+                              isDarkMode
+                                  ? isSpeaking ? "text-primary-foreground" : "text-primary-foreground/80"
+                                  : isSpeaking ? "text-primary" : "text-primary/80"
+                          )} />
+                        </div>
+                      </div>
+
+                      {/* AI Name and Status */}
+                      <div className="flex flex-col items-center space-y-2">
+                        <h3 className={cn(
+                            "text-2xl font-semibold tracking-tight transition-colors duration-300",
+                            isDarkMode
+                                ? isSpeaking ? "text-white" : "text-gray-200"
+                                : isSpeaking ? "text-gray-900" : "text-gray-700",
+                            isSpeaking && "speaking-animation"
+                        )}>
+                          TaleeX
+                        </h3>
+                        <div className={cn(
+                            "text-xs uppercase tracking-wider font-medium",
+                            isDarkMode
+                                ? isSpeaking ? "text-primary-foreground" : "text-primary-foreground/80"
+                                : isSpeaking ? "text-primary" : "text-primary/80"
+                        )}>
+                          AI Interviewer
+                        </div>
+                      </div>
+
+                      {/* Transcript preview (if available) */}
+                      {transcript && (
+                          <div className={cn(
+                              "max-w-[90%] px-4 py-2 rounded-lg text-sm text-center",
+                              isDarkMode
+                                  ? "bg-gray-800/80 text-gray-200"
+                                  : "bg-gray-100/80 text-gray-700",
+                              "backdrop-blur-sm line-clamp-2"
+                          )}>
+                            "{transcript}"
+                          </div>
+                      )}
+
+                      {/* Status indicator */}
+                      <div className={cn(
+                          "absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-2 px-4 py-2 rounded-full",
+                          isDarkMode
+                              ? "bg-gray-900/70 text-gray-300"
+                              : "bg-white/90 text-gray-700",
+                          "backdrop-blur-md border",
+                          isDarkMode
+                              ? isSpeaking ? "border-primary/50" : "border-gray-800"
+                              : isSpeaking ? "border-primary/30" : "border-gray-200",
+                          "transition-all duration-300",
+                          isSpeaking && "ring-1 ring-primary/50"
+                      )}>
+                        <div className={cn(
+                            "w-2.5 h-2.5 rounded-full animate-pulse",
+                            status.color
+                        )}></div>
+                        <div className="flex items-center gap-1.5">
+                          {status.icon}
+                          <p className="text-sm font-medium">{status.text}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Audio visualization for AI */}
+                    {isSpeaking && (
+                        <div className="absolute bottom-4 right-4 flex items-center gap-2.5 animate-fadeIn">
+                          <div className={cn(
+                              "audio-wave",
+                              isDarkMode ? "text-primary-foreground" : "text-primary"
+                          )}>
+                            {[...Array(5)].map((_, i) => (
+                                <span
+                                    key={i}
+                                    style={{
+                                      height: `${Math.min(8 + i * 3, 20)}px`,
+                                      animationDelay: `${i * 0.1}s`,
+                                    }}
+                                    className="bg-current"
+                                />
+                            ))}
+                          </div>
+                          <div className={cn(
+                              "p-2 rounded-full",
+                              isDarkMode
+                                  ? "bg-gray-800/90 text-primary-foreground ring-1 ring-primary/50"
+                                  : "bg-white/90 text-primary ring-1 ring-primary/50",
+                              "backdrop-blur-sm"
+                          )}>
+                            <Volume2 className="h-4 w-4" />
+                          </div>
+                        </div>
+                    )}
+                  </div>
+                </>
+            )}
+          </div>
+      );
+    }
 );
 
 VideoContainer.displayName = "VideoContainer";
