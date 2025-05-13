@@ -55,9 +55,9 @@ export function AllApplicantsTab({
   const { id } = useParams();
   const { jobsQuery } = useJobs();
 
-  const jobs = jobsQuery.data.jobs
-    .filter((job) => job._id !== id)
-    .filter((job) => job.status === "open" && job?.company);
+  const jobs = jobsQuery?.data?.jobs
+    .filter((job) => job?._id !== id)
+    .filter((job) => job?.status === "open" && job?.company);
 
   const inviteToJobMutation = useMutation({
     mutationFn: ({ jobId, applicationIds, newJobId }) =>
@@ -154,9 +154,9 @@ export function AllApplicantsTab({
                     <SelectValue placeholder="Select a job" />
                   </SelectTrigger>
                   <SelectContent>
-                    {jobs.map((job) => (
-                      <SelectItem key={job._id} value={job._id}>
-                        {job.title}
+                    {jobs?.map((job) => (
+                      <SelectItem key={job?._id} value={job?._id}>
+                        {job?.title}
                       </SelectItem>
                     ))}
                   </SelectContent>

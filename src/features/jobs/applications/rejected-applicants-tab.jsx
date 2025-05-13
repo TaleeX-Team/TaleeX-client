@@ -106,11 +106,11 @@ export function RejectedApplicantsTab({
                     />
                   </td>
                   <td className="py-3 px-4 font-medium dark:text-gray-200">
-                    {applicant.name}
+                    {applicant?.name}
                   </td>
                   <td className="py-3 px-4 dark:text-gray-300">
                     <div className="flex items-center">
-                      {applicant.email}
+                      {applicant?.email}
                       <Button
                         variant="ghost"
                         size="sm"
@@ -214,7 +214,7 @@ export function RejectedApplicantsTab({
                               asChild
                             >
                               <a
-                                href={applicant.cvUrl}
+                                href={applicant?.cvUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
@@ -238,7 +238,7 @@ export function RejectedApplicantsTab({
                     <Badge
                       variant="outline"
                       className={(() => {
-                        switch (applicant.phase) {
+                        switch (applicant?.phase) {
                           case "Applications":
                             return "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800";
                           case "CV Review":
@@ -258,7 +258,7 @@ export function RejectedApplicantsTab({
                         }
                       })()}
                     >
-                      {applicant.phase}
+                      {applicant?.phase}
                     </Badge>
                   </td>
                 </tr>

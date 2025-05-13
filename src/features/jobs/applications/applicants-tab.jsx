@@ -390,7 +390,7 @@ export default function JobApplicationManager() {
             <h1 className="text-3xl font-bold dark:text-white">{job?.title}</h1>
             <JobStatusBadge initialStatus={job?.status} jobId={job?._id} />
           </div>
-          {job.company && (
+          {job?.company && (
             <div className="hidden md:flex flex-col md:flex-row md:items-center md:gap-4 text-muted-foreground">
               <div className="flex items-center">
                 <Building2 className="w-5 h-5 mr-2 text-primary" />
@@ -399,7 +399,7 @@ export default function JobApplicationManager() {
                 </span>
               </div>
 
-              {job.company.address && (
+              {job?.company?.address && (
                 <div className="flex items-center">
                   <MapPin className="w-4 h-4 mr-2 text-primary" />
                   <span>{job?.company?.address}</span>
