@@ -49,8 +49,8 @@ export function AllApplicantsTab({
   toggleSelectApplicant,
   setSelectedApplicants,
 }) {
-  // Static job list for the dropdown
-  const [selectedJob, setSelectedJob] = useState();
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const queryClient = useQueryClient();
   const { id } = useParams();
   const { jobsQuery } = useJobs();
@@ -58,20 +58,20 @@ export function AllApplicantsTab({
   const jobs = jobsQuery.data.jobs
     .filter((job) => job._id !== id)
     .filter((job) => job.status === "open" && job?.company);
+
   const inviteToJobMutation = useMutation({
     mutationFn: ({ jobId, applicationIds, newJobId }) =>
       inviteToJob(jobId, applicationIds, newJobId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
-
       toast(
         `${selectedApplicants.length} ${
           selectedApplicants.length === 1 ? "applicant" : "applicants"
-        } sent to CV Review`,
+        } been sent a job invitation`,
         {
           description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
             selectedApplicants.length === 1 ? "has" : "have"
-          } been sent a job invitation `,
+          } been sent a job invitation`,
           style: {
             backgroundColor: "#195f32",
             color: "white",
@@ -79,16 +79,19 @@ export function AllApplicantsTab({
         }
       );
       setSelectedApplicants([]);
+      setIsDialogOpen(false); // Close dialog on success
+      setSelectedJob(null); // Reset selected job
     },
     onError: (err) => {
-      console.error("Failed to invite applicants to the job :", err.message);
+      console.error("Failed to invite applicants to the job:", err.message);
       toast.error("Failed to invite applicants to the job", {
         description: "Please try again later.",
       });
     },
   });
+
   const inviteToJobFunction = () => {
-    if (selectedApplicants.length === 0) return;
+    if (selectedApplicants.length === 0 || !selectedJob) return;
     inviteToJobMutation.mutate({
       jobId: id,
       applicationIds: selectedApplicants.map((a) => a.id),
@@ -122,7 +125,7 @@ export function AllApplicantsTab({
             />
           </svg>
         </div>
-        <Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button
               variant="outline"
@@ -143,10 +146,10 @@ export function AllApplicantsTab({
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="flex items-center gap-5">
-                <label htmlFor="job" className="col-span-1 ">
+                <label htmlFor="job" className="col-span-1">
                   Job to invite to:
                 </label>
-                <Select onValueChange={setSelectedJob}>
+                <Select onValueChange={setSelectedJob} value={selectedJob}>
                   <SelectTrigger className="col-span-3">
                     <SelectValue placeholder="Select a job" />
                   </SelectTrigger>
@@ -170,8 +173,38 @@ export function AllApplicantsTab({
               </div>
             )}
             <DialogFooter>
-              <Button onClick={inviteToJobFunction} type="submit">
-                Invite
+              <Button
+                onClick={inviteToJobFunction}
+                disabled={!selectedJob || inviteToJobMutation.isPending}
+                type="submit"
+              >
+                {inviteToJobMutation.isPending ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5 mr-2"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8 8 8 0 01-8-8z"
+                      ></path>
+                    </svg>
+                    Inviting...
+                  </>
+                ) : (
+                  "Invite"
+                )}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -380,7 +413,7 @@ export function AllApplicantsTab({
                       className={(() => {
                         switch (applicant.phase) {
                           case "Applications":
-                            return "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800";
+                            return "bg-indigo-50 text-indigo-700 linf0-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800";
                           case "CV Review":
                             return "bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-900/20 dark:text-pink-400 dark:border-pink-800";
                           case "Sending Interview":
