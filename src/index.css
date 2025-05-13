@@ -222,7 +222,7 @@
   --sidebar-ring: #93c5fd;
 }
 
-/* 
+/*
 .dark {
   --background: #121213;
   --foreground: #f8fafc;
@@ -232,11 +232,11 @@
   --popover-foreground: #f8fafc;
   --primary: #3b82f6;
   --primary-foreground: #ffffff;
-  --secondary: #1e293b; 
-  --secondary-foreground: #94a3b8; 
-  --muted: #1e293b; 
+  --secondary: #1e293b;
+  --secondary-foreground: #94a3b8;
+  --muted: #1e293b;
   --muted-foreground: #94a3b8;
-  --accent: #2d3748; 
+  --accent: #2d3748;
   --accent-foreground: #e2e8f0;
   --destructive: #f87171;
   --border: #334155;
@@ -251,7 +251,7 @@
   --sidebar-foreground: #f8fafc;
   --sidebar-primary: #3b82f6;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #2d3748; 
+  --sidebar-accent: #2d3748;
   --sidebar-accent-foreground: #e2e8f0;
   --sidebar-border: #334155;
   --sidebar-ring: #60a5fa;
@@ -313,41 +313,41 @@
   .glass-card {
     @apply rounded-xl border shadow-xl transition-all duration-300 relative;
     background: linear-gradient(120deg,
-        rgba(255, 255, 255, 0.6) 20%,
-        rgba(241, 245, 249, 0.52) 100%);
+    rgba(255, 255, 255, 0.6) 20%,
+    rgba(241, 245, 249, 0.52) 100%);
     border-color: rgba(37, 99, 235, 0.18);
     box-shadow: 0 10px 40px rgba(59, 130, 246, 0.18),
-      0 2px 10px rgba(37, 99, 235, 0.1);
+    0 2px 10px rgba(37, 99, 235, 0.1);
     transform: translateY(0);
   }
 
   .glass-card:hover {
     @apply shadow-2xl;
     background: linear-gradient(120deg,
-        rgba(255, 255, 255, 0.7) 20%,
-        rgba(241, 245, 249, 0.64) 100%);
+    rgba(255, 255, 255, 0.7) 20%,
+    rgba(241, 245, 249, 0.64) 100%);
     border-color: rgba(37, 99, 235, 0.28);
     box-shadow: 0 15px 50px rgba(59, 130, 246, 0.25),
-      0 3px 15px rgba(37, 99, 235, 0.15);
+    0 3px 15px rgba(37, 99, 235, 0.15);
     transform: translateY(-5px);
   }
 
   .dark .glass-card {
     background: linear-gradient(120deg,
-        rgba(30, 41, 59, 0.85) 10%,
-        rgba(15, 23, 42, 0.75) 100%);
+    rgba(30, 41, 59, 0.85) 10%,
+    rgba(15, 23, 42, 0.75) 100%);
     border-color: rgba(59, 130, 246, 0.2);
     box-shadow: 0 10px 40px rgba(30, 64, 175, 0.25),
-      0 2px 10px rgba(59, 130, 246, 0.15);
+    0 2px 10px rgba(59, 130, 246, 0.15);
   }
 
   .dark .glass-card:hover {
     background: linear-gradient(120deg,
-        rgba(30, 41, 59, 0.9) 10%,
-        rgba(15, 23, 42, 0.8) 100%);
+    rgba(30, 41, 59, 0.9) 10%,
+    rgba(15, 23, 42, 0.8) 100%);
     border-color: rgba(59, 130, 246, 0.35);
     box-shadow: 0 15px 50px rgba(30, 64, 175, 0.35),
-      0 3px 15px rgba(59, 130, 246, 0.25);
+    0 3px 15px rgba(59, 130, 246, 0.25);
     transform: translateY(-5px);
   }
 
@@ -355,33 +355,33 @@
   .gradient-border {
     @apply relative rounded-lg p-[1px] backdrop-blur-xl shadow-lg transition-all duration-300;
     background: linear-gradient(45deg,
-        rgba(37, 99, 235, 0.7) 0%,
-        rgba(59, 130, 246, 0.7) 50%,
-        rgba(37, 99, 235, 0.6) 100%);
+    rgba(37, 99, 235, 0.7) 0%,
+    rgba(59, 130, 246, 0.7) 50%,
+    rgba(37, 99, 235, 0.6) 100%);
     box-shadow: 0 6px 24px rgba(37, 99, 235, 0.15);
   }
 
   .gradient-border:hover {
     background: linear-gradient(45deg,
-        rgba(37, 99, 235, 0.8) 0%,
-        rgba(59, 130, 246, 0.8) 50%,
-        rgba(37, 99, 235, 0.7) 100%);
+    rgba(37, 99, 235, 0.8) 0%,
+    rgba(59, 130, 246, 0.8) 50%,
+    rgba(37, 99, 235, 0.7) 100%);
     box-shadow: 0 8px 32px rgba(37, 99, 235, 0.25);
   }
 
   .dark .gradient-border {
     background: linear-gradient(45deg,
-        rgba(59, 130, 246, 0.85) 0%,
-        rgba(96, 165, 250, 0.85) 50%,
-        rgba(37, 99, 235, 0.85) 100%);
+    rgba(59, 130, 246, 0.85) 0%,
+    rgba(96, 165, 250, 0.85) 50%,
+    rgba(37, 99, 235, 0.85) 100%);
     box-shadow: 0 6px 24px rgba(30, 64, 175, 0.3);
   }
 
   .dark .gradient-border:hover {
     background: linear-gradient(45deg,
-        rgba(59, 130, 246, 0.95) 0%,
-        rgba(96, 165, 250, 0.95) 50%,
-        rgba(37, 99, 235, 0.95) 100%);
+    rgba(59, 130, 246, 0.95) 0%,
+    rgba(96, 165, 250, 0.95) 50%,
+    rgba(37, 99, 235, 0.95) 100%);
     box-shadow: 0 8px 32px rgba(30, 64, 175, 0.4);
   }
 
@@ -393,14 +393,14 @@
   .text-gradient {
     @apply bg-clip-text text-transparent transition-colors duration-300;
     background-image: linear-gradient(to right,
-        rgba(37, 99, 235, 1),
-        rgba(59, 130, 246, 1));
+    rgba(37, 99, 235, 1),
+    rgba(59, 130, 246, 1));
   }
 
   .text-gradient:hover {
     background-image: linear-gradient(to right,
-        rgba(59, 130, 246, 1),
-        rgba(96, 165, 250, 1));
+    rgba(59, 130, 246, 1),
+    rgba(96, 165, 250, 1));
   }
 
   .bg-gradient-dark {
@@ -411,16 +411,16 @@
   .auth-bg-gradient {
     @apply absolute inset-0 z-0;
     background: radial-gradient(circle at 70% 90%,
-        rgba(37, 99, 235, 0.4) 0,
-        rgba(255, 255, 255, 0) 65%),
-      linear-gradient(124deg, rgba(226, 232, 240, 0.25) 0 60%, transparent 100%);
+    rgba(37, 99, 235, 0.4) 0,
+    rgba(255, 255, 255, 0) 65%),
+    linear-gradient(124deg, rgba(226, 232, 240, 0.25) 0 60%, transparent 100%);
   }
 
   .dark .auth-bg-gradient {
     background: radial-gradient(circle at 60% 90%,
-        rgba(30, 64, 175, 0.6) 0,
-        rgba(30, 41, 59, 0) 60%),
-      linear-gradient(127deg, rgba(30, 41, 59, 1) 60%, rgba(15, 23, 42, 1) 100%);
+    rgba(30, 64, 175, 0.6) 0,
+    rgba(30, 41, 59, 0) 60%),
+    linear-gradient(127deg, rgba(30, 41, 59, 1) 60%, rgba(15, 23, 42, 1) 100%);
   }
 
   /* Improved input styling */
@@ -466,8 +466,8 @@
   .glass-card .btn {
     @apply transition-all duration-300 font-medium;
     background: linear-gradient(90deg,
-        rgba(37, 99, 235, 1) 0%,
-        rgba(59, 130, 246, 1) 100%);
+    rgba(37, 99, 235, 1) 0%,
+    rgba(59, 130, 246, 1) 100%);
     color: #fff;
     border-radius: var(--radius);
     box-shadow: 0 4px 16px rgba(37, 99, 235, 0.25);
@@ -478,8 +478,8 @@
   .glass-card .shadcn-button:hover,
   .glass-card .btn:hover {
     background: linear-gradient(90deg,
-        rgba(59, 130, 246, 1) 0%,
-        rgba(96, 165, 250, 1) 100%);
+    rgba(59, 130, 246, 1) 0%,
+    rgba(96, 165, 250, 1) 100%);
     color: #fff;
     box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
     transform: translateY(-2px);
@@ -488,8 +488,8 @@
   .dark .glass-card .shadcn-button,
   .dark .glass-card .btn {
     background: linear-gradient(90deg,
-        rgba(59, 130, 246, 0.9) 0%,
-        rgba(30, 64, 175, 1) 100%);
+    rgba(59, 130, 246, 0.9) 0%,
+    rgba(30, 64, 175, 1) 100%);
     color: #f8f8fa;
     border: none;
     box-shadow: 0 4px 16px rgba(30, 64, 175, 0.4);
@@ -497,8 +497,8 @@
 
   .dark .glass-card .btn:hover {
     background: linear-gradient(105deg,
-        rgba(59, 130, 246, 1),
-        rgba(30, 64, 175, 1) 100%);
+    rgba(59, 130, 246, 1),
+    rgba(30, 64, 175, 1) 100%);
     color: #fff;
     box-shadow: 0 6px 20px rgba(30, 64, 175, 0.5);
     transform: translateY(-2px);
@@ -507,13 +507,13 @@
   /* 3D shadow enhancement */
   .auth-3d {
     box-shadow: 0 10px 40px rgba(37, 99, 235, 0.2),
-      0 2px 15px rgba(59, 130, 246, 0.15);
+    0 2px 15px rgba(59, 130, 246, 0.15);
     transition: all 0.3s ease;
   }
 
   .auth-3d:hover {
     box-shadow: 0 15px 50px rgba(37, 99, 235, 0.3),
-      0 3px 20px rgba(59, 130, 246, 0.2);
+    0 3px 20px rgba(59, 130, 246, 0.2);
     transform: translateY(-3px);
   }
 
@@ -634,66 +634,4 @@
 
 .dark .theme-toggle-glass {
   background-color: rgba(30, 41, 59, 0.3);
-}
-@layer utilities {
-  .audio-wave {
-    @apply flex items-end h-5 gap-0.5;
-  }
-
-  .audio-wave span {
-    @apply w-1 rounded-full animate-pulse-slow;
-    animation: audio-wave 1.2s infinite ease-in-out;
-  }
-
-  @keyframes audio-wave {
-    0%, 100% {
-      transform: scaleY(0.5);
-    }
-    50% {
-      transform: scaleY(1);
-    }
-  }
-
-  .speaking-animation {
-    animation: speaking-pulse 1.5s infinite alternate;
-  }
-
-  @keyframes speaking-pulse {
-    0% {
-      opacity: 0.8;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-
-  .animate-pulse-slow {
-    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  .animate-flash {
-    animation: flash 0.75s ease-out;
-  }
-
-  @keyframes flash {
-    0% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-    }
-  }
-
-  .animate-fadeIn {
-    animation: fadeIn 0.3s ease-in;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
 }
