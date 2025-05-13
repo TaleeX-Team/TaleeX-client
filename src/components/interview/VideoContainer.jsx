@@ -243,19 +243,7 @@ export const VideoContainer = forwardRef(
                             <div className="absolute inset-0 pointer-events-none border-4 border-emerald-500/40 animate-pulse rounded-lg"></div>
                         )}
 
-                        {/* Screenshot count indicator */}
-                        {screenshotCount > 0 && (
-                            <div className={cn(
-                                "absolute top-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-full text-xs font-medium",
-                                isDarkMode
-                                    ? "bg-gray-800/70 text-white"
-                                    : "bg-white/70 text-gray-700",
-                                "backdrop-blur-sm flex items-center gap-1.5"
-                            )}>
-                              <span className="block h-2 w-2 rounded-full bg-emerald-500"></span>
-                              <span>{screenshotCount} captures</span>
-                            </div>
-                        )}
+
                       </div>
                   ) : (
                       // Avatar fallback when video is off
