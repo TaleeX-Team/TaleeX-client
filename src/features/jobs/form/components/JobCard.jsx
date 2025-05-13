@@ -11,14 +11,21 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Building2, Clock, ExternalLink, Edit, ShieldCheck } from "lucide-react";
+import {
+  Building2,
+  Clock,
+  ExternalLink,
+  Edit,
+  ShieldCheck,
+} from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslation } from "react-i18next";
 import UpdateJob from "@/features/jobs/addJob/UpdateJob.jsx";
 import JobStatusBadge from "../../ui/JobStatusBadge";
 
 export default function JobCard({ job }) {
+  const { t, i18n } = useTranslation();
   const {
     _id,
     title,
@@ -31,18 +38,21 @@ export default function JobCard({ job }) {
     description,
   } = job;
   const { id } = useParams();
+
   const formatOpenTime = (openTime) => {
-    if (!openTime) return "Recently";
+    if (!openTime) return t("jobs.time.recently");
 
     if (openTime.days > 0) {
-      return `${openTime.days} day${openTime.days > 1 ? "s" : ""} ago`;
+      return t("jobs.time.days", { count: openTime.days });
     } else if (openTime.hours > 0) {
-      return `${openTime.hours} hour${openTime.hours > 1 ? "s" : ""} ago`;
+      return t("jobs.time.hours", { count: openTime.hours });
     } else {
-      return `${openTime.minutes} minute${openTime.minutes > 1 ? "s" : ""} ago`;
+      return t("jobs.time.minutes", { count: openTime.minutes });
     }
   };
+
   if (!company) return null;
+
   return (
     <Card className="overflow-hidden flex flex-col relative border border-border hover:border-border/80 transition-all duration-300">
       <CardHeader className="pb-1">
@@ -56,9 +66,7 @@ export default function JobCard({ job }) {
                 </Badge>
               )}
               {experienceLevel && (
-                <Badge
-                  className={`px-2 py-0.5 text-xs bg-muted text-muted-foreground capitalize`}
-                >
+                <Badge className="px-2 py-0.5 text-xs bg-muted text-muted-foreground capitalize">
                   {experienceLevel}
                 </Badge>
               )}
@@ -70,12 +78,10 @@ export default function JobCard({ job }) {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <ShieldCheck className="text-blue-700 border-blue-200 text-xs py-0 0 dark:text-blue-300 dark:border-blue-900 h-5">
-
-                      </ShieldCheck>
+                      <ShieldCheck className="text-blue-700 border-blue-200 text-xs py-0 0 dark:text-blue-300 dark:border-blue-900 h-5" />
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p className="text-xs">Verified Company</p>
+                      <p className="text-xs">{t("jobs.verifiedCompany")}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -120,34 +126,25 @@ export default function JobCard({ job }) {
           <Clock className="h-3.5 w-3.5 mr-1.5" />
           <span>{formatOpenTime(openTime)}</span>
         </div>
-        {status !== "closed"}
+
         <div className="flex gap-2">
-          {/* Edit Job Button with UpdateJob Dialog */}
           {status !== "closed" && (
             <UpdateJob
               jobId={_id}
               trigger={
                 <Button variant="outline" size="sm">
                   <Edit className="h-3.5 w-3.5 mr-1" />
-                  Edit
+                  {t("jobs.common.edit")}
                 </Button>
               }
             />
           )}
 
-          {/* View Details Button */}
           <Button asChild variant="outline" size="sm">
-            {!id ? (
-              <Link to={`/app/jobs/${_id}`}>
-                View Details
-                <ExternalLink className="h-3.5 w-3.5 ml-1" />
-              </Link>
-            ) : (
-              <Link to={`${_id}`}>
-                View Details
-                <ExternalLink className="h-3.5 w-3.5 ml-1" />
-              </Link>
-            )}
+            <Link to={!id ? `/app/jobs/${_id}` : `${_id}`}>
+              {t("jobs.viewDetails")}
+              <ExternalLink className="h-3.5 w-3.5 ml-1" />
+            </Link>
           </Button>
         </div>
       </CardFooter>

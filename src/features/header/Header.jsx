@@ -9,6 +9,7 @@ import { Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 import UserAvatar from "./user-avatar/UserAvatar";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import LanguageToggle from "@/togglingButton";
 
 export default function Header() {
   return (
@@ -68,8 +69,10 @@ export default function Header() {
 
         {/* Right Section */}
         <div className="flex items-center gap-3">
+        <LanguageToggle></LanguageToggle>
           <ThemeToggle />
           <Separator orientation="vertical" className="h-5 hidden md:block" />
+          
           <UserAvatar />
         </div>
       </header>
