@@ -635,3 +635,65 @@
 .dark .theme-toggle-glass {
   background-color: rgba(30, 41, 59, 0.3);
 }
+@layer utilities {
+  .audio-wave {
+    @apply flex items-end h-5 gap-0.5;
+  }
+
+  .audio-wave span {
+    @apply w-1 rounded-full animate-pulse-slow;
+    animation: audio-wave 1.2s infinite ease-in-out;
+  }
+
+  @keyframes audio-wave {
+    0%, 100% {
+      transform: scaleY(0.5);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+  }
+
+  .speaking-animation {
+    animation: speaking-pulse 1.5s infinite alternate;
+  }
+
+  @keyframes speaking-pulse {
+    0% {
+      opacity: 0.8;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-flash {
+    animation: flash 0.75s ease-out;
+  }
+
+  @keyframes flash {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
