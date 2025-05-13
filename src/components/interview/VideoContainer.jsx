@@ -175,7 +175,7 @@ export const VideoContainer = forwardRef(
                   isUser ? "video-container-user" : "video-container-ai",
                   isSpeaking && activeColors.speakingRing,
                   isSpeaking && "ring-2 shadow-lg",
-                  isSpeaking ? "z-10 scale-[1.02]" : "z-0",
+                  isSpeaking ? "z-10 scale-[1.05]" : "z-0",
                   !isSpeaking && "opacity-95"
               )}
               style={{
