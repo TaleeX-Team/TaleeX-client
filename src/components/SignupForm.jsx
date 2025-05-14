@@ -19,7 +19,8 @@ import {
 } from "@/components/ui/form";
 import gsap from "gsap";
 import { useTheme } from "@/layouts/theme_provider/ThemeProvider.jsx";
-import {LoadingIndicator} from "@/components/LoadingButton.jsx";
+import { LoadingIndicator } from "@/components/LoadingButton.jsx";
+import { useTranslation } from "react-i18next"; // Import i18n hook
 
 const formSchema = z
   .object({
@@ -61,6 +62,7 @@ export const SignupForm = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const formRef = useRef();
+  const { t } = useTranslation(); // Initialize translation hook
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -100,12 +102,13 @@ export const SignupForm = ({
         className="space-y-3"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {/* First Name */}
           <FormField
             control={form.control}
             name="firstName"
             render={({ field }) => (
               <FormItem className="space-y-1">
-                <FormLabel className="text-xs">First Name</FormLabel>
+                <FormLabel className="text-xs">{t("signupForm.firstName")}</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <User
@@ -113,8 +116,8 @@ export const SignupForm = ({
                       size={14}
                     />
                     <Input
-                      placeholder="John"
-                      className=" pl-10 h-8 text-sm"
+                      placeholder={t("signupForm.firstNamePlaceholder")}
+                      className="pl-10 h-8 text-sm"
                       {...field}
                     />
                   </div>
@@ -124,12 +127,13 @@ export const SignupForm = ({
             )}
           />
 
+          {/* Last Name */}
           <FormField
             control={form.control}
             name="lastName"
             render={({ field }) => (
               <FormItem className="space-y-1">
-                <FormLabel className="text-xs">Last Name</FormLabel>
+                <FormLabel className="text-xs">{t("signupForm.lastName")}</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <User
@@ -137,8 +141,8 @@ export const SignupForm = ({
                       size={14}
                     />
                     <Input
-                      placeholder="Doe"
-                      className=" pl-10 h-8 text-sm"
+                      placeholder={t("signupForm.lastNamePlaceholder")}
+                      className="pl-10 h-8 text-sm"
                       {...field}
                     />
                   </div>
@@ -149,12 +153,13 @@ export const SignupForm = ({
           />
         </div>
 
+        {/* Email */}
         <FormField
           control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem className="space-y-1">
-              <FormLabel className="text-xs">Email</FormLabel>
+              <FormLabel className="text-xs">{t("signupForm.email")}</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Mail
@@ -162,8 +167,8 @@ export const SignupForm = ({
                     size={14}
                   />
                   <Input
-                    placeholder="name@company.com"
-                    className=" pl-10 h-8 text-sm"
+                    placeholder={t("signupForm.emailPlaceholder")}
+                    className="pl-10 h-8 text-sm"
                     {...field}
                   />
                 </div>
@@ -173,12 +178,13 @@ export const SignupForm = ({
           )}
         />
 
+        {/* Phone */}
         <FormField
           control={form.control}
           name="phone"
           render={({ field }) => (
             <FormItem className="space-y-1">
-              <FormLabel className="text-xs">Phone Number</FormLabel>
+              <FormLabel className="text-xs">{t("signupForm.phone")}</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Phone
@@ -186,8 +192,8 @@ export const SignupForm = ({
                     size={14}
                   />
                   <Input
-                    placeholder="+1234567890"
-                    className=" pl-10 h-8 text-sm"
+                    placeholder={t("signupForm.phonePlaceholder")}
+                    className="pl-10 h-8 text-sm"
                     {...field}
                   />
                 </div>
@@ -197,12 +203,13 @@ export const SignupForm = ({
           )}
         />
 
+        {/* Password */}
         <FormField
           control={form.control}
           name="password"
           render={({ field }) => (
             <FormItem className="space-y-1">
-              <FormLabel className="text-xs">Password</FormLabel>
+              <FormLabel className="text-xs">{t("signupForm.password")}</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Lock
@@ -211,7 +218,7 @@ export const SignupForm = ({
                   />
                   <Input
                     type={showPassword ? "text" : "password"}
-                    className=" pl-10 pr-10 h-8 text-sm"
+                    className="pl-10 pr-10 h-8 text-sm"
                     {...field}
                   />
                   <button
@@ -228,12 +235,13 @@ export const SignupForm = ({
           )}
         />
 
+        {/* Confirm Password */}
         <FormField
           control={form.control}
           name="confirmPassword"
           render={({ field }) => (
             <FormItem className="space-y-1">
-              <FormLabel className="text-xs">Confirm Password</FormLabel>
+              <FormLabel className="text-xs">{t("signupForm.confirmPassword")}</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Lock
@@ -242,7 +250,7 @@ export const SignupForm = ({
                   />
                   <Input
                     type={showConfirmPassword ? "text" : "password"}
-                    className=" pl-10 pr-10 h-8 text-sm"
+                    className="pl-10 pr-10 h-8 text-sm"
                     {...field}
                   />
                   <button
@@ -250,11 +258,7 @@ export const SignupForm = ({
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
-                    {showConfirmPassword ? (
-                      <EyeOff size={14} />
-                    ) : (
-                      <Eye size={14} />
-                    )}
+                    {showConfirmPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                   </button>
                 </div>
               </FormControl>
@@ -263,6 +267,7 @@ export const SignupForm = ({
           )}
         />
 
+        {/* Terms Checkbox */}
         <FormField
           control={form.control}
           name="termsAccepted"
@@ -278,14 +283,7 @@ export const SignupForm = ({
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel htmlFor="terms" className="text-xs">
-                  I agree to the{" "}
-                  <Link to="#" className="text-primary hover:text-primary/70">
-                    Terms of Service
-                  </Link>{" "}
-                  and{" "}
-                  <Link to="#" className="text-primary hover:text-primary/70">
-                    Privacy Policy
-                  </Link>
+                  {t("signupForm.termsText")} {/* Translated */}
                 </FormLabel>
                 <FormMessage className="text-xs" />
               </div>
@@ -293,18 +291,20 @@ export const SignupForm = ({
           )}
         />
 
+        {/* Submit Button */}
         <Button
           type="submit"
           className={`w-full bg-gradient-to-r from-primary to-pink-400 hover:primary/70 hover:to-pink-500 transition-all duration-300`}
           disabled={isLoading}
         >
-          {isLoading ?   <>
-              <LoadingIndicator className="mr-2" />
-              Processing
-          </> : "Create account"}{" "}
+          {isLoading ? <>
+            <LoadingIndicator className="mr-2" />
+            {t("signupForm.processing")}
+          </> : t("signupForm.createAccount")} {/* Translated */}
           <ArrowRight className="ml-2" size={14} />
         </Button>
 
+        {/* Social Buttons */}
         <SocialButtons
           disabled={isLoading}
           handleOAuthSuccess={handleOAuthSuccess}

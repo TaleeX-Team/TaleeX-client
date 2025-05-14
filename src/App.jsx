@@ -1,6 +1,6 @@
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
-
+import "../i18n.js";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -24,6 +24,7 @@ import JobApplicationPage from "@/features/jobs/form/JobApplicationPage.jsx";
 import { InviteJob } from "@/features/jobs/inviteJob/InviteJob.jsx";
 import { StartScreen } from "@/components/interview/StartScreen.jsx";
 import VerifiedEmail from "@/features/auth/verified-email/VerifiedEmail.jsx";
+import { I18nextProvider, useTranslation } from "react-i18next";
 import LandingPage from "./features/landingPage/landingPage";
 import AboutPage from "./features/aboutUs/aboutUs";
 import ContactPage from "./features/contactUs/contactUs";
@@ -64,6 +65,12 @@ const initialOptions = {
 };
 
 function App() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    document.documentElement.lang = i18n.language;
+    document.documentElement.dir = i18n.language === "ar" ? "rtl" : "ltr";
+  }, [i18n.language]);
   const [router] = useState(() =>
     createBrowserRouter([
       // Root redirect
@@ -139,9 +146,11 @@ function App() {
       <ThemeProvider storageKey="app-theme">
         <ReactQueryDevtools initialIsOpen={false} />
         <Suspense fallback={<FullPageSpinner />}>
-          <PayPalScriptProvider options={initialOptions}>
-            <RouterProvider router={router} />
-          </PayPalScriptProvider>
+          <I18nextProvider i18n={i18n}>
+            <PayPalScriptProvider options={initialOptions}>
+              <RouterProvider router={router} />
+            </PayPalScriptProvider>
+          </I18nextProvider>
         </Suspense>
         <Toaster />
       </ThemeProvider>

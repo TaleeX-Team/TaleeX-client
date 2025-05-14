@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "react-i18next";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,13 +27,15 @@ export function RejectedApplicantsTab({
   toggleSelectAll,
   toggleSelectApplicant,
 }) {
+  const { t } = useTranslation();
+
   return (
     <div>
       {/* Search for rejected */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
           <Input
-            placeholder="Find email or name..."
+            placeholder={t("reject.rejectedApplicantss.searchPlaceholder")}
             className="pl-10 bg-input"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
@@ -70,22 +73,22 @@ export function RejectedApplicantsTab({
                 />
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Name
+                {t("reject.rejectedApplicantss.table.name")}
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Email
+                {t("reject.rejectedApplicantss.table.email")}
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Applied
+                {t("reject.rejectedApplicantss.table.applied")}
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Feedbacks
+                {t("reject.rejectedApplicantss.table.Feedbacks")}
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                CV
+                {t("reject.rejectedApplicantss.table.CV")}
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Last Phase
+                {t("reject.rejectedApplicantss.table.lastPhase")}
               </th>
             </tr>
           </thead>
@@ -147,7 +150,9 @@ export function RejectedApplicantsTab({
                               className="h-8 px-3"
                               disabled={!applicant?.feedback?.cv}
                             >
-                              CV
+                              {t(
+                                "reject.rejectedApplicantss.table.feedbacks.cv"
+                              )}
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
@@ -165,7 +170,9 @@ export function RejectedApplicantsTab({
                               size="sm"
                               className="h-8 px-3"
                             >
-                              Feedback
+                              {t(
+                                "reject.rejectedApplicantss.table.feedbacks.feedback"
+                              )}
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
@@ -190,7 +197,9 @@ export function RejectedApplicantsTab({
                               size="sm"
                               className="h-8 px-3"
                             >
-                              Final Feedback
+                              {t(
+                                "reject.rejectedApplicantss.table.feedbacks.finalFeedback"
+                              )}
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
@@ -219,18 +228,24 @@ export function RejectedApplicantsTab({
                                 rel="noopener noreferrer"
                               >
                                 <Newspaper className="h-3.5 w-3.5" />
-                                <span className="sr-only">Open CV</span>
+                                <span className="sr-only">
+                                  {t(
+                                    "reject.rejectedApplicantss.table.cv.open"
+                                  )}
+                                </span>
                               </a>
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Open CV</p>
+                            <p>
+                              {t("reject.rejectedApplicantss.table.cv.open")}
+                            </p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     ) : (
                       <span className="text-gray-400 dark:text-gray-500">
-                        No CV
+                        {t("reject.reject.rejectedApplicantss.table.cv.noCV")}
                       </span>
                     )}
                   </td>
@@ -238,16 +253,16 @@ export function RejectedApplicantsTab({
                     <Badge
                       variant="outline"
                       className={(() => {
-                        switch (applicant?.phase) {
-                          case "Applications":
+                        switch (applicant.phase) {
+                          case t("reject.phases.applications"):
                             return "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800";
-                          case "CV Review":
+                          case t("reject.phases.cvReview"):
                             return "bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-900/20 dark:text-pink-400 dark:border-pink-800";
-                          case "Sending Interview":
+                          case t("reject.phases.sendingInterview"):
                             return "bg-lime-50 text-lime-700 border-lime-200 dark:bg-lime-900/20 dark:text-lime-400 dark:border-lime-800";
-                          case "Interview Feedback":
+                          case t("reject.phases.interviewFeedback"):
                             return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800";
-                          case "Final Feedback":
+                          case t("reject.phases.finalFeedback"):
                             return "bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-900/20 dark:text-sky-400 dark:border-sky-800";
                           case "offer":
                             return "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800";
@@ -269,7 +284,7 @@ export function RejectedApplicantsTab({
                   colSpan={7}
                   className="py-4 text-center text-gray-500 dark:text-gray-400"
                 >
-                  No rejected applicants found.
+                  {t("reject.rejectedApplicantss.table.noApplicants")}
                 </td>
               </tr>
             )}

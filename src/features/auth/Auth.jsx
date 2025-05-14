@@ -6,6 +6,8 @@ import { AnimatedBackground } from "@/components/AnimatedBackground.jsx";
 import { ThreeDLogoSection } from "@/components/TheeDLogoSection.jsx";
 import { AuthTabs } from "@/components/AuthTabs.jsx";
 import { useTheme } from "@/layouts/theme_provider/ThemeProvider";
+import { useTranslation } from "react-i18next"; 
+import LanguageToggle from "@/togglingButton";
 
 const Auth = () => {
     const [activeTab, setActiveTab] = useState("login");
@@ -13,6 +15,7 @@ const Auth = () => {
     const { theme } = useTheme();
     const isDark = theme === "dark";
 
+    const {t} = useTranslation()
     useEffect(() => {
         // Initial animations
         gsap.fromTo(
@@ -34,15 +37,23 @@ const Auth = () => {
 
             {/* Right Panel - Auth Form */}
             <div ref={cardRef} className="w-full max-w-md lg:w-1/2 space-y-6">
-                <div className="flex items-center justify-between mb-3">
-                    <ThreeDLogoSection isMobile={true} />
-                    <ThemeToggle />
-                </div>
+            <div className="flex items-center justify-between mb-3">
+  <ThreeDLogoSection isMobile={true} />
+  
+  <div className="flex items-center gap-2">
+    
+    <ThemeToggle />
+    <LanguageToggle />
+  </div>
+</div>
+
+                
 
                 <Card>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-2xl font-semibold text-center text-gradient">
-                            {activeTab === "login" ? "Welcome back" : "Create an account"}
+                            {activeTab === 
+                            "login" ? t("auth.welcomeBack"): t("auth.createAccount")}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>

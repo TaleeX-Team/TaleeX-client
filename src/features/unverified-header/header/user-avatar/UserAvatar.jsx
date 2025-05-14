@@ -18,11 +18,12 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth.js";
 import { useUser } from "@/hooks/useUser";
+import { useTranslation } from "react-i18next"; // Import translation hook
 
 const UserAvatar = () => {
+  const { t } = useTranslation(); // Initialize translation hook
   const { logout } = useAuth();
   const [openDialog, setOpenDialog] = useState(false);
   const { data: user } = useUser();
@@ -31,6 +32,7 @@ const UserAvatar = () => {
     logout.mutate();
     setOpenDialog(false);
   };
+
   const getInitials = (name) => name?.charAt(0).toUpperCase() || "U"; // Fallback to 'U' if name is empty
 
   return (
@@ -42,7 +44,7 @@ const UserAvatar = () => {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel>{t("userAvatar.myAccount")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
@@ -52,24 +54,20 @@ const UserAvatar = () => {
           }}
           className="text-red-600 focus:bg-red-100 dark:focus:bg-red-900 cursor-pointer"
         >
-          Logout
+          {t("userAvatar.logout")}
         </DropdownMenuItem>
       </DropdownMenuContent>
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Are you sure you want to logout?</DialogTitle>
-            <DialogDescription>
-              You will be logged out of your account. This action cannot be
-              undone.
-            </DialogDescription>
+            <DialogTitle>{t("userAvatar.confirmLogoutTitle")}</DialogTitle>
           </DialogHeader>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setOpenDialog(false)}>
-              Cancel
+              {t("userAvatar.cancel")}
             </Button>
             <Button variant="destructive" onClick={handleLogout}>
-              Logout
+              {t("userAvatar.logout")}
             </Button>
           </DialogFooter>
         </DialogContent>

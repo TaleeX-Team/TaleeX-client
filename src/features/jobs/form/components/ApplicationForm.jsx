@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Loader2 } from "lucide-react"
 import { FileUpload } from "@/features/jobs/form/components/FileUpload.jsx";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 const applicationSchema = z.object({
     name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -23,6 +24,7 @@ const applicationSchema = z.object({
 })
 
 export function ApplicationForm({ jobId, onSubmit, isSubmitting }) {
+    const { t } = useTranslation(); // Initialize t function for translation
     const [file, setFile] = useState(null)
 
     const form = useForm({
@@ -58,8 +60,8 @@ export function ApplicationForm({ jobId, onSubmit, isSubmitting }) {
     return (
         <Card className="mt-8">
             <CardHeader>
-                <CardTitle>Apply for this position</CardTitle>
-                <CardDescription>Fill out the form below to submit your application</CardDescription>
+                <CardTitle>{t("applicationForm.title")}</CardTitle>
+                <CardDescription>{t("applicationForm.description")}</CardDescription>
             </CardHeader>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSubmit)}>
@@ -70,7 +72,7 @@ export function ApplicationForm({ jobId, onSubmit, isSubmitting }) {
                                 name="name"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Full Name</FormLabel>
+                                        <FormLabel>{t("applicationForm.fullName")}</FormLabel>
                                         <FormControl>
                                             <Input placeholder="John Doe" {...field} />
                                         </FormControl>
@@ -84,7 +86,7 @@ export function ApplicationForm({ jobId, onSubmit, isSubmitting }) {
                                 name="email"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Email</FormLabel>
+                                        <FormLabel>{t("applicationForm.email")}</FormLabel>
                                         <FormControl>
                                             <Input type="email" placeholder="john.doe@example.com" {...field} />
                                         </FormControl>
@@ -99,12 +101,12 @@ export function ApplicationForm({ jobId, onSubmit, isSubmitting }) {
                             name="linkedIn"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>LinkedIn Profile (Optional)</FormLabel>
+                                    <FormLabel>{t("applicationForm.linkedIn")}</FormLabel>
                                     <FormControl>
                                         <Input placeholder="https://linkedin.com/in/johndoe" {...field} />
                                     </FormControl>
                                     <FormDescription>
-                                        Share your LinkedIn profile to help the employer learn more about you
+                                        {t("applicationForm.linkedInDescription")}
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
@@ -116,7 +118,7 @@ export function ApplicationForm({ jobId, onSubmit, isSubmitting }) {
                             name="document"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Resume/CV</FormLabel>
+                                    <FormLabel>{t("applicationForm.resume")}</FormLabel>
                                     <FormControl>
                                         <FileUpload
                                             value={file}
@@ -127,7 +129,7 @@ export function ApplicationForm({ jobId, onSubmit, isSubmitting }) {
                                             accept=".pdf"
                                         />
                                     </FormControl>
-                                    <FormDescription>Upload your resume or CV (PDF files only)</FormDescription>
+                                    <FormDescription>{t("applicationForm.resumeDescription")}</FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -138,15 +140,15 @@ export function ApplicationForm({ jobId, onSubmit, isSubmitting }) {
                             name="notes"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Additional Notes (Optional)</FormLabel>
+                                    <FormLabel>{t("applicationForm.additionalNotes")}</FormLabel>
                                     <FormControl>
                                         <Textarea
-                                            placeholder="Share any additional information that might be relevant to your application"
+                                            placeholder={t("applicationForm.additionalNotes")}
                                             className="min-h-[120px]"
                                             {...field}
                                         />
                                     </FormControl>
-                                    <FormDescription>Maximum 500 characters</FormDescription>
+                                    <FormDescription>{t("applicationForm.additionalNotesDescription")}</FormDescription>
                                     <FormMessage />
                                 </FormItem>
                             )}
@@ -155,16 +157,16 @@ export function ApplicationForm({ jobId, onSubmit, isSubmitting }) {
                     </CardContent>
                     <CardFooter className="mt-4 flex justify-between">
                         <p className="text-xs">
-                            By submitting this application, you consent to Taleex sharing your information with the company posting this job.
+                            {t("applicationForm.consent")}
                         </p>
                         <Button type="submit" className="w-auto" disabled={isSubmitting}>
                             {isSubmitting ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Submitting...
+                                    {t("applicationForm.submitting")}
                                 </>
                             ) : (
-                                "Submit Application"
+                                t("applicationForm.submit")
                             )}
                         </Button>
                     </CardFooter>

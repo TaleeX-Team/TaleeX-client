@@ -16,8 +16,10 @@ import { useEffect, useState } from "react";
 import { useUser } from "@/hooks/useUser";
 import PayPalButton from "./paypalcheckoutButton";
 import PayPalButton2 from "./paypalButton2";
+import { useTranslation } from "react-i18next"; // Import translation hook
 
 export default function SubscriptionPage() {
+  const { t } = useTranslation(); // Initialize translation hook
   const { data: user } = useUser();
   const {
     tokenPrice,
@@ -61,10 +63,10 @@ export default function SubscriptionPage() {
       <div className="flex">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Tokens
+            {t("subscriptionPage.tokens")}
           </h1>
           <p className="text-muted-foreground">
-            Purchase tokens to use our AI-powered services
+            {t("subscriptionPage.purchaseTokensDescription")}
           </p>
         </div>
       </div>
@@ -75,15 +77,15 @@ export default function SubscriptionPage() {
             <DialogTrigger asChild>
               <Button>
                 <Zap className="mr-2 h-4 w-4" />
-                Buy Tokens
+                {t("subscriptionPage.buyTokens")}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <div className="p-6 max-w-md w-full">
-                <h2 className="text-2xl font-bold mb-4">Purchase Tokens</h2>
+                <h2 className="text-2xl font-bold mb-4">{t("subscriptionPage.purchaseTokens")}</h2>
                 <div className="mb-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xl">Tokens: {tokenCount}</h3>
+                    <h3 className="text-xl">{t("subscriptionPage.tokens")}: {tokenCount}</h3>
                     <div className="flex items-center space-x-2">
                       <Button onClick={handleDecrement} disabled={tokenCount <= 5000}>-</Button>
                       <input
@@ -98,7 +100,7 @@ export default function SubscriptionPage() {
                     </div>
                   </div>
                   <div className="mt-2">
-                    <p className="text-lg font-semibold">Total Price: ${totalPrice.toFixed(2)}</p>
+                    <p className="text-lg font-semibold">{t("subscriptionPage.totalPrice")}: ${totalPrice.toFixed(2)}</p>
                   </div>
                 </div>
 
@@ -121,24 +123,24 @@ export default function SubscriptionPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl">Token Credit</CardTitle>
+              <CardTitle className="text-xl">{t("subscriptionPage.tokenCredit")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
                 <span className="text-4xl font-bold text-primary">{user.tokens}</span>
-                <span className="text-lg ml-2 text-muted-foreground">tokens</span>
+                <span className="text-lg ml-2 text-muted-foreground">{t("subscriptionPage.tokensLabel")}</span>
               </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl">Token Price</CardTitle>
+              <CardTitle className="text-xl">{t("subscriptionPage.tokenPrice")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
                 <span className="text-4xl font-bold text-primary">${tokenPrice}</span>
-                <span className="text-lg ml-2 text-muted-foreground">per token</span>
+                <span className="text-lg ml-2 text-muted-foreground">{t("subscriptionPage.perToken")}</span>
               </div>
             </CardContent>
           </Card>
@@ -158,7 +160,7 @@ export default function SubscriptionPage() {
               {index === 1 && (
                 <div className="absolute top-0 right-0">
                   <Badge className="rounded-tl-none rounded-br-none bg-primary text-primary-foreground">
-                    Most Popular
+                    {t("subscriptionPage.mostPopular")}
                   </Badge>
                 </div>
               )}
@@ -167,7 +169,7 @@ export default function SubscriptionPage() {
                   <Icon className="h-6 w-6 text-white" />
                 </div>
                 <CardTitle>{pack.name}</CardTitle>
-                <CardDescription>{pack.tokens} tokens</CardDescription>
+                <CardDescription>{pack.tokens} {t("subscriptionPage.tokens")}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-baseline">
@@ -177,21 +179,21 @@ export default function SubscriptionPage() {
 
                 <div className="bg-muted/30 p-3 rounded-md text-center">
                   <span className="text-2xl font-bold text-primary">{pack.tokens}</span>
-                  <span className="text-muted-foreground ml-1">tokens</span>
+                  <span className="text-muted-foreground ml-1">{t("subscriptionPage.tokensLabel")}</span>
                 </div>
 
                 <ul className="space-y-2">
                   <li className="flex items-start">
                     <Check className="h-4 w-4 mr-2 mt-1 text-green-500" />
-                    <span className="text-sm">Use tokens for any service</span>
+                    <span className="text-sm">{t("subscriptionPage.useTokensForAnyService")}</span>
                   </li>
                   <li className="flex items-start">
                     <Check className="h-4 w-4 mr-2 mt-1 text-green-500" />
-                    <span className="text-sm">No expiration date</span>
+                    <span className="text-sm">{t("subscriptionPage.noExpiration")}</span>
                   </li>
                   <li className="flex items-start">
                     <Check className="h-4 w-4 mr-2 mt-1 text-green-500" />
-                    <span className="text-sm">24/7 support</span>
+                    <span className="text-sm">{t("subscriptionPage.support24x7")}</span>
                   </li>
                 </ul>
               </CardContent>
@@ -205,7 +207,7 @@ export default function SubscriptionPage() {
 
       {/* How Tokens Work */}
       <div className="mt-16">
-        <h2 className="text-2xl font-bold mb-6 text-center">How Tokens Work</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">{t("subscriptionPage.howTokensWork")}</h2>
         <div className="grid md:grid-cols-3 gap-6">
           {tokenFeatures?.map((feature) => (
             <Card key={feature._id}>
@@ -214,11 +216,11 @@ export default function SubscriptionPage() {
               </CardHeader>
               <CardContent>
                 <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Cost:</span>
-                  <Badge variant="secondary">{feature.tokenCost} tokens</Badge>
+                  <span className="text-muted-foreground">{t("subscriptionPage.cost")}</span>
+                  <Badge variant="secondary">{feature.tokenCost} {t("subscriptionPage.tokensLabel")}</Badge>
                 </div>
                 <p className="text-sm mt-3">
-                  Token cost for {feature.feature} service.
+               { t("subscriptionPage.tokenCostForService", { service: feature.feature })}
                 </p>
               </CardContent>
             </Card>

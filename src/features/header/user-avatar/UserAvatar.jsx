@@ -21,8 +21,10 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth.js";
 import { useUser } from "@/hooks/useUser";
+import { useTranslation } from "react-i18next";  // Import useTranslation
 
 const UserAvatar = () => {
+  const { t } = useTranslation(); // Use t for translation
   const { logout } = useAuth();
   const [openDialog, setOpenDialog] = useState(false);
   const { data: user } = useUser();
@@ -31,6 +33,7 @@ const UserAvatar = () => {
     logout.mutate();
     setOpenDialog(false);
   };
+  
   const getInitials = (name) => name?.charAt(0).toUpperCase() || "U"; // Fallback to 'U' if name is empty
 
   return (
@@ -46,13 +49,13 @@ const UserAvatar = () => {
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel>{t('myAccount')}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <Link to="settings">
-          <DropdownMenuItem>Settings</DropdownMenuItem>
+          <DropdownMenuItem>{t('settings')}</DropdownMenuItem>
         </Link>
         {/* <Link to="/settings/billing">
-          <DropdownMenuItem>Billing</DropdownMenuItem>
+          <DropdownMenuItem>{t('billing')}</DropdownMenuItem>
         </Link> */}
         <DropdownMenuItem
           onSelect={(e) => {
@@ -61,24 +64,23 @@ const UserAvatar = () => {
           }}
           className="text-red-600 focus:bg-red-100 dark:focus:bg-red-900 cursor-pointer"
         >
-          Logout
+          {t('logout')}
         </DropdownMenuItem>
       </DropdownMenuContent>
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Are you sure you want to logout?</DialogTitle>
+            <DialogTitle>{t('logoutConfirmation')}</DialogTitle>
             <DialogDescription>
-              You will be logged out of your account. This action cannot be
-              undone.
+              {t('logoutWarning')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setOpenDialog(false)}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button variant="destructive" onClick={handleLogout}>
-              Logout
+              {t('logout')}
             </Button>
           </DialogFooter>
         </DialogContent>

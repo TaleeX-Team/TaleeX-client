@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -49,74 +50,6 @@ import {
 import { useNonRejectedCompanies } from "@/hooks/useNonRejectedCompanies";
 import { useJobs } from "../useJobs";
 
-const formSchema = z
-    .object({
-        title: z
-            .string()
-            .min(3, { message: "Title must be at least 3 characters" }),
-        description: z
-            .string()
-            .min(10, { message: "Description must be at least 10 characters" }),
-        requirements: z
-            .string()
-            .min(10, { message: "Requirements must be at least 10 characters" }),
-        company: z.string().min(1, { message: "Company is required" }),
-        workPlaceType: z.enum(["remote", "on-site", "hybrid"], {
-            message: "Workplace type is required",
-        }),
-        jobType: z.enum(
-            [
-                "full-time",
-                "part-time",
-                "contract",
-                "internship",
-                "temporary",
-                "freelance",
-            ],
-            {
-                message: "Job type is required",
-            }
-        ),
-        experienceLevel: z.enum(
-            [
-                "Intern",
-                "Entry-Level",
-                "Junior",
-                "Mid-Level",
-                "Senior",
-                "Lead",
-                "Principal",
-                "Staff",
-                "Manager",
-                "Director",
-                "Vice President",
-                "C-Level",
-            ],
-            { message: "Experience level is required" }
-        ),
-        tags: z.array(z.string()).optional(),
-        salary: z
-            .object({
-                min: z.string().optional(),
-                max: z.string().optional(),
-                currency: z.enum(["USD", "EUR", "SAR", "AED", "KWD", "EGP"]).optional(),
-            })
-            .optional(),
-        hiringTarget: z.string().optional(),
-    })
-    .refine(
-        (data) => {
-            if (data.salary?.min && data.salary?.max) {
-                return parseFloat(data.salary.min) <= parseFloat(data.salary.max);
-            }
-            return true;
-        },
-        {
-            message: "Minimum salary must be less than or equal to maximum salary",
-            path: ["salary.max"],
-        }
-    );
-
 const COMMON_TAGS = [
     "JavaScript",
     "React",
@@ -131,6 +64,7 @@ const COMMON_TAGS = [
 ];
 
 export default function AddJob() {
+    const { t } = useTranslation();
     const [open, setOpen] = useState(false);
     const [tags, setTags] = useState([]);
     const [currentTag, setCurrentTag] = useState("");
@@ -144,6 +78,74 @@ export default function AddJob() {
         isLoading: isCompaniesLoading,
         isError: isCompaniesError,
     } = useNonRejectedCompanies();
+
+    const formSchema = z
+        .object({
+            title: z
+                .string()
+                .min(3, { message: t("addJob.validation.title.min") }),
+            description: z
+                .string()
+                .min(10, { message: t("addJob.validation.description.min") }),
+            requirements: z
+                .string()
+                .min(10, { message: t("addJob.validation.requirements.min") }),
+            company: z.string().min(1, { message: t("addJob.validation.company.required") }),
+            workPlaceType: z.enum(["remote", "on-site", "hybrid"], {
+                message: t("addJob.validation.workPlaceType.required"),
+            }),
+            jobType: z.enum(
+                [
+                    "full-time",
+                    "part-time",
+                    "contract",
+                    "internship",
+                    "temporary",
+                    "freelance",
+                ],
+                {
+                    message: t("addJob.validation.jobType.required"),
+                }
+            ),
+            experienceLevel: z.enum(
+                [
+                    "Intern",
+                    "Entry-Level",
+                    "Junior",
+                    "Mid-Level",
+                    "Senior",
+                    "Lead",
+                    "Principal",
+                    "Staff",
+                    "Manager",
+                    "Director",
+                    "Vice President",
+                    "C-Level",
+                ],
+                { message: t("addJob.validation.experienceLevel.required") }
+            ),
+            tags: z.array(z.string()).optional(),
+            salary: z
+                .object({
+                    min: z.string().optional(),
+                    max: z.string().optional(),
+                    currency: z.enum(["USD", "EUR", "SAR", "AED", "KWD", "EGP"]).optional(),
+                })
+                .optional(),
+            hiringTarget: z.string().optional(),
+        })
+        .refine(
+            (data) => {
+                if (data.salary?.min && data.salary?.max) {
+                    return parseFloat(data.salary.min) <= parseFloat(data.salary.max);
+                }
+                return true;
+            },
+            {
+                message: t("addJob.validation.salary.max"),
+                path: ["salary.max"],
+            }
+        );
 
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -211,13 +213,13 @@ export default function AddJob() {
             };
 
             await createJobMutation.mutateAsync(transformedValues);
-            toast.success("Job added successfully!");
+            toast.success(t("addJob.toast.success"));
             form.reset();
             setTags([]);
             setOpen(false);
         } catch (error) {
             console.error("Job submission error:", error);
-            toast.error(` ${error?.response?.data?.message}`);
+            toast.error(t("addJob.toast.error", { message: error?.response?.data?.message || t("addJob.toast.errorDefault") }));
         } finally {
             setIsSubmitting(false);
         }
@@ -243,7 +245,7 @@ export default function AddJob() {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button className="mt-4 md:mt-0 bg-primary hover:bg-primary text-primary-foreground">
-                    <Plus className="mr-2 h-4 w-4" /> Post a Job
+                    <Plus className="mr-2 h-4 w-4" /> {t("addJob.button.postJob")}
                 </Button>
             </DialogTrigger>
 
@@ -262,20 +264,19 @@ export default function AddJob() {
                                 <Briefcase className="h-5 w-5 text-primary" />
                             </div>
                             <DialogTitle className="text-2xl font-semibold">
-                                Create New Job
+                                {t("addJob.dialog.title")}
                             </DialogTitle>
                         </div>
                         <DialogDescription className="text-muted-foreground">
-                            Fill in the details to track applications and candidate progress.
+                            {t("addJob.dialog.description")}
                         </DialogDescription>
                     </DialogHeader>
 
                     <Tabs defaultValue="basics" className="w-full px-6">
-
                         <TabsList className="grid w-full grid-cols-3 mb-4 bg-secondary/50 dark:bg-card">
-                            <TabsTrigger value="basics">Basic Info</TabsTrigger>
-                            <TabsTrigger value="details">Job Details</TabsTrigger>
-                            <TabsTrigger value="additional">Additional Info</TabsTrigger>
+                            <TabsTrigger value="basics">{t("addJob.tabs.basics")}</TabsTrigger>
+                            <TabsTrigger value="details">{t("addJob.tabs.details")}</TabsTrigger>
+                            <TabsTrigger value="additional">{t("addJob.tabs.additional")}</TabsTrigger>
                         </TabsList>
 
                         <ScrollArea className="max-h-[65vh]">
@@ -291,11 +292,11 @@ export default function AddJob() {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel className="text-sm font-medium">
-                                                        Job Title *
+                                                        {t("addJob.form.title.label")} *
                                                     </FormLabel>
                                                     <FormControl>
                                                         <Input
-                                                            placeholder="e.g. Frontend Developer"
+                                                            placeholder={t("addJob.form.title.placeholder")}
                                                             className="bg-input"
                                                             {...field}
                                                         />
@@ -312,7 +313,7 @@ export default function AddJob() {
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel className="text-sm font-medium">
-                                                            Company *
+                                                            {t("addJob.form.company.label")} *
                                                         </FormLabel>
                                                         <Select
                                                             onValueChange={field.onChange}
@@ -320,7 +321,7 @@ export default function AddJob() {
                                                         >
                                                             <FormControl>
                                                                 <SelectTrigger className="w-full sm:w-[268px] bg-input">
-                                                                    <SelectValue placeholder="Select a company" />
+                                                                    <SelectValue placeholder={t("addJob.form.company.placeholder")} />
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
@@ -328,12 +329,12 @@ export default function AddJob() {
                                                                     <SelectItem disabled value="loading">
                                                                         <div className="flex items-center">
                                                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                                            Loading companies...
+                                                                            {t("addJob.form.company.loading")}
                                                                         </div>
                                                                     </SelectItem>
                                                                 ) : isCompaniesError ? (
                                                                     <SelectItem disabled value="error">
-                                                                        Failed to load companies
+                                                                        {t("addJob.form.company.error")}
                                                                     </SelectItem>
                                                                 ) : companies.length > 0 ? (
                                                                     companies.map((comp) =>
@@ -345,7 +346,7 @@ export default function AddJob() {
                                                                     )
                                                                 ) : (
                                                                     <SelectItem disabled value="no-companies">
-                                                                        No companies available
+                                                                        {t("addJob.form.company.noCompanies")}
                                                                     </SelectItem>
                                                                 )}
                                                             </SelectContent>
@@ -361,7 +362,7 @@ export default function AddJob() {
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel className="text-sm font-medium">
-                                                            Job Type *
+                                                            {t("addJob.form.jobType.label")} *
                                                         </FormLabel>
                                                         <Select
                                                             onValueChange={field.onChange}
@@ -369,27 +370,27 @@ export default function AddJob() {
                                                         >
                                                             <FormControl>
                                                                 <SelectTrigger className="w-full sm:w-[268px] bg-input">
-                                                                    <SelectValue placeholder="Select type" />
+                                                                    <SelectValue placeholder={t("addJob.form.jobType.placeholder")} />
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
                                                                 <SelectItem value="full-time">
-                                                                    Full-time
+                                                                    {t("addJob.form.jobType.options.fullTime")}
                                                                 </SelectItem>
                                                                 <SelectItem value="part-time">
-                                                                    Part-time
+                                                                    {t("addJob.form.jobType.options.partTime")}
                                                                 </SelectItem>
                                                                 <SelectItem value="contract">
-                                                                    Contract
+                                                                    {t("addJob.form.jobType.options.contract")}
                                                                 </SelectItem>
                                                                 <SelectItem value="internship">
-                                                                    Internship
+                                                                    {t("addJob.form.jobType.options.internship")}
                                                                 </SelectItem>
                                                                 <SelectItem value="temporary">
-                                                                    Temporary
+                                                                    {t("addJob.form.jobType.options.temporary")}
                                                                 </SelectItem>
                                                                 <SelectItem value="freelance">
-                                                                    Freelance
+                                                                    {t("addJob.form.jobType.options.freelance")}
                                                                 </SelectItem>
                                                             </SelectContent>
                                                         </Select>
@@ -405,7 +406,7 @@ export default function AddJob() {
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel className="text-sm font-medium">
-                                                            Workplace Type *
+                                                            {t("addJob.form.workPlaceType.label")} *
                                                         </FormLabel>
                                                         <Select
                                                             onValueChange={field.onChange}
@@ -413,13 +414,13 @@ export default function AddJob() {
                                                         >
                                                             <FormControl>
                                                                 <SelectTrigger className="w-full sm:w-[268px] bg-input">
-                                                                    <SelectValue placeholder="Select type" />
+                                                                    <SelectValue placeholder={t("addJob.form.workPlaceType.placeholder")} />
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
-                                                                <SelectItem value="remote">Remote</SelectItem>
-                                                                <SelectItem value="hybrid">Hybrid</SelectItem>
-                                                                <SelectItem value="on-site">On-site</SelectItem>
+                                                                <SelectItem value="remote">{t("addJob.form.workPlaceType.options.remote")}</SelectItem>
+                                                                <SelectItem value="hybrid">{t("addJob.form.workPlaceType.options.hybrid")}</SelectItem>
+                                                                <SelectItem value="on-site">{t("addJob.form.workPlaceType.options.onSite")}</SelectItem>
                                                             </SelectContent>
                                                         </Select>
                                                         <FormMessage className="text-destructive" />
@@ -433,7 +434,7 @@ export default function AddJob() {
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel className="text-sm font-medium">
-                                                            Experience Level *
+                                                            {t("addJob.form.experienceLevel.label")} *
                                                         </FormLabel>
                                                         <Select
                                                             onValueChange={field.onChange}
@@ -441,32 +442,22 @@ export default function AddJob() {
                                                         >
                                                             <FormControl>
                                                                 <SelectTrigger className="w-full sm:w-[268px] bg-input">
-                                                                    <SelectValue placeholder="Select level" />
+                                                                    <SelectValue placeholder={t("addJob.form.experienceLevel.placeholder")} />
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
-                                                                <SelectItem value="Intern">Intern</SelectItem>
-                                                                <SelectItem value="Entry-Level">
-                                                                    Entry-Level
-                                                                </SelectItem>
-                                                                <SelectItem value="Junior">Junior</SelectItem>
-                                                                <SelectItem value="Mid-Level">
-                                                                    Mid-Level
-                                                                </SelectItem>
-                                                                <SelectItem value="Senior">Senior</SelectItem>
-                                                                <SelectItem value="Lead">Lead</SelectItem>
-                                                                <SelectItem value="Principal">
-                                                                    Principal
-                                                                </SelectItem>
-                                                                <SelectItem value="Staff">Staff</SelectItem>
-                                                                <SelectItem value="Manager">Manager</SelectItem>
-                                                                <SelectItem value="Director">
-                                                                    Director
-                                                                </SelectItem>
-                                                                <SelectItem value="Vice President">
-                                                                    Vice President
-                                                                </SelectItem>
-                                                                <SelectItem value="C-Level">C-Level</SelectItem>
+                                                                <SelectItem value="Intern">{t("addJob.form.experienceLevel.options.intern")}</SelectItem>
+                                                                <SelectItem value="Entry-Level">{t("addJob.form.experienceLevel.options.entryLevel")}</SelectItem>
+                                                                <SelectItem value="Junior">{t("addJob.form.experienceLevel.options.junior")}</SelectItem>
+                                                                <SelectItem value="Mid-Level">{t("addJob.form.experienceLevel.options.midLevel")}</SelectItem>
+                                                                <SelectItem value="Senior">{t("addJob.form.experienceLevel.options.senior")}</SelectItem>
+                                                                <SelectItem value="Lead">{t("addJob.form.experienceLevel.options.lead")}</SelectItem>
+                                                                <SelectItem value="Principal">{t("addJob.form.experienceLevel.options.principal")}</SelectItem>
+                                                                <SelectItem value="Staff">{t("addJob.form.experienceLevel.options.staff")}</SelectItem>
+                                                                <SelectItem value="Manager">{t("addJob.form.experienceLevel.options.manager")}</SelectItem>
+                                                                <SelectItem value="Director">{t("addJob.form.experienceLevel.options.director")}</SelectItem>
+                                                                <SelectItem value="Vice President">{t("addJob.form.experienceLevel.options.vicePresident")}</SelectItem>
+                                                                <SelectItem value="C-Level">{t("addJob.form.experienceLevel.options.cLevel")}</SelectItem>
                                                             </SelectContent>
                                                         </Select>
                                                         <FormMessage className="text-destructive" />
@@ -483,11 +474,11 @@ export default function AddJob() {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel className="text-sm font-medium">
-                                                        Description *
+                                                        {t("addJob.form.description.label")} *
                                                     </FormLabel>
                                                     <FormControl>
                                                         <Textarea
-                                                            placeholder="Describe the job responsibilities and role"
+                                                            placeholder={t("addJob.form.description.placeholder")}
                                                             className="min-h-[150px] bg-input"
                                                             {...field}
                                                         />
@@ -503,11 +494,11 @@ export default function AddJob() {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel className="text-sm font-medium">
-                                                        Requirements *
+                                                        {t("addJob.form.requirements.label")} *
                                                     </FormLabel>
                                                     <FormControl>
                                                         <Textarea
-                                                            placeholder="List the required skills and qualifications"
+                                                            placeholder={t("addJob.form.requirements.placeholder")}
                                                             className="min-h-[150px] bg-input"
                                                             {...field}
                                                         />
@@ -521,7 +512,7 @@ export default function AddJob() {
                                     <TabsContent value="additional" className="space-y-6 py-2">
                                         <div className="space-y-2">
                                             <FormLabel className="text-sm font-medium">
-                                                Tags
+                                                {t("addJob.form.tags.label")}
                                             </FormLabel>
                                             <div className="flex flex-wrap gap-2 mb-2">
                                                 {tags.map((tag) => (
@@ -546,7 +537,7 @@ export default function AddJob() {
                                                     value={currentTag}
                                                     onChange={(e) => setCurrentTag(e.target.value)}
                                                     onFocus={() => setShowTagSuggestions(true)}
-                                                    placeholder="e.g. React, Node.js"
+                                                    placeholder={t("addJob.form.tags.placeholder")}
                                                     className="bg-input"
                                                     onKeyDown={(e) => {
                                                         if (e.key === "Enter") {
@@ -558,11 +549,11 @@ export default function AddJob() {
                                                 {showTagSuggestions && (
                                                     <Command className="absolute z-10 mt-1 w-full rounded-md border bg-popover shadow-md">
                                                         <CommandInput
-                                                            placeholder="Search tags..."
+                                                            placeholder={t("addJob.form.tags.searchPlaceholder")}
                                                             className="h-10"
                                                         />
                                                         <CommandList>
-                                                            <CommandEmpty>No tags found.</CommandEmpty>
+                                                            <CommandEmpty>{t("addJob.form.tags.noTags")}</CommandEmpty>
                                                             <CommandGroup>
                                                                 {COMMON_TAGS.filter(
                                                                     (tag) =>
@@ -591,7 +582,7 @@ export default function AddJob() {
 
                                         <div>
                                             <h3 className="text-sm font-medium mb-3">
-                                                Salary Information
+                                                {t("addJob.form.salary.label")}
                                             </h3>
                                             <div className="grid grid-cols-3 gap-3 flex justify-between">
                                                 <FormField
@@ -600,12 +591,12 @@ export default function AddJob() {
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel className="text-sm font-medium">
-                                                                Min Salary
+                                                                {t("addJob.form.salary.min.label")}
                                                             </FormLabel>
                                                             <FormControl>
                                                                 <Input
                                                                     type="number"
-                                                                    placeholder="e.g. 50000"
+                                                                    placeholder={t("addJob.form.salary.min.placeholder")}
                                                                     className="bg-input"
                                                                     {...field}
                                                                 />
@@ -620,12 +611,12 @@ export default function AddJob() {
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel className="text-sm font-medium">
-                                                                Max Salary
+                                                                {t("addJob.form.salary.max.label")}
                                                             </FormLabel>
                                                             <FormControl>
                                                                 <Input
                                                                     type="number"
-                                                                    placeholder="e.g. 100000"
+                                                                    placeholder={t("addJob.form.salary.max.placeholder")}
                                                                     className="bg-input"
                                                                     {...field}
                                                                 />
@@ -640,7 +631,7 @@ export default function AddJob() {
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel className="text-sm font-medium">
-                                                                Currency
+                                                                {t("addJob.form.salary.currency.label")}
                                                             </FormLabel>
                                                             <Select
                                                                 onValueChange={field.onChange}
@@ -649,16 +640,16 @@ export default function AddJob() {
                                                             >
                                                                 <FormControl>
                                                                     <SelectTrigger className="bg-input">
-                                                                        <SelectValue placeholder="Select currency" />
+                                                                        <SelectValue placeholder={t("addJob.form.salary.currency.placeholder")} />
                                                                     </SelectTrigger>
                                                                 </FormControl>
                                                                 <SelectContent>
-                                                                    <SelectItem value="USD">USD</SelectItem>
-                                                                    <SelectItem value="EUR">EUR</SelectItem>
-                                                                    <SelectItem value="SAR">SAR</SelectItem>
-                                                                    <SelectItem value="AED">AED</SelectItem>
-                                                                    <SelectItem value="KWD">KWD</SelectItem>
-                                                                    <SelectItem value="EGP">EGP</SelectItem>
+                                                                    <SelectItem value="USD">{t("addJob.form.salary.currency.options.usd")}</SelectItem>
+                                                                    <SelectItem value="EUR">{t("addJob.form.salary.currency.options.eur")}</SelectItem>
+                                                                    <SelectItem value="SAR">{t("addJob.form.salary.currency.options.sar")}</SelectItem>
+                                                                    <SelectItem value="AED">{t("addJob.form.salary.currency.options.aed")}</SelectItem>
+                                                                    <SelectItem value="KWD">{t("addJob.form.salary.currency.options.kwd")}</SelectItem>
+                                                                    <SelectItem value="EGP">{t("addJob.form.salary.currency.options.egp")}</SelectItem>
                                                                 </SelectContent>
                                                             </Select>
                                                             <FormMessage className="text-destructive" />
@@ -674,12 +665,12 @@ export default function AddJob() {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel className="text-sm font-medium">
-                                                        Hiring Target
+                                                        {t("addJob.form.hiringTarget.label")}
                                                     </FormLabel>
                                                     <FormControl>
                                                         <Input
                                                             type="number"
-                                                            placeholder="e.g. 3"
+                                                            placeholder={t("addJob.form.hiringTarget.placeholder")}
                                                             className="bg-input"
                                                             {...field}
                                                         />
@@ -697,7 +688,7 @@ export default function AddJob() {
                                                 variant="outline"
                                                 className="border-input hover:bg-muted"
                                             >
-                                                Cancel
+                                                {t("addJob.form.cancel")}
                                             </Button>
                                         </DialogClose>
                                         <Button
@@ -714,10 +705,10 @@ export default function AddJob() {
                                             {isSubmitting ? (
                                                 <>
                                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                    Submitting...
+                                                    {t("addJob.form.submitting")}
                                                 </>
                                             ) : (
-                                                "Submit Job"
+                                                t("addJob.form.submit")
                                             )}
                                         </Button>
                                     </DialogFooter>
@@ -727,6 +718,6 @@ export default function AddJob() {
                     </Tabs>
                 </div>
             </DialogContent>
-        </Dialog >
+        </Dialog>
     );
 }

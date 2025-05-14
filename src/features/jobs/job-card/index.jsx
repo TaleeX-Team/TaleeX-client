@@ -24,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next"; // Import the translation hook
 
 // Badge styles
 const jobTypeColors = {
@@ -40,6 +41,7 @@ const statusColors = {
 };
 
 export default function JobCard({ job, handleDelete }) {
+  const { t } = useTranslation(); // Initialize the translation hook
   const cardRef = useRef(null);
 
   useEffect(() => {
@@ -104,7 +106,7 @@ export default function JobCard({ job, handleDelete }) {
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem>
               <Info className="mr-2 h-4 w-4" />
-              View Details
+              {t("viewDetails")}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -112,7 +114,7 @@ export default function JobCard({ job, handleDelete }) {
               onClick={() => handleDelete?.(job)}
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              Delete Job
+              {t("deleteJob")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -152,7 +154,7 @@ export default function JobCard({ job, handleDelete }) {
             </div>
             {company && (
               <div className="text-sm text-muted-foreground mt-1">
-                Company:{" "}
+                {t("company")}:{" "}
                 <span className="font-medium">
                   {typeof company === "string" ? company : company.name}
                 </span>
@@ -166,7 +168,7 @@ export default function JobCard({ job, handleDelete }) {
       <CardContent className="pb-2 flex-1">
         <div className="space-y-2 text-sm">
           <p className="text-muted-foreground line-clamp-3">
-            {description || "No description provided."}
+            {description || t("noDescription")}
           </p>
         </div>
 
@@ -195,11 +197,9 @@ export default function JobCard({ job, handleDelete }) {
       {/* Footer */}
       <CardFooter className="flex justify-between pt-4 mt-auto">
         <Link to={`${job._id}`}>
-          {" "}
           <Button variant="default" size="sm" className="gap-1">
-            {" "}
-            <Info className="h-4 w-4" /> <span>See Details</span>{" "}
-          </Button>{" "}
+            <Info className="h-4 w-4" /> <span>{t("seeDetails")}</span>
+          </Button>
         </Link>
         {applicationLink && (
           <a
@@ -209,7 +209,7 @@ export default function JobCard({ job, handleDelete }) {
             className="text-sm text-primary flex items-center hover:underline"
           >
             <ExternalLink className="h-4 w-4 mr-1" />
-            <span>Link</span>
+            <span>{t("link")}</span>
           </a>
         )}
       </CardFooter>

@@ -14,68 +14,64 @@ import {
 } from "lucide-react";
 import AboutContactHeader from "../about-contact-header/Header";
 import Footer from "../footer";
+import { useTranslation } from "react-i18next";
 
 export default function AboutPage() {
+  const { t } = useTranslation();
+
   const targetAudience = [
     {
       icon: Users,
-      title: "Business Owners",
-      description:
-        "Streamline your hiring process and find the right talent faster.",
+      title: t("aboutPage.targetAudience.businessOwners.title"),
+      description: t("aboutPage.targetAudience.businessOwners.description"),
     },
     {
       icon: Heart,
-      title: "HR Professionals & Recruiters",
-      description:
-        "Get AI-powered tools that enhance your expertise, not replace it.",
+      title: t("aboutPage.targetAudience.hrProfessionals.title"),
+      description: t("aboutPage.targetAudience.hrProfessionals.description"),
     },
     {
       icon: Target,
-      title: "Growing Startups & Mid-sized Companies",
-      description: "Scale your recruitment efforts without scaling your team.",
+      title: t("aboutPage.targetAudience.startups.title"),
+      description: t("aboutPage.targetAudience.startups.description"),
     },
   ];
 
   const features = [
     {
       icon: FileText,
-      title: "Company Profile Management",
-      description:
-        "Shape AI evaluation based on your company values and hiring criteria.",
+      title: t("aboutPage.features.companyProfile.title"),
+      description: t("aboutPage.features.companyProfile.description"),
     },
     {
       icon: Brain,
-      title: "AI CV Reviewing",
-      description:
-        "Goes beyond keyword-matching to analyze true relevance and culture fit.",
+      title: t("aboutPage.features.aiCV.title"),
+      description: t("aboutPage.features.aiCV.description"),
     },
     {
       icon: MessageSquare,
-      title: "AI-powered Interview",
-      description: "Real-time, adaptive interviews personalized for each role.",
+      title: t("aboutPage.features.aiInterview.title"),
+      description: t("aboutPage.features.aiInterview.description"),
     },
     {
       icon: BarChart,
-      title: "AI Feedback",
-      description:
-        "Behavioral insights, technical clarity, and structured hiring feedback.",
+      title: t("aboutPage.features.aiFeedback.title"),
+      description: t("aboutPage.features.aiFeedback.description"),
     },
     {
       icon: Shield,
-      title: "Trust & Transparency",
-      description:
-        "Verified companies, candidate protections, and full control.",
+      title: t("aboutPage.features.trustTransparency.title"),
+      description: t("aboutPage.features.trustTransparency.description"),
     },
     {
       icon: Mail,
-      title: "Smarter Communication",
-      description:
-        "One-click rejections, follow-ups, and branded engagement emails.",
+      title: t("aboutPage.features.smarterCommunication.title"),
+      description: t("aboutPage.features.smarterCommunication.description"),
     },
     {
       icon: Zap,
-      title: "Talent Re-Routing",
-      description: "Easily reassign candidates to more suitable roles.",
+      title: t("aboutPage.features.talentReRouting.title"),
+      description: t("aboutPage.features.talentReRouting.description"),
     },
   ];
 
@@ -88,15 +84,13 @@ export default function AboutPage() {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
               <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                "We're not replacing the recruiter. We're giving them
-                superpowers."
+                {t("aboutPage.heroQuote")}
               </h1>
               <p className="text-xl text-muted-foreground mb-8">
-                An AI-driven platform that makes recruitment faster, smarter,
-                and fairer for everyone.
+                {t("aboutPage.heroDescription")}
               </p>
               <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg py-6 px-8">
-                Transform Your Hiring
+                {t("aboutPage.transformButton")}
               </Button>
             </div>
           </div>
@@ -105,25 +99,23 @@ export default function AboutPage() {
         {/* What is Taleex */}
         <section className="py-16 bg-white dark:bg-background">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold mb-4">What is Taleex?</h2>
+            <h2 className="text-3xl font-bold mb-4">{t("aboutPage.whatIsTaleexTitle")}</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-12">
-              An AI hiring platform that simplifies job management, screening,
-              and communication—all in one place.
+              {t("aboutPage.whatIsTaleexDescription")}
             </p>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               {[
                 {
-                  title: "Job Application Management",
-                  desc: "Filter, organize, and respond to applicants effortlessly.",
+                  title: t("aboutPage.featuress.jobApplicationManagement.title"),
+                  desc: t("aboutPage.featuress.jobApplicationManagement.desc"),
                 },
                 {
-                  title: "AI CV Matching & Interviews",
-                  desc: "Use AI for smarter screening and personalized interviews.",
+                  title: t("aboutPage.featuress.aiCVMatching.title"),
+                  desc: t("aboutPage.featuress.aiCVMatching.desc"),
                 },
                 {
-                  title: "Candidate Communication",
-                  desc: "Update, reject, or engage candidates with minimal effort.",
+                  title: t("aboutPage.featuress.candidateCommunication.title"),
+                  desc: t("aboutPage.featuress.candidateCommunication.desc"),
                 },
               ].map((item, i) => (
                 <Card
@@ -143,9 +135,9 @@ export default function AboutPage() {
         {/* Target Audience */}
         <section className="py-16 bg-white dark:bg-background">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold mb-4">Who Taleex Empowers</h2>
+            <h2 className="text-3xl font-bold mb-4">{t("aboutPage.targetAudienceTitle")}</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-12">
-              Designed for modern teams and hiring professionals.
+              {t("aboutPage.targetAudienceDescription")}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -170,9 +162,9 @@ export default function AboutPage() {
         {/* Features */}
         <section className="py-16 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-muted dark:to-muted/50">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold mb-4">Features</h2>
+            <h2 className="text-3xl font-bold mb-4">{t("aboutPage.featuresTitle")}</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-12">
-              Unlock your recruiting potential with these intelligent tools.
+              {t("aboutPage.featuresDescription")}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
@@ -197,26 +189,24 @@ export default function AboutPage() {
         {/* Coming Soon */}
         <section className="py-16 bg-white dark:bg-background">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold mb-4">What’s Coming Next</h2>
+            <h2 className="text-3xl font-bold mb-4">{t("aboutPage.comingSoonTitle")}</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-12">
-              A glimpse of what we’re building for tomorrow’s recruiters.
+              {t("aboutPage.comingSoonDescription")}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
               {[
-                { icon: Brain, label: "AI Assessments & Exams" },
-                { icon: MessageSquare, label: "Tone & Body Language Analysis" },
-                { icon: Zap, label: "Slack, Zoom, ATS Integrations" },
-                { icon: FileText, label: "Job Description Curation" },
+                { icon: Brain, label: t("aboutPage.comingSoon.aiAssessments") },
+                { icon: MessageSquare, label: t("aboutPage.comingSoon.toneAnalysis") },
+                { icon: Zap, label: t("aboutPage.comingSoon.slackZoomIntegrations") },
+                { icon: FileText, label: t("aboutPage.comingSoon.jobDescription") },
               ].map(({ icon: Icon, label }, i) => (
                 <div
                   key={i}
                   className="flex flex-col items-center p-6 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-muted dark:to-muted rounded-lg"
                 >
                   <Icon className="h-10 w-10 text-blue-600 mb-4" />
-                  <p className="text-center font-medium text-foreground">
-                    {label}
-                  </p>
+                  <p className="text-center font-medium text-foreground">{label}</p>
                 </div>
               ))}
             </div>

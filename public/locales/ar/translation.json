@@ -1,0 +1,910 @@
+{
+  "jobs": {
+    "header": {
+      "title": "الوظائف",
+      "description": "إدارة دليل الوظائف الخاص بك"
+    },
+    "filters": {
+      "titlePlaceholder": "البحث عن الوظائف حسب العنوان",
+      "show": "عرض الفلاتر",
+      "hide": "إخفاء الفلاتر",
+      "advanced": "الفلاتر المتقدمة",
+      "basic": "الفلاتر الأساسية",
+      "workplace": "نوع مكان العمل",
+      "jobType": "نوع الوظيفة",
+      "experience": "مستوى الخبرة",
+      "status": "حالة الوظيفة",
+      "tags": "العلامات (المهارات أو الكلمات الرئيسية)",
+      "minSalary": "الحد الأدنى للراتب",
+      "maxSalary": "الحد الأقصى للراتب",
+      "postedAfter": "نُشرت بعد",
+      "postedBefore": "نُشرت قبل",
+      "pickDate": "اختر تاريخًا",
+      "addTag": "إضافة علامة",
+      "active": "الفلاتر النشطة:",
+      "salaryRange": "نطاق الراتب"
+    },
+    
+    "time": {
+      "recently": "مؤخراً",
+      "days": "{{count}} يومًا مضى",
+      "hours": "{{count}} ساعة مضت",
+      "minutes": "{{count}} دقيقة مضت"
+    },
+
+    "verifiedCompany": "شركة موثوقة",
+    "viewDetails": "عرض التفاصيل",
+
+    "error": {
+      "title": "خطأ في تحميل الوظائف",
+      "message": "حدث خطأ أثناء جلب قائمة الوظائف. يرجى المحاولة مرة أخرى أو الاتصال بالدعم."
+    },
+    "empty": {
+      "title": "لم يتم العثور على وظائف",
+      "message": "لا توجد وظائف تطابق معايير التصفية الحالية",
+      "clearFilters": "مسح جميع الفلاتر"
+    },
+    "common": {
+      "clearAll": "مسح الكل",
+      "edit": "تعديل"
+    }
+  },
+  "companies": {
+    "title": "الشركات",
+    "description": "إدارة دليل الشركات الخاص بك",
+    "searchPlaceholder": "البحث عن الشركات...",
+    "filter": {
+      "placeholder": "تصفية حسب الحالة",
+      "all": "جميع الشركات",
+      "verified": "موثوق بها",
+      "pending": "معلق",
+      "rejected": "مرفوضة"
+    },
+    "verifyCompany": "التحقق من الشركة",
+    "verifyTitle": "التحقق من ملكية الشركة",
+    "verifyDescription": "تأكد من أنك جزء من {{companyName}} لإدارة ملفها الشخصي وإعلانات الوظائف.",
+    "verifyAlert": "توفير معلومات دقيقة وتحميل مستندات صالحة يساعد فريقنا على التحقق من شركتك بسرعة.",
+    "emailTab": "التحقق من البريد الإلكتروني",
+    "documentTab": "تحميل المستند",
+    "enterOtp": "أدخل الرمز المكون من 6 أرقام المرسل إلى {{email}}",
+    "sendCode": "إرسال رمز التحقق",
+    "sending": "جارٍ الإرسال...",
+    "verifyCode": "التحقق من الرمز",
+    "emailVerified": "تم التحقق من البريد الإلكتروني بنجاح! حسابك في انتظار موافقة الإدارة لإدارة {{companyName}}.",
+    "emailVerifiedSuccess": "تم التحقق من البريد الإلكتروني بنجاح! لديك الآن الوصول لإدارة {{companyName}}.",
+    "documentUploaded": "تم تحميل المستند بنجاح! سنقوم بمراجعة مستندك والتحقق من ملكيتك للشركة.",
+    "verificationDocument": "وثيقة التحقق",
+    "documentDescription": "قم بتحميل مستند يثبت انتماءك إلى {{companyName}} (ملفات PDF فقط، بحد أقصى 5MB). المستندات المقبولة: بطاقة هوية الشركة، بطاقة العمل، خطاب التوظيف، أو أي مستند رسمي يحتوي على اسمك واسم الشركة.",
+    "unauthorizedUse": "استخدام غير مصرح به لتفاصيل الشركة قد يؤدي إلى عواقب قانونية.",
+    "addCompany": "إضافة شركة",
+    "addNewCompany": "إضافة شركة جديدة",
+    "descriptionCheck": "يرجى التحقق من جميع المعلومات قبل الإرسال - تفاصيل الشركة لا يمكن تعديلها لاحقًا.",
+    "basicInfo": "المعلومات الأساسية",
+    "additionalDetails": "تفاصيل إضافية",
+    "companyLogo": "شعار الشركة",
+    "uploadLogo": "تحميل الشعار",
+    "browseFiles": "استعراض الملفات",
+    "recommendedSize": "الموصى به: 400×400 بكسل، PNG أو JPG",
+    "companyName": "اسم الشركة",
+    "enterCompanyName": "أدخل اسم الشركة",
+    "website": "الموقع الإلكتروني",
+    "includeUrl": "يرجى تضمين الرابط الكامل مع http:// أو https://",
+    "address": "العنوان",
+    "Description": "الوصف",
+    "descriptionPlaceholder": "وصف مختصر للشركة",
+    "descriptionLimit": "إذا تم تقديمه، يجب أن يكون الوصف على الأقل 10 أحرف",
+    "companyValues": "قِيَم الشركة",
+    "addValuePlaceholder": "إضافة قيمة للشركة (مثل الابتكار، والنزاهة)",
+    "pressEnter": "اضغط على Enter لإضافة قيمة أو انقر على زر الإضافة",
+    "createCompany": "إنشاء شركة",
+    "processing": "جارٍ المعالجة",
+    "cancel": "إلغاء",
+    "backToCompanies": "الرجوع إلى الشركات",
+    "companyNotFound": "الشركة غير موجودة",
+    "companyNotExist": "الشركة التي تبحث عنها غير موجودة أو تم إزالتها.",
+    "returnToDirectory": "الرجوع إلى الدليل",
+    "aboutTab": "عن الشركة",
+    "jobsTab": "الوظائف",
+     "jobsTabTitle": "وظائف الشركة",
+     "verificationStatus": {
+      "pending": "قيد الانتظار",
+      "approved": "موافق عليه",
+      "rejected": "مرفوض"
+    },
+    "about": "عن",
+    "contactInformation": "معلومات الاتصال",
+    "companyDetails": "تفاصيل الشركة",
+    "noDescription": "لا توجد وصف متاح",
+    "emailAddress": "عنوان البريد الإلكتروني",
+    "companyDomain": "نطاق الشركة",
+    "uploadDocument": "تحميل المستند",
+     "uploading" : "جارٍ التحميل..."
+    
+  },
+  "common": {
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "retry": "إعادة المحاولة",
+     "details": "تفاصيل"
+  },
+  "jobApplicationPage": {
+    "errorTitle": "خطأ",
+    "errorMessage": "فشل في تحميل تفاصيل الوظيفة",
+    "days": "{{count}} يوم(أيام)",
+    "hours": "{{count}} ساعة(ساعات)",
+    "minutes": "{{count}} دقيقة(دقائق)",
+    "justNow": "الآن",
+    "verifiedCompany": "شركة موثوقة",
+    "pendingVerification": "في انتظار التحقق",
+    "applicationSubmitted": "تم إرسال الطلب",
+    "applicationSuccess": "تم إرسال طلبك بنجاح. ستتواصل معك الشركة إذا كانوا مهتمين.",
+    "jobNotAvailableTitle": "الوظيفة غير متاحة",
+    "jobNotAvailableMessage": "هذه الوظيفة لا تقبل الطلبات في الوقت الحالي.",
+    "companyPendingReview": "الشركة قيد المراجعة",
+    "pendingCompanyDescription": "لم يتم التحقق من ملف الشركة بعد من قبل Taleex. نوصي بالبحث عن الشركة قبل تقديم طلبك. إذا كان هناك شيء مريب، يرجى استخدام ميزة الإبلاغ لإبلاغ فريقنا.",
+    "verificationReminder": "تم نشر هذه الوظيفة بواسطة Taleex نيابة عن شركة خارجية. يرجى التحقق من شرعية الشركة قبل المتابعة في تقديم طلبك."
+  },
+  "reportJobDialog": {
+    "reportButton": "الإبلاغ عن الوظيفة",
+    "title": "الإبلاغ عن هذا الإعلان الوظيفي",
+    "errorTitle": "خطأ",
+    "errorMessage": "فشل في تقديم التقرير. حاول مرة أخرى.",
+    "selectReasonError": "يرجى اختيار سبب للإبلاغ",
+    "nameRequired": "الاسم مطلوب",
+    "emailRequired": "البريد الإلكتروني مطلوب",
+    "emailInvalid": "يرجى إدخال بريد إلكتروني صالح",
+    "detailsRequired": "يرجى تقديم التفاصيل لسبب 'آخر'",
+    "reasonDescription": "لماذا تقوم بالإبلاغ عن هذه الوظيفة؟",
+    "continueButton": "استمرار",
+    "nameLabel": "اسمك",
+    "namePlaceholder": "أدخل اسمك",
+    "emailLabel": "بريدك الإلكتروني",
+    "emailPlaceholder": "أدخل عنوان بريدك الإلكتروني",
+    "additionalDetailsLabel": "تفاصيل إضافية",
+    "detailsPlaceholder": "يرجى تقديم أي تفاصيل إضافية حول هذا التقرير",
+    "otherReasonMessage": "يرجى تقديم تفاصيل لتقريرك",
+    "backButton": "الرجوع",
+    "submitButton": "تقديم التقرير",
+    "submittingButton": "جاري التقديم...",
+    "reportReceived": "تم استلام التقرير",
+    "reportSuccess": "شكراً لإعلامنا. تم تسجيل تقريرك وسنتابع إذا لزم الأمر اتخاذ إجراء آخر.",
+    "closeButton": "إغلاق"
+  },
+  "jobDetails": {
+    "Verified": "تم التحقق",
+    "Company Website": "موقع الشركة",
+    "Posted by": "تم النشر بواسطة",
+    "Posted": "تم النشر",
+    "Job Details": "تفاصيل الوظيفة",
+    "Description": "الوصف",
+    "Requirements": "المتطلبات"
+  },
+  "days": "يوم",
+  "hours": "ساعة",
+  "minutes": "دقيقة",
+  "Just now": "الآن",
+  "Hiring": "توظيف",
+  "positions": "مناصب",
+  "Posted": "تم النشر",
+  "Company Website": "موقع الشركة",
+  "Report this job if it seems suspicious or inappropriate": "قم بالإبلاغ عن هذه الوظيفة إذا كانت تبدو مشبوهة أو غير لائقة",
+  "Job Description": "وصف الوظيفة",
+  "Requirements": "المتطلبات",
+  "Required Skills": "المهارات المطلوبة",
+  "Job Details": "تفاصيل الوظيفة",
+  "applicants": "المتقدمون",
+  "ago": "منذ",
+
+  "viewDetails": "عرض التفاصيل",
+  "deleteJob": "حذف الوظيفة",
+  "company": "الشركة",
+  "noDescription": "لا توجد تفاصيل مقدمة.",
+  "seeDetails": "عرض التفاصيل",
+  "link": "الرابط",
+  "fileUpload": {
+    "dragDrop": "قم بسحب وإفلات الملف هنا",
+    "selectFile": "اختار الملف",
+    "supports": "يدعم PDF و DOC و DOCX و JPG و PNG",
+    "removeFile": "إزالة الملف"
+  },
+  "applicationForm": {
+    "title": "تقدم لهذا المنصب",
+    "description": "املأ النموذج أدناه لتقديم طلبك",
+    "fullName": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "linkedIn": "رابط LinkedIn (اختياري)",
+    "linkedInDescription": "شارك رابط LinkedIn الخاص بك لمساعدة صاحب العمل في التعرف عليك",
+    "resume": "السيرة الذاتية",
+    "resumeDescription": "قم بتحميل سيرتك الذاتية أو CV (ملفات PDF فقط)",
+    "additionalNotes": "ملاحظات إضافية (اختياري)",
+    "additionalNotesDescription": "الحد الأقصى 500 حرف",
+    "submit": "تقديم الطلب",
+    "submitting": "يتم التقديم...",
+    "consent": "بتقديم هذا الطلب، فإنك توافق على أن تقوم Taleex بمشاركة معلوماتك مع الشركة التي نشرت هذا الإعلان."
+  },
+  "applicantss": {
+    "searchPlaceholder": "ابحث عن البريد الإلكتروني أو الاسم...",
+    "inviteButton": "دعوة للوظيفة",
+    "dialogTitle": "دعوة المتقدمين للوظيفة",
+    "dialogDescription": "إرسال دعوات للوظيفة إلى المتقدمين المحددين.",
+    "jobToInvite": "الوظيفة التي سيتم دعوة المتقدمين إليها:",
+    "selectedApplicants": "المتقدمون المحددون",
+    "selectedApplicantsMessage": "تم اختيار {count} متقدمًا",
+    "invite": "دعوة",
+    "inviting": "جارٍ الدعوة...",
+    "noApplicantsFound": "لم يتم العثور على متقدمين.",
+    "noCV": "لا يوجد سيرة ذاتية",
+    "openCV": "فتح السيرة الذاتية"
+  },
+  "headerAbout":{
+      "getstarted": "ابدأ الآن"
+    },
+    "aboutPage": {
+      "heroQuote": "نحن لا نستبدل مسؤول التوظيف، نحن نمنحه قوى خارقة.",
+      "heroDescription": "منصة مدفوعة بالذكاء الاصطناعي تجعل التوظيف أسرع وأكثر ذكاءً وعدلاً للجميع.",
+      "transformButton": "حوّل عملية التوظيف الخاصة بك",
+      "whatIsTaleexTitle": "ما هي Taleex؟",
+      "whatIsTaleexDescription": "منصة توظيف مدفوعة بالذكاء الاصطناعي تبسط إدارة الوظائف، والفحص، والتواصل — كلها في مكان واحد.",
+      "targetAudienceTitle": "من تمكّنه Taleex",
+      "targetAudienceDescription": "مصممة للفرق الحديثة والمحترفين في مجال التوظيف.",
+      "featuresTitle": "الميزات",
+      "featuresDescription": "افتح إمكانيات التوظيف الخاصة بك باستخدام هذه الأدوات الذكية.",
+      "comingSoonTitle": "ما هو القادم",
+      "comingSoonDescription": "لمحة عما نبني لمجندين الغد.",
+      "targetAudience": {
+        "businessOwners": {
+          "title": "أصحاب الأعمال",
+          "description": "تبسيط عملية التوظيف والعثور على المواهب المناسبة بشكل أسرع."
+        },
+        "hrProfessionals": {
+          "title": "المحترفون في مجال الموارد البشرية والمجندون",
+          "description": "احصل على أدوات مدفوعة بالذكاء الاصطناعي تعزز خبرتك، دون استبدالك."
+        },
+        "startups": {
+          "title": "الشركات الناشئة والشركات المتوسطة الحجم",
+          "description": "زيادة جهود التوظيف دون زيادة حجم الفريق."
+        }
+      },
+      "features": {
+        "companyProfile": {
+          "title": "إدارة الملف الشخصي للشركة",
+          "description": "شكّل التقييمات المدفوعة بالذكاء الاصطناعي استنادًا إلى قيم شركتك ومعايير التوظيف."
+        },
+        "aiCV": {
+          "title": "مراجعة السير الذاتية باستخدام الذكاء الاصطناعي",
+          "description": "يتجاوز مطابقة الكلمات الرئيسية لتحليل الصلة الحقيقية والملائمة الثقافية."
+        },
+        "aiInterview": {
+          "title": "المقابلة المدفوعة بالذكاء الاصطناعي",
+          "description": "مقابلات حية وقابلة للتكيف مخصصة لكل وظيفة."
+        },
+        "aiFeedback": {
+          "title": "التعليقات المدفوعة بالذكاء الاصطناعي",
+          "description": "الرؤى السلوكية، والوضوح الفني، والتعليقات المنظمة للتوظيف."
+        },
+        "trustTransparency": {
+          "title": "الثقة والشفافية",
+          "description": "شركات موثوقة، وحماية للمرشحين، وتحكم كامل."
+        },
+        "smarterCommunication": {
+          "title": "التواصل الأكثر ذكاءً",
+          "description": "رفض المرشحين، والمتابعات، ورسائل البريد الإلكتروني المعتمدة بنقرة واحدة."
+        },
+        "talentReRouting": {
+          "title": "إعادة توجيه المواهب",
+          "description": "إعادة توجيه المرشحين بسهولة إلى الأدوار الأكثر ملائمة."
+        }
+      },
+      "comingSoon": {
+        "aiAssessments": "التقييمات والاختبارات باستخدام الذكاء الاصطناعي",
+        "toneAnalysis": "تحليل النبرة ولغة الجسد",
+        "slackZoomIntegrations": "تكاملات Slack و Zoom و ATS",
+        "jobDescription": "إعداد أوصاف الوظائف"
+      },
+      "featuress": {
+      "jobApplicationManagement": {
+        "title": "إدارة طلبات التوظيف",
+        "desc": "فلترة وتنظيم والرد على المتقدمين بسهولة."
+      },
+      "aiCVMatching": {
+        "title": "مطابقة السير الذاتية والمقابلات باستخدام الذكاء الاصطناعي",
+        "desc": "استخدم الذكاء الاصطناعي للفرز الذكي والمقابلات المخصصة."
+      },
+      "candidateCommunication": {
+        "title": "التواصل مع المتقدمين",
+        "desc": "تحديث أو رفض أو التواصل مع المتقدمين بأقل جهد."
+      }
+    }
+    },
+    "authTabs": {
+      "signIn": "تسجيل الدخول",
+      "signUp": "إنشاء حساب",
+      "authError": "فشل المصادقة. يرجى المحاولة مرة أخرى.",
+      "loginSuccess": "تم تسجيل الدخول بنجاح!",
+      "signupSuccess": "تم إنشاء الحساب بنجاح!"
+    },
+    "auth": {
+    "welcomeBack": "مرحبًا بعودتك",
+    "createAccount": "أنشئ حسابًا"
+  },
+  "loginForm": {
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "name@company.com",
+    "password": "كلمة المرور",
+    "rememberMe": "تذكرني",
+    "forgotPassword": "هل نسيت كلمة السر؟",
+    "processing": "جاري المعالجة",
+    "signIn": "تسجيل الدخول"
+  },
+  "signupForm": {
+    "firstName": "الاسم الأول",
+    "firstNamePlaceholder": "جون",
+    "lastName": "الاسم الأخير",
+    "lastNamePlaceholder": "دو",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "name@company.com",
+    "phone": "رقم الهاتف",
+    "phonePlaceholder": "+1234567890",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "termsText": "أوافق على شروط الخدمة وسياسة الخصوصية",
+    "processing": "جاري المعالجة",
+    "createAccount": "إنشاء حساب"
+  },
+  "forgotPassword": {
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "enterEmail": "أدخل بريدك الإلكتروني لتلقي تعليمات إعادة تعيين كلمة المرور",
+    "email": "عنوان البريد الإلكتروني",
+    "processing": "جاري المعالجة",
+    "sendReset": "إرسال تعليمات إعادة تعيين كلمة المرور",
+    "checkInbox": "تحقق من صندوق الوارد الخاص بك",
+    "sentTo": "لقد أرسلنا رابط إعادة تعيين كلمة المرور إلى",
+    "checkSpam": "لم تستلم البريد؟ تحقق من البريد العشوائي أو جرب مرة أخرى.",
+    "tryAgain": "حاول مرة أخرى",
+    "backToLogin": "العودة إلى تسجيل الدخول"
+  },
+  "contactPage": {
+    "heroTitle": "نود سماع منك",
+    "heroDescription": "هل لديك أسئلة حول منصتنا؟ هل ترغب في جدولة عرض توضيحي؟ فريقنا هنا للمساعدة.",
+    "contactOptionsTitle": "خيارات الاتصال",
+    "contactOptionsDescription": "تواصل معنا عبر الطريقة التي تفضلها",
+    "callUs": "اتصل بنا",
+    "callUsDescription": "تحدث مباشرة مع فريق الدعم لدينا",
+    "emailUs": "ارسل لنا بريدًا إلكترونيًا",
+    "emailUsDescription": "ارسل لنا بريدًا إلكترونيًا وسنرد عليك خلال 24 ساعة",
+    "formTitle": "أرسل لنا رسالة",
+    "messageSent": "تم إرسال الرسالة!",
+    "messageSentDescription": "سنعود إليك في أقرب وقت ممكن.",
+    "sendAnotherMessage": "إرسال رسالة أخرى",
+    "nameLabel": "اسمك",
+    "emailLabel": "عنوان البريد الإلكتروني",
+    "companyLabel": "الشركة",
+    "subjectLabel": "الموضوع",
+    "messageLabel": "الرسالة",
+    "sendMessageButton": "إرسال الرسالة"
+  },
+  "footer": {
+    "allRightsReserved": "جميع الحقوق محفوظة.",
+    "aboutUs": "معلومات عنا",
+    "landingPage": "الصفحة الرئيسية",
+    "contactUs": "اتصل بنا"
+  },
+  "header": {
+    "companies": "الشركات",
+    "jobs": "الوظائف"
+  },
+  "setPassword": {
+    "setPasswordTitle": "إعداد كلمة المرور",
+    "setPasswordDescription": "قم بتعزيز أمان حسابك عن طريق تعيين كلمة مرور",
+    "newPasswordLabel": "كلمة المرور الجديدة",
+    "newPasswordPlaceholder": "أدخل كلمة مرور آمنة",
+    "confirmPasswordLabel": "تأكيد كلمة المرور",
+    "confirmPasswordPlaceholder": "تأكيد كلمة المرور",
+    "passwordErrorLength": "يجب أن تكون كلمة المرور طويلة بما فيه الكفاية (8 أحرف على الأقل)",
+    "passwordErrorMatch": "كلمات المرور لا تتطابق",
+    "settingPassword": "جاري تعيين كلمة المرور...",
+    "setPasswordButton": "تعيين كلمة المرور"
+  },
+  "profilePage": {
+    "accountSettings": "إعدادات الحساب",
+    "accountDescription": "إدارة إعدادات حسابك وتفضيلاتك",
+    "personalInfoTitle": "المعلومات الشخصية",
+    "personalInfoDescription": "قم بتحديث معلوماتك الشخصية وكيفية رؤية الآخرين لك على المنصة",
+    "changeAvatar": "تغيير الصورة",
+    "avatarInfo": "موصى به: صورة مربعة، JPG أو PNG",
+    "firstName": "الاسم الأول",
+    "lastName": "الاسم الأخير",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "phoneError": "يرجى إدخال رقم هاتف مختلف عن الرقم الحالي.",
+    "saveChanges": "حفظ التغييرات",
+    "processing": "جاري المعالجة",
+    "updateSuccess": "تم تحديث الملف الشخصي بنجاح!",
+    "updateError": "فشل في تحديث الملف الشخصي. يرجى المحاولة مرة أخرى.",
+    "noChanges": "لا توجد تغييرات لحفظها"
+  },
+  "changePasswordPage": {
+    "changePasswordTitle": "تغيير كلمة المرور",
+    "updatePasswordDescription": "قم بتحديث كلمة المرور الخاصة بك للحفاظ على أمان حسابك",
+    "currentPassword": "كلمة المرور الحالية",
+    "enterCurrentPassword": "أدخل كلمة المرور الحالية",
+    "newPassword": "كلمة المرور الجديدة",
+    "enterNewPassword": "أدخل كلمة المرور الجديدة",
+    "passwordRequirements": "متطلبات كلمة المرور:",
+    "passwordMinLength": "على الأقل 8 أحرف",
+    "passwordUpperCase": "حرف كبير واحد على الأقل",
+    "passwordLowerCase": "حرف صغير واحد على الأقل",
+    "passwordNumber": "رقم واحد على الأقل",
+    "passwordSpecialChar": "رمز خاص واحد على الأقل",
+    "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+    "confirmYourNewPassword": "تأكيد كلمة المرور الجديدة",
+    "passwordsMatch": "كلمات المرور متطابقة",
+    "passwordMismatch": "كلمات المرور الجديدة غير متطابقة",
+    "passwordError": "كلمة المرور الجديدة لا تفي بجميع المتطلبات",
+    "allFieldsRequired": "جميع الحقول مطلوبة",
+    "changingPassword": "جاري تغيير كلمة المرور...",
+    "changePassword": "تغيير كلمة المرور",
+    "passwordChangedSuccessfully": "تم تغيير كلمة المرور بنجاح!"
+  },
+  "subscriptionPage": {
+    "tokens": "توكنات",
+    "purchaseTokensDescription": "اشترِ توكنات لاستخدام خدماتنا المدعومة بالذكاء الاصطناعي",
+    "buyTokens": "شراء توكنات",
+    "purchaseTokens": "شراء توكنات",
+    "totalPrice": "السعر الإجمالي",
+    "tokenCredit": "رصيد توكنات",
+    "tokenPrice": "سعر الرمز",
+    "tokensLabel": "التوكن",
+    "perToken": "لكل توكن",
+    "mostPopular": "الأكثر شعبية",
+    "useTokensForAnyService": "استخدم توكنات لأي خدمة",
+    "noExpiration": "بدون تاريخ انتهاء",
+    "support24x7": "دعم على مدار الساعة طوال الأسبوع",
+    "howTokensWork": "كيف تعمل توكنات",
+    "cost": "التكلفة",
+    "tokenCostForService": "تكلفة التوكن لخدمة {{service}}."},
+
+  "settingsLayout": {
+    "settings": "الإعدادات",
+    "manageSettings": "إدارة إعدادات حسابك وتفضيلاتك.",
+    "profile": "الملف الشخصي",
+    "billing": "المحفظة",
+    "changePassword": "تغيير كلمة المرور",
+    "setPassword": "تعيين كلمة المرور",
+    "backToHomepage": "العودة إلى الصفحة الرئيسية"
+  },
+  "myAccount": "حسابي",
+  "settings": "الإعدادات",
+  "logout": "تسجيل الخروج",
+  "logoutConfirmation": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+  "logoutWarning": "سيتم تسجيل خروجك من حسابك. لا يمكن التراجع عن هذا الإجراء.",
+  "cancel": "إلغاء",
+  "searchEmailName": "ابحث عن البريد الإلكتروني أو الاسم...",
+  "inviteToJob": "دعوة للوظيفة",
+  "inviteApplicantsToJob": "دعوة المتقدمين للوظيفة",
+  "sendJobInvitationsToSelectedApplicants": "إرسال دعوات للوظيفة إلى المتقدمين المحددين.",
+  "jobToInviteTo": "الوظيفة للدعوة إليها:",
+  "selectJob": "اختر وظيفة",
+  "selectedApplicants": "المتقدمين المحددين",
+  "applicant": "متقدم",
+  "Applicants": "متقدمين",
+  "invited": "تم إرسال دعوة للوظيفة",
+  "beenSentJobInvitation": "تم إرسال دعوة للوظيفة",
+  "failedToInviteApplicants": "فشل في دعوة المتقدمين للوظيفة",
+  "pleaseTryAgainLater": "يرجى المحاولة لاحقًا.",
+  "inviting": "جارٍ دعوة...",
+  "invite": "دعوة",
+  "feedbacks": "التعليقات",
+  "cv": "السيرة الذاتية",
+  "currentPhase": "المرحلة الحالية",
+  "noCV": "لا يوجد سيرة ذاتية",
+  "openCV": "فتح السيرة الذاتية",
+  "noApplicantsFound": "لم يتم العثور على متقدمين.",
+  "name":"الاسم",
+  "email":"البريد الإلكتروني",
+  "applied":"المتقدمين",
+  
+    "tabs": {
+      "overview": "نظرة عامة",
+      "applicants": "المتقدمون",
+      "rejectedApplicants": "المتقدمون المرفوضون",
+      "allApplicants": "جميع المتقدمين"
+    },
+    "phases": {
+      "applications": "الطلبات",
+      "cvReview": "مراجعة السيرة الذاتية",
+      "sendingInterview": "إرسال المقابلة",
+      "interviewFeedback": "تعليقات المقابلة",
+      "finalFeedback": "التعليقات النهائية"
+    },
+    "unknownCompany": "شركة غير معروفة",
+    "rejected": "مرفوض",
+    "offered": "معروض",
+    "rejectedApplicants": "المتقدمون المرفوضون",
+    "offeredApplicants": "المتقدمون المعروض عليهم",
+    "error": "خطأ",
+    "toast": {
+      "advanceToCVReview": "{count, plural, one {تم إرسال متقدم واحد إلى مراجعة السيرة الذاتية} other {تم إرسال # متقدمين إلى مراجعة السيرة الذاتية}}",
+      "advanceToCVReviewDescription": "{names} {count, plural, one {تم إرساله} other {تم إرسالهم}} من {phase} إلى مراجعة السيرة الذاتية",
+      "sendToInterview": "{count, plural, one {تم إرسال متقدم واحد إلى المقابلة} other {تم إرسال # متقدمين إلى المقابلة}}",
+      "sendToInterviewDescription": "{names} {count, plural, one {تم إرساله} other {تم إرسالهم}} من {phase} إلى المقابلة",
+      "moveToStage": "{count, plural, one {تم نقل متقدم واحد إلى {stage}} other {تم نقل # متقدمين إلى {stage}}}",
+      "moveToStageDescription": "{names} {count, plural, one {تم نقله} other {تم نقلهم}} من {phase} إلى {stage}",
+      "moveToFinalFeedback": "{count, plural, one {تم نقل متقدم واحد إلى التعليقات النهائية} other {تم نقل # متقدمين إلى التعليقات النهائية}}",
+      "moveToFinalFeedbackDescription": "{names} {count, plural, one {تم نقله} other {تم نقلهم}} من {phase} إلى التعليقات النهائية",
+      "error": {
+        "advanceToCVReview": "فشل في إرسال المتقدمين إلى مراجعة السيرة الذاتية",
+        "sendToInterview": "فشل في إرسال إلى المقابلة المرئية",
+        "rejectApplications": "فشل في رفض الطلبات",
+        "moveToFinalFeedback": "فشل في نقل الطلبات إلى التعليقات النهائية",
+        "tryAgain": "يرجى المحاولة مرة أخرى لاحقًا."
+      }
+    },
+    "cuurentPhase":{
+      
+        "tabs": {
+          "overview": "نظرة عامة",
+          "applicants": "المتقدمون",
+          "rejectedApplicants": "المتقدمون المرفوضون",
+          "allApplicants": "جميع المتقدمين"
+        },
+        "phases": {
+          "applications": "الطلبات",
+          "cvreview": "مراجعة السيرة الذاتية",
+          "sendinginterview": "إرسال المقابلة",
+          "interviewfeedback": "تعليقات المقابلة",
+          "finalfeedback": "التعليقات النهائية"
+        },
+        "unknownCompany": "شركة غير معروفة",
+        "rejected": "مرفوض",
+        "offered": "معروض",
+        "rejectedApplicants": "المتقدمون المرفوضون",
+        "offeredApplicants": "المتقدمون المعروض عليهم",
+        "error": "خطأ",
+        "searchPlaceholder": "البحث عن بريد إلكتروني أو اسم...",
+        "actions": {
+          "runAICVReview": "تشغيل مراجعة السيرة الذاتية بالذكاء الاصطناعي",
+          "sendToFinalFeedback": "إرسال إلى التعليقات النهائية",
+          "sendAIInterview": "إرسال مقابلة بالذكاء الاصطناعي",
+          "reject": "رفض",
+          "offer": "عرض"
+        },
+        "dialogs": {
+          "sendVideoInterview": {
+            "title": "إرسال مقابلة مرئية",
+            "description": "تكوين إعدادات المقابلة أدناه.",
+            "interviewType": {
+              "label": "نوع المقابلة",
+              "description": "حدد نوعًا واحدًا أو أكثر من أنواع المقابلات",
+              "technical": "فني",
+              "behavioral": "سلوكي",
+              "error": "يرجى تحديد نوع مقابلة واحد على الأقل"
+            },
+            "questionCount": {
+              "label": "عدد الأسئلة"
+            },
+            "expiryDate": {
+              "label": "تاريخ انتهاء المقابلة",
+              "placeholder": "اختر تاريخًا",
+              "description": "تاريخ الانتهاء هو افتراضيًا بعد يومين من الآن"
+            }
+          },
+          "sendOfferEmail": {
+            "title": "إرسال بريد إلكتروني بالعرض",
+            "description": "تكوين تفاصيل البريد الإلكتروني للعرض أدناه.",
+            "emailSubject": {
+              "label": "موضوع البريد الإلكتروني",
+              "placeholder": "أدخل موضوع البريد الإلكتروني (10 أحرف على الأقل)"
+            },
+            "emailBody": {
+              "label": "نص البريد الإلكتروني",
+              "placeholder": "أدخل نص البريد الإلكتروني (10 أحرف على الأقل)"
+            },
+            "error": "يرجى التأكد من ملء موضوع البريد الإلكتروني ونصه، وأن يكون كل منهما يحتوي على 10 أحرف على الأقل."
+          },
+          "selectedApplicants": {
+            "title": "المتقدمون المحددون",
+            "description": "{count, plural, one {متقدم واحد محدد} other {# متقدمين محددين}}"
+          },
+          "cancel": "إلغاء",
+          "sendInterview": "إرسال المقابلة",
+          "sendOffer": "إرسال العرض"
+        },
+        "table": {
+          "name": "الاسم",
+          "email": "البريد الإلكتروني",
+          "appliedAt": "تاريخ التقديم",
+          "feedbacks": "التعليقات",
+          "Cv": "السيرة الذاتية",
+          "cv":{
+            "open": "فتح السيرة الذاتية",
+            "noCV": "لا توجد سيرة ذاتية"
+          },
+          "phase": "المرحلة",
+          "score": "الدرجة",
+          "scoreTooltip": "الدرجة: {score}%",
+          "noApplicants": "لم يتم العثور على متقدمين في هذه المرحلة."
+        },
+        "toast": {
+          "advanceToCVReview": "{count, plural, one {تم إرسال متقدم واحد إلى مراجعة السيرة الذاتية} other {تم إرسال # متقدمين إلى مراجعة السيرة الذاتية}}",
+          "advanceToCVReviewDescription": "{names} {count, plural, one {تم إرساله} other {تم إرسالهم}} من {phase} إلى مراجعة السيرة الذاتية",
+          "sendToInterview": "{count, plural, one {تم إرسال متقدم واحد إلى المقابلة} other {تم إرسال # متقدمين إلى المقابلة}}",
+          "sendToInterviewDescription": "{names} {count, plural, one {تم إرساله} other {تم إرسالهم}} من {phase} إلى المقابلة",
+          "moveToStage": "{count, plural, one {تم نقل متقدم واحد إلى {stage}} other {تم نقل # متقدمين إلى {stage}}}",
+          "moveToStageDescription": "{names} {count, plural, one {تم نقله} other {تم نقلهم}} من {phase} إلى {stage}",
+          "moveToFinalFeedback": "{count, plural, one {تم نقل متقدم واحد إلى التعليقات النهائية} other {تم نقل # متقدمين إلى التعليقات النهائية}}",
+          "moveToFinalFeedbackDescription": "{names} {count, plural, one {تم نقله} other {تم نقلهم}} من {phase} إلى التعليقات النهائية",
+          "error": {
+            "advanceToCVReview": "فشل في إرسال المتقدمين إلى مراجعة السيرة الذاتية",
+            "sendToInterview": "فشل في إرسال إلى المقابلة المرئية",
+            "rejectApplications": "فشل في رفض الطلبات",
+            "moveToFinalFeedback": "فشل في نقل الطلبات إلى التعليقات النهائية",
+            "tryAgain": "يرجى المحاولة مرة أخرى لاحقًا."
+          }
+        }
+      }
+      ,
+      "reject":{
+        "tabs": {
+          "overview": "نظرة عامة",
+          "applicants": "المتقدمون",
+          "rejectedApplicants": "المتقدمون المرفوضون",
+          "allApplicants": "جميع المتقدمين"
+        },
+        "phases": {
+          "applications": "الطلبات",
+          "cvreview": "مراجعة السيرة الذاتية",
+          "sendinginterview": "إرسال المقابلة",
+          "interviewfeedback": "تعليقات المقابلة",
+          "finalfeedback": "التعليقات النهائية"
+        },
+        "unknownCompany": "شركة غير معروفة",
+        "rejected": "مرفوض",
+        "offered": "معروض",
+        "rejectedApplicants": "المتقدمون المرفوضون",
+        "offeredApplicants": "المتقدمون المعروض عليهم",
+        "error": "خطأ",
+        "actions": {
+          "runAICVReview": "تشغيل مراجعة السيرة الذاتية بالذكاء الاصطناعي",
+          "sendToFinalFeedback": "إرسال إلى التعليقات النهائية",
+          "sendAIInterview": "إرسال مقابلة بالذكاء الاصطناعي",
+          "reject": "رفض",
+          "offer": "عرض"
+        },
+        "dialogs": {
+          "sendVideoInterview": {
+            "title": "إرسال مقابلة مرئية",
+            "description": "تكوين إعدادات المقابلة أدناه.",
+            "interviewType": {
+              "label": "نوع المقابلة",
+              "description": "حدد نوعًا واحدًا أو أكثر من أنواع المقابلات",
+              "technical": "فني",
+              "behavioral": "سلوكي",
+              "error": "يرجى تحديد نوع مقابلة واحد على الأقل"
+            },
+            "questionCount": {
+              "label": "عدد الأسئلة"
+            },
+            "expiryDate": {
+              "label": "تاريخ انتهاء المقابلة",
+              "placeholder": "اختر تاريخًا",
+              "description": "تاريخ الانتهاء هو افتراضيًا بعد يومين من الآن"
+            }
+          },
+          "sendOfferEmail": {
+            "title": "إرسال بريد إلكتروني بالعرض",
+            "description": "تكوين تفاصيل البريد الإلكتروني للعرض أدناه.",
+            "emailSubject": {
+              "label": "موضوع البريد الإلكتروني",
+              "placeholder": "أدخل موضوع البريد الإلكتروني (10 أحرف على الأقل)"
+            },
+            "emailBody": {
+              "label": "نص البريد الإلكتروني",
+              "placeholder": "أدخل نص البريد الإلكتروني (10 أحرف على الأقل)"
+            },
+            "error": "يرجى التأكد من ملء موضوع البريد الإلكتروني ونصه، وأن يكون كل منهما يحتوي على 10 أحرف على الأقل."
+          },
+          "selectedApplicants": {
+            "title": "المتقدمون المحددون",
+            "description": "{count, plural, one {متقدم واحد محدد} other {# متقدمين محددين}}"
+          },
+          "cancel": "إلغاء",
+          "sendInterview": "إرسال المقابلة",
+          "sendOffer": "إرسال العرض"
+        },
+        "table": {
+          "name": "الاسم",
+          "email": "البريد الإلكتروني",
+          "appliedAt": "تاريخ التقديم",
+          "feedbacks": "التعليقات",
+          "CV":"السيرة الذاتية",
+          "cv": {
+            "open": "فتح السيرة الذاتية",
+            "noCV": "لا توجد سيرة ذاتية"
+          },
+          "phase": "المرحلة",
+          "score": "الدرجة",
+          "scoreTooltip": "الدرجة: {score}%",
+          "noApplicants": "لم يتم العثور على متقدمين في هذه المرحلة."
+        },
+        "rejectedApplicantss": {
+          "searchPlaceholder": "البحث عن بريد إلكتروني أو اسم...",
+          "table": {
+            "name": "الاسم",
+            "email": "البريد الإلكتروني",
+            "applied": "تاريخ التقديم",
+            "Feedbacks": "التعليقات",
+            "lastPhase": "المرحلة الأخيرة",
+            "cv": {
+              "open": "فتح السيرة الذاتية",
+              "noCV": "لا توجد سيرة ذاتية"
+            },
+            
+            "noApplicants": "لم يتم العثور على متقدمين مرفوضين.",
+            "feedbacks": {
+              "cv": "السيرة الذاتية",
+              "feedback": "التعليقات",
+              "finalFeedback": "التعليقات النهائية"
+            }
+          }
+        },
+        "toast": {
+          "advanceToCVReview": "{count, plural, one {تم إرسال متقدم واحد إلى مراجعة السيرة الذاتية} other {تم إرسال # متقدمين إلى مراجعة السيرة الذاتية}}",
+          "advanceToCVReviewDescription": "{names} {count, plural, one {تم إرساله} other {تم إرسالهم}} من {phase} إلى مراجعة السيرة الذاتية",
+          "sendToInterview": "{count, plural, one {تم إرسال متقدم واحد إلى المقابلة} other {تم إرسال # متقدمين إلى المقابلة}}",
+          "sendToInterviewDescription": "{names} {count, plural, one {تم إرساله} other {تم إرسالهم}} من {phase} إلى المقابلة",
+          "moveToStage": "{count, plural, one {تم نقل متقدم واحد إلى {stage}} other {تم نقل # متقدمين إلى {stage}}}",
+          "moveToStageDescription": "{names} {count, plural, one {تم نقله} other {تم نقلهم}} من {phase} إلى {stage}",
+          "moveToFinalFeedback": "{count, plural, one {تم نقل متقدم واحد إلى التعليقات النهائية} other {تم نقل # متقدمين إلى التعليقات النهائية}}",
+          "moveToFinalFeedbackDescription": "{names} {count, plural, one {تم نقله} other {تم نقلهم}} من {phase} إلى التعليقات النهائية",
+          "error": {
+            "advanceToCVReview": "فشل في إرسال المتقدمين إلى مراجعة السيرة الذاتية",
+            "sendToInterview": "فشل في إرسال إلى المقابلة المرئية",
+            "rejectApplications": "فشل في رفض الطلبات",
+            "moveToFinalFeedback": "فشل في نقل الطلبات إلى التعليقات النهائية",
+            "tryAgain": "يرجى المحاولة مرة أخرى لاحقًا."
+          }
+        }
+      },
+      "addJob": {
+    "button": {
+      "postJob": "نشر وظيفة"
+    },
+    "dialog": {
+      "title": "إنشاء وظيفة جديدة",
+      "description": "املأ التفاصيل لتتبع الطلبات وتقدم المرشحين."
+    },
+    "tabs": {
+      "basics": "المعلومات الأساسية",
+      "details": "تفاصيل الوظيفة",
+      "additional": "معلومات إضافية"
+    },
+    "form": {
+      "title": {
+        "label": "عنوان الوظيفة",
+        "placeholder": "مثال: مطور واجهة أمامية"
+      },
+      "company": {
+        "label": "الشركة",
+        "placeholder": "اختر شركة",
+        "loading": "جارٍ تحميل الشركات...",
+        "error": "فشل في تحميل الشركات",
+        "noCompanies": "لا توجد شركات متاحة"
+      },
+      "jobType": {
+        "label": "نوع الوظيفة",
+        "placeholder": "اختر النوع",
+        "options": {
+          "fullTime": "دوام كامل",
+          "partTime": "دوام جزئي",
+          "contract": "عقد",
+          "internship": "تدريب",
+          "temporary": "مؤقت",
+          "freelance": "عمل حر"
+        }
+      },
+      "workPlaceType": {
+        "label": "نوع مكان العمل",
+        "placeholder": "اختر النوع",
+        "options": {
+          "remote": "عن بُعد",
+          "hybrid": "هجين",
+          "onSite": "في الموقع"
+        }
+      },
+      "experienceLevel": {
+        "label": "مستوى الخبرة",
+        "placeholder": "اختر المستوى",
+        "options": {
+          "intern": "متدرب",
+          "entryLevel": "مبتدئ",
+          "junior": "صغير",
+          "midLevel": "متوسط",
+          "senior": "كبير",
+          "lead": "قائد",
+          "principal": "رئيسي",
+          "staff": "موظف",
+          "manager": "مدير",
+          "director": "مدير تنفيذي",
+          "vicePresident": "نائب الرئيس",
+          "cLevel": "مستوى تنفيذي"
+        }
+      },
+      "description": {
+        "label": "الوصف",
+        "placeholder": "صف مسؤوليات الوظيفة والدور"
+      },
+      "requirements": {
+        "label": "المتطلبات",
+        "placeholder": "سرد المهارات والمؤهلات المطلوبة"
+      },
+      "tags": {
+        "label": "العلامات",
+        "placeholder": "مثال: React، Node.js",
+        "searchPlaceholder": "البحث عن العلامات...",
+        "noTags": "لم يتم العثور على علامات."
+      },
+      "salary": {
+        "label": "معلومات الراتب",
+        "min": {
+          "label": "الحد الأدنى للراتب",
+          "placeholder": "مثال: 50000"
+        },
+        "max": {
+          "label": "الحد الأقصى للراتب",
+          "placeholder": "مثال: 100000"
+        },
+        "currency": {
+          "label": "العملة",
+          "placeholder": "اختر العملة",
+          "options": {
+            "usd": "دولار أمريكي",
+            "eur": "يورو",
+            "sar": "ريال سعودي",
+            "aed": "درهم إماراتي",
+            "kwd": "دينار كويتي",
+            "egp": "جنيه مصري"
+          }
+        }
+      },
+      "hiringTarget": {
+        "label": "هدف التوظيف",
+        "placeholder": "مثال: 3"
+      },
+      "cancel": "إلغاء",
+      "submit": "إرسال الوظيفة",
+      "submitting": "جارٍ الإرسال..."
+    },
+    "validation": {
+      "title": {
+        "min": "يجب أن يكون العنوان 3 أحرف على الأقل"
+      },
+      "description": {
+        "min": "يجب أن يكون الوصف 10 أحرف على الأقل"
+      },
+      "requirements": {
+        "min": "يجب أن تكون المتطلبات 10 أحرف على الأقل"
+      },
+      "company": {
+        "required": "الشركة مطلوبة"
+      },
+      "workPlaceType": {
+        "required": "نوع مكان العمل مطلوب"
+      },
+      "jobType": {
+        "required": "نوع الوظيفة مطلوب"
+      },
+      "experienceLevel": {
+        "required": "مستوى الخبرة مطلوب"
+      },
+      "salary": {
+        "max": "يجب أن يكون الحد الأدنى للراتب أقل من أو يساوي الحد الأقصى للراتب"
+      }
+    },
+    "toast": {
+      "success": "تمت إضافة الوظيفة بنجاح!",
+      "error": "{message}",
+      "errorDefault": "فشل في إضافة الوظيفة"
+    }
+  }
+}

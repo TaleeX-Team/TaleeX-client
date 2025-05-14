@@ -14,10 +14,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "react-i18next";  // Import i18n hook
 
 const SetPassword = () => {
-  const hasPassword = localStorage.getItem("hasPassword") === "true";
+  const { t } = useTranslation();  // Initialize translation hook
 
+  const hasPassword = localStorage.getItem("hasPassword") === "true";
   const setPasswordMutation = useSetPassword();
 
   const [newPassword, setNewPassword] = useState("");
@@ -31,12 +33,12 @@ const SetPassword = () => {
 
     // Validate passwords
     if (newPassword.length < 8) {
-      setPasswordError("Password must be at least 8 characters long");
+      setPasswordError(t("setPassword.passwordErrorLength"));
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setPasswordError("Passwords do not match");
+      setPasswordError(t("setPassword.passwordErrorMatch"));
       return;
     }
 
@@ -60,10 +62,10 @@ const SetPassword = () => {
           <div className="flex">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">
-                Set Password
+                {t("setPassword.setPasswordTitle")}
               </h1>
               <p className="text-muted-foreground">
-                Enhance your account security by setting a password
+                {t("setPassword.setPasswordDescription")}
               </p>
             </div>
           </div>
@@ -71,14 +73,14 @@ const SetPassword = () => {
             <CardContent>
               <form onSubmit={handleSetPassword} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword">New Password</Label>
+                  <Label htmlFor="newPassword">{t("setPassword.newPasswordLabel")}</Label>
                   <div className="relative">
                     <Input
                       id="newPassword"
                       type={showPassword ? "text" : "password"}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="Enter a secure password"
+                      placeholder={t("setPassword.newPasswordPlaceholder")}
                       className="pr-10"
                     />
                     <button
@@ -96,13 +98,13 @@ const SetPassword = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Label htmlFor="confirmPassword">{t("setPassword.confirmPasswordLabel")}</Label>
                   <Input
                     id="confirmPassword"
                     type={showPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm your password"
+                    placeholder={t("setPassword.confirmPasswordPlaceholder")}
                   />
                 </div>
 
@@ -125,8 +127,8 @@ const SetPassword = () => {
                 }
               >
                 {setPasswordMutation.isPending
-                  ? "Setting Password..."
-                  : "Set Password"}
+                  ? t("setPassword.settingPassword")
+                  : t("setPassword.setPasswordButton")}
               </Button>
             </CardFooter>
           </Card>
@@ -137,3 +139,4 @@ const SetPassword = () => {
 };
 
 export default SetPassword;
+

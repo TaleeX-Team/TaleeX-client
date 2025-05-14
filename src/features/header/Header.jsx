@@ -9,8 +9,12 @@ import { Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 import UserAvatar from "./user-avatar/UserAvatar";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import LanguageToggle from "@/togglingButton";
+import { useTranslation } from "react-i18next"; // Import i18n hook
 
 export default function Header() {
+  const { t } = useTranslation(); // Initialize translation hook
+
   return (
     <div className="sticky top-0 z-40 flex justify-center w-full px-4">
       <header className="flex items-center justify-between backdrop-blur supports-[backdrop-filter]:bg-background/90 transition-all duration-500 h-16 w-full bg-background border-b">
@@ -29,13 +33,13 @@ export default function Header() {
                   asChild
                   className="flex h-9 cursor-pointer items-center rounded-md px-3 text-sm font-medium"
                 >
-                  <Link to="companies">Companies</Link>
+                  <Link to="companies">{t("header.companies")}</Link> {/* Translated */}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   asChild
                   className="flex h-9 cursor-pointer items-center rounded-md px-3 text-sm font-medium"
                 >
-                  <Link to="jobs">Jobs</Link>
+                  <Link to="jobs">{t("header.jobs")}</Link> {/* Translated */}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -55,21 +59,23 @@ export default function Header() {
               to="companies"
               className="px-3 py-1 text-sm font-medium rounded-md hover:bg-muted transition-colors"
             >
-              Companies
+              {t("header.companies")} {/* Translated */}
             </Link>
             <Link
               to="jobs"
               className="px-3 py-1 text-sm font-medium rounded-md hover:bg-muted transition-colors"
             >
-              Jobs
+              {t("header.jobs")} {/* Translated */}
             </Link>
           </nav>
         </div>
 
         {/* Right Section */}
         <div className="flex items-center gap-3">
+          <LanguageToggle />
           <ThemeToggle />
           <Separator orientation="vertical" className="h-5 hidden md:block" />
+
           <UserAvatar />
         </div>
       </header>

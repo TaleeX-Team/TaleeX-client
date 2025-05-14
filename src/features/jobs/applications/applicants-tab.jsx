@@ -8,6 +8,7 @@ import { AllApplicantsTab } from "./all-applicants-tab.jsx";
 import JobDetailsPage from "../jobDetails";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   getJobApplications,
   advanceToCVReview,
@@ -33,8 +34,9 @@ const PHASES = [
 const generateId = () => Math.random().toString(36).substring(2, 9);
 
 export default function JobApplicationManager() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("overview");
-  const [selectedApplicants, setSelectedApplicants] = useState([]); // Now stores { id, name } objects
+  const [selectedApplicants, setSelectedApplicants] = useState([]);
   const [activePhase, setActivePhase] = useState("Applications");
   const [searchQuery, setSearchQuery] = useState("");
   const { id } = useParams();
@@ -64,13 +66,13 @@ export default function JobApplicationManager() {
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
 
       toast(
-        `${selectedApplicants.length} ${
-          selectedApplicants.length === 1 ? "applicant" : "applicants"
-        } sent to CV Review`,
+        t("toast.advanceToCVReview", { count: selectedApplicants.length }),
         {
-          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
-            selectedApplicants.length === 1 ? "has" : "have"
-          } been sent from ${activePhase} to CV Review`,
+          description: t("toast.advanceToCVReviewDescription", {
+            names: selectedApplicants.map((a) => a.name).join(", "),
+            count: selectedApplicants.length,
+            phase: activePhase,
+          }),
           style: {
             backgroundColor: "#195f32",
             color: "white",
@@ -105,20 +107,17 @@ export default function JobApplicationManager() {
     onSuccess: (data, { jobId, applicationIds }) => {
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
 
-      toast(
-        `${selectedApplicants.length} ${
-          selectedApplicants.length === 1 ? "applicant" : "applicants"
-        } sent to Interview`,
-        {
-          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
-            selectedApplicants.length === 1 ? "has" : "have"
-          } been sent from ${activePhase} to Interview`,
-          style: {
-            backgroundColor: "#195f32",
-            color: "white",
-          },
-        }
-      );
+      toast(t("toast.sendToInterview", { count: selectedApplicants.length }), {
+        description: t("toast.sendToInterviewDescription", {
+          names: selectedApplicants.map((a) => a.name).join(", "),
+          count: selectedApplicants.length,
+          phase: activePhase,
+        }),
+        style: {
+          backgroundColor: "#195f32",
+          color: "white",
+        },
+      });
       setSelectedApplicants([]);
     },
     onError: (err) => {
@@ -136,17 +135,20 @@ export default function JobApplicationManager() {
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
 
       toast(
-        `${selectedApplicants.length} ${
-          selectedApplicants.length === 1 ? "applicant" : "applicants"
-        } moved to ${
-          stage === "rejected" ? "Rejected Applicants" : "Offered Applicants"
-        }`,
+        t("toast.moveToStage", {
+          count: selectedApplicants.length,
+          stage:
+            stage === "rejected"
+              ? t("rejectedApplicants")
+              : t("offeredApplicants"),
+        }),
         {
-          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
-            selectedApplicants.length === 1 ? "has" : "have"
-          } been moved from ${activePhase} to ${
-            stage === "rejected" ? "Rejected" : "Offered"
-          } Applicants`,
+          description: t("toast.moveToStageDescription", {
+            names: selectedApplicants.map((a) => a.name).join(", "),
+            count: selectedApplicants.length,
+            phase: activePhase,
+            stage: stage === "rejected" ? t("rejected") : t("offered"),
+          }),
           style: {
             backgroundColor: `${stage === "rejected" ? "darkred" : "#195f32"}`,
             color: "white",
@@ -169,13 +171,13 @@ export default function JobApplicationManager() {
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
 
       toast(
-        `${selectedApplicants.length} ${
-          selectedApplicants.length === 1 ? "applicant" : "applicants"
-        } moved to Final Feedback`,
+        t("toast.moveToFinalFeedback", { count: selectedApplicants.length }),
         {
-          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
-            selectedApplicants.length === 1 ? "has" : "have"
-          } been moved from ${activePhase} to Final Feedback`,
+          description: t("toast.moveToFinalFeedbackDescription", {
+            names: selectedApplicants.map((a) => a.name).join(", "),
+            count: selectedApplicants.length,
+            phase: activePhase,
+          }),
           style: {
             backgroundColor: "#1e88e5",
             color: "white",
@@ -206,15 +208,15 @@ export default function JobApplicationManager() {
       cvScore: app?.feedback?.cv?.matchScore,
       phase:
         app.stage === "applied"
-          ? "Applications"
+          ? t("phases.applications")
           : app.stage === "cv review"
-          ? "CV Review"
+          ? t("phases.cvReview")
           : app.stage === "sending interview"
-          ? "Sending Interview"
+          ? t("phases.sendingInterview")
           : app.stage === "completed interview"
-          ? "Interview Feedback"
+          ? t("phases.interviewFeedback")
           : app.stage === "final feedback"
-          ? "Final Feedback"
+          ? t("phases.finalFeedback")
           : app.stage,
       rejected: app.stage === "rejected",
       rejectedOn: app.stage === "rejected" ? app.createdAt : null,
@@ -251,7 +253,9 @@ export default function JobApplicationManager() {
   // Count applicants in each phase
   const phaseCounts = PHASES.reduce((acc, phase) => {
     acc[phase] = applicants.filter(
-      (a) => a.phase === phase && !a.rejected
+      (a) =>
+        a.phase === t(`phases.${phase.toLowerCase().replace(" ", "")}`) &&
+        !a.rejected
     ).length;
     return acc;
   }, {});
@@ -275,7 +279,6 @@ export default function JobApplicationManager() {
   };
 
   const offerApplicants = ({ emailSubject, emailBody }) => {
-    console.log(emailSubject, emailBody, "asdadsadasdsad");
     if (selectedApplicants.length === 0) return;
     rejectApplicationsMutation.mutate({
       applicantIds: selectedApplicants.map((a) => a.id),
@@ -300,12 +303,14 @@ export default function JobApplicationManager() {
       questionCount,
     });
   };
+
   const sendToFinalFeedback = () => {
     if (selectedApplicants.length === 0) return;
     finalFeedbackMutation.mutate({
       applicationIds: selectedApplicants.map((a) => a.id),
     });
   };
+
   // Handle selecting all applicants
   const toggleSelectAll = (checked) => {
     if (checked) {
@@ -333,9 +338,11 @@ export default function JobApplicationManager() {
       );
     }
   };
+
   useEffect(() => {
     setSelectedApplicants([]);
   }, [activeTab, activePhase]);
+
   // Render loading skeleton
   if (isLoading || isLoadingJob) {
     return (
@@ -367,24 +374,22 @@ export default function JobApplicationManager() {
 
   // Render error state
   if (isError) {
-    return <div>Error: {error?.response?.data?.message}</div>;
+    return (
+      <div>
+        {t("error")}: {error?.response?.data?.message}
+      </div>
+    );
   }
+
   const isLoadingMutation =
     advanceToCVReviewMutation.isPending ||
     rejectApplicationsMutation.isPending ||
     sendVideoInterviewMutation.isPending ||
     finalFeedbackMutation.isPending;
 
-  console.log(isLoadingMutation);
   return (
     <div className="bg-background p-4 md:p-8 min-h-screen">
       <div className="mx-auto max-w-7xl">
-        {/* {isLoadingJob ? (
-        <div className="flex justify-between items-center mb-6">
-          <div className="h-10 w-2/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-          <div className="h-9 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-        </div>
-      ) : ( */}
         <div className="mb-8 space-y-4">
           <div className="flex flex-row flex-wrap items-center justify-between gap-2 mt-6 rounded-xl">
             <h1 className="text-3xl font-bold dark:text-white">{job?.title}</h1>
@@ -395,7 +400,7 @@ export default function JobApplicationManager() {
               <div className="flex items-center">
                 <Building2 className="w-5 h-5 mr-2 text-primary" />
                 <span className="text-lg">
-                  {job?.company?.name || "Unknown Company"}
+                  {job?.company?.name || t("unknownCompany")}
                 </span>
               </div>
 
@@ -433,7 +438,7 @@ export default function JobApplicationManager() {
                   : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
             >
-              Overview
+              {t("tabs.overview")}
               {activeTab === "overview" && (
                 <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black dark:bg-white"></span>
               )}
@@ -446,7 +451,7 @@ export default function JobApplicationManager() {
                   : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
             >
-              Applicants
+              {t("tabs.applicants")}
               {activeTab === "applicants" && (
                 <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black dark:bg-white"></span>
               )}
@@ -459,7 +464,7 @@ export default function JobApplicationManager() {
                   : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
             >
-              Rejected Applicants
+              {t("tabs.rejectedApplicants")}
               {activeTab === "rejected" && (
                 <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black dark:bg-white"></span>
               )}
@@ -472,7 +477,7 @@ export default function JobApplicationManager() {
                   : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
             >
-              All Applicants
+              {t("tabs.allApplicants")}
               {activeTab === "all" && (
                 <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black dark:bg-white"></span>
               )}

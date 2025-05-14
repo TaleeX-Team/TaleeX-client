@@ -13,18 +13,20 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 export function ConfirmationModal({
-                                    isOpen,
-                                    onClose,
-                                    onConfirm,
-                                    title,
-                                    description,
-                                    confirmText = "Delete",
-                                    cancelText = "Cancel",
-                                    intent = "destructive", // Options: "destructive", "warning", "info", "question"
-                                    size = "default", // Options: "sm", "default", "lg"
-                                  }) {
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  description,
+  confirmText = "Delete",
+  cancelText = "Cancel",
+  intent = "destructive", // Options: "destructive", "warning", "info", "question"
+  size = "default", // Options: "sm", "default", "lg"
+}) {
+  const { t } = useTranslation(); // Added i18n translation hook
   // Refs for animations
   const contentRef = useRef(null);
   const backdropRef = useRef(null);
@@ -228,69 +230,69 @@ export function ConfirmationModal({
   };
 
   return (
-      <AlertDialog open={isOpen} onOpenChange={onClose}>
-        <div
-            ref={backdropRef}
-            className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm"
-        />
-        <AlertDialogContent
-            ref={contentRef}
-            className={`${currentSize.containerClass} border shadow-lg backdrop-blur-sm bg-card/95 p-0 overflow-hidden`}
-        >
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+    <AlertDialog open={isOpen} onOpenChange={onClose}>
+      <div
+          ref={backdropRef}
+          className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm"
+      />
+      <AlertDialogContent
+          ref={contentRef}
+          className={`${currentSize.containerClass} border shadow-lg backdrop-blur-sm bg-card/95 p-0 overflow-hidden`}
+      >
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
-          <div className="flex flex-col items-center px-6 pt-6">
-            <div
-                ref={iconWrapperRef}
-                className={`${currentSize.iconWrapperSize} rounded-full ${currentIntent.bgColor} ${currentIntent.borderColor} border flex items-center justify-center mb-5`}
-            >
-              <IconComponent
-                  ref={iconRef}
-                  className={`${currentSize.iconSize} ${currentIntent.iconColor}`}
-              />
-            </div>
-          </div>
-
-          <AlertDialogHeader className="px-6 gap-2">
-            <AlertDialogTitle
-                ref={titleRef}
-                className={`text-center font-semibold ${currentSize.titleClass}`}
-            >
-              {title}
-            </AlertDialogTitle>
-            <AlertDialogDescription
-                ref={descriptionRef}
-                className="text-center text-muted-foreground"
-            >
-              {description}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-
-          <AlertDialogFooter
-              ref={buttonsRef}
-              className="flex p-6 gap-3 sm:gap-3 border-t bg-muted/20 mt-4"
+        <div className="flex flex-col items-center px-6 pt-6">
+          <div
+              ref={iconWrapperRef}
+              className={`${currentSize.iconWrapperSize} rounded-full ${currentIntent.bgColor} ${currentIntent.borderColor} border flex items-center justify-center mb-5`}
           >
-            <AlertDialogCancel asChild className="m-0 sm:m-0">
-              <Button
-                  variant="outline"
-                  className="flex-1 gap-2 border-muted-foreground/20"
-                  onClick={onClose}
-              >
-                <X className="h-4 w-4" />
-                {cancelText}
-              </Button>
-            </AlertDialogCancel>
-            <AlertDialogAction asChild className="m-0 sm:m-0">
-              <Button
-                  className={`flex-1 gap-2 ${currentIntent.buttonClass}`}
-                  onClick={handleConfirm}
-              >
-                <Check className="h-4 w-4" />
-                {confirmText}
-              </Button>
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            <IconComponent
+                ref={iconRef}
+                className={`${currentSize.iconSize} ${currentIntent.iconColor}`}
+            />
+          </div>
+        </div>
+
+        <AlertDialogHeader className="px-6 gap-2">
+          <AlertDialogTitle
+              ref={titleRef}
+              className={`text-center font-semibold ${currentSize.titleClass}`}
+          >
+            {t('confirmationModal.title')}
+          </AlertDialogTitle>
+          <AlertDialogDescription
+              ref={descriptionRef}
+              className="text-center text-muted-foreground"
+          >
+            {description || t('confirmationModal.description', { companyName: companyName })}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <AlertDialogFooter
+            ref={buttonsRef}
+            className="flex p-6 gap-3 sm:gap-3 border-t bg-muted/20 mt-4"
+        >
+          <AlertDialogCancel asChild className="m-0 sm:m-0">
+            <Button
+                variant="outline"
+                className="flex-1 gap-2 border-muted-foreground/20"
+                onClick={onClose}
+            >
+              <X className="h-4 w-4" />
+              {cancelText || t('common.cancel')}
+            </Button>
+          </AlertDialogCancel>
+          <AlertDialogAction asChild className="m-0 sm:m-0">
+            <Button
+                className={`flex-1 gap-2 ${currentIntent.buttonClass}`}
+                onClick={handleConfirm}
+            >
+              <Check className="h-4 w-4" />
+              {confirmText || t('common.delete')}
+            </Button>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

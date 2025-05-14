@@ -19,9 +19,9 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoadingIndicator } from "@/components/LoadingButton.jsx";
+import { useTranslation } from "react-i18next"; // Import i18n hook
 
 // Create a schema for form validation with the new requirements
-// All fields are optional for update, but if provided must follow validation rules
 const profileSchema = z.object({
   firstName: z
     .string()
@@ -57,6 +57,7 @@ const profileSchema = z.object({
 });
 
 export default function ProfilePage() {
+  const { t } = useTranslation(); // Initialize translation hook
   const { data: user } = useUser();
   const { updateUserMutation } = useProfile();
   const [avatarPreview, setAvatarPreview] = useState(null);
@@ -104,7 +105,7 @@ export default function ProfilePage() {
     // Only check if phone number is the same as the original when a value is provided
     if (data.phone && data.phone === originalPhone) {
       setPhoneError(
-        "Please enter a different phone number than your current one."
+        t("profilePage.phoneError")
       );
       return;
     }
@@ -118,7 +119,7 @@ export default function ProfilePage() {
 
     // Don't submit if no changes were made
     if (Object.keys(cleanedData).length === 0 && !data.image) {
-      toast.info("No changes to save");
+      toast.info(t("profilePage.noChanges"));
       return;
     }
 
@@ -144,7 +145,7 @@ export default function ProfilePage() {
       },
       {
         onSuccess: () => {
-          toast.success("Profile updated successfully!");
+          toast.success(t("profilePage.updateSuccess"));
           // Reset the avatar preview if needed
           // Update the original phone number with the new one
           setOriginalPhone(data.phone);
@@ -154,7 +155,7 @@ export default function ProfilePage() {
           console.error("Error updating profile:", error);
           toast.error(
             error.response?.data?.message ||
-            "Failed to update profile. Please try again."
+            t("profilePage.updateError")
           );
         },
       }
@@ -175,10 +176,10 @@ export default function ProfilePage() {
       <div className="flex">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Account Settings
+            {t("profilePage.accountSettings")}
           </h1>
           <p className="text-muted-foreground">
-            Manage your account settings and preferences
+            {t("profilePage.accountDescription")}
           </p>
         </div>
       </div>
@@ -186,10 +187,9 @@ export default function ProfilePage() {
       <Card>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <CardHeader>
-            <CardTitle>Personal Information</CardTitle>
+            <CardTitle>{t("profilePage.personalInfoTitle")}</CardTitle>
             <CardDescription>
-              Update your personal information and how others see you on the
-              platform
+              {t("profilePage.personalInfoDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 pt-10">
@@ -232,10 +232,10 @@ export default function ProfilePage() {
                   size="sm"
                   onClick={handleAvatarButtonClick}
                 >
-                  Change Avatar
+                  {t("profilePage.changeAvatar")}
                 </Button>
                 <p className="text-xs text-muted-foreground text-center mt-1">
-                  Recommended: Square image, JPG or PNG
+                  {t("profilePage.avatarInfo")}
                 </p>
                 {form.formState.errors.image && (
                   <p className="text-xs text-destructive">
@@ -255,7 +255,7 @@ export default function ProfilePage() {
                           : ""
                       }
                     >
-                      First Name*
+                      {t("profilePage.firstName")}
                     </Label>
                     <Input
                       id="firstName"
@@ -280,7 +280,7 @@ export default function ProfilePage() {
                         form.formState.errors.lastName ? "text-destructive" : ""
                       }
                     >
-                      Last Name*
+                      {t("profilePage.lastName")}
                     </Label>
                     <Input
                       id="lastName"
@@ -307,7 +307,7 @@ export default function ProfilePage() {
                       form.formState.errors.email ? "text-destructive" : ""
                     }
                   >
-                    Email
+                    {t("profilePage.email")}
                   </Label>
                   <Input
                     id="email"
@@ -333,7 +333,7 @@ export default function ProfilePage() {
                         : ""
                     }
                   >
-                    Phone Number
+                    {t("profilePage.phone")}
                   </Label>
                   <Input
                     id="phone"
@@ -363,10 +363,10 @@ export default function ProfilePage() {
               {isLoading ? (
                 <>
                   <LoadingIndicator className="mr-2" />
-                  Processing
+                  {t("profilePage.processing")}
                 </>
               ) : (
-                "Save Changes"
+                t("profilePage.saveChanges")
               )}
             </Button>
           </CardFooter>

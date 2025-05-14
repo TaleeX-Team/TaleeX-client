@@ -134,10 +134,19 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 flex items-center justify-between">
           <div className="flex items-center">
             <div className="flex items-center">
-              <h1 className="text-lg font-bold tracking-tight">
-                <span className="text-foreground">Talee</span>
-                <span className="text-primary">X</span>
-              </h1>
+            <div className="mr-2">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-md flex items-center justify-center text-white font-bold">
+                  T
+                </div>
+              </div>
+              <div className="flex items-center">
+                <div className="flex items-center">
+                  <h1 className="text-lg font-bold tracking-tight">
+                    <span className="text-foreground">Talee</span>
+                    <span className="text-primary">X</span>
+                  </h1>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -213,8 +222,12 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="py-16 md:py-24 bg-muted">
-        <div className="container mx-auto px-4">
+      <section className="py-16 md:py-24 bg-gradient-to-r from-blue-100 to-purple-300 dark:from-gray-900 dark:to-gray-900">
+
+
+
+
+      <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-10 md:mb-0">
               <div className="inline-block mb-4 px-3 py-1  bg-blue-100 rounded-full">

@@ -1,53 +1,53 @@
-import  React from "react"
-import { useState, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { FileText, Upload, X } from "lucide-react"
-
+import React, { useState, useRef } from "react";
+import { useTranslation } from "react-i18next";  // Import the useTranslation hook
+import { Button } from "@/components/ui/button";
+import { FileText, Upload, X } from "lucide-react";
 
 export function FileUpload({ value, onChange, accept = "*" }) {
-    const [isDragging, setIsDragging] = useState(false)
-    const fileInputRef = useRef(null)
+    const { t } = useTranslation();  // Initialize t function
+    const [isDragging, setIsDragging] = useState(false);
+    const fileInputRef = useRef(null);
 
     const handleDragOver = (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        setIsDragging(true)
-    }
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(true);
+    };
 
     const handleDragLeave = (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        setIsDragging(false)
-    }
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+    };
 
     const handleDrop = (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        setIsDragging(false)
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
 
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            onChange(e.dataTransfer.files[0])
+            onChange(e.dataTransfer.files[0]);
         }
-    }
+    };
 
     const handleFileChange = (e) => {
         if (e.target.files && e.target.files.length > 0) {
-            onChange(e.target.files[0])
+            onChange(e.target.files[0]);
         }
-    }
+    };
 
     const handleRemoveFile = () => {
-        onChange(null)
+        onChange(null);
         if (fileInputRef.current) {
-            fileInputRef.current.value = ""
+            fileInputRef.current.value = "";
         }
-    }
+    };
 
     const formatFileSize = (bytes) => {
-        if (bytes < 1024) return bytes + " bytes"
-        else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB"
-        else return (bytes / 1048576).toFixed(1) + " MB"
-    }
+        if (bytes < 1024) return bytes + " bytes";
+        else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
+        else return (bytes / 1048576).toFixed(1) + " MB";
+    };
 
     return (
         <div className="w-full">
@@ -64,11 +64,11 @@ export function FileUpload({ value, onChange, accept = "*" }) {
                     <div className="flex flex-col items-center justify-center gap-2">
                         <Upload className="h-10 w-10 text-muted-foreground" />
                         <div className="flex flex-col items-center">
-                            <p className="text-sm font-medium">Drag and drop your file here or click to browse</p>
-                            <p className="text-xs text-muted-foreground mt-1">Supports PDF, DOC, DOCX, JPG, PNG</p>
+                            <p className="text-sm font-medium">{t("fileUpload.dragDrop")}</p>
+                            <p className="text-xs text-muted-foreground mt-1">{t("fileUpload.supports")}</p>
                         </div>
                         <Button type="button" variant="secondary" size="sm" className="mt-2">
-                            Select File
+                            {t("fileUpload.selectFile")}
                         </Button>
                     </div>
                     <input ref={fileInputRef} type="file" className="hidden" accept={accept} onChange={handleFileChange} />
@@ -86,10 +86,10 @@ export function FileUpload({ value, onChange, accept = "*" }) {
                     </div>
                     <Button type="button" variant="ghost" size="icon" onClick={handleRemoveFile} className="h-8 w-8">
                         <X className="h-4 w-4" />
-                        <span className="sr-only">Remove file</span>
+                        <span className="sr-only">{t("fileUpload.removeFile")}</span>
                     </Button>
                 </div>
             )}
         </div>
-    )
+    );
 }

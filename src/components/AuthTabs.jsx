@@ -6,6 +6,7 @@ import { SignupForm } from "@/components/SignupForm.jsx";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next"; // Import i18n hook
 
 export const AuthTabs = ({ activeTab, setActiveTab }) => {
   const contentRef = useRef();
