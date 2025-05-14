@@ -10,10 +10,9 @@ export default function VerifyLayout() {
   const { data: user } = useUser();
 
   const handleVerifyNow = () => {
+    console.log(user?.email);
     if (user?.email) {
-      verificationMutation.mutate({
-        email: user.email,
-      });
+      verificationMutation.mutate(user?.email);
     }
   };
 
@@ -27,7 +26,8 @@ export default function VerifyLayout() {
         Account verification required
       </h3>
       <p className="text-md text-amber-700 dark:text-amber-500/80 max-w-xs mb-8">
-        To access all features without restrictions, please verify your email address.
+        To access all features without restrictions, please verify your email
+        address.
       </p>
       <Button
         onClick={handleVerifyNow}
