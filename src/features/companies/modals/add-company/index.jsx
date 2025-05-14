@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,8 +41,7 @@ import { toast } from "sonner";
 import { useCompanies } from "../../features";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from "react-router-dom";
-import { LoadingIndicator } from "@/components/LoadingButton.jsx";
+import { useTranslation } from "react-i18next";
 
 const formSchema = z.object({
   image: z.any().refine((file) => file instanceof File || file === null, {
@@ -65,6 +65,7 @@ const formSchema = z.object({
 });
 
 export default function AddCompany() {
+  const { t } = useTranslation();
   const [logoPreview, setLogoPreview] = useState(null);
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState([]);
@@ -137,7 +138,7 @@ export default function AddCompany() {
   const onSubmit = (values) => {
     createCompanyMutation.mutate(values, {
       onSuccess: () => {
-        toast.success("Company created successfully!");
+        toast.success(t("companies.toast.createSuccess"));
         setOpen(false);
         form.reset();
         setLogoPreview(null);
@@ -147,7 +148,7 @@ export default function AddCompany() {
         console.error("Error creating company:", error);
         toast.error(
           error.response?.data?.message ||
-          "Failed to create company. Please try again."
+          t("companies.toast.createError")
         );
       },
     });
@@ -157,7 +158,7 @@ export default function AddCompany() {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button className="mt-4 md:mt-0 bg-primary text-primary-foreground">
-          <Plus className="mr-2 h-4 w-4" /> Add Company
+          <Plus className="mr-2 h-4 w-4" /> {t("companies.addCompany")}
         </Button>
       </DialogTrigger>
       <DialogContent
@@ -175,21 +176,18 @@ export default function AddCompany() {
               <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center">
                 <Building2 className="h-5 w-5 text-primary" />
               </div>
-              <DialogTitle className="text-xl">Add New Company</DialogTitle>
+              <DialogTitle className="text-xl">{t("companies.addNewCompany")}</DialogTitle>
             </div>
             <DialogDescription className="text-sm text-muted-foreground text-left space-y-1">
-              <p>Please double-check all information before submitting — company details cannot be edited later.</p>
-              {/* <p>You can create as many company profiles as you like, free of charge.</p> */}
+              <p>{t("companies.descriptionCheck")}</p>
             </DialogDescription>
-
-
           </DialogHeader>
 
           <Tabs defaultValue="basic" className="w-full">
             <div className="px-6">
               <TabsList className="grid w-full grid-cols-2 bg-secondary/50 dark:bg-card">
-                <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                <TabsTrigger value="additional">Additional Details</TabsTrigger>
+                <TabsTrigger value="basic">{t("companies.basicInfo")}</TabsTrigger>
+                <TabsTrigger value="additional">{t("companies.additionalDetails")}</TabsTrigger>
               </TabsList>
             </div>
 
@@ -202,7 +200,7 @@ export default function AddCompany() {
                   <TabsContent value="basic" className="space-y-6 pt-2">
                     {/* Logo Upload */}
                     <div className="space-y-2">
-                      <FormLabel htmlFor="logo-upload">Company Logo</FormLabel>
+                      <FormLabel htmlFor="logo-upload">{t("companies.companyLogo")}</FormLabel>
                       <div className="flex flex-col items-center">
                         <div
                           ref={uploadAreaRef}
@@ -227,7 +225,7 @@ export default function AddCompany() {
                             <>
                               <ImagePlus className="h-10 w-10 text-muted-foreground mb-2" />
                               <span className="text-sm text-muted-foreground">
-                                Upload logo
+                                {t("companies.uploadLogo")}
                               </span>
                             </>
                           )}
@@ -243,10 +241,10 @@ export default function AddCompany() {
                           htmlFor="logo-upload"
                           className="mt-2 text-sm text-primary cursor-pointer hover:underline"
                         >
-                          Browse files
+                          {t("companies.browseFiles")}
                         </label>
                         <p className="text-xs text-muted-foreground mt-1">
-                          Recommended: 400×400px, PNG or JPG
+                          {t("companies.recommendedSize")}
                         </p>
                         {form.formState.errors.image && (
                           <p className="text-sm text-destructive">
@@ -262,10 +260,10 @@ export default function AddCompany() {
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Company Name *</FormLabel>
+                          <FormLabel>{t("companies.companyName")}</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Enter company name"
+                              placeholder={t("companies.enterCompanyName")}
                               className="bg-input"
                               {...field}
                             />
@@ -281,7 +279,7 @@ export default function AddCompany() {
                       name="website"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Website</FormLabel>
+                          <FormLabel>{t("companies.website")}</FormLabel>
                           <FormControl>
                             <div className="relative">
                               <Globe className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -293,7 +291,7 @@ export default function AddCompany() {
                             </div>
                           </FormControl>
                           <FormDescription>
-                            Include the full URL with http:// or https://
+                            {t("companies.includeUrl")}
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -306,7 +304,7 @@ export default function AddCompany() {
                       name="address"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Address *</FormLabel>
+                          <FormLabel>{t("companies.address")}</FormLabel>
                           <FormControl>
                             <div className="relative">
                               <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -330,17 +328,16 @@ export default function AddCompany() {
                       name="description"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Description</FormLabel>
+                          <FormLabel>{t("companies.Description")}</FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder="Brief description of the company"
+                              placeholder={t("companies.descriptionPlaceholder")}
                               className="min-h-[120px] resize-y bg-input"
                               {...field}
                             />
                           </FormControl>
                           <FormDescription>
-                            If provided, description must be at least 10
-                            characters
+                            {t("companies.descriptionLimit")}
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -349,7 +346,7 @@ export default function AddCompany() {
 
                     {/* Company Values */}
                     <div className="space-y-2">
-                      <Label htmlFor="values">Company Values</Label>
+                      <Label htmlFor="values">{t("companies.companyValues")}</Label>
                       <div className="flex flex-wrap gap-2 mb-2">
                         {values.map((value, index) => (
                           <Badge
@@ -363,7 +360,7 @@ export default function AddCompany() {
                               className="ml-1 rounded-full hover:bg-primary/20 p-0.5"
                             >
                               <X className="h-3 w-3" />
-                              <span className="sr-only">Remove {value}</span>
+                              <span className="sr-only">{t("common.remove")}</span>
                             </button>
                           </Badge>
                         ))}
@@ -374,7 +371,7 @@ export default function AddCompany() {
                           value={currentValue}
                           onChange={(e) => setCurrentValue(e.target.value)}
                           onKeyDown={handleKeyDown}
-                          placeholder="Add a company value (e.g. Innovation, Integrity)"
+                          placeholder={t("companies.addValuePlaceholder")}
                           className="bg-input"
                         />
                         <Button
@@ -385,11 +382,11 @@ export default function AddCompany() {
                           disabled={!currentValue.trim()}
                         >
                           <Plus className="h-4 w-4" />
-                          <span className="sr-only">Add value</span>
+                          <span className="sr-only">{t("common.add")}</span>
                         </Button>
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        Press Enter to add a value or click the plus button
+                        {t("companies.pressEnter")}
                       </p>
                     </div>
                   </TabsContent>
@@ -397,7 +394,7 @@ export default function AddCompany() {
                   <DialogFooter className="py-4 sticky bottom-0">
                     <DialogClose asChild>
                       <Button type="button" variant="outline">
-                        Cancel
+                        {t("common.cancel")}
                       </Button>
                     </DialogClose>
                     <Button
@@ -407,8 +404,8 @@ export default function AddCompany() {
                     >
                       {isLoading ? <>
                         <LoadingIndicator className="mr-2" />
-                        Processing
-                      </> : "Create Company"}
+                        {t("companies.processing")}
+                      </> : t("companies.createCompany")}
                     </Button>
                   </DialogFooter>
                 </form>

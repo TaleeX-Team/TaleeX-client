@@ -1,4 +1,3 @@
-
 {
   "jobs": {
     "header": {
@@ -32,7 +31,6 @@
       "hours": "{{count}} hour(s) ago",
       "minutes": "{{count}} minute(s) ago"
     },
-    
 
     "verifiedCompany": "Verified Company",
     "viewDetails": "View Details",
@@ -47,10 +45,944 @@
       "clearFilters": "Clear all filters"
     },
     "common": {
-    "clearAll": "Clear all",
-    "edit": "Edit"
+      "clearAll": "Clear all",
+      "edit": "Edit"
+    }
+  },
+  "companies": {
+    "title": "Companies",
+    "description": "Manage your company directory",
+    "searchPlaceholder": "Search companies...",
+    "filter": {
+      "placeholder": "Filter by status",
+      "all": "All Companies",
+      "verified": "Verified",
+      "pending": "Pending",
+      "rejected": "Rejected"
+    },
+    "verifyCompany": "Verify Company",
+    "verifyTitle": "Verify Company Ownership",
+    "verifyDescription": "Verify that you are part of {{companyName}} to manage its profile and job listings.",
+    "verifyAlert": "Providing accurate information and uploading valid documents helps our team verify your company faster.",
+    "emailTab": "Email Verification",
+    "documentTab": "Document Upload",
+    "enterOtp": "Enter the 6-digit code sent to {{email}}",
+    "sendCode": "Send Verification Code",
+    "sending": "Sending...",
+    "verifyCode": "Verify Code",
+    "emailVerified": "Email verified successfully! Your account is awaiting admin approval to manage {{companyName}}.",
+    "emailVerifiedSuccess": "Email verified successfully! You now have access to manage {{companyName}}.",
+    "documentUploaded": "Document uploaded successfully! We'll review your document and verify your company ownership.",
+    "verificationDocument": "Verification Document",
+    "documentDescription": "Upload a document that proves your affiliation with {{companyName}} (PDF files only, max 5MB). Accepted documents: Company ID, Business card, Employment letter, or any official document with your name and the company name.",
+    "unauthorizedUse": "Unauthorized use of company details may lead to legal consequences.",
+    "addCompany": "Add Company",
+    "addNewCompany": "Add New Company",
+    "descriptionCheck": "Please double-check all information before submitting — company details cannot be edited later.",
+    "basicInfo": "Basic Info",
+    "additionalDetails": "Additional Details",
+    "uploadLogo": "Upload logo",
+    "browseFiles": "Browse files",
+    "recommendedSize": "Recommended: 400×400px, PNG or JPG",
+    "companyName": "Company Name",
+    "enterCompanyName": "Enter company name",
+    "website": "Website",
+    "includeUrl": "Include the full URL with http:// or https://",
+    "address": "Address",
+    "Description": "Description",
+    "descriptionPlaceholder": "Brief description of the company",
+    "descriptionLimit": "If provided, description must be at least 10 characters",
+    "companyValues": "Company Values",
+    "addValuePlaceholder": "Add a company value (e.g. Innovation, Integrity)",
+    "pressEnter": "Press Enter to add a value or click the plus button",
+    "createCompany": "Create Company",
+    "processing": "Processing",
+    "cancel": "Cancel",
+    "backToCompanies": "Back to Companies",
+    "companyNotFound": "Company Not Found",
+    "companyNotExist": "The company you're looking for doesn't exist or has been removed.",
+    "returnToDirectory": "Return to Directory",
+    "aboutTab": "About",
+    "jobsTab": "Jobs",
+    "companyLogo": "Company Logo",
+    "jobsTabTitle": "Company Jobs",
+    "verificationStatus": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "about": "About",
+    "contactInformation": "Contact Information",
+    "companyDetails": "Company Details",
+     "noDescription": "No description available",
+     "emailAddress": "Email Address",
+     "companyDomain": "Company Domain",
+     "uploadDocument": "Upload Document",
+     "uploading" : "Uploading..."
 
-  }
-  }
+
+  },
+  "common": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "retry": "Retry",
+    "details": "Details"
+  },
+  "jobApplicationPage": {
+    "error": "Error",
+    "failedToLoadJob": "Failed to load job details",
+    "days": "{{count}} day(s)",
+    "hours": "{{count}} hour(s)",
+    "minutes": "{{count}} minute(s)",
+    "justNow": "Just now",
+    "verifiedCompany": "Verified Company",
+    "pendingVerification": "Pending Verification",
+    "applicationSubmitted": "Application Submitted",
+    "successMessage": "Your application has been successfully submitted. The company will contact you if they're interested.",
+    "jobNotAvailable": "Job Not Available",
+    "notAcceptingApplications": "This job is not currently accepting applications.",
+    "companyPendingReview": "Company Pending Review",
+    "researchCompanyBeforeApplying": "This company's profile has not yet been verified by Taleex. We recommend researching the company before submitting your application. If anything appears suspicious, please use the report feature to notify our team.",
+    "jobPostedBy": "This job is posted by Taleex on behalf of an external company. Please verify the company’s legitimacy before proceeding with your application."
+  },
+  "reportJobDialog": {
+    "reportButton": "Report Job",
+    "title": "Report this job listing",
+    "errorTitle": "Error",
+    "errorMessage": "Failed to submit report. Please try again.",
+    "selectReasonError": "Please select a reason for reporting",
+    "nameRequired": "Name is required",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Please enter a valid email address",
+    "detailsRequired": "Please provide details for 'Other' reason",
+    "reasonDescription": "Why are you reporting this job?",
+    "continueButton": "Continue",
+    "nameLabel": "Your Name",
+    "namePlaceholder": "Enter your name",
+    "emailLabel": "Your Email",
+    "emailPlaceholder": "Enter your email address",
+    "additionalDetailsLabel": "Additional Details",
+    "detailsPlaceholder": "Please provide any additional details about this report",
+    "otherReasonMessage": "Please provide details for your report",
+    "backButton": "Back",
+    "submitButton": "Submit Report",
+    "submittingButton": "Submitting...",
+    "reportReceived": "Report Received",
+    "reportSuccess": "Thanks for letting us know. We’ve logged your report and will follow up if further action is needed.",
+    "closeButton": "Close"
+  },
+  "jobDetails": {
+    "Verified": "Verified",
+    "Company Website": "Company Website",
+    "Posted by": "Posted by",
+    "Posted": "Posted",
+    "Job Details": "Job Details",
+    "Description": "Description",
+    "Requirements": "Requirements"
+  },
+  "days": "day",
+  "hours": "hour",
+  "minutes": "minute",
+  "Just now": "Just now",
+  "Hiring": "Hiring",
+  "positions": "positions",
+  "Posted": "Posted",
+  "Company Website": "Company Website",
+  "Report this job if it seems suspicious or inappropriate": "Report this job if it seems suspicious or inappropriate",
+  "Job Description": "Job Description",
+  "Requirements": "Requirements",
+  "Required Skills": "Required Skills",
+  "Job Details": "Job Details",
+  "applicants": "Applicants",
+  "ago": "ago",
+  "viewDetails": "View Details",
+  "deleteJob": "Delete Job",
+  "company": "Company",
+  "noDescription": "No description provided.",
+  "seeDetails": "See Details",
+  "link": "Link",
+  "fileUpload": {
+    "dragDrop": "Drag and drop your file here",
+    "selectFile": "Select File",
+    "supports": "Supports PDF, DOC, DOCX, JPG, PNG",
+    "removeFile": "Remove file"
+  },
+  "applicationForm": {
+    "title": "Apply for this position",
+    "description": "Fill out the form below to submit your application",
+    "fullName": "Full Name",
+    "email": "Email",
+    "linkedIn": "LinkedIn Profile (Optional)",
+    "linkedInDescription": "Share your LinkedIn profile to help the employer learn more about you",
+    "resume": "Resume/CV",
+    "resumeDescription": "Upload your resume or CV (PDF files only)",
+    "additionalNotes": "Additional Notes (Optional)",
+    "additionalNotesDescription": "Maximum 500 characters",
+    "submit": "Submit Application",
+    "submitting": "Submitting...",
+    "consent": "By submitting this application, you consent to Taleex sharing your information with the company posting this job."
+  },
+  "applicantss": {
+    "searchPlaceholder": "Find email or name...",
+    "inviteButton": "Invite to Job",
+    "dialogTitle": "Invite Applicants to Job",
+    "dialogDescription": "Send job invitations to the selected applicants.",
+    "jobToInvite": "Job to invite to:",
+    "selectedApplicants": "Selected Applicants",
+    "selectedApplicantsMessage": "{count} applicant(s) selected",
+    "invite": "Invite",
+    "inviting": "Inviting...",
+    "noApplicantsFound": "No applicants found.",
+    "noCV": "No CV",
+    "openCV": "Open CV"
+  },
+    "headerAbout":{
+      "getstarted":"Get Started"
+    },
+    "aboutPage": {
+    "heroQuote": "We're not replacing the recruiter. We're giving them superpowers.",
+    "heroDescription": "An AI-driven platform that makes recruitment faster, smarter, and fairer for everyone.",
+    "transformButton": "Transform Your Hiring",
+    "whatIsTaleexTitle": "What is Taleex?",
+    "whatIsTaleexDescription": "An AI hiring platform that simplifies job management, screening, and communication—all in one place.",
+    "targetAudienceTitle": "Who Taleex Empowers",
+    "targetAudienceDescription": "Designed for modern teams and hiring professionals.",
+    "featuresTitle": "Features",
+    "featuresDescription": "Unlock your recruiting potential with these intelligent tools.",
+    "comingSoonTitle": "What’s Coming Next",
+    "comingSoonDescription": "A glimpse of what we’re building for tomorrow’s recruiters.",
+    "targetAudience": {
+      "businessOwners": {
+        "title": "Business Owners",
+        "description": "Streamline your hiring process and find the right talent faster."
+      },
+      "hrProfessionals": {
+        "title": "HR Professionals & Recruiters",
+        "description": "Get AI-powered tools that enhance your expertise, not replace it."
+      },
+      "startups": {
+        "title": "Growing Startups & Mid-sized Companies",
+        "description": "Scale your recruitment efforts without scaling your team."
+      }
+    },
+    "features": {
+      "companyProfile": {
+        "title": "Company Profile Management",
+        "description": "Shape AI evaluation based on your company values and hiring criteria."
+      },
+      "aiCV": {
+        "title": "AI CV Reviewing",
+        "description": "Goes beyond keyword-matching to analyze true relevance and culture fit."
+      },
+      "aiInterview": {
+        "title": "AI-powered Interview",
+        "description": "Real-time, adaptive interviews personalized for each role."
+      },
+      "aiFeedback": {
+        "title": "AI Feedback",
+        "description": "Behavioral insights, technical clarity, and structured hiring feedback."
+      },
+      "trustTransparency": {
+        "title": "Trust & Transparency",
+        "description": "Verified companies, candidate protections, and full control."
+      },
+      "smarterCommunication": {
+        "title": "Smarter Communication",
+        "description": "One-click rejections, follow-ups, and branded engagement emails."
+      },
+      "talentReRouting": {
+        "title": "Talent Re-Routing",
+        "description": "Easily reassign candidates to more suitable roles."
+      }
+    },
+    "comingSoon": {
+      "aiAssessments": "AI Assessments & Exams",
+      "toneAnalysis": "Tone & Body Language Analysis",
+      "slackZoomIntegrations": "Slack, Zoom, ATS Integrations",
+      "jobDescription": "Job Description Curation"
+    },
+    "featuress": {
+      "jobApplicationManagement": {
+        "title": "Job Application Management",
+        "desc": "Filter, organize, and respond to applicants effortlessly."
+      },
+      "aiCVMatching": {
+        "title": "AI CV Matching & Interviews",
+        "desc": "Use AI for smarter screening and personalized interviews."
+      },
+      "candidateCommunication": {
+        "title": "Candidate Communication",
+        "desc": "Update, reject, or engage candidates with minimal effort."
+      }
+    }
+  },
+  "auth": {
+    "welcomeBack": "Welcome back",
+    "createAccount": "Create an account"
+  },
+  "authTabs": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "authError": "Authentication failed. Please try again.",
+    "loginSuccess": "Logged in successfully!",
+    "signupSuccess": "Account created successfully!"
+  },
+  "loginForm": {
+    "email": "Email",
+    "emailPlaceholder": "name@company.com",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "processing": "Processing",
+    "signIn": "Sign In"
+  },
+  "signupForm": {
+    "firstName": "First Name",
+    "firstNamePlaceholder": "John",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Doe",
+    "email": "Email",
+    "emailPlaceholder": "name@company.com",
+    "phone": "Phone Number",
+    "phonePlaceholder": "+1234567890",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "termsText": "I agree to the Terms of Service and Privacy Policy",
+    "processing": "Processing",
+    "createAccount": "Create account"
+  },
+  "forgotPassword": {
+    "resetPassword": "Reset Password",
+    "enterEmail": "Enter your email to receive reset instructions",
+    "email": "Email address",
+    "processing": "Processing",
+    "sendReset": "Send reset instructions",
+    "checkInbox": "Check your inbox",
+    "sentTo": "We've sent a password reset link to",
+    "checkSpam": "Didn't receive the email? Check your spam or try again.",
+    "tryAgain": "Try again",
+    "backToLogin": "Back to login"
+  },
+  "contactPage": {
+    "heroTitle": "We'd Love to Hear From You",
+    "heroDescription": "Have questions about our platform? Want to schedule a demo? Our team is here to help.",
+    "contactOptionsTitle": "Contact Options",
+    "contactOptionsDescription": "Reach out to us via your preferred method",
+    "callUs": "Call Us",
+    "callUsDescription": "Speak directly with our support team",
+    "emailUs": "Email Us",
+    "emailUsDescription": "Send us an email and we'll respond within 24 hours",
+    "formTitle": "Send Us a Message",
+    "messageSent": "Message Sent!",
+    "messageSentDescription": "We'll get back to you as soon as possible.",
+    "sendAnotherMessage": "Send Another Message",
+    "nameLabel": "Your Name",
+    "emailLabel": "Email Address",
+    "companyLabel": "Company",
+    "subjectLabel": "Subject",
+    "messageLabel": "Message",
+    "sendMessageButton": "Send Message"
+  },
+  "footer": {
+    "allRightsReserved": "All rights reserved.",
+    "aboutUs": "About Us",
+    "landingPage": "Landing Page",
+    "contactUs": "Contact Us"
+  },
+  "header": {
+    "companies": "Companies",
+    "jobs": "Jobs"
+  },
+  "setPassword": {
+    "setPasswordTitle": "Set Password",
+    "setPasswordDescription": "Enhance your account security by setting a password",
+    "newPasswordLabel": "New Password",
+    "newPasswordPlaceholder": "Enter a secure password",
+    "confirmPasswordLabel": "Confirm Password",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "passwordErrorLength": "Password must be at least 8 characters long",
+    "passwordErrorMatch": "Passwords do not match",
+    "settingPassword": "Setting Password...",
+    "setPasswordButton": "Set Password"
+  },
+  "profilePage": {
+    "accountSettings": "Account Settings",
+    "accountDescription": "Manage your account settings and preferences",
+    "personalInfoTitle": "Personal Information",
+    "personalInfoDescription": "Update your personal information and how others see you on the platform",
+    "changeAvatar": "Change Avatar",
+    "avatarInfo": "Recommended: Square image, JPG or PNG",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone Number",
+    "phoneError": "Please enter a different phone number than your current one.",
+    "saveChanges": "Save Changes",
+    "processing": "Processing",
+    "updateSuccess": "Profile updated successfully!",
+    "updateError": "Failed to update profile. Please try again.",
+    "noChanges": "No changes to save"
+  },
+  "changePasswordPage": {
+    "changePasswordTitle": "Change Password",
+    "updatePasswordDescription": "Update your password to keep your account secure",
+    "currentPassword": "Current Password",
+    "enterCurrentPassword": "Enter your current password",
+    "newPassword": "New Password",
+    "enterNewPassword": "Enter your new password",
+    "passwordRequirements": "Password requirements:",
+    "passwordMinLength": "At least 8 characters",
+    "passwordUpperCase": "At least one uppercase letter",
+    "passwordLowerCase": "At least one lowercase letter",
+    "passwordNumber": "At least one number",
+    "passwordSpecialChar": "At least one special character",
+    "confirmNewPassword": "Confirm New Password",
+    "confirmYourNewPassword": "Confirm your new password",
     
-}
+    "passwordMismatch": "New passwords do not match",
+    "passwordError": "Your new password doesn't meet all requirements",
+    "allFieldsRequired": "All fields are required",
+    "changingPassword": "Changing Password...",
+    "changePassword": "Change Password",
+    "passwordChangedSuccessfully": "Password changed successfully!",
+    "passwordsMatch": "Passwords match"
+  },
+  "subscriptionPage": {
+    "tokens": "Tokens",
+    "purchaseTokensDescription": "Purchase tokens to use our AI-powered services",
+    "buyTokens": "Buy Tokens",
+    "purchaseTokens": "Purchase Tokens",
+    
+    "totalPrice": "Total Price",
+    "tokenCredit": "Token Credit",
+    "tokenPrice": "Token Price",
+    "tokensLabel": "tokens",
+    "perToken": "per token",
+    "mostPopular": "Most Popular",
+    "useTokensForAnyService": "Use tokens for any service",
+    "noExpiration": "No expiration date",
+    "support24x7": "24/7 support",
+    "howTokensWork": "How Tokens Work",
+    "cost": "Cost",
+     "tokenCostForService": "Token cost for service {{service}}"
+  },
+  "settingsLayout": {
+    "settings": "Settings",
+    "manageSettings": "Manage your account settings and preferences.",
+    "profile": "Profile",
+    "billing": "Billing",
+    "changePassword": "Change Password",
+    "setPassword": "Set Password",
+    "backToHomepage": "Back to Homepage"
+  },
+  "myAccount": "My Account",
+  "settings": "Settings",
+  "logout": "Logout",
+  "logoutConfirmation": "Are you sure you want to logout?",
+  "logoutWarning": "You will be logged out of your account. This action cannot be undone.",
+  "cancel": "Cancel",
+ 
+    "searchEmailName": "Find email or name...",
+    "inviteToJob": "Invite to Job",
+    "inviteApplicantsToJob": "Invite Applicants to Job",
+    "sendJobInvitationsToSelectedApplicants": "Send job invitations to the selected applicants.",
+    "jobToInviteTo": "Job to invite to:",
+    "selectJob": "Select a job",
+    "selectedApplicants": "Selected Applicants",
+    "applicant": "applicant",
+    "Applicants": "applicants",
+    "invited": "been sent a job invitation",
+    "beenSentJobInvitation": "has been sent a job invitation",
+    "failedToInviteApplicants": "Failed to invite applicants to the job",
+    "pleaseTryAgainLater": "Please try again later.",
+    "inviting": "Inviting...",
+    "invite": "Invite",
+    "feedbacks": "Feedbacks",
+    "cv": "CV",
+    "currentPhase": "Current Phase",
+    "noCV": "No CV",
+    "openCV": "Open CV",
+    "noApplicantsFound": "No applicants found.",
+    "name":"name",
+  "email":"email",
+  "applied":"applied",
+  
+    "tabs": {
+      "overview": "Overview",
+      "applicants": "Applicants",
+      "rejectedApplicants": "Rejected Applicants",
+      "allApplicants": "All Applicants"
+    },
+    "phases": {
+      "applications": "Applications",
+      "cvReview": "CV Review",
+      "sendingInterview": "Sending Interview",
+      "interviewFeedback": "Interview Feedback",
+      "finalFeedback": "Final Feedback"
+    },
+    "unknownCompany": "Unknown Company",
+    "rejected": "Rejected",
+    "offered": "Offered",
+    "rejectedApplicants": "Rejected Applicants",
+    "offeredApplicants": "Offered Applicants",
+    "error": "Error",
+    "toast": {
+      "advanceToCVReview": "{count, plural, one {# applicant sent to CV Review} other {# applicants sent to CV Review}}",
+      "advanceToCVReviewDescription": "{names} {count, plural, one {has} other {have}} been sent from {phase} to CV Review",
+      "sendToInterview": "{count, plural, one {# applicant sent to Interview} other {# applicants sent to Interview}}",
+      "sendToInterviewDescription": "{names} {count, plural, one {has} other {have}} been sent from {phase} to Interview",
+      "moveToStage": "{count, plural, one {# applicant moved to {stage}} other {# applicants moved to {stage}}}",
+      "moveToStageDescription": "{names} {count, plural, one {has} other {have}} been moved from {phase} to {stage}",
+      "moveToFinalFeedback": "{count, plural, one {# applicant moved to Final Feedback} other {# applicants moved to Final Feedback}}",
+      "moveToFinalFeedbackDescription": "{names} {count, plural, one {has} other {have}} been moved from {phase} to Final Feedback",
+      "error": {
+        "advanceToCVReview": "Failed to advance applicants to CV Review",
+        "sendToInterview": "Failed to send to video interview",
+        "rejectApplications": "Failed to reject applications",
+        "moveToFinalFeedback": "Failed to move applications to final feedback",
+        "tryAgain": "Please try again later."
+      }
+    },
+    
+  
+ 
+  "searchPlaceholder": "Find email or name...",
+  "actions": {
+    "run A CV Review": "Run AI CV Review",
+    "sendToFinalFeedback": "Send to final feedback",
+    "sendAIInterview": "Send AI Interview",
+    "reject": "Reject",
+    "offer": "Offer"
+  },
+  "dialogs": {
+    "sendVideoInterview": {
+      "title": "Send Video Interview",
+      "description": "Configure the interview settings below.",
+      "interviewType": {
+        "label": "Interview Type",
+        "description": "Select one or more interview types",
+        "technical": "Technical",
+        "behavioral": "Behavioral",
+        "error": "Please select at least one interview type"
+      },
+      "questionCount": {
+        "label": "Number of Questions"
+      },
+      "expiryDate": {
+        "label": "Interview Expiry Date",
+        "placeholder": "Pick a date",
+        "description": "The expiry date is by default two days from now"
+      }
+    },
+    "sendOfferEmail": {
+      "title": "Send Offer Email",
+      "description": "Configure the offer email details below.",
+      "emailSubject": {
+        "label": "Email Subject",
+        "placeholder": "Enter email subject (minimum 10 characters)"
+      },
+      "emailBody": {
+        "label": "Email Body",
+        "placeholder": "Enter email body (minimum 10 characters)"
+      },
+      "error": "Please ensure both email subject and body are filled and each has at least 10 characters."
+    },
+    "selectedApplicants": {
+      "title": "Selected Applicants",
+      "description": "{count, plural, one {# applicant selected} other {# applicants selected}}"
+    },
+    "cancel": "Cancel",
+    "sendInterview": "Send Interview",
+    "sendOffer": "Send Offer"
+  },
+  "table": {
+    "name": "Name",
+    "email": "Email",
+    "appliedAt": "Applied at",
+    "cv": {
+      "open": "Open CV",
+      "noCV": "No CV"
+    },
+    "phase": "Phase",
+    "score": "Score",
+    "scoreTooltip": "Score: {score}%",
+    "noApplicants": "No applicants found in this phase.",
+    "feedbacks": {
+      "cv": "CV",
+      "feedback": "Feedback",
+      "finalFeedback": "Final Feedback"
+    }
+  },
+  "cuurentPhase":{
+      "tabs": {
+        "overview": "Overview",
+        "applicants": "Applicants",
+        "rejectedApplicants": "Rejected Applicants",
+        "allApplicants": "All Applicants"
+      },
+      "phases": {
+        "applications": "Applications",
+        "cvreview": "CV Review",
+        "sendinginterview": "Sending Interview",
+        "interviewfeedback": "Interview Feedback",
+        "finalfeedback": "Final Feedback"
+      },
+      "unknownCompany": "Unknown Company",
+      "rejected": "Rejected",
+      "offered": "Offered",
+      "rejectedApplicants": "Rejected Applicants",
+      "offeredApplicants": "Offered Applicants",
+      "error": "Error",
+      "searchPlaceholder": "Find email or name...",
+      "actions": {
+        "run A CV Review": "Run AI CV Review",
+        "sendToFinalFeedback": "Send to final feedback",
+        "sendAIInterview": "Send AI Interview",
+        "reject": "Reject",
+        "offer": "Offer"
+      },
+      "dialogs": {
+        "sendVideoInterview": {
+          "title": "Send Video Interview",
+          "description": "Configure the interview settings below.",
+          "interviewType": {
+            "label": "Interview Type",
+            "description": "Select one or more interview types",
+            "technical": "Technical",
+            "behavioral": "Behavioral",
+            "error": "Please select at least one interview type"
+          },
+          "questionCount": {
+            "label": "Number of Questions"
+          },
+          "expiryDate": {
+            "label": "Interview Expiry Date",
+            "placeholder": "Pick a date",
+            "description": "The expiry date is by default two days from now"
+          }
+        },
+        "sendOfferEmail": {
+          "title": "Send Offer Email",
+          "description": "Configure the offer email details below.",
+          "emailSubject": {
+            "label": "Email Subject",
+            "placeholder": "Enter email subject (minimum 10 characters)"
+          },
+          "emailBody": {
+            "label": "Email Body",
+            "placeholder": "Enter email body (minimum 10 characters)"
+          },
+          "error": "Please ensure both email subject and body are filled and each has at least 10 characters."
+        },
+        "selectedApplicants": {
+          "title": "Selected Applicants",
+          "description": "{count, plural, one {# applicant selected} other {# applicants selected}}"
+        },
+        "cancel": "Cancel",
+        "sendInterview": "Send Interview",
+        "sendOffer": "Send Offer"
+      },
+      "table": {
+        "name": "Name",
+        "email": "Email",
+        "appliedAt": "Applied at",
+        "feedbacks": "Feedbacks",
+        "Cv": "CV",
+        "cv": {
+          "open": "Open CV",
+          "noCV": "No CV"
+        },
+        "phase": "Phase",
+        "score": "Score",
+        "scoreTooltip": "Score: {score}%",
+        "noApplicants": "No applicants found in this phase."
+      },
+      "toast": {
+        "advanceToCVReview": "{count, plural, one {# applicant sent to CV Review} other {# applicants sent to CV Review}}",
+        "advanceToCVReviewDescription": "{names} {count, plural, one {has} other {have}} been sent from {phase} to CV Review",
+        "sendToInterview": "{count, plural, one {# applicant sent to Interview} other {# applicants sent to Interview}}",
+        "sendToInterviewDescription": "{names} {count, plural, one {has} other {have}} been sent from {phase} to Interview",
+        "moveToStage": "{count, plural, one {# applicant moved to {stage}} other {# applicants moved to {stage}}}",
+        "moveToStageDescription": "{names} {count, plural, one {has} other {have}} been moved from {phase} to {stage}",
+        "moveToFinalFeedback": "{count, plural, one {# applicant moved to Final Feedback} other {# applicants moved to Final Feedback}}",
+        "moveToFinalFeedbackDescription": "{names} {count, plural, one {has} other {have}} been moved from {phase} to Final Feedback",
+        "error": {
+          "advanceToCVReview": "Failed to advance applicants to CV Review",
+          "sendToInterview": "Failed to send to video interview",
+          "rejectApplications": "Failed to reject applications",
+          "moveToFinalFeedback": "Failed to move applications to final feedback",
+          "tryAgain": "Please try again later."
+        }
+      }
+    },
+    "reject":{
+      "tabs": {
+        "overview": "Overview",
+        "applicants": "Applicants",
+        "rejectedApplicants": "Rejected Applicants",
+        "allApplicants": "All Applicants"
+      },
+      "phases": {
+        "applications": "Applications",
+        "cvreview": "CV Review",
+        "sendinginterview": "Sending Interview",
+        "interviewfeedback": "Interview Feedback",
+        "finalfeedback": "Final Feedback"
+      },
+      "unknownCompany": "Unknown Company",
+      "rejected": "Rejected",
+      "offered": "Offered",
+      "rejectedApplicants": "Rejected Applicants",
+      "offeredApplicants": "Offered Applicants",
+      "error": "Error",
+      "actions": {
+        "runAICVReview": "Run AI CV Review",
+        "sendToFinalFeedback": "Send to final feedback",
+        "sendAIInterview": "Send AI Interview",
+        "reject": "Reject",
+        "offer": "Offer"
+      },
+      "dialogs": {
+        "sendVideoInterview": {
+          "title": "Send Video Interview",
+          "description": "Configure the interview settings below.",
+          "interviewType": {
+            "label": "Interview Type",
+            "description": "Select one or more interview types",
+            "technical": "Technical",
+            "behavioral": "Behavioral",
+            "error": "Please select at least one interview type"
+          },
+          "questionCount": {
+            "label": "Number of Questions"
+          },
+          "expiryDate": {
+            "label": "Interview Expiry Date",
+            "placeholder": "Pick a date",
+            "description": "The expiry date is by default two days from now"
+          }
+        },
+        "sendOfferEmail": {
+          "title": "Send Offer Email",
+          "description": "Configure the offer email details below.",
+          "emailSubject": {
+            "label": "Email Subject",
+            "placeholder": "Enter email subject (minimum 10 characters)"
+          },
+          "emailBody": {
+            "label": "Email Body",
+            "placeholder": "Enter email body (minimum 10 characters)"
+          },
+          "error": "Please ensure both email subject and body are filled and each has at least 10 characters."
+        },
+        "selectedApplicants": {
+          "title": "Selected Applicants",
+          "description": "{count, plural, one {# applicant selected} other {# applicants selected}}"
+        },
+        "cancel": "Cancel",
+        "sendInterview": "Send Interview",
+        "sendOffer": "Send Offer"
+      },
+      "table": {
+        "name": "Name",
+        "email": "Email",
+        "appliedAt": "Applied at",
+        "Feedbacks": "Feedbacks",
+        "cv": {
+          "open": "Open CV",
+          "noCV": "No CV"
+        },
+        "phase": "Phase",
+        "score": "Score",
+        "scoreTooltip": "Score: {score}%",
+        "noApplicants": "No applicants found in this phase.",
+        "feedbacks": {
+          "cv": "CV",
+          "feedback": "Feedback",
+          "finalFeedback": "Final Feedback"
+        }
+      },
+      "rejectedApplicantss": {
+        "searchPlaceholder": "Find email or name...",
+        "table": {
+          "name": "Name",
+          "email": "Email",
+          "applied": "Applied",
+          "CV": "CV",
+          "noApplicants": "No rejected applicants found.",
+          "lastPhase": "Last Phase",
+          "Feedbacks": "Feedbacks" },
+          
+          
+          
+          "feedbacks": {
+            "cv": "CV",
+            "feedback": "Feedback",
+            "finalFeedback": "Final Feedback"
+          }
+        },
+        "toast": {
+        "advanceToCVReview": "{count, plural, one {# applicant sent to CV Review} other {# applicants sent to CV Review}}",
+        "advanceToCVReviewDescription": "{names} {count, plural, one {has} other {have}} been sent from {phase} to CV Review",
+        "sendToInterview": "{count, plural, one {# applicant sent to Interview} other {# applicants sent to Interview}}",
+        "sendToInterviewDescription": "{names} {count, plural, one {has} other {have}} been sent from {phase} to Interview",
+        "moveToStage": "{count, plural, one {# applicant moved to {stage}} other {# applicants moved to {stage}}}",
+        "moveToStageDescription": "{names} {count, plural, one {has} other {have}} been moved from {phase} to {stage}",
+        "moveToFinalFeedback": "{count, plural, one {# applicant moved to Final Feedback} other {# applicants moved to Final Feedback}}",
+        "moveToFinalFeedbackDescription": "{names} {count, plural, one {has} other {have}} been moved from {phase} to Final Feedback",
+        "error": {
+          "advanceToCVReview": "Failed to advance applicants to CV Review",
+          "sendToInterview": "Failed to send to video interview",
+          "rejectApplications": "Failed to reject applications",
+          "moveToFinalFeedback": "Failed to move applications to final feedback",
+          "tryAgain": "Please try again later."
+        }
+      }
+      },
+      "addJob": {
+    "button": {
+      "postJob": "Post a Job"
+    },
+    "dialog": {
+      "title": "Create New Job",
+      "description": "Fill in the details to track applications and candidate progress."
+    },
+    "tabs": {
+      "basics": "Basic Info",
+      "details": "Job Details",
+      "additional": "Additional Info"
+    },
+    "form": {
+      "title": {
+        "label": "Job Title",
+        "placeholder": "e.g. Frontend Developer"
+      },
+      "company": {
+        "label": "Company",
+        "placeholder": "Select a company",
+        "loading": "Loading companies...",
+        "error": "Failed to load companies",
+        "noCompanies": "No companies available"
+      },
+      "jobType": {
+        "label": "Job Type",
+        "placeholder": "Select type",
+        "options": {
+          "fullTime": "Full-time",
+          "partTime": "Part-time",
+          "contract": "Contract",
+          "internship": "Internship",
+          "temporary": "Temporary",
+          "freelance": "Freelance"
+        }
+      },
+      "workPlaceType": {
+        "label": "Workplace Type",
+        "placeholder": "Select type",
+        "options": {
+          "remote": "Remote",
+          "hybrid": "Hybrid",
+          "onSite": "On-site"
+        }
+      },
+      "experienceLevel": {
+        "label": "Experience Level",
+        "placeholder": "Select level",
+        "options": {
+          "intern": "Intern",
+          "entryLevel": "Entry-Level",
+          "junior": "Junior",
+          "midLevel": "Mid-Level",
+          "senior": "Senior",
+          "lead": "Lead",
+          "principal": "Principal",
+          "staff": "Staff",
+          "manager": "Manager",
+          "director": "Director",
+          "vicePresident": "Vice President",
+          "cLevel": "C-Level"
+        }
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Describe the job responsibilities and role"
+      },
+      "requirements": {
+        "label": "Requirements",
+        "placeholder": "List the required skills and qualifications"
+      },
+      "tags": {
+        "label": "Tags",
+        "placeholder": "e.g. React, Node.js",
+        "searchPlaceholder": "Search tags...",
+        "noTags": "No tags found."
+      },
+      "salary": {
+        "label": "Salary Information",
+        "min": {
+          "label": "Min Salary",
+          "placeholder": "e.g. 50000"
+        },
+        "max": {
+          "label": "Max Salary",
+          "placeholder": "e.g. 100000"
+        },
+        "currency": {
+          "label": "Currency",
+          "placeholder": "Select currency",
+          "options": {
+            "usd": "USD",
+            "eur": "EUR",
+            "sar": "SAR",
+            "aed": "AED",
+            "kwd": "KWD",
+            "egp": "EGP"
+          }
+        }
+      },
+      "hiringTarget": {
+        "label": "Hiring Target",
+        "placeholder": "e.g. 3"
+      },
+      "cancel": "Cancel",
+      "submit": "Submit Job",
+      "submitting": "Submitting..."
+    },
+    "validation": {
+      "title": {
+        "min": "Title must be at least 3 characters"
+      },
+      "description": {
+        "min": "Description must be at least 10 characters"
+      },
+      "requirements": {
+        "min": "Requirements must be at least 10 characters"
+      },
+      "company": {
+        "required": "Company is required"
+      },
+      "workPlaceType": {
+        "required": "Workplace type is required"
+      },
+      "jobType": {
+        "required": "Job type is required"
+      },
+      "experienceLevel": {
+        "required": "Experience level is required"
+      },
+      "salary": {
+        "max": "Minimum salary must be less than or equal to maximum salary"
+      }
+    },
+    "toast": {
+      "success": "Job added successfully!",
+      "error": "{message}",
+      "errorDefault": "Failed to add job"
+    }
+  }
+      
+    }
+    
+    
+
+

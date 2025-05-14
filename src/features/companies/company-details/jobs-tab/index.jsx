@@ -12,6 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import AddJob from "@/features/jobs/addJob/createJob";
 import JobCard from "@/features/jobs/form/components/JobCard";
+import { useTranslation } from "react-i18next";
+
 const jobTypeColors = {
   "Full-time":
     "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
@@ -21,12 +23,15 @@ const jobTypeColors = {
   Internship:
     "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
 };
+
 export default function JobsTab({ jobs, verification }) {
+  const { t } = useTranslation();
+
   return (
     <TabsContent value="jobs">
       <div className="bg-card rounded-lg shadow-sm border p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Company Jobs</h2>
+          <h2 className="text-xl font-semibold">{t("companies.jobsTabTitle")}</h2>
           {verification.status !== "rejected" && <AddJob />}
         </div>
 

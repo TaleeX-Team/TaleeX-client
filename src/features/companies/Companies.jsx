@@ -33,12 +33,14 @@ import { toast } from "sonner";
 import { useUser } from "@/hooks/useUser";
 import VerifyLayout from "@/components/ui/VerifyLayout";
 import CompaniesHeader from "./companies-header";
+import { useTranslation } from "react-i18next";
 
 export default function Companies() {
   const {
     companyData: { data: companies, isLoading, isError },
     deleteCompanyMutation,
   } = useCompanies();
+  const { t } = useTranslation();
 
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -52,14 +54,14 @@ export default function Companies() {
     if (selectedCompany) {
       deleteCompanyMutation.mutate(selectedCompany._id, {
         onSuccess: () => {
-          toast.success("Company deleted successfully!");
+          toast.success(t("companies.toast.deleteSuccess"));
           setSelectedCompany(null);
         },
         onError: (error) => {
           console.error("Error deleting company:", error);
           toast.error(
             error.response?.data?.message ||
-              "Failed to delete company. Please try again."
+              t("companies.toast.deleteError")
           );
         },
       });
@@ -104,10 +106,10 @@ export default function Companies() {
             </div>
             <div>
               <h1 className="text-3xl font-bold flex items-center gap-2">
-                Companies
+                {t("companies.title")}
               </h1>
               <p className="text-muted-foreground mt-1">
-                Manage your company directory
+                {t("companies.description")}
               </p>
             </div>
           </div>
@@ -121,7 +123,7 @@ export default function Companies() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search companies..."
+              placeholder={t("companies.searchPlaceholder")}
               className="pl-10 w-full"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -129,13 +131,13 @@ export default function Companies() {
           </div>
           <Select value={selectedStatus} onValueChange={setSelectedStatus}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by status" />
+              <SelectValue placeholder={t("companies.filter.placeholder")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Companies</SelectItem>
-              <SelectItem value="verified">Verified</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="rejected">Rejected</SelectItem>
+              <SelectItem value="all">{t("companies.filter.all")}</SelectItem>
+              <SelectItem value="verified">{t("companies.filter.verified")}</SelectItem>
+              <SelectItem value="pending">{t("companies.filter.pending")}</SelectItem>
+              <SelectItem value="rejected">{t("companies.filter.rejected")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -156,14 +158,13 @@ export default function Companies() {
                 <AlertCircle className="h-9 w-9 text-destructive" />
               </div>
               <h2 className="text-xl font-semibold text-destructive mb-2">
-                Error loading companies
+                {t("companies.error.title")}
               </h2>
               <p className="text-muted-foreground mb-8 max-w-xs">
-                There was an error fetching your company data. Please try again
-                or contact support.
+                {t("companies.error.message")}
               </p>
               <Button variant="outline" className="mx-auto">
-                Retry
+                {t("common.retry")}
               </Button>
             </div>
           )}
@@ -184,10 +185,10 @@ export default function Companies() {
                 <div className="flex flex-col items-center justify-center py-16 px-4 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/50">
                   <FileX className="h-12 w-12 text-gray-400 dark:text-gray-500 mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
-                    No companies found
+                    {t("companies.empty.title")}
                   </h3>
                   <p className="text-gray-500 dark:text-gray-400 text-center mb-4">
-                    No companies match your current filter criteria
+                    {t("companies.empty.message")}
                   </p>
                 </div>
               )}
@@ -203,20 +204,19 @@ export default function Companies() {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
-                Delete {selectedCompany?.name || "this company"}?
+                {t("companies.dialog.title", { name: selectedCompany?.name || t("companies.dialog.defaultName") })}
               </AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the
-                company and all related data.
+                {t("companies.dialog.description")}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
               <AlertDialogAction
                 onClick={confirmDelete}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
-                Delete
+                {t("common.delete")}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

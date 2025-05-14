@@ -48,6 +48,7 @@ import CVFeedbackPage from "@/features/feedback/cv-feedback";
 import BehavioralFeedbackPage from "@/features/feedback/behavioral-feedback";
 import FinalFeedbackPage from "@/features/feedback/final-feedback";
 import TechnicalFeedbackPage from "@/features/feedback/technicall-feedback";
+import { useTranslation } from "react-i18next";
 
 export function ApplicantsTab({
   PHASES,
@@ -86,6 +87,7 @@ export function ApplicantsTab({
   const toggleSortOrder = () => {
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
   };
+  const { t } = useTranslation();
 
   const sortedApplicants = [...filteredApplicants].sort((a, b) => {
     console.log("Sorting applicants:", a.cvScore, b.cvScore);
@@ -201,7 +203,7 @@ export function ApplicantsTab({
             >
               {phaseCounts[phase] || 0}
             </span>
-            {phase}
+            {t(`cuurentPhase.phases.${phase.toLowerCase().replace(" ", "")}`)}
             {index < PHASES.length - 1 && (
               <ArrowRight className="h-4 w-4 ml-2 text-gray-400" />
             )}
@@ -213,7 +215,7 @@ export function ApplicantsTab({
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
           <Input
-            placeholder="Find email or name..."
+            placeholder={t("cuurentPhase.searchPlaceholder")}
             className="pl-10 bg-input"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -237,10 +239,10 @@ export function ApplicantsTab({
 
       {/* Action buttons */}
       <div className="flex flex-wrap gap-2 mb-6">
-        {activePhase !== "CV Review" &&
-          activePhase !== "Sending Interview" &&
-          activePhase !== "Interview Feedback" &&
-          activePhase !== "Final Feedback" && (
+        {activePhase !== t("cuurentPhase.phases.cvReview") &&
+          activePhase !== t("cuurentPhase.phases.sendingInterview") &&
+          activePhase !== t("cuurentPhase.phases.interviewFeedback") &&
+          activePhase !== t("cuurentPhase.phases.finalFeedback") && (
             <Button
               variant="outline"
               size="sm"
@@ -251,17 +253,17 @@ export function ApplicantsTab({
               {cvReviewLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Run AI CV Review
+                  {t("cuurentPhase.actions.runAICVReview")}
                 </>
               ) : (
                 <>
                   <ArrowRight className="h-4 w-4" />
-                  Run AI CV Review
+                  {t("cuurentPhase.actions.runAICVReview")}
                 </>
               )}
             </Button>
           )}
-        {activePhase === "Interview Feedback" && (
+        {activePhase === t("cuurentPhase.phases.interviewFeedback") && (
           <Button
             variant="outline"
             size="sm"
@@ -272,17 +274,17 @@ export function ApplicantsTab({
             {finalFeedBackLoading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Send to final feedback
+                {t("cuurentPhase.actions.sendToFinalFeedback")}
               </>
             ) : (
               <>
                 <ArrowRight className="h-4 w-4" />
-                Send to final feedback
+                {t("cuurentPhase.actions.sendToFinalFeedback")}
               </>
             )}
           </Button>
         )}
-        {(activePhase === "CV Review" || activePhase === "Applications") && (
+        {(activePhase === t("cuurentPhase.phases.cvReview") || activePhase === t("cuurentPhase.phases.applications")) && (
           <Dialog
             open={openInterview}
             onOpenChange={handleInterviewDialogChange}
@@ -297,29 +299,29 @@ export function ApplicantsTab({
                 {sendVideoInterviewLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Send AI Interview
+                    {t("cuurentPhase.actions.sendAIInterview")}
                   </>
                 ) : (
                   <>
                     <Video className="h-4 w-4" />
-                    Send AI Interview
+                    {t("cuurentPhase.actions.sendAIInterview")}
                   </>
                 )}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Send Video Interview</DialogTitle>
+                <DialogTitle>{t("dialogs.sendVideoInterview.title")}</DialogTitle>
                 <DialogDescription>
-                  Configure the interview settings below.
+                  {t("cuurentPhase.dialogs.sendVideoInterview.description")}
                 </DialogDescription>
               </DialogHeader>
 
               <div className="grid gap-4 py-4">
                 <div className="space-y-2">
-                  <Label>Interview Type</Label>
+                  <Label>{t("cuurentPhase.dialogs.sendVideoInterview.interviewType.label")}</Label>
                   <p className="text-sm text-muted-foreground">
-                    Select one or more interview types
+                    {t("cuurentPhase.dialogs.sendVideoInterview.interviewType.description")}
                   </p>
                   <div className="flex gap-4">
                     <div
@@ -331,7 +333,7 @@ export function ApplicantsTab({
                       onClick={() => toggleInterviewType("technical")}
                     >
                       <Label htmlFor="technical" className="cursor-pointer">
-                        Technical
+                        {t("cuurentPhase.dialogs.sendVideoInterview.interviewType.technical")}
                       </Label>
                     </div>
                     <div
@@ -343,14 +345,14 @@ export function ApplicantsTab({
                       onClick={() => toggleInterviewType("behavioral")}
                     >
                       <Label htmlFor="behavioral" className="cursor-pointer">
-                        Behavioral
+                        {t("cuurentPhase.dialogs.sendVideoInterview.interviewType.behavioral")}
                       </Label>
                     </div>
                   </div>
                   {showInterviewError && (
                     <Alert variant="destructive">
                       <AlertDescription>
-                        Please select at least one interview type
+                        {t("cuurentPhase.dialogs.sendVideoInterview.interviewType.error")}
                       </AlertDescription>
                     </Alert>
                   )}
@@ -358,7 +360,7 @@ export function ApplicantsTab({
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label>Number of Questions</Label>
+                    <Label>{t("cuurentPhase.dialogs.sendVideoInterview.questionCount.label")}</Label>
                     <span className="text-sm font-medium bg-muted px-2 py-1 rounded mb-4">
                       {questionCount}
                     </span>
@@ -378,7 +380,7 @@ export function ApplicantsTab({
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Interview Expiry Date</Label>
+                  <Label>{t("cuurentPhase.dialogs.sendVideoInterview.expiryDate.label")}</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -391,7 +393,7 @@ export function ApplicantsTab({
                         {expiryDate ? (
                           format(expiryDate, "PPP")
                         ) : (
-                          <span>Pick a date</span>
+                          <span>{t("cuurentPhase.dialogs.sendVideoInterview.expiryDate.placeholder")}</span>
                         )}
                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                       </Button>
@@ -409,16 +411,17 @@ export function ApplicantsTab({
                     </PopoverContent>
                   </Popover>
                   <p className="text-xs text-muted-foreground">
-                    The expiry date is by default two days from now
+                    {t("cuurentPhase.dialogs.sendVideoInterview.expiryDate.description")}
                   </p>
                 </div>
 
                 {selectedApplicants.length > 0 && (
                   <div className="p-3 rounded-md border bg-muted">
-                    <p className="text-sm font-medium">Selected Applicants</p>
+                    <p className="text-sm font-medium">{t("cuurentPhase.dialogs.selectedApplicants.title")}</p>
                     <p className="text-xs text-muted-foreground">
-                      {selectedApplicants.length} applicant
-                      {selectedApplicants.length !== 1 ? "s" : ""} selected
+                      {t("cuurentPhase.dialogs.selectedApplicants.description", {
+                        count: selectedApplicants.length,
+                      })}
                     </p>
                   </div>
                 )}
@@ -429,9 +432,9 @@ export function ApplicantsTab({
                   variant="outline"
                   onClick={() => handleInterviewDialogChange(false)}
                 >
-                  Cancel
+                  {t("cuurentPhase.dialogs.cancel")}
                 </Button>
-                <Button onClick={handleSubmitInterview}>Send Interview</Button>
+                <Button onClick={handleSubmitInterview}>{t("cuurentPhase.dialogs.sendInterview")}</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -439,19 +442,21 @@ export function ApplicantsTab({
         <Button
           variant="outline"
           size="sm"
-          className="flex items-center gap-1 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-50 dark:disabled:hover:bg-transparent"
+          className="flex items-center gap-1 text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red
+
+-300 dark:border-gray-700 dark:hover:bg-gray-800 disabled:opacity-50 dark:disabled:hover:bg-transparent"
           onClick={rejectApplicants}
           disabled={selectedApplicants.length === 0 || isLoadingMutation}
         >
           {changeStageLoading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              Reject
+              {t("cuurentPhase.actions.reject")}
             </>
           ) : (
             <>
               <XCircle className="h-4 w-4" />
-              Reject
+              {t("cuurentPhase.actions.reject")}
             </>
           )}
         </Button>
@@ -466,44 +471,44 @@ export function ApplicantsTab({
               {changeStageLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Offer
+                  {t("cuurentPhase.actions.offer")}
                 </>
               ) : (
                 <>
                   <CheckCircle className="h-4 w-4" />
-                  Offer
+                  {t("cuurentPhase.actions.offer")}
                 </>
               )}
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Send Offer Email</DialogTitle>
+              <DialogTitle>{t("cuurentPhase.dialogs.sendOfferEmail.title")}</DialogTitle>
               <DialogDescription>
-                Configure the offer email details below.
+                {t("cuurentPhase.dialogs.sendOfferEmail.description")}
               </DialogDescription>
             </DialogHeader>
 
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="emailSubject">Email Subject</Label>
+                <Label htmlFor="emailSubject">{t("cuurentPhase.dialogs.sendOfferEmail.emailSubject.label")}</Label>
                 <Input
                   id="emailSubject"
                   value={emailSubject}
                   onChange={(e) => setEmailSubject(e.target.value)}
-                  placeholder="Enter email subject (minimum 10 characters)"
+                  placeholder={t("cuurentPhase.dialogs.sendOfferEmail.emailSubject.placeholder")}
                   required
                   minLength={10}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="emailBody">Email Body</Label>
+                <Label htmlFor="emailBody">{t("cuurentPhase.dialogs.sendOfferEmail.emailBody.label")}</Label>
                 <textarea
                   id="emailBody"
                   value={emailBody}
                   onChange={(e) => setEmailBody(e.target.value)}
-                  placeholder="Enter email body (minimum 10 characters)"
+                  placeholder={t("cuurentPhase.dialogs.sendOfferEmail.emailBody.placeholder")}
                   className="w-full h-32 p-2 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary"
                   required
                   minLength={10}
@@ -513,18 +518,18 @@ export function ApplicantsTab({
               {showOfferError && (
                 <Alert variant="destructive">
                   <AlertDescription>
-                    Please ensure both email subject and body are filled and
-                    each has at least 10 characters.
+                    {t("cuurentPhase.dialogs.sendOfferEmail.error")}
                   </AlertDescription>
                 </Alert>
               )}
 
               {selectedApplicants.length > 0 && (
                 <div className="p-3 rounded-md border bg-muted">
-                  <p className="text-sm font-medium">Selected Applicants</p>
+                  <p className="text-sm font-medium">{t("cuurentPhase.dialogs.selectedApplicants.title")}</p>
                   <p className="text-xs text-muted-foreground">
-                    {selectedApplicants.length} applicant
-                    {selectedApplicants.length !== 1 ? "s" : ""} selected
+                    {t("cuurentPhase.dialogs.selectedApplicants.description", {
+                      count: selectedApplicants.length,
+                    })}
                   </p>
                 </div>
               )}
@@ -535,9 +540,9 @@ export function ApplicantsTab({
                 variant="outline"
                 onClick={() => handleOfferDialogChange(false)}
               >
-                Cancel
+                {t("cuurentPhase.dialogs.cancel")}
               </Button>
-              <Button onClick={handleSubmitOffer}>Send Offer</Button>
+              <Button onClick={handleSubmitOffer}>{t("cuurentPhase.dialogs.sendOffer")}</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -563,28 +568,28 @@ export function ApplicantsTab({
                 />
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Name
+                {t("cuurentPhase.table.name")}
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Email
+                {t("cuurentPhase.table.email")}
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Applied at
+                {t("cuurentPhase.table.appliedAt")}
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Feedbacks
+                {t("cuurentPhase.table.feedbacks")}
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                CV
+                {t("cuurentPhase.table.Cv")}
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Phase
+                {t("cuurentPhase.table.phase")}
               </th>
               <th
                 className="py-2 px-4 text-left font-medium dark:text-gray-200 cursor-pointer flex items-center gap-1"
                 onClick={toggleSortOrder}
               >
-                Score
+                {t("cuurentPhase.table.score")}
                 <ArrowUpDown className="h-4 w-4" />
               </th>
             </tr>
@@ -627,7 +632,7 @@ export function ApplicantsTab({
                               className="h-8 px-3"
                               disabled={!applicant?.feedback?.cv}
                             >
-                              CV
+                              {t("cuurentPhase.table.feedbacks.cv")}
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
@@ -645,7 +650,7 @@ export function ApplicantsTab({
                               size="sm"
                               className="h-8 px-3"
                             >
-                              Feedback
+                              {t("cuurentPhase.table.feedbacks.feedback")}
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
@@ -678,7 +683,7 @@ export function ApplicantsTab({
                               size="sm"
                               className="h-8 px-3"
                             >
-                              Final Feedback
+                              {t("cuurentPhase.table.feedbacks.finalFeedback")}
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
@@ -707,18 +712,18 @@ export function ApplicantsTab({
                                 rel="noopener noreferrer"
                               >
                                 <Newspaper className="h-3.5 w-3.5" />
-                                <span className="sr-only">Open CV</span>
+                                <span className="sr-only">{t("cuurentPhase.table.cv.open")}</span>
                               </a>
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Open CV</p>
+                            <p>{t("cuurentPhase.table.cv.open")}</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     ) : (
                       <span className="text-gray-400 dark:text-gray-500">
-                        No CV
+                        {t("cuurentPhase.table.cv.noCV")}
                       </span>
                     )}
                   </td>
@@ -727,15 +732,15 @@ export function ApplicantsTab({
                       variant="outline"
                       className={(() => {
                         switch (applicant.phase) {
-                          case "Applications":
+                          case t("cuurentPhase.phases.applications"):
                             return "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800";
-                          case "CV Review":
+                          case t("cuurentPhase.phases.cvReview"):
                             return "bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-900/20 dark:text-pink-400 dark:border-pink-800";
-                          case "Sending Interview":
+                          case t("cuurentPhase.phases.sendingInterview"):
                             return "bg-lime-50 text-lime-700 border-lime-200 dark:bg-lime-900/20 dark:text-lime-400 dark:border-lime-800";
-                          case "Interview Feedback":
+                          case t("cuurentPhase.phases.interviewFeedback"):
                             return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800";
-                          case "Final Feedback":
+                          case t("cuurentPhase.phases.finalFeedback"):
                             return "bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-900/20 dark:text-sky-400 dark:border-sky-800";
                           case "offer":
                             return "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800";
@@ -764,7 +769,7 @@ export function ApplicantsTab({
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
-                            Score: {applicant.cvScore.toFixed(1)}%
+                            {t("cuurentPhase.table.scoreTooltip", { score: applicant.cvScore.toFixed(1) })}
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -782,7 +787,7 @@ export function ApplicantsTab({
                   colSpan={8}
                   className="py-4 text-center text-gray-500 dark:text-gray-400"
                 >
-                  No applicants found in this phase.
+                  {t("cuurentPhase.table.noApplicants")}
                 </td>
               </tr>
             )}

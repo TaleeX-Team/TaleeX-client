@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle, Mail, Phone } from "lucide-react";
 import Footer from "../footer";
 import AboutContactHeader from "../about-contact-header/Header";
+import { useTranslation } from "react-i18next";  // Import i18n hook
 
 export default function ContactPage() {
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -17,6 +18,7 @@ export default function ContactPage() {
     subject: "",
     message: "",
   });
+  const { t } = useTranslation(); // Initialize translation hook
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,11 +47,10 @@ export default function ContactPage() {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
               <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                We'd Love to Hear From You
+                {t("contactPage.heroTitle")}
               </h1>
               <p className="text-xl text-muted-foreground">
-                Have questions about our platform? Want to schedule a demo? Our
-                team is here to help.
+                {t("contactPage.heroDescription")}
               </p>
             </div>
           </div>
@@ -59,9 +60,9 @@ export default function ContactPage() {
         <section className="py-16 bg-background">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">Contact Options</h2>
+              <h2 className="text-3xl font-bold mb-4">{t("contactPage.contactOptionsTitle")}</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Reach out to us via your preferred method
+                {t("contactPage.contactOptionsDescription")}
               </p>
             </div>
 
@@ -69,14 +70,14 @@ export default function ContactPage() {
               {[
                 {
                   icon: Phone,
-                  label: "Call Us",
-                  text: "Speak directly with our support team",
+                  label: t("contactPage.callUs"),
+                  text: t("contactPage.callUsDescription"),
                   href: "tel:+201004198987",
                 },
                 {
                   icon: Mail,
-                  label: "Email Us",
-                  text: "Send us an email and we'll respond within 24 hours",
+                  label: t("contactPage.emailUs"),
+                  text: t("contactPage.emailUsDescription"),
                   href: "mailto:taleex.app@gmail.com",
                 },
               ].map(({ icon: Icon, label, text, href }, i) => (
@@ -104,31 +105,31 @@ export default function ContactPage() {
             {/* Form Section */}
             <div className="max-w-3xl mx-auto">
               <h2 className="text-2xl font-bold mb-6 text-center">
-                Send Us a Message
+                {t("contactPage.formTitle")}
               </h2>
               {formSubmitted ? (
                 <div className="bg-green-100 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-6 text-center">
                   <div className="w-12 h-12 rounded-full bg-green-200 dark:bg-green-800 flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+                    <CheckCircle className="h-6 w-6 text-green-500" />
                   </div>
                   <h3 className="text-xl font-bold text-green-800 dark:text-green-300 mb-2">
-                    Message Sent!
+                    {t("contactPage.messageSent")}
                   </h3>
                   <p className="text-green-700 dark:text-green-400 mb-4">
-                    We'll get back to you as soon as possible.
+                    {t("contactPage.messageSentDescription", { email: formData.email })}
                   </p>
                   <Button
                     variant="outline"
                     onClick={() => setFormSubmitted(false)}
                   >
-                    Send Another Message
+                    {t("contactPage.sendAnotherMessage")}
                   </Button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="name">Your Name</Label>
+                      <Label htmlFor="name">{t("contactPage.nameLabel")}</Label>
                       <Input
                         id="name"
                         name="name"
@@ -138,7 +139,7 @@ export default function ContactPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email Address</Label>
+                      <Label htmlFor="email">{t("contactPage.emailLabel")}</Label>
                       <Input
                         id="email"
                         name="email"
@@ -150,7 +151,7 @@ export default function ContactPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="company">Company</Label>
+                    <Label htmlFor="company">{t("contactPage.companyLabel")}</Label>
                     <Input
                       id="company"
                       name="company"
@@ -159,7 +160,7 @@ export default function ContactPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="subject">Subject</Label>
+                    <Label htmlFor="subject">{t("contactPage.subjectLabel")}</Label>
                     <Input
                       id="subject"
                       name="subject"
@@ -169,7 +170,7 @@ export default function ContactPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="message">Message</Label>
+                    <Label htmlFor="message">{t("contactPage.messageLabel")}</Label>
                     <Textarea
                       id="message"
                       name="message"
@@ -183,7 +184,7 @@ export default function ContactPage() {
                     type="submit"
                     className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-700"
                   >
-                    Send Message
+                    {t("contactPage.sendMessageButton")}
                   </Button>
                 </form>
               )}

@@ -5,6 +5,7 @@ import VerifyCompany from "../../modals/verify-company";
 import { Badge } from "@/components/ui/badge";
 import { statusBadgeStyles } from "@/utils/statusBadgeStyles";
 import { StatusIcon } from "@/components/StatusIcon";
+import { useTranslation } from "react-i18next";
 
 export default function Header({
   image,
@@ -13,6 +14,8 @@ export default function Header({
   website,
   verification,
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="bg-card rounded-lg shadow-sm border p-6 mb-8">
       <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
@@ -34,8 +37,7 @@ export default function Header({
             {verification?.status && (
               <Badge className={statusBadgeStyles[verification?.status]}>
                 <StatusIcon status={verification?.status} />
-                {verification?.status.charAt(0).toUpperCase() +
-                  verification?.status.slice(1)}
+                {t(`companies.verificationStatus.${verification?.status}`)}
               </Badge>
             )}
           </div>
@@ -49,13 +51,6 @@ export default function Header({
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
           {verification.status === "pending" && <VerifyCompany />}
-          {/* <Button
-            variant="outline"
-            className="flex items-center gap-2"
-            onClick={() => console.log("View Website")}
-          >
-            <Edit className="h-4 w-4" /> Edit Company
-          </Button> */}
         </div>
       </div>
     </div>

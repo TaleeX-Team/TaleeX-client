@@ -4,41 +4,43 @@ import { Button } from "@/components/ui/button";
 import { Link, Outlet } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import Cookies from "js-cookie";
+import { useTranslation } from "react-i18next"; // Import translation hook
 
 export default function SettingsLayout() {
+  const { t } = useTranslation(); // Initialize translation hook
   const hasPassword = localStorage.getItem("hasPassword") === "true";
 
   const sidebarNavItems = React.useMemo(() => {
     const baseItems = [
-      { title: "Profile", href: "profile" },
-      { title: "Billing", href: "billing" },
+      { title: t("settingsLayout.profile"), href: "profile" },
+      { title: t("settingsLayout.billing"), href: "billing" },
     ];
 
     if (hasPassword) {
       baseItems.push({
-        title: "Change Password",
+        title: t("settingsLayout.changePassword"),
         href: "change-password",
       });
     } else {
-      baseItems.push({ title: "Set Password", href: "set-password" });
+      baseItems.push({ title: t("settingsLayout.setPassword"), href: "set-password" });
     }
 
     return baseItems;
-  }, [hasPassword]);
+  }, [hasPassword, t]);
 
   return (
     <div className="container mx-auto space-y-6 p-6 pb-16 min-h-screen ">
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
-          <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
+          <h2 className="text-2xl font-bold tracking-tight">{t("settingsLayout.settings")}</h2>
           <p className="text-muted-foreground">
-            Manage your account settings and preferences.
+            {t("settingsLayout.manageSettings")}
           </p>
         </div>
         {/* <Button variant="outline" asChild>
           <Link to="/" className="gap-2 flex items-center">
             <ArrowLeft className="h-4 w-4" />
-            Back to Homepage
+            {t("settingsLayout.backToHomepage")}
           </Link>
         </Button> */}
       </div>
@@ -53,3 +55,4 @@ export default function SettingsLayout() {
     </div>
   );
 }
+

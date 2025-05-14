@@ -6,6 +6,7 @@ import { SignupForm } from "@/components/SignupForm.jsx";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";  // Import i18n hook
 
 export const AuthTabs = ({
     activeTab,
@@ -14,6 +15,7 @@ export const AuthTabs = ({
     const contentRef = useRef();
     const navigate = useNavigate();
     const { login, register } = useAuth();
+    const { t } = useTranslation();  // Initialize translation hook
 
     useEffect(() => {
         gsap.fromTo(
@@ -43,7 +45,7 @@ export const AuthTabs = ({
         } else if (message) {
             toast.error(message);
         } else {
-            toast.error(fallbackMessage || "Authentication failed. Please try again.");
+            toast.error(fallbackMessage || t("authTabs.authError"));
         }
     };
 
@@ -55,7 +57,7 @@ export const AuthTabs = ({
             login.mutate(data, {
                 onSuccess: (data) => {
                     console.log("Login mutation successful");
-                    toast.success(data.message || "Logged in successfully!");
+                    toast.success(data.message || t("authTabs.loginSuccess"));
                     navigate("/app/companies", { replace: true });
                 },
                 onError: (error) => {
@@ -67,7 +69,7 @@ export const AuthTabs = ({
             register.mutate(data, {
                 onSuccess: (data) => {
                     console.log("Registration successful");
-                    toast.success(data.message || "Account created successfully!");
+                    toast.success(data.message || t("authTabs.signupSuccess"));
                     navigate("/app/companies", { replace: true });
                 },
                 onError: (error) => {
@@ -88,13 +90,13 @@ export const AuthTabs = ({
                     value="login"
                     className="data-[state=active]:bg-white dark:data-[state=active]:bg-accent data-[state=active]:text-primary dark:data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all duration-200"
                 >
-                    Sign In
+                    {t("authTabs.signIn")}  {/* Translated */}
                 </TabsTrigger>
                 <TabsTrigger
                     value="signup"
                     className="data-[state=active]:bg-white dark:data-[state=active]:bg-accent data-[state=active]:text-primary dark:data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all duration-200"
                 >
-                    Sign Up
+                    {t("authTabs.signUp")}  {/* Translated */}
                 </TabsTrigger>
             </TabsList>
 

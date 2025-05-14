@@ -1,28 +1,29 @@
+"use client";
 import React, { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
 import AboutTab from "./about-tab";
 import JobsTab from "./jobs-tab";
 import Header from "./header";
 import { useCompanies } from "../features";
 import { useJobs } from "@/features/jobs/useJobs";
+import { useTranslation } from "react-i18next";
 
 export default function CompanyDetails() {
   const queryClient = useQueryClient();
   const { companyId } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("about");
   const { companyData } = useCompanies();
   const { jobsQuery } = useJobs();
+
   // Get current company by finding it using the companyId
   const companies = queryClient.getQueryData(["companies"])?.companies || [];
   const company = companies.find((company) => company?._id === companyId);
-  //find the jobs that whose job.company._id is equal to companyId
 
   const jobs2 =
     jobsQuery.data?.jobs?.filter((job) => job?.company?._id === companyId) ||
@@ -55,22 +56,21 @@ export default function CompanyDetails() {
             onClick={() => navigate(-1)}
             className="mb-8"
           >
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Companies
+            <ArrowLeft className="mr-2 h-4 w-4" /> {t("companies.backToCompanies")}
           </Button>
 
           <div className="text-center py-16">
-            <h2 className="text-2xl font-bold mb-2">Company Not Found</h2>
+            <h2 className="text-2xl font-bold mb-2">{t("companies.companyNotFound")}</h2>
             <p className="text-muted-foreground mb-6">
-              The company you're looking for doesn't exist or has been removed.
+              {t("companies.companyNotExist")}
             </p>
-            <Button onClick={() => navigate("/")}>Return to Directory</Button>
+            <Button onClick={() => navigate("/")}>{t("companies.returnToDirectory")}</Button>
           </div>
         </div>
       </div>
     );
   }
 
-  // Extract company details from the data
   const {
     name = "",
     _id,
@@ -88,7 +88,7 @@ export default function CompanyDetails() {
         {/* Header with back button */}
         <div className="flex items-center justify-between mb-8 mt-6">
           <Button variant="outline" onClick={() => navigate(-1)}>
-            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Companies
+            <ArrowLeft className="mr-2 h-4 w-4" /> {t("companies.backToCompanies")}
           </Button>
         </div>
 
@@ -109,8 +109,10 @@ export default function CompanyDetails() {
           onValueChange={setActiveTab}
         >
           <TabsList className="grid w-full grid-cols-2 mb-8 dark:bg-card">
-            <TabsTrigger value="about">About</TabsTrigger>
-            <TabsTrigger value="jobs">Jobs ({jobs2?.length})</TabsTrigger>
+            <TabsTrigger value="about">{t("companies.aboutTab")}</TabsTrigger>
+            <TabsTrigger value="jobs">
+              {t("companies.jobsTab")} ({jobs2?.length})
+            </TabsTrigger>
           </TabsList>
 
           <AboutTab

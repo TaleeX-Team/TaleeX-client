@@ -14,7 +14,7 @@ export default function LanguageToggle() {
 
   return (
     <Button onClick={toggleLanguage}>
-      {i18n.language === 'ar' ? 'English' : 'العربية'}
+      {i18n.language === 'ar' ? 'En' : 'Ar'}
     </Button>
   );
 }

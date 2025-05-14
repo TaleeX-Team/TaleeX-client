@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -10,9 +11,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Briefcase, Building2, CheckCircle, Clock, Globe, MapPin, ShieldCheck, User } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import { ReportJobDialog } from "./ReportJobDialog";
+import { useTranslation } from "react-i18next";
 
 export function JobDetails({ job }) {
+  const { t } = useTranslation();
   const { id } = useParams();
+
   const getStatusColor = (status) => {
     switch (status) {
       case "open":
@@ -28,15 +32,14 @@ export function JobDetails({ job }) {
 
   const formatOpenTime = (openTime) => {
     if (openTime.days > 0) {
-      return `${openTime.days} day${openTime.days > 1 ? "s" : ""} ago`;
+      return `${openTime.days} ${t('days')}`;
     } else if (openTime.hours > 0) {
-      return `${openTime.hours} hour${openTime.hours > 1 ? "s" : ""} ago`;
+      return `${openTime.hours} ${t('hours')}`;
     } else {
-      return `${openTime.minutes} minute${openTime.minutes > 1 ? "s" : ""} ago`;
+      return `${openTime.minutes} ${t('minutes')}`;
     }
   };
 
-  // Get first two capital letters of company name for the fallback avatar
   const getInitials = (name) => {
     if (!name) return "CO";
     const words = name.split(" ");
@@ -55,7 +58,7 @@ export function JobDetails({ job }) {
           <h1 className="text-3xl font-bold">{job.title}</h1>
           <div className="flex items-center gap-3">
             <Badge className={`${getStatusColor(job.status)} capitalize`}>
-              {job.status}
+              {t(job.status)}
             </Badge>
             <TooltipProvider>
               <Tooltip>
@@ -66,11 +69,10 @@ export function JobDetails({ job }) {
                       defaultName=""
                       defaultEmail=""
                     />
-                    {/* <span className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full"></span> */}
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Report this job if it seems suspicious or inappropriate</p>
+                  <p>{t('Report this job if it seems suspicious or inappropriate')}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -86,7 +88,7 @@ export function JobDetails({ job }) {
               className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1"
             >
               <ShieldCheck className="w-3.5 h-3.5" />
-              Verified
+              {t('Verified')}
             </Badge>
           )}
         </div>
@@ -94,7 +96,7 @@ export function JobDetails({ job }) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Company Information</CardTitle>
+          <CardTitle>{t('Company Information')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-col md:flex-row gap-6">
@@ -132,19 +134,19 @@ export function JobDetails({ job }) {
                       rel="noopener noreferrer"
                       className="text-primary hover:underline"
                     >
-                      Company Website
+                      {t('Company Website')}
                     </Link>
                   </div>
                 )}
                 <div className="flex items-center gap-2 text-sm">
                   <User className="h-4 w-4 text-muted-foreground" />
                   <span>
-                    Posted by {job.createdBy.firstName} {job.createdBy.lastName}
+                    {t('Posted by')} {job.createdBy.firstName} {job.createdBy.lastName}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span>Posted {formatOpenTime(job.openTime)}</span>
+                  <span>{t('Posted')} {formatOpenTime(job.openTime)}</span>
                 </div>
               </div>
             </div>
@@ -154,35 +156,35 @@ export function JobDetails({ job }) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Job Details</CardTitle>
+          <CardTitle>{t('Job Details')}</CardTitle>
           <CardDescription>
             <div className="flex flex-wrap gap-2 mt-2">
               <Badge variant="secondary" className="capitalize">
                 <Briefcase className="h-3 w-3 mr-1" />
-                {job.jobType.replace("-", " ")}
+                {t(job.jobType.replace("-", " "))}
               </Badge>
               <Badge variant="secondary" className="capitalize">
                 <MapPin className="h-3 w-3 mr-1" />
-                {job.workPlaceType}
+                {t(job.workPlaceType)}
               </Badge>
               <Badge variant="secondary" className="capitalize">
                 <User className="h-3 w-3 mr-1" />
-                {job.experienceLevel}
+                {t(job.experienceLevel)}
               </Badge>
             </div>
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <h3 className="font-semibold mb-2">Description</h3>
+            <h3 className="font-semibold mb-2">{t('Description')}</h3>
             <p className="text-sm whitespace-pre-line">{job.description}</p>
           </div>
           <div>
-            <h3 className="font-semibold mb-2">Requirements</h3>
+            <h3 className="font-semibold mb-2">{t('Requirements')}</h3>
             <p className="text-sm whitespace-pre-line">{job.requirements}</p>
           </div>
         </CardContent>
       </Card>
-    </div >
+    </div>
   );
 }

@@ -1,42 +1,19 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
-import {
-  MapPin,
-  Globe,
-  ExternalLink,
-  Trash2,
-  Info,
-  Briefcase,
-  MoreHorizontal,
-  Star,
-  StarOff,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { gsap } from "gsap";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Edit, Globe, MapPin } from "lucide-react";
+import React, { useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Trash2, ExternalLink, Info } from "lucide-react";
 import { statusBadgeStyles } from "@/utils/statusBadgeStyles";
 import { StatusIcon } from "@/components/StatusIcon";
+import { Link } from "react-router-dom";
+import { gsap } from "gsap";
 
 export default function CompanyCard({ company, handleDelete }) {
+  const { t } = useTranslation();
+
   // Add fallback for company to prevent errors if it's undefined
   if (!company) {
     return null; // Or render a placeholder/skeleton
@@ -77,24 +54,6 @@ export default function CompanyCard({ company, handleDelete }) {
       duration: 0.3,
     });
   };
-
-  // Initial animation when component mounts
-  useEffect(() => {
-    if (logoRef.current && contentRef.current) {
-      gsap.fromTo(
-        logoRef.current,
-        { scale: 0, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 0.6, ease: "back.out(1.7)" }
-      );
-
-      gsap.fromTo(
-        contentRef.current,
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5, delay: 0.2 }
-      );
-    }
-  }, []);
-
   // Handle company delete
   //   const handleDelete = () => {
   //     console.log("Delete company", id);
@@ -152,7 +111,7 @@ export default function CompanyCard({ company, handleDelete }) {
             variant="ghost"
             size="icon"
             className="rounded-full bg-background/80 hover:bg-slate-100 dark:hover:bg-slate-800 text-muted-foreground hover:cursor-pointer transition-colors"
-            aria-label="Delete company"
+            aria-label={t("common.delete")}
             onClick={() => handleDelete(company)}
           >
             <Trash2 className="h-4 w-4" />
@@ -184,6 +143,7 @@ export default function CompanyCard({ company, handleDelete }) {
                     <Badge
                       className={`${statusBadgeStyles[verification.status]} `}
                     >
+                      <StatusIcon status={verification.status} />
                       {verification.status.charAt(0).toUpperCase() +
                         verification.status.slice(1)}
                     </Badge>
@@ -209,7 +169,7 @@ export default function CompanyCard({ company, handleDelete }) {
         <CardContent ref={contentRef} className="flex-1">
           <div className="space-y-2 text-sm">
             <p className="text-muted-foreground line-clamp-3">
-              {description || "No description available"}
+              {description || t("companies.noDescription")}
             </p>
             {address && (
               <div className="flex items-center text-muted-foreground">
@@ -242,14 +202,10 @@ export default function CompanyCard({ company, handleDelete }) {
         </CardContent>
 
         <CardFooter className="flex justify-end">
-          {/* <Button variant="outline" size="sm" className="gap-1">
-            <Briefcase className="h-4 w-4" />
-            <span>Add Job</span>
-          </Button> */}
           <Link to={`${_id}`}>
             <Button variant="default" size="sm" className="gap-1">
               <Info className="h-4 w-4" />
-              <span>Details</span>
+              <span>{t("common.details")}</span>
             </Button>
           </Link>
         </CardFooter>

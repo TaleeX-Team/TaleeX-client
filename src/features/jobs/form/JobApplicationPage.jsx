@@ -29,8 +29,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import FormAndInterviewHeader from "@/features/interview-appform-header/Header";
+import { useTranslation } from "react-i18next";
 
 export default function JobApplicationPage() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const {
     jobData,
@@ -60,29 +62,27 @@ export default function JobApplicationPage() {
       <div className="container max-w-4xl mx-auto py-8 px-4">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
+          <AlertTitle>{t('jobApplicationPage.error')}</AlertTitle>
           <AlertDescription>
             {error instanceof Error
               ? error?.response?.data?.message
-              : "Failed to load job details"}
+              : t('jobApplicationPage.failedToLoadJob')}
           </AlertDescription>
         </Alert>
       </div>
     );
   }
 
-  // Format job posted date
   const formatOpenTime = (openTime) => {
     if (openTime.days > 0) {
-      return `${openTime.days} day${openTime.days > 1 ? "s" : ""} ago`;
+      return `${openTime.days} ${t('jobApplicationPage.days', { count: openTime.days })}`;
     } else if (openTime.hours > 0) {
-      return `${openTime.hours} hour${openTime.hours > 1 ? "s" : ""} ago`;
+      return `${openTime.hours} ${t('jobApplicationPage.hours', { count: openTime.hours })}`;
     } else {
-      return `${openTime.minutes} minute${openTime.minutes > 1 ? "s" : ""} ago`;
+      return `${openTime.minutes} ${t('jobApplicationPage.minutes', { count: openTime.minutes })}`;
     }
   };
 
-  // Helper for verification status badge
   const getVerificationBadge = () => {
     const status = jobData?.company?.verification?.status;
 
@@ -93,7 +93,7 @@ export default function JobApplicationPage() {
           className="bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800 flex items-center gap-1"
         >
           <Shield className="h-3 w-3" />
-          Verified Company
+          {t('jobApplicationPage.verifiedCompany')}
         </Badge>
       );
     } else if (status === "pending") {
@@ -103,7 +103,7 @@ export default function JobApplicationPage() {
           className="bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800 flex items-center gap-1"
         >
           <AlertTriangle className="h-3 w-3" />
-          Pending Verification
+          {t('jobApplicationPage.pendingVerification')}
         </Badge>
       );
     }
@@ -111,7 +111,6 @@ export default function JobApplicationPage() {
     return null;
   };
 
-  // Create a reference to trigger the dialog
   const handleOpenReportDialog = () => {
     document.querySelector("[data-report-trigger]")?.click();
   };
@@ -124,43 +123,36 @@ export default function JobApplicationPage() {
           <Alert className="mb-6 bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800">
             <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
             <AlertTitle className="text-green-800 dark:text-green-400">
-              Application Submitted
+              {t('jobApplicationPage.applicationSubmitted')}
             </AlertTitle>
             <AlertDescription className="text-green-700 dark:text-green-300">
-              Your application has been successfully submitted. The company will
-              contact you if they're interested.
+              {t('jobApplicationPage.successMessage')}
             </AlertDescription>
           </Alert>
         )}
 
-        {/* Only show form if job status is open */}
         {jobData.status !== "open" && (
           <Alert>
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Job Not Available</AlertTitle>
+            <AlertTitle>{t('jobApplicationPage.jobNotAvailable')}</AlertTitle>
             <AlertDescription>
-              This job is not currently accepting applications.
+              {t('jobApplicationPage.notAcceptingApplications')}
             </AlertDescription>
           </Alert>
         )}
 
-        {/* Show warning for pending jobs */}
         {jobData?.company?.verification?.status === "pending" && (
           <Alert className="my-6 bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-600/30">
             <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
             <AlertTitle className="text-amber-800 dark:text-amber-400">
-              Company Pending Review
+              {t('jobApplicationPage.companyPendingReview')}
             </AlertTitle>
             <AlertDescription className="text-amber-700 dark:text-amber-300">
-              This company's profile has not yet been verified by Taleex. We
-              recommend researching the company before submitting your
-              application. If anything appears suspicious, please use the report
-              feature to notify our team.
+              {t('jobApplicationPage.researchCompanyBeforeApplying')}
             </AlertDescription>
           </Alert>
         )}
 
-        {/* Display detailed job info */}
         <JobDetails job={jobData} />
 
         {jobData.status === "open" && (
@@ -175,9 +167,7 @@ export default function JobApplicationPage() {
         )}
 
         <p className="text-xs text-muted-foreground text-center mt-6">
-          This job is posted by Taleex on behalf of an external company. Please
-          verify the company’s legitimacy before proceeding with your
-          application.
+          {t('jobApplicationPage.jobPostedBy')}
         </p>
 
         {/* Place the report dialog trigger without wrapping it in a button */}

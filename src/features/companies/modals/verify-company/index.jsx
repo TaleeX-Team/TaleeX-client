@@ -32,6 +32,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { FileUpload } from "@/features/jobs/form/components/FileUpload.jsx";
+import { useTranslation } from "react-i18next";
+
 
 // Define the form schema with Zod
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -50,7 +52,7 @@ const documentFormSchema = z.object({
 
 export default function VerifyCompany() {
   const queryClient = useQueryClient();
-
+  const { t } = useTranslation();
   // Dialog state
   const [open, setOpen] = useState(false);
 
@@ -255,7 +257,7 @@ export default function VerifyCompany() {
     >
       <DialogTrigger asChild>
         <Button variant="default" className="flex items-center gap-2">
-          <Shield className="h-4 w-4" /> Verify Company
+          <Shield className="h-4 w-4" /> {t("companies.verifyCompany")}
         </Button>
       </DialogTrigger>
       <DialogContent
@@ -266,24 +268,24 @@ export default function VerifyCompany() {
           scrollbarWidth: "none",
           msOverflowStyle: "none",
         }}
-      >        <DialogHeader className="p-6 pb-2">
+      >
+        <DialogHeader className="p-6 pb-2">
           <div className="flex items-center gap-2 mb-2">
             <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center">
               <Building2 className="h-5 w-5 text-primary" />
             </div>
             <DialogTitle className="text-xl">
-              Verify Company Ownership
+              {t("companies.verifyTitle")}
             </DialogTitle>
           </div>
           <DialogDescription>
-            Verify that you are part of {companyName} to manage its profile and job listings.
+            {t("companies.verifyDescription", { companyName })}
           </DialogDescription>
 
           <Alert className="mt-1 bg-muted/40 border border-muted-200 dark:bg-muted/20 dark:border-muted">
             <Shield className="h-4 w-4 mr-2 text-muted-foreground" />
             <AlertDescription className="text-sm text-muted-foreground">
-              Providing accurate information and uploading valid documents helps our team verify your company faster.
-              {/* Please ensure all details are correct. Unauthorized use of company information may lead to legal consequences. */}
+              {t("companies.verifyAlert")}
             </AlertDescription>
           </Alert>
         </DialogHeader>
@@ -291,8 +293,8 @@ export default function VerifyCompany() {
         <Tabs defaultValue="email" className="w-full">
           <div className="px-6">
             <TabsList className="grid w-full grid-cols-2 dark:bg-card">
-              <TabsTrigger value="email">Email Verification</TabsTrigger>
-              <TabsTrigger value="document">Document Upload</TabsTrigger>
+              <TabsTrigger value="email">{t("companies.emailTab")}</TabsTrigger>
+              <TabsTrigger value="document">{t("companies.documentTab")}</TabsTrigger>
             </TabsList>
           </div>
 
@@ -303,23 +305,21 @@ export default function VerifyCompany() {
                 <Alert className="bg-yellow-50 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-900">
                   <Check className="h-4 w-4 mr-2" />
                   <AlertDescription>
-                    Email verified successfully! Your account is awaiting admin
-                    approval to manage {companyName}.
+                    {t("companies.emailVerified")}
                   </AlertDescription>
                 </Alert>
               ) : emailVerified ? (
                 <Alert className="bg-green-50 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-900">
                   <Check className="h-4 w-4 mr-2" />
                   <AlertDescription>
-                    Email verified successfully! You now have access to manage{" "}
-                    {companyName}.
+                    {t("companies.emailVerifiedSuccess", { companyName })}
                   </AlertDescription>
                 </Alert>
               ) : otpSent ? (
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="otp">
-                      Enter the 6-digit code sent to {email}
+                      {t("companies.enterOtp", { email })}
                     </Label>
                     <Input
                       id="otp"
@@ -333,14 +333,14 @@ export default function VerifyCompany() {
                     )}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    Didn't receive the code?{" "}
+                    {t("companies.didNotReceiveCode")}{" "}
                     <button
                       type="button"
                       className="text-primary hover:underline"
                       onClick={handleSendOtp}
                       disabled={isLoadingRequest}
                     >
-                      Resend
+                      {t("companies.resend")}
                     </button>
                   </div>
                   <Button
@@ -351,13 +351,13 @@ export default function VerifyCompany() {
                     {isLoadingConfirm && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    {isLoadingConfirm ? "Verifying..." : "Verify Code"}
+                    {isLoadingConfirm ? t("companies.verifying") : t("companies.verifyCode")}
                   </Button>
                 </div>
               ) : (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Company Email Address</Label>
+                    <Label htmlFor="email">{t("companies.emailAddress")}</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <Input
@@ -374,7 +374,7 @@ export default function VerifyCompany() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="domain">Company Domain</Label>
+                    <Label htmlFor="domain">{t("companies.companyDomain")}</Label>
                     <div className="relative">
                       <Building2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <Input
@@ -389,11 +389,6 @@ export default function VerifyCompany() {
                       <p className="text-sm text-destructive">{domainError}</p>
                     )}
                   </div>
-                  {/* 
-                  <div className="text-sm text-muted-foreground">
-                    We'll send a verification code to your company email
-                    address.
-                  </div> */}
                   <Button
                     onClick={handleSendOtp}
                     className="w-full bg-primary text-primary-foreground my-2"
@@ -402,10 +397,10 @@ export default function VerifyCompany() {
                     {isLoadingRequest && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    {isLoadingRequest ? "Sending..." : "Send Verification Code"}
+                    {isLoadingRequest ? t("companies.sending") : t("companies.sendCode")}
                   </Button>
                   <p className="text-[0.75rem] text-destructive max-w-sm ml-1">
-                    Unauthorized use of company details may lead to legal consequences.
+                    {t("companies.unauthorizedUse")}
                   </p>
                 </div>
               )}
@@ -417,8 +412,7 @@ export default function VerifyCompany() {
                 <Alert className="bg-green-50 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-900">
                   <Check className="h-4 w-4 mr-2" />
                   <AlertDescription>
-                    Document uploaded successfully! We'll review your document
-                    and verify your company ownership.
+                    {t("companies.documentUploaded")}
                   </AlertDescription>
                 </Alert>
               ) : (
@@ -432,7 +426,7 @@ export default function VerifyCompany() {
                       name="document"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Verification Document</FormLabel>
+                          <FormLabel>{t("companies.verificationDocument")}</FormLabel>
                           <FormControl>
                             <FileUpload
                               value={file}
@@ -444,11 +438,7 @@ export default function VerifyCompany() {
                             />
                           </FormControl>
                           <FormDescription>
-                            Upload a document that proves your affiliation with{" "}
-                            {companyName} (PDF files only, max 5MB). Accepted
-                            documents: Company ID, Business card, Employment
-                            letter, or any official document with your name and
-                            the company name.
+                            {t("companies.documentDescription", { companyName })}
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -463,10 +453,10 @@ export default function VerifyCompany() {
                       {isLoadingDocument && (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       )}
-                      {isLoadingDocument ? "Uploading..." : "Upload Document"}
+                      {isLoadingDocument ? t("companies.uploading") : t("companies.uploadDocument")}
                     </Button>
                     <p className="text-[0.75rem] text-destructive max-w-sm ml-1">
-                      Unauthorized use of company details may lead to legal consequences.
+                      {t("companies.unauthorizedUse")}
                     </p>
                   </form>
                 </Form>
@@ -477,7 +467,7 @@ export default function VerifyCompany() {
           <DialogFooter className="p-6 pt-0">
             <DialogClose asChild>
               <Button type="button" variant="outline">
-                Cancel
+                {t("common.cancel")}
               </Button>
             </DialogClose>
           </DialogFooter>

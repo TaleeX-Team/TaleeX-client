@@ -39,6 +39,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { inviteToJob } from "@/services/apiApplications";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 export function AllApplicantsTab({
   filteredApplicants,
@@ -49,6 +50,7 @@ export function AllApplicantsTab({
   toggleSelectApplicant,
   setSelectedApplicants,
 }) {
+  const { t } = useTranslation(); // Use t for translation
   const [selectedJob, setSelectedJob] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const queryClient = useQueryClient();
@@ -66,12 +68,14 @@ export function AllApplicantsTab({
       queryClient.invalidateQueries({ queryKey: ["job/applicants", id] });
       toast(
         `${selectedApplicants.length} ${
-          selectedApplicants.length === 1 ? "applicant" : "applicants"
-        } been sent a job invitation`,
+          selectedApplicants.length === 1 ? t("Applicant") : t("Applicants")
+        } ${t("invited")}`,
         {
-          description: `${selectedApplicants.map((a) => a.name).join(", ")} ${
-            selectedApplicants.length === 1 ? "has" : "have"
-          } been sent a job invitation`,
+          description: `${selectedApplicants
+            .map((a) => a.name)
+            .join(", ")} ${
+            selectedApplicants.length === 1 ? t("has") : t("have")
+          } ${t("beenSentJobInvitation")}`,
           style: {
             backgroundColor: "#195f32",
             color: "white",
@@ -84,8 +88,8 @@ export function AllApplicantsTab({
     },
     onError: (err) => {
       console.error("Failed to invite applicants to the job:", err.message);
-      toast.error("Failed to invite applicants to the job", {
-        description: "Please try again later.",
+      toast.error(t("failedToInviteApplicants"), {
+        description: t("pleaseTryAgainLater"),
       });
     },
   });
@@ -105,7 +109,7 @@ export function AllApplicantsTab({
       <div className="flex flex-col md:flex-row gap-4 mb-6 items-center">
         <div className="relative flex-1">
           <Input
-            placeholder="Find email or name..."
+            placeholder={t("searchEmailName")}
             className="pl-10 bg-input"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
@@ -134,24 +138,24 @@ export function AllApplicantsTab({
               disabled={selectedApplicants.length === 0}
             >
               <Users className="h-4 w-4 mr-2" />
-              Invite to Job
+              {t("inviteToJob")}
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Invite Applicants to Job</DialogTitle>
+              <DialogTitle>{t("inviteApplicantsToJob")}</DialogTitle>
               <DialogDescription>
-                Send job invitations to the selected applicants.
+                {t("sendJobInvitationsToSelectedApplicants")}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="flex items-center gap-5">
                 <label htmlFor="job" className="col-span-1">
-                  Job to invite to:
+                  {t("jobToInviteTo")}
                 </label>
                 <Select onValueChange={setSelectedJob} value={selectedJob}>
                   <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select a job" />
+                    <SelectValue placeholder={t("selectJob")} />
                   </SelectTrigger>
                   <SelectContent>
                     {jobs.map((job) => (
@@ -165,10 +169,11 @@ export function AllApplicantsTab({
             </div>
             {selectedApplicants.length > 0 && (
               <div className="p-3 rounded-md border bg-muted">
-                <p className="text-sm font-medium">Selected Applicants</p>
+                <p className="text-sm font-medium">{t("selectedApplicants")}</p>
                 <p className="text-xs text-muted-foreground">
-                  {selectedApplicants.length} applicant
-                  {selectedApplicants.length !== 1 ? "s" : ""} selected
+                  {selectedApplicants.length} {t("applicant")}{" "}
+                  {selectedApplicants.length !== 1 ? t("s") : ""}
+                  {t("selected")}
                 </p>
               </div>
             )}
@@ -200,10 +205,10 @@ export function AllApplicantsTab({
                         d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8 8 8 0 01-8-8z"
                       ></path>
                     </svg>
-                    Inviting...
+                    {t("inviting")}
                   </>
                 ) : (
-                  "Invite"
+                  t("invite")
                 )}
               </Button>
             </DialogFooter>
@@ -231,22 +236,22 @@ export function AllApplicantsTab({
                 />
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Name
+                {t("name")}
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Email
+                {t("email")}
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Applied
+                {t("applied")}
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Feedbacks
+                {t("feedbacks")}
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                CV
+                {t("cv")}
               </th>
               <th className="py-2 px-4 text-left font-medium dark:text-gray-200">
-                Current Phase
+                {t("currentPhase")}
               </th>
             </tr>
           </thead>
@@ -311,7 +316,7 @@ export function AllApplicantsTab({
                               className="h-8 px-3"
                               disabled={!applicant?.feedback?.cv}
                             >
-                              CV
+                              {t("cv")}
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
@@ -329,7 +334,7 @@ export function AllApplicantsTab({
                               size="sm"
                               className="h-8 px-3"
                             >
-                              Feedback
+                              {t("feedback")}
                             </Button>
                           </DialogTrigger>
 
@@ -363,7 +368,7 @@ export function AllApplicantsTab({
                               size="sm"
                               className="h-8 px-3"
                             >
-                              Final Feedback
+                              {t("finalFeedback")}
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="!w-full !max-w-5xl max-h-[90vh] overflow-y-auto">
@@ -392,18 +397,18 @@ export function AllApplicantsTab({
                                 rel="noopener noreferrer"
                               >
                                 <Newspaper className="h-3.5 w-3.5" />
-                                <span className="sr-only">Open CV</span>
+                                <span className="sr-only">{t("openCV")}</span>
                               </a>
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Open CV</p>
+                            <p>{t("openCV")}</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     ) : (
                       <span className="text-gray-400 dark:text-gray-500">
-                        No CV
+                        {t("noCV")}
                       </span>
                     )}
                   </td>
@@ -442,7 +447,7 @@ export function AllApplicantsTab({
                   colSpan={6}
                   className="py-4 text-center text-gray-500 dark:text-gray-400"
                 >
-                  No applicants found.
+                  {t("noApplicantsFound")}
                 </td>
               </tr>
             )}
@@ -452,3 +457,4 @@ export function AllApplicantsTab({
     </div>
   );
 }
+

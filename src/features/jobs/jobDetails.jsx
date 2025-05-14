@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   MapPin,
   Briefcase,
@@ -39,6 +40,7 @@ import { useShareJob } from "@/hooks/useShareJob.js";
 import { Input } from "@/components/ui/input";
 
 export default function JobDetailsPage() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const [copied, setCopied] = useState(false);
   const { shareOnLinkedIn, isSharing } = useShareJob();
@@ -60,6 +62,7 @@ export default function JobDetailsPage() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
   const handleShareOnLinkedIn = async () => {
     try {
       await shareOnLinkedIn(id);
@@ -73,18 +76,18 @@ export default function JobDetailsPage() {
 
     const parts = [];
     if (openTime.days > 0) {
-      parts.push(`${openTime.days} day${openTime.days !== 1 ? "s" : ""}`);
+      parts.push(`${openTime.days} ${t('days')}`);
     }
     if (openTime.hours > 0) {
-      parts.push(`${openTime.hours} hour${openTime.hours !== 1 ? "s" : ""}`);
+      parts.push(`${openTime.hours} ${t('hours')}`);
     }
     if (openTime.minutes > 0) {
       parts.push(
-        `${openTime.minutes} minute${openTime.minutes !== 1 ? "s" : ""}`
+        `${openTime.minutes} ${t('minutes')}`
       );
     }
 
-    return parts.length > 0 ? parts.join(", ") : "Just now";
+    return parts.length > 0 ? parts.join(", ") : t('Just now');
   };
 
   if (isLoading) {
@@ -123,44 +126,13 @@ export default function JobDetailsPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-16">
-      {/* Header with blur effect */}
-      {/* <div className="sticky top-0 z-10 backdrop-blur-md bg-background/70 border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-foreground flex items-center gap-2"
-            onClick={() => window.history.back()}
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-
-          <div className="hidden sm:flex items-center gap-3">
-            <Badge variant="outline" className="capitalize">
-              {status || "Active"}
-            </Badge>
-            {workPlaceType && <Badge variant="outline">{workPlaceType}</Badge>}
-            {openTime && (
-              <Badge variant="secondary" className="text-primary">
-                <Clock className="h-3 w-3 mr-1" /> Posted{" "}
-                {formatTimeOpen(openTime)} ago
-              </Badge>
-            )}
-          </div>
-        </div>
-      </div> */}
-
-      {/* <div className="max-w-6xl mx-auto px-4 pt-8"> */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column - Job Details */}
         <div className="space-y-6 order-2 lg:order-1 lg:col-span-2">
-          {/* Job Description */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5 text-primary" />
-                Job Description
+                {t('Job Description')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -170,13 +142,12 @@ export default function JobDetailsPage() {
             </CardContent>
           </Card>
 
-          {/* Requirements */}
           {requirements && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Briefcase className="h-5 w-5 text-primary" />
-                  Requirements
+                  {t('Requirements')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -187,13 +158,12 @@ export default function JobDetailsPage() {
             </Card>
           )}
 
-          {/* Skills */}
           {((Tags && Tags.length > 0) || (tags && tags.length > 0)) && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <LucideTag className="h-5 w-5 text-primary" />
-                  Required Skills
+                  {t('Required Skills')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -223,23 +193,12 @@ export default function JobDetailsPage() {
           )}
         </div>
 
-        {/* Right Column - Job Metadata */}
         <div className="space-y-6 order-1 lg:order-2">
-          {/* Job Details Card */}
           <Card className="sticky top-20">
             <CardHeader>
-              <CardTitle>Job Details</CardTitle>
-              {/* <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <Badge className="bg-primary text-primary-foreground">
-                    {status?.toUpperCase() || "OPEN"}
-                  </Badge>
-                  <Badge variant="secondary">
-                    {jobType?.replace("-", " ")}
-                  </Badge>
-                </div> */}
+              <CardTitle>{t('Job Details')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
-              {/* Job Metadata */}
               <div className="space-y-4 text-sm">
                 {location && (
                   <div className="flex items-start">
@@ -273,7 +232,7 @@ export default function JobDetailsPage() {
                   <div className="flex items-start">
                     <Users className="w-4 h-4 mr-3 text-primary mt-0.5 flex-shrink-0" />
                     <span className="text-foreground">
-                      {applicants} applicants
+                      {applicants} {t('applicants')}
                     </span>
                   </div>
                 )}
@@ -282,7 +241,7 @@ export default function JobDetailsPage() {
                   <div className="flex items-start">
                     <BarChart className="w-4 h-4 mr-3 text-primary mt-0.5 flex-shrink-0" />
                     <span className="text-foreground">
-                      Hiring {hiringCount} positions
+                      {t('Hiring')} {hiringCount} {t('positions')}
                     </span>
                   </div>
                 )}
@@ -291,10 +250,11 @@ export default function JobDetailsPage() {
                   <div className="flex items-start">
                     <Calendar className="w-4 h-4 mr-3 text-primary mt-0.5 flex-shrink-0" />
                     <span className="text-foreground">
-                      Posted {formatTimeOpen(openTime)} ago
+                      {t('Posted')} {formatTimeOpen(openTime)} {t('ago')}
                     </span>
                   </div>
                 )}
+
                 {typeof salary?.min === "number" &&
                   typeof salary?.max === "number" &&
                   salary.min > 0 &&
@@ -311,100 +271,9 @@ export default function JobDetailsPage() {
               </div>
 
               <Separator />
-              {/* {applicationLink && (
-                  <div className="mt-6">
-                    <div className="flex items-center gap-2">
-                      <Input readOnly value={applicationLink} className="flex-1 text-sm" />
-                      <Button className="inline-flex items-center px-6 py-2 bg-primary text-white rounded-md hover:bg-primary/90" variant="secondary" onClick={copyToClipboard}>
-                        <Copy className="h-4 w-4 mr-1" /> Copy Link
-                      </Button>
-                    </div>
-                  </div>
-                )} */}
-              {/* Application Link */}
-              {applicationLink && (
-                <div className="pt-2">
-                  <div className="flex items-center justify-between mb-3">
-                    <p className="text-sm text-muted-foreground">
-                      Application Link:
-                    </p>
-                    {openTime && (
-                      <span className="text-xs text-success flex items-center">
-                        <Clock className="h-3 w-3 mr-1" /> Active for{" "}
-                        {formatTimeOpen(openTime)}
-                      </span>
-                    )}
-                  </div>
-                  <div className="w-full border border-border rounded-md shadow-sm overflow-hidden group transition-colors duration-200">
-                    <div className="flex items-center">
-                      <Input
-                        readOnly
-                        value={applicationLink}
-                        className="flex-1 text-sm dark:bg-transparent border-none ring-0 outline-none focus:ring-0 focus:outline-none focus:ring-transparent focus-visible:ring-0 focus-visible:outline-none shadow-none cursor-default"
-                      />
-                      <div className="flex border-l ">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button onClick={copyToClipboard} className="p-2">
-                                {copied ? (
-                                  <CheckCircle className="h-4 w-4 text-success" />
-                                ) : (
-                                  <LinkIcon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors duration-200" />
-                                )}
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Copy link</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-
-                        {/* <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <button
-                                  onClick={handleShareOnLinkedIn}
-                                  className="p-2 hover:bg-accent transition-colors duration-200 border-l border-border"
-                                  disabled={isSharing}
-                                >
-                                  <Linkedin className="h-4 w-4 text-blue-500 dark:text-blue-400" />
-                                </button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Share on LinkedIn</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider> */}
-                      </div>
-                    </div>
-                  </div>
-
-                  {copied && (
-                    <div className="mt-2 text-xs text-success flex items-center justify-end">
-                      <CheckCircle className="h-3 w-3 mr-1" /> Copied to
-                      clipboard
-                    </div>
-                  )}
-                </div>
-              )}
-              <Button
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                onClick={handleShareOnLinkedIn}
-                disabled={isSharing}
-              >
-                <div className="flex items-center w-full justify-center">
-                  <p className="text-center text-lg">Share on LinkedIn</p>
-                  <Linkedin
-                    className="text-white fill-current absolute left-10"
-                    style={{ width: "22px", height: "22px" }}
-                  />
-                </div>
-              </Button>
             </CardContent>
           </Card>
         </div>
-        {/* </div> */}
       </div>
     </div>
   );
