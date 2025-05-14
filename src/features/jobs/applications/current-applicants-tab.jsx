@@ -584,7 +584,7 @@ export function ApplicantsTab({
                 className="py-2 px-4 text-left font-medium dark:text-gray-200 cursor-pointer flex items-center gap-1"
                 onClick={toggleSortOrder}
               >
-                Score
+                CV Score
                 <ArrowUpDown className="h-4 w-4" />
               </th>
             </tr>
