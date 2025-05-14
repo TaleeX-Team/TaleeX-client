@@ -74,7 +74,7 @@ export default function JobsPage() {
     return jobData?.jobs?.length > 0 ? (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {jobData.jobs.map((job) => (
-          <JobCard key={job.id} job={job} />
+          <JobCard key={job._id} job={job} />
         ))}
       </div>
     ) : (
@@ -98,7 +98,6 @@ export default function JobsPage() {
   return (
     <div className="bg-background p-4 md:p-8 min-h-screen">
       <div className="mx-auto max-w-7xl">
-
         {/* Always show the header regardless of verification status */}
         <JobsHeaderWithFilters
           onFilterChange={handleFilterChange}
@@ -116,8 +115,7 @@ export default function JobsPage() {
 // Enhanced skeleton component for better loading states
 function JobCardSkeleton() {
   return (
-    <Card
-      className="overflow-hidden flex flex-col relative border border-border/60 shadow-sm bg-gradient-to-b from-background to-muted/30">
+    <Card className="overflow-hidden flex flex-col relative border border-border/60 shadow-sm bg-gradient-to-b from-background to-muted/30">
       <div className="absolute inset-0 w-full h-full overflow-hidden">
         <div className="shimmer-effect"></div>
       </div>
@@ -136,7 +134,6 @@ function JobCardSkeleton() {
 
           <Skeleton className="h-6 w-10 rounded-full flex-shrink-0" />
         </div>
-
       </CardHeader>
       <CardContent className="pb-2">
         <div className="space-y-2 mb-4">
@@ -145,10 +142,7 @@ function JobCardSkeleton() {
         </div>
         <div className="flex flex-wrap gap-2">
           {[...Array(3)].map((_, index) => (
-            <Skeleton
-              key={index}
-              className="h-6 w-13 rounded-full"
-            />
+            <Skeleton key={index} className="h-6 w-13 rounded-full" />
           ))}
         </div>
       </CardContent>
@@ -160,7 +154,6 @@ function JobCardSkeleton() {
           <Skeleton className="h-6 w-22 rounded-md" />
           <Skeleton className="h-6 w-28 rounded-md" />
         </div>
-
       </CardFooter>
       <style jsx>{`
         .shimmer-effect {
@@ -178,7 +171,7 @@ function JobCardSkeleton() {
           animation: shimmer 2s infinite;
           transform: skewX(-20deg);
         }
-        
+
         @keyframes shimmer {
           0% {
             left: -100%;
